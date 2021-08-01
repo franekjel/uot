@@ -19,7 +19,7 @@ You can of course omit -Gninja and use make, but ninja is usually faster.
 
 Make sure you have installed cmake and ninja in Visual Studio. Install Qt. Open in VS as cmake project. You may need to configure qt path to build - in project setting or directly in CMakeSettings.json:
 ```
-"cmakeComandArgs": -"DCMAKE_PREFIX_PATH=C:\Qt\\5.15.0\\msvc2019_64"
+"cmakeComandArgs": "DCMAKE_PREFIX_PATH=C:\\Qt\\5.15.0\\msvc2019_64"
 ```
 Add "C:\Qt\5.15.0\msvc2019_64\bin" to the Windows "PATH" environment variable.
 
