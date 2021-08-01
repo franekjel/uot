@@ -22,7 +22,7 @@ Make sure you have installed cmake and ninja in Visual Studio. Install Qt. Open 
 "cmakeComandArgs": -"DCMAKE_PREFIX_PATH=C:\Qt\\5.15.0\\msvc2019_64"
 ```
 Add "C:\Qt\5.15.0\msvc2019_64\bin" to the Windows "PATH" environment variable.
-```
+
 Make sure that this is valid path to your qt installation dir.
 
 ### QtCreator
