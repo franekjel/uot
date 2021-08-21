@@ -1,4 +1,5 @@
 #pragma once
+#include <set>
 #include "building.h"
 #include "resource.h"
 
@@ -7,9 +8,9 @@ struct SpaceObjectBonus; // kind of object bonuses
 
 struct SpaceObjectType
 {
-    std::set<BuildingType> possible_buildings
+    std::set<BuildingType> possible_buildings;
 
-    SpaceObjectTyp(const std::set<BuildingType> buildings) possible_buildings(buildings)
+    SpaceObjectType(const std::set<BuildingType> buildings): possible_buildings(buildings) {}
 };
 
 const SpaceObjectType Planet({});
@@ -21,5 +22,5 @@ struct SpaceObject
     SpaceObjectType type;
     std::set<Resource> resources;
     std::set<SpaceObjectBonus> bonuses;
-    std::set<Building>;
+    std::set<Building> buildings;
 };
