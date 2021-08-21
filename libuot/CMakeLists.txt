@@ -5,6 +5,9 @@ set(SRCS
     libmain.h
     libmain.cpp
     ship.h
+    building.h
+    resource.h
+    spaceobject.h
 )
 
 add_library(${LIB_NAME}

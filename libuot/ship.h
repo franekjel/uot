@@ -3,8 +3,7 @@
 #include <memory>
 #include <set>
 #include <vector>
-
-struct Resource;  // when done include relevant header
+#include "resource.h"
 
 // TODO These modules (like SmallReactor etc.) should be hold in some global set when we will be doing usable version
 struct Module
