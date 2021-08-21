@@ -5,12 +5,12 @@
 // TODO - where store and how apply bonuses
 struct BuildingType
 {
-    std::map<Resource, float> initial_costs;
+    std::map<Resource, float> initial_resources_costs;
     int initial_turns_cost;
     int max_level;
 
-    BuildingType(const std::map<Resource, float> costs, int cost, int max)
-        : initial_costs(costs), initial_turns_cost(cost), max_level(max)
+    BuildingType(const std::map<Resource, float> initial_resources_costs, int initial_turns_cost, int max_level)
+        : initial_resources_costs(initial_resources_costs), initial_turns_cost(initial_turns_cost), max_level(max_level)
     {
     }
 };

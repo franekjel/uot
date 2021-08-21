@@ -10,7 +10,7 @@ struct SpaceObjectType
 {
     std::set<BuildingType> possible_buildings;
 
-    SpaceObjectType(const std::set<BuildingType> buildings): possible_buildings(buildings) {}
+    SpaceObjectType(const std::set<BuildingType> possible_buildings) : possible_buildings(possible_buildings) {}
 };
 
 const SpaceObjectType Planet({});
