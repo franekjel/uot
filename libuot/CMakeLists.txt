@@ -15,11 +15,12 @@ set(SRCS
     resource.h
     galaxygenerator.h
     galaxygenerator.cpp
+    resource.cpp
 )
 
 add_library(${LIB_NAME}
     ${SRCS}
-)
+ )
 
 #this allow to include libuot headers from other modules (without prefixes)
 target_include_directories(${LIB_NAME}
