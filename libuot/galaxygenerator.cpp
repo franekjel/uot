@@ -2,9 +2,11 @@
 
 #include <random>
 
-static constexpr float habitable_planet_base_hance = 0.01f;
+static constexpr float habitable_planet_base_chance = 0.01f;
 
 static std::normal_distribution<> size_distribution{1.0, 0.15};
+
+// TODO: parameteterization for chances and distributions
 
 static QPointF PointOnCircle(float r)
 {
@@ -106,7 +108,7 @@ static std::set<std::shared_ptr<SectorObject>> GenerateSectorObjects(const Galax
 
     dist = std::discrete_distribution<>({1, 2, 5, 10, 10, 8, 5, 3, 1});  // chances for objects
     int num_objects = dist(gen);
-    float habitable_chance = habitable_planet_base_hance * parameters.habitable_planet_chance_multipler;
+    float habitable_chance = habitable_planet_base_chance * parameters.habitable_planet_chance_multipler;
     for (int i = 0; i < num_objects; i++)
     {
         const float r = 0.2 + (0.7 / num_objects) * i;
