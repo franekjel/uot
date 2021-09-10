@@ -13,3 +13,5 @@ _deps
 *.so
 *.dll
 *.exe
+/.vs
+/out
