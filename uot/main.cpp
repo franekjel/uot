@@ -7,6 +7,7 @@ to ensure that everything works as expected
 #include <QCuboidMesh>
 #include <QEntity>
 #include <QGuiApplication>
+#include <QMouseEvent>
 #include <QObjectPicker>
 #include <QOpenGLContext>
 #include <QPainter>
@@ -27,10 +28,14 @@ to ensure that everything works as expected
 #include "imguiqt3dwindow.h"
 
 // to test that we can include headers from libuot
+#include "galaxygenerator.h"
 #include "libmain.h"
 
 class ImguiManager;
 
+Galaxy galaxy;
+QQuaternion sceneRotation;
+std::vector<std::pair<Qt3DCore::QEntity*, Sector*>> entities;
 namespace Qt3DCore
 {
 class QEntity;
@@ -123,6 +128,68 @@ void Gui::frame(Qt3DCore::QEntity* rootEntity)
     }
 }
 
+QVector3D GetPos(float x, float y, float z)
+{
+    // TODO Uzale¿niæ to od czegoœ zasadnego, a nie magic number
+    float posMultiplier = 10.f;
+    QVector3D xAxis, yAxis, zAxis;
+    sceneRotation.getAxes(&xAxis, &yAxis, &zAxis);
+    QVector3D res = posMultiplier * (x * xAxis + y * yAxis + z * zAxis) + QVector3D(0.0f, 0.0f, -7.0f);
+    return res;
+}
+
+class SceneRotationEventFilter : public QObject
+{
+    bool rightButtonPressed = false;
+    QPoint lastPos;
+    bool eventFilter(QObject* object, QEvent* event) override
+    {
+        if (event->type() == QEvent::MouseButtonPress)
+        {
+            if (((QMouseEvent*)event)->button() == Qt::MouseButton::RightButton)
+            {
+                rightButtonPressed = true;
+                lastPos = ((QMouseEvent*)event)->globalPos();
+            }
+        }
+        if (event->type() == QEvent::MouseButtonRelease)
+        {
+            if (((QMouseEvent*)event)->button() == Qt::MouseButton::RightButton)
+            {
+                rightButtonPressed = false;
+            }
+        }
+        if (event->type() == QEvent::MouseMove)
+        {
+            if (rightButtonPressed)
+            {
+                auto pos = ((QMouseEvent*)event)->globalPos();
+                auto temp = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 0.1 * (lastPos.x() - pos.x()));
+                sceneRotation *= temp;
+                auto temp2 = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 0.1 * (lastPos.y() - pos.y()));
+                sceneRotation *= temp2;
+                for (auto pair : entities)
+                {
+                    auto sector = pair.second;
+                    auto entity = pair.first;
+                    float x = sector->position.x();
+                    float y = sector->position.y();
+                    float z = -0.3f;
+                    Qt3DCore::QTransform* qtTrans = new Qt3DCore::QTransform;
+                    qtTrans->setTranslation(GetPos(x, y, z));
+                    qtTrans->setRotation(sceneRotation);
+                    auto transforms = entity->componentsOfType<Qt3DCore::QTransform>();
+                    for (auto trans : transforms)
+                        entity->removeComponent(trans);
+                    entity->addComponent(qtTrans);
+                }
+                lastPos = pos;
+            }
+        }
+        return false;
+    }
+};
+
 int main(int argc, char** argv)
 {
     QGuiApplication app(argc, argv);
@@ -158,10 +225,40 @@ int main(int argc, char** argv)
     // uncomment to start with gui hidden
     // guiMgr.setEnabled(false);
 
+    galaxy = GenerateGalaxy({6, 0.5});
+    SceneRotationEventFilter fo;
+    w.installEventFilter(&fo);
     w.setCreateSceneFunc(
         [&guiMgr](Qt3DCore::QEntity* parent)
         {
             guiMgr.initialize(parent);
+
+            for (auto sector : galaxy.sectors)
+            {
+                Qt3DCore::QEntity* qtSector = new Qt3DCore::QEntity(parent);
+                entities.push_back(std::make_pair(qtSector, sector.get()));
+                // Da³em Cuboid ¿eby by³o widaæ ¿e siê ok obraca
+                Qt3DExtras::QCuboidMesh* qtSectorGeom = new Qt3DExtras::QCuboidMesh;
+                qtSectorGeom->setXExtent(2);
+                Qt3DCore::QTransform* qtSectorTrans = new Qt3DCore::QTransform;
+
+                // TODO Mo¿na uwzglêdniæ trzy wspó³rzêdne w generacji
+                qtSectorTrans->setTranslation(GetPos(sector->position.x(), sector->position.y(), -0.3f));
+                qtSectorTrans->setRotation(sceneRotation);
+                Qt3DExtras::QPhongMaterial* qtSectorMat = new Qt3DExtras::QPhongMaterial;
+                qtSector->addComponent(qtSectorGeom);
+                qtSector->addComponent(qtSectorTrans);
+                qtSector->addComponent(qtSectorMat);
+                Qt3DRender::QObjectPicker* qtSectorPicker = new Qt3DRender::QObjectPicker;
+                qtSector->addComponent(qtSectorPicker);
+                QObject::connect(qtSectorPicker, &Qt3DRender::QObjectPicker::pressed,
+                                 [qtSectorMat, qtSector](Qt3DRender::QPickEvent* ev)
+                                 {
+                                     if (ImGui::GetIO().WantCaptureMouse)
+                                         return;
+                                     // do smth
+                                 });
+            }
 
             Qt3DCore::QEntity* cube = new Qt3DCore::QEntity(parent);
             Qt3DExtras::QCuboidMesh* cubeGeom = new Qt3DExtras::QCuboidMesh;
