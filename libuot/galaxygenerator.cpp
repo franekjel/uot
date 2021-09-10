@@ -176,8 +176,39 @@ Galaxy GenerateGalaxy(const GalaxyGeneratorParameters &parameters)
 
         const std::set<std::shared_ptr<SectorObject>> sector_objects = GenerateSectorObjects(parameters);
 
-        galaxy.sectors.insert(std::shared_ptr<Sector>(new Sector{pos, {}, sector_objects}));
+        galaxy.sectors.insert(
+            std::shared_ptr<Sector>(new Sector{i, QVector3D(pos.x(), pos.y(), 0.0f), {}, sector_objects}));
         // TODO: neighbour find - brute force or use kd-trees (nanoflann?)
     }
+    return galaxy;
+}
+
+Galaxy GenerateGalaxyTest(const GalaxyGeneratorParameters &parameters)
+{
+    std::random_device dev;
+    std::mt19937 gen(dev());
+    std::uniform_real_distribution<> dist(-1.0, 1.0);
+
+    Galaxy galaxy;
+
+    for (int i = 0; i < parameters.size; i++)
+    {
+        QVector3D pos(dist(gen), dist(gen), dist(gen));
+        // TODO: check if new sector isn't too close to other secotr
+
+        const std::set<std::shared_ptr<SectorObject>> sector_objects = GenerateSectorObjects(parameters);
+
+        galaxy.sectors.insert(std::shared_ptr<Sector>(new Sector{i, pos, {}, sector_objects}));
+        // TODO: neighbour find - brute force or use kd-trees (nanoflann?)
+    }
+    for (auto sector1 : galaxy.sectors)
+        for (auto sector2 : galaxy.sectors)
+        {
+            if (sector1->sector_id + 1 == sector2->sector_id)
+            {
+                sector1->neighbors.insert(sector2);
+                sector2->neighbors.insert(sector1);
+            }
+        }
     return galaxy;
 }

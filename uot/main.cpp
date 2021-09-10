@@ -5,6 +5,7 @@ to ensure that everything works as expected
 */
 
 #include <QCuboidMesh>
+#include <QCylinderMesh>
 #include <QEntity>
 #include <QGuiApplication>
 #include <QMouseEvent>
@@ -35,7 +36,11 @@ class ImguiManager;
 
 Galaxy galaxy;
 QQuaternion sceneRotation;
-std::vector<std::pair<Qt3DCore::QEntity*, Sector*>> entities;
+std::vector<std::pair<Qt3DCore::QEntity*, std::shared_ptr<Sector>>> entities;
+std::vector<std::pair<Qt3DCore::QEntity*, std::pair<std::shared_ptr<Sector>, std::shared_ptr<Sector>>>> edges;
+// TODO Uzale¿niæ to od czegoœ zasadnego, a nie magic number
+float posMultiplier = 10.f;
+
 namespace Qt3DCore
 {
 class QEntity;
@@ -128,13 +133,11 @@ void Gui::frame(Qt3DCore::QEntity* rootEntity)
     }
 }
 
-QVector3D GetPos(float x, float y, float z)
+QVector3D GetPos(QVector3D vec)
 {
-    // TODO Uzale¿niæ to od czegoœ zasadnego, a nie magic number
-    float posMultiplier = 10.f;
     QVector3D xAxis, yAxis, zAxis;
     sceneRotation.getAxes(&xAxis, &yAxis, &zAxis);
-    QVector3D res = posMultiplier * (x * xAxis + y * yAxis + z * zAxis) + QVector3D(0.0f, 0.0f, -7.0f);
+    QVector3D res = posMultiplier * (vec.x() * xAxis + vec.y() * yAxis + vec.z() * zAxis) + QVector3D(0.0f, 0.0f, -7.0f);
     return res;
 }
 
@@ -172,16 +175,32 @@ class SceneRotationEventFilter : public QObject
                 {
                     auto sector = pair.second;
                     auto entity = pair.first;
-                    float x = sector->position.x();
-                    float y = sector->position.y();
-                    float z = -0.3f;
                     Qt3DCore::QTransform* qtTrans = new Qt3DCore::QTransform;
-                    qtTrans->setTranslation(GetPos(x, y, z));
+                    qtTrans->setTranslation(GetPos(sector->position));
                     qtTrans->setRotation(sceneRotation);
                     auto transforms = entity->componentsOfType<Qt3DCore::QTransform>();
                     for (auto trans : transforms)
                         entity->removeComponent(trans);
                     entity->addComponent(qtTrans);
+                }
+                for (auto pair : edges)
+                {
+                    auto pair2 = pair.second;
+                    auto entity = pair.first;
+                    auto obj1 = pair2.first;
+                    auto obj2 = pair2.second;
+                    auto pos1 = GetPos(obj1->position);
+                    auto pos2 = GetPos(obj2->position);
+                    auto pos = (pos1 + pos2) / 2;
+
+                    Qt3DCore::QTransform* qtEdgeTrans = new Qt3DCore::QTransform;
+                    qtEdgeTrans->setTranslation(pos);
+                    auto rot = QQuaternion::rotationTo({0.0f, 1.0f, 0.0f}, (pos1 - pos2).normalized());
+                    qtEdgeTrans->setRotation(rot);
+                    auto transforms = entity->componentsOfType<Qt3DCore::QTransform>();
+                    for (auto trans : transforms)
+                        entity->removeComponent(trans);
+                    entity->addComponent(qtEdgeTrans);
                 }
                 lastPos = pos;
             }
@@ -225,7 +244,7 @@ int main(int argc, char** argv)
     // uncomment to start with gui hidden
     // guiMgr.setEnabled(false);
 
-    galaxy = GenerateGalaxy({6, 0.5});
+    galaxy = GenerateGalaxyTest({6, 0.5});
     SceneRotationEventFilter fo;
     w.installEventFilter(&fo);
     w.setCreateSceneFunc(
@@ -236,14 +255,13 @@ int main(int argc, char** argv)
             for (auto sector : galaxy.sectors)
             {
                 Qt3DCore::QEntity* qtSector = new Qt3DCore::QEntity(parent);
-                entities.push_back(std::make_pair(qtSector, sector.get()));
-                // Da³em Cuboid ¿eby by³o widaæ ¿e siê ok obraca
+                entities.push_back(std::make_pair(qtSector, sector));
+                // Da³em Cuboid ¿eby by³o widaæ ¿e siê ok obraca, docelowo pewnie QSphereMesh
                 Qt3DExtras::QCuboidMesh* qtSectorGeom = new Qt3DExtras::QCuboidMesh;
                 qtSectorGeom->setXExtent(2);
                 Qt3DCore::QTransform* qtSectorTrans = new Qt3DCore::QTransform;
 
-                // TODO Mo¿na uwzglêdniæ trzy wspó³rzêdne w generacji
-                qtSectorTrans->setTranslation(GetPos(sector->position.x(), sector->position.y(), -0.3f));
+                qtSectorTrans->setTranslation(GetPos(sector->position));
                 qtSectorTrans->setRotation(sceneRotation);
                 Qt3DExtras::QPhongMaterial* qtSectorMat = new Qt3DExtras::QPhongMaterial;
                 qtSector->addComponent(qtSectorGeom);
@@ -258,6 +276,36 @@ int main(int argc, char** argv)
                                          return;
                                      // do smth
                                  });
+
+                for (auto neighbor : sector->neighbors)
+                {
+                    if (sector->sector_id < neighbor->sector_id)
+                    {
+                        Qt3DCore::QEntity* qtEdge = new Qt3DCore::QEntity(parent);
+                        edges.push_back(std::make_pair(qtEdge, std::make_pair(sector, neighbor)));
+                        Qt3DExtras::QCylinderMesh* qtEdgeGeom = new Qt3DExtras::QCylinderMesh;
+
+                        auto pos1 = GetPos(sector->position);
+                        auto pos2 = GetPos(neighbor->position);
+
+                        qtEdgeGeom->setRadius(0.05f);
+                        qtEdgeGeom->setLength(pos1.distanceToPoint(pos2));
+
+                        Qt3DCore::QTransform* qtEdgeTrans = new Qt3DCore::QTransform;
+
+                        auto pos = (pos1 + pos2) / 2;
+                        qtEdgeTrans->setTranslation(pos);
+
+                        auto rot = QQuaternion::rotationTo(
+                            {0.0f, 1.0f, 0.0f},
+                            (pos1-pos2).normalized());
+                        qtEdgeTrans->setRotation(rot);
+                        Qt3DExtras::QPhongMaterial* qtEdgeMat = new Qt3DExtras::QPhongMaterial;
+                        qtEdge->addComponent(qtEdgeGeom);
+                        qtEdge->addComponent(qtEdgeTrans);
+                        qtEdge->addComponent(qtEdgeMat);
+                    }
+                }
             }
 
             Qt3DCore::QEntity* cube = new Qt3DCore::QEntity(parent);

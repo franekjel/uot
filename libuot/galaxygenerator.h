@@ -9,3 +9,4 @@ struct GalaxyGeneratorParameters
 };
 
 Galaxy GenerateGalaxy(const GalaxyGeneratorParameters& parameters);
+Galaxy GenerateGalaxyTest(const GalaxyGeneratorParameters& parameters);
