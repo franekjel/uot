@@ -4,10 +4,10 @@
 #include <memory>
 #include <set>
 
+#include "common.h"
 #include "planet.h"
 #include "resource.h"
 #include "sectorobject.h"
-#include <QVector3D>
 
 struct Star : SectorObject
 {
@@ -49,7 +49,7 @@ struct InhabitableObject : SectorObject
 struct Sector
 {
     int sector_id;
-    QVector3D position;  // position on galaxy map
+    Point position;  // position on galaxy map
     std::set<std::shared_ptr<Sector>> neighbors;
     std::set<std::shared_ptr<SectorObject>> objects;  // stars, planets, asteroid
 };

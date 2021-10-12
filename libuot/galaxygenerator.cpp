@@ -2,19 +2,21 @@
 
 #include <random>
 
+#include "common.h"
+
 static constexpr float habitable_planet_base_chance = 0.01f;
 
 static std::normal_distribution<> size_distribution{1.0, 0.15};
 
 // TODO: parameteterization for chances and distributions
 
-static QPointF PointOnCircle(float r)
+static Point PointOnCircle(float r)
 {
     std::random_device dev;
     std::mt19937 gen(dev());
     std::uniform_real_distribution<> dist(-1.0, 1.0);
-    QPointF p = QPointF(dist(gen), dist(gen));
-    p *= r / sqrtf(QPointF::dotProduct(p, p));
+    Point p = Point(dist(gen), dist(gen));
+    p *= r / sqrtf(p.squaredLength());
     return p;
 }
 
@@ -29,13 +31,13 @@ static void GenerateBlackHoleSector(std::set<std::shared_ptr<SectorObject>> &sec
     int cloud_num = dist(gen);
     for (int i = 0; i < cloud_num; i++)
     {
-        QPointF pos = PointOnCircle(0.2 + (0.7 / cloud_num) * i);
+        Point pos = PointOnCircle(0.2 + (0.7 / cloud_num) * i);
         sector_objects.insert(std::shared_ptr<SectorObject>(new InhabitableObject(
             SectorObject{pos, float(size_distribution(gen))}, {}, InhabitableObject::ObjectType::DarkMatterCloud)));
     }
 }
 
-static std::shared_ptr<SectorObject> GenerateInhabitable(const QPointF &pos, InhabitableObject::ObjectType type,
+static std::shared_ptr<SectorObject> GenerateInhabitable(const Point &pos, InhabitableObject::ObjectType type,
                                                          std::mt19937 &gen)
 {
     Resource r = Resource::Metals;
@@ -89,11 +91,11 @@ static std::set<std::shared_ptr<SectorObject>> GenerateSectorObjects(const Galax
     if (sector_star_types.size() == 1)
     {
         sector_objects.insert(std::shared_ptr<SectorObject>(
-            new Star(SectorObject{QPointF(0.0f, 0.0f), float(size_distribution(gen))}, sector_star_types.front())));
+            new Star(SectorObject{Point(0.0f, 0.0f), float(size_distribution(gen))}, sector_star_types.front())));
     }
     else if (sector_star_types.size() == 2)
     {
-        QPointF p = PointOnCircle(0.2);
+        Point p = PointOnCircle(0.2);
         sector_objects.insert(std::shared_ptr<SectorObject>(
             new Star(SectorObject{p, float(size_distribution(gen))}, sector_star_types.front())));
         sector_objects.insert(std::shared_ptr<SectorObject>(
@@ -169,15 +171,14 @@ Galaxy GenerateGalaxy(const GalaxyGeneratorParameters &parameters)
 
     for (int i = 0; i < parameters.size; i++)
     {
-        QPointF pos(0, 0);
-        while (QPointF::dotProduct(pos, pos) < 1.0f && QPointF::dotProduct(pos, pos) > 0.1f)
-            pos = QPointF(dist(gen), dist(gen));
+        Point pos(0, 0);
+        while (pos.squaredLength() < 1.0f && pos.squaredLength() > 0.1f)
+            pos = Point(dist(gen), dist(gen));
         // TODO: check if new sector isn't too close to other secotr
 
         const std::set<std::shared_ptr<SectorObject>> sector_objects = GenerateSectorObjects(parameters);
 
-        galaxy.sectors.insert(
-            std::shared_ptr<Sector>(new Sector{i, QVector3D(pos.x(), pos.y(), 0.0f), {}, sector_objects}));
+        galaxy.sectors.insert(std::shared_ptr<Sector>(new Sector{i, pos, {}, sector_objects}));
         // TODO: neighbour find - brute force or use kd-trees (nanoflann?)
     }
     return galaxy;
@@ -193,7 +194,7 @@ Galaxy GenerateGalaxyTest(const GalaxyGeneratorParameters &parameters)
 
     for (int i = 0; i < parameters.size; i++)
     {
-        QVector3D pos(dist(gen), dist(gen), dist(gen));
+        Point pos(dist(gen), dist(gen));
         // TODO: check if new sector isn't too close to other secotr
 
         const std::set<std::shared_ptr<SectorObject>> sector_objects = GenerateSectorObjects(parameters);
