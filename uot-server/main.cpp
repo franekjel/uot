@@ -1,3 +1,1 @@
-#include "libmain.h"
-
-int main() { return func(); }
+int main() { return 0; }

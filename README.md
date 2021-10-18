@@ -6,24 +6,18 @@ This repo contains Universe of Technology (UoT) source code. UoT is space 4X gam
 
 ### Linux
 
-Install Qt - tested version is 5.15. Make sure you have qt-3d installed. Then compile like any other cmake project:
+Compile like any other cmake project:
 ```
 mkdir build
 cd build
 cmake .. -GNinja
 ninja
 ```
-You can of course omit -Gninja and use make, but ninja is usually faster.
+You can of course omit -GNinja and use make, but ninja is usually faster.
 
 ### Windows with Visual Studio 2019
 
-Make sure you have installed cmake and ninja in Visual Studio. Install Qt. Open in VS as cmake project. You may need to configure qt path to build - in project setting or directly in CMakeSettings.json:
-```
-"cmakeComandArgs": "DCMAKE_PREFIX_PATH=C:\\Qt\\5.15.0\\msvc2019_64"
-```
-Add "C:\Qt\5.15.0\msvc2019_64\bin" to the Windows "PATH" environment variable.
-
-Make sure that this is valid path to your qt installation dir.
+Make sure you have installed cmake and ninja in Visual Studio. Open in VS as cmake project.
 
 ### QtCreator
 
