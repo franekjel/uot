@@ -1,0 +1,25 @@
+[ ] components
+    for input handling
+    - unordered_map<usigned int, std::vector<unsigned int>> planetoids per galaxy
+    - unordered_map<unsgined int, std::vector<uint>> ships per galaxy
+    - only one std::vector of all galaxies
+
+    for render:
+    - positions for all objects, vector
+    - separate positions for ships
+    - sprite animations for all objects, vector
+
+[ ] game state manager
+    - vectors for each window
+    - mode switching
+[ ] SDL_manager
+
+
+possible game interactions:
+-> menu clicks () actions enum
+-> 
+
+on pick:
+    -> recognize which buttons / easy, we need to know whether galaxy/ship/planetoid
+    -> recognize which info do we need / throw enum and based on enum display necessary components
+    -> ship positions will change, add and delete, probably a separate vector would be in place (no necessity to render them in loop with other elements)
