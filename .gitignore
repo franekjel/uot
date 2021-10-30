@@ -1,4 +1,6 @@
 *.user
+build/
+build/*
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
