@@ -12,6 +12,8 @@ namespace sdl_utilities {
     std::shared_ptr<SDL_Texture> load_texture_from_file(const std::string& path, const std::shared_ptr<SDL_Renderer>& r);
 
     void paint_background(SDL_Renderer* r, const SDL_Color& c);
+    void paint_frame(SDL_Renderer* r, const SDL_Color& f, const SDL_Color& b);
+
 
     std::shared_ptr<SDL_Window> sdl_create_window(const std::string title, int x, int y, int w, int h, Uint32 flags);
     std::shared_ptr<SDL_Renderer> sdl_create_renderer(const std::shared_ptr<SDL_Window>& w, int index, Uint32 flags);
@@ -25,6 +27,17 @@ namespace sdl_utilities {
         buttonViewport.w = W;
         buttonViewport.h = H;
         SDL_RenderSetViewport( r, &buttonViewport );
+    }
+
+    template<typename T, int X = T::x_offset, int Y = T::y_offset, int W = T::width, int H = T::height>
+    bool check_view_area_collision(const int x, const int y) {
+        //Mouse is left of the area
+        if( x < X || x > X + W || y < Y || y > Y + H)
+        {
+            return false;
+        }
+
+        return true;
     }
 }
 

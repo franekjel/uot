@@ -5,7 +5,14 @@
 #include "uncopiable.h"
 #include "sdl_utilities.h"
 #include <atomic>
+#include <vector>
 #include <array>
+#include <optional>
+
+struct position {
+    float x;
+    float y;
+};
 
 enum class game_view_t {
     menu_view = 0,
@@ -34,12 +41,28 @@ struct game_state_t : public uncopiable
 
     public:
         void draw();
+        void handleMouse(Uint32 event_type, int x, int y);
         void set_view(game_view_t gv);
         void set_bk_texture(std::shared_ptr<SDL_Texture> bk);
         void set_renderer(std::shared_ptr<SDL_Renderer> r);
         std::shared_ptr<SDL_Renderer>& get_renderer();
         void set_window(std::shared_ptr<SDL_Window> w);
         std::shared_ptr<SDL_Window>& get_window();
+
+        // planetoids and galaxoids, practically a vector that gets set
+        // in the beginning and stays const for the entire runtime
+        // TODO: change to std::array with fixed max size
+        std::vector<position> cosmic_positions;
+
+        // access by object_id, item is texture_id
+        // to be used with the resource manager
+        std::vector<position> cosmic_texture_ids;
+
+        // ships, this gets changed very regularly
+        std::vector<position> ship_positions;
+
+        int planet_frame = 0;
+        std::optional<int> focused_button;
 };
 
 #endif
