@@ -1,4 +1,5 @@
 *.user
+uot-client/.vscode/
 build/
 build/*
 CMakeCache.txt

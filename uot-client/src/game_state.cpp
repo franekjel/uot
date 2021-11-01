@@ -29,6 +29,9 @@ void game_state_t::draw() {
 
 	SDL_RenderPresent( renderer.get() );
 
+    planet_frame = (planet_frame + 1 == (planets_meta::num_frames * planets_meta::frame_duration) )
+                                        ? 0 
+                                        : planet_frame + 1;
 }
 
 
@@ -42,4 +45,22 @@ std::shared_ptr<SDL_Renderer>& game_state_t::get_renderer() {
 
 std::shared_ptr<SDL_Window>& game_state_t::get_window() {
     return window;
+}
+
+
+void game_state_t::handleMouse(Uint32 event_type, int x, int y) {
+    switch (event_type)
+    {
+    case SDL_MOUSEMOTION:
+        // check if menu area
+        if(sdl_utilities::check_view_area_collision<size_settings::button_area>(x, y)) {
+            focused_button = (y - size_settings::button_area::y_offset) / buttons_meta::button_y_offset; 
+        } else {
+            focused_button.reset();
+        }
+        break;
+    
+    default:
+        break;
+    }
 }

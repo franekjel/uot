@@ -8,7 +8,9 @@ namespace game_rendering {
 
     void render_background(const std::shared_ptr<SDL_Renderer>& r);
 
-    void render_button(const int buttonId, const int ind, const std::shared_ptr<SDL_Renderer>& r);
+    void render_button_sprite(const int buttonId, const int ind, const std::shared_ptr<SDL_Renderer>& r);
+
+    void render_menu_planet(const std::shared_ptr<SDL_Renderer>& r);
 
     void render_menu(const std::shared_ptr<SDL_Renderer>& r);
 

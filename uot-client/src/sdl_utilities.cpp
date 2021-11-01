@@ -1,4 +1,5 @@
 #include "../include/sdl_utilities.h"
+#include <algorithm>
 
 void sdl_texture_deleter(SDL_Texture* t) {
     SDL_DestroyTexture(t);
@@ -23,6 +24,28 @@ std::shared_ptr<SDL_Texture> sdl_utilities::load_texture_from_file(const std::st
 void sdl_utilities::paint_background(SDL_Renderer* r, const SDL_Color& c) {
     SDL_SetRenderDrawColor( r, c.r, c.g, c.b, c.a );
     SDL_RenderFillRect(r, NULL);
+}
+
+void sdl_utilities::paint_frame(SDL_Renderer* r, const SDL_Color& f, const SDL_Color& b) {
+    constexpr int offset = 8;
+    // paint frame
+    SDL_SetRenderDrawColor( r, f.r, f.g, f.b, f.a );
+    SDL_RenderFillRect(r, NULL);
+
+    // paint background
+    SDL_Rect vp;
+    SDL_RenderGetViewport(r, &vp);
+    const auto vp_width = vp.w;
+    const auto vp_height = vp.h;
+
+    SDL_SetRenderDrawColor( r, b.r, b.g, b.b, b.a );
+    SDL_Rect dest;
+    dest.x = offset;
+    dest.y = offset;
+    dest.w = vp_width - 2 * offset;
+    dest.h = vp_height - 2 * offset;
+
+    SDL_RenderFillRect(r,&dest);
 }
 
 void sdl_window_deleter(SDL_Window* w) {
