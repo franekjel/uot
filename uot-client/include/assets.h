@@ -49,22 +49,6 @@ namespace buttons_meta {
        EXIT_BUTTON
    };
 
-   static const int universe_buttons[] = {
-
-   };
-
-   static const int galaxy_buttons[] = {
-
-   };
-
-   static const int planet_buttons[] = {
-
-   };
-
-   static const int ship_buttons[] = {
-
-   };
-
 }
 
 #endif
