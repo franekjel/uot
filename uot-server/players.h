@@ -3,6 +3,7 @@
 #include <vector>
 #include "galaxy.h"
 #include "player.h"
+#include <stdexcept>
 
 static long player_id = 1;
 class PlayersList
@@ -40,6 +41,8 @@ class PlayersList
             if (!!planet)
                 break;
         }
+        if (!planet)
+            throw std::runtime_error("No empty planet found");
         std::shared_ptr<Colony> startingColony = std::make_shared<Colony>(player_id, planet);
         return startingColony;
     }
