@@ -32,5 +32,11 @@ struct Player
         owned_ships = {};
 
     }
-    bool operator==(Player lhs, const Player& rhs) { return lhs.player_id == rhs.player_id; }
 };
+
+inline bool operator==(const Player& lhs, const Player& rhs)
+{ 
+    return lhs.player_id == rhs.player_id;
+}
+
+inline bool operator!=(const Player& lhs, const Player& rhs) { return !(lhs == rhs); }
