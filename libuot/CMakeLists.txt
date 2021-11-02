@@ -13,7 +13,7 @@ set(SRCS
     galaxygenerator.cpp
     resource.cpp
     common.h
- "player.h")
+    player.h)
 
 add_library(${LIB_NAME}
     ${SRCS}
