@@ -1,8 +1,14 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#ifdef __linux__
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
+#elif _WIN32
+#include "SDL.h"
+#include "SDL_image.h"
+#endif
+
 #include "size_settings.h"
 #include "stdexcept"
 #include <string>

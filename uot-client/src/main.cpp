@@ -4,8 +4,6 @@
 #elif _WIN32
 #include "SDL.h"
 #include "SDL_image.h"
-#else
-#error this compiles only on Windows/Linux
 #endif
 
 #include "../include/singleton.h"

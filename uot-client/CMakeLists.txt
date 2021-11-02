@@ -2,15 +2,28 @@ cmake_minimum_required(VERSION 3.7)
 
 project(UOT_CLIENT)
 
-file(GLOB SOURCES src/*.cpp)
 
-add_executable(SDL2Test ${SOURCES})
+set(SRCS
+    include/assets.h
+    include/game_renderer.h
+    include/game_resources.h
+    include/game_state.h
+    include/sdl_utilities.h
+    include/singleton.h
+    include/size_settings.h
+    include/uncopiable.h
 
+    src/game_renderer.cpp
+    src/game_state.cpp
+    src/sdl_utilities.cpp
+    src/main.cpp
+)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+add_executable(SDL2Test ${SRCS})
+
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 
-target_link_libraries(SDL2Test ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
+
+target_link_libraries(SDL2Test SDL2::Main SDL2::Image)
