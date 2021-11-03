@@ -63,6 +63,8 @@ struct game_state_t : public uncopiable
 
         int planet_frame = 0;
         std::optional<int> focused_button;
+
+        std::vector<position> clicked_positions;
 };
 
 #endif

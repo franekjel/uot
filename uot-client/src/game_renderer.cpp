@@ -34,7 +34,7 @@ void game_rendering::render_menu(const std::shared_ptr<SDL_Renderer>& r) {
     sdl_utilities::paint_frame(r.get(), SDL_Color {0xFF, 0xFF, 0xFF, 0xFF }, SDL_Color {0x00, 0x00, 0x00, 0x00 });
 
     // render menu planet
-    game_rendering::render_menu_planet(r);
+    //game_rendering::render_menu_planet(r);
 }
 
 void game_rendering::render_button_sprite(const int button_id, const int ind, const std::shared_ptr<SDL_Renderer>& r) {
@@ -63,8 +63,14 @@ void game_rendering::render_menu_planet(const std::shared_ptr<SDL_Renderer>& r) 
 
 
     SDL_Rect s { (gs.planet_frame / planets_meta::frame_duration) * planets_meta::frame_width, 0, planets_meta::frame_width, planets_meta::frame_height};
-    SDL_Rect d { (vp_width - planets_meta::frame_width) / 2, (vp_height - planets_meta::frame_height) / 2, planets_meta::frame_width, planets_meta::frame_height };
-    SDL_RenderCopyEx(r.get(), texture.get(), &s, &d, 0, NULL, SDL_FLIP_NONE);
+    //SDL_Rect d { (vp_width - planets_meta::frame_width) / 2, (vp_height - planets_meta::frame_height) / 2, planets_meta::frame_width, planets_meta::frame_height };
+    //SDL_RenderCopyEx(r.get(), texture.get(), &s, &d, 0, NULL, SDL_FLIP_NONE);
+
+    for (position pos : gs.clicked_positions)
+    {
+        SDL_Rect d{pos.x - planets_meta::frame_width / 2, pos.y - planets_meta::frame_height / 2, planets_meta::frame_width, planets_meta::frame_height};
+        SDL_RenderCopyEx(r.get(), texture.get(), &s, &d, 0, NULL, SDL_FLIP_NONE);
+    }
 }
 
 

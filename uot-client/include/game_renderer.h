@@ -22,6 +22,8 @@ namespace game_rendering {
 
     void render_ship(const unsigned int ship_idx);
 
+    void render_mouse_click(const std::shared_ptr<SDL_Renderer>& r);
+
 }
 
 #endif
