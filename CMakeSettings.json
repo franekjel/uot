@@ -1,0 +1,62 @@
+﻿{
+  "configurations": [
+    {
+      "name": "x64-Debug (domyślnie)",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "SDL2_IMAGE_NO_DEFAULT_PATH",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "SDL2_NO_DEFAULT_PATH",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "SDL2_IMAGE_PATH",
+          "value": "C:/sdl/SDL2_image/",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "SDL2_PATH",
+          "value": "C:/sdl/SDL2/",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "SDL2_IMAGE_INCLUDE_DIR",
+          "value": "C:/sdl/SDL2_image/include",
+          "type": "PATH"
+        },
+        {
+          "name": "SDL2MAIN_LIBRARY",
+          "value": "C:/sdl/SDL2/lib/x64/SDL2main.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "SDL2_IMAGE_LIBRARY",
+          "value": "C:/sdl/SDL2_image/lib/x64/SDL2_image.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "SDL2_LIBRARY",
+          "value": "C:/sdl/SDL2/lib/x64/SDL2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "SDL2_INCLUDE_DIR",
+          "value": "C:/sdl/SDL2/include",
+          "type": "PATH"
+        }
+      ]
+    }
+  ]
+}
