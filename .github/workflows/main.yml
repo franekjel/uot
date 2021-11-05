@@ -20,9 +20,8 @@ jobs:
       if: |
         github.event_name == 'issues' &&
         (
-          github.event.action == 'opened' ||
-          contains(github.event.issue.labels.*.name, 'mylabel')
+          github.event.action == 'opened')
         )
       with:
-        project: 'https://github.com/srggrs/assign-one-project-github-action/projects/3'
+        project: 'https://github.com/franekjel/uot/projects/2'
         column_name: 'TODO'
