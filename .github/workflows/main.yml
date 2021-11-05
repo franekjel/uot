@@ -19,9 +19,7 @@ jobs:
       uses: srggrs/assign-one-project-github-action@1.2.1
       if: |
         github.event_name == 'issues' &&
-        (
-          github.event.action == 'opened')
-        )
+        github.event.action == 'opened'
       with:
         project: 'https://github.com/franekjel/uot/projects/2'
         column_name: 'TODO'
