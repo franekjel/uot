@@ -1,4 +1,5 @@
 #include "resource.h"
+
 std::map<Resource, float> operator+(std::map<Resource, float> a, const std::map<Resource, float>& b)
 {
     for (const auto& p : b)

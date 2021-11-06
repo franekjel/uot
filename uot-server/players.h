@@ -1,9 +1,10 @@
 #pragma once
 #include <memory>
+#include <stdexcept>
 #include <vector>
+
 #include "galaxy.h"
 #include "player.h"
-#include <stdexcept>
 
 static long player_id = 1;
 class PlayersList
@@ -29,7 +30,7 @@ class PlayersList
         std::shared_ptr<Planet> planet = nullptr;
         for (auto& sector : startingGalaxy->sectors)
         {
-           for (auto& sector_object : sector->objects)
+            for (auto& sector_object : sector->objects)
             {
                 std::shared_ptr<Planet> is_planet = std::dynamic_pointer_cast<Planet>(sector_object);
                 if (!!is_planet)

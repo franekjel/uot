@@ -103,7 +103,8 @@ struct Colony
     float population;
     long owner_id = 0;
 
-    Colony(const long& owner_id_, const std::shared_ptr<Planet> planet_) { 
+    Colony(const long& owner_id_, const std::shared_ptr<Planet> planet_)
+    {
         owner_id = owner_id_;
         population = 1;
         buildings = {};
