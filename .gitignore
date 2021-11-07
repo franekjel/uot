@@ -1,5 +1,6 @@
+CMakeSettings.json
 *.user
-uot-client/.vscode/
+uot/.vscode/
 build/
 build/*
 CMakeCache.txt

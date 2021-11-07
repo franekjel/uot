@@ -1,20 +1,29 @@
-set(APP_NAME "uot")
+cmake_minimum_required(VERSION 3.7)
+
+project(UOT)
+
+
+set(SRCS
+    include/assets.h
+    include/game_renderer.h
+    include/game_resources.h
+    include/game_state.h
+    include/sdl_utilities.h
+    include/singleton.h
+    include/size_settings.h
+    include/uncopiable.h
+
+    src/game_renderer.cpp
+    src/game_state.cpp
+    src/sdl_utilities.cpp
+    src/main.cpp
+)
+
+add_executable(uot ${SRCS})
+
 
 find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS})
+find_package(SDL2_image REQUIRED)
 
 
-#here we list sources (and headers). If there is so many of them maybe create new module - with new folder and new list - MODULE_SRCS
-set(SRCS
-    main.cpp
-)
-
-add_executable(${APP_NAME}
-    ${SRCS}
-)
-
-#here we must specify all libraries we need
-target_link_libraries(${APP_NAME}
-    libuot
-    ${SDL2_LIBRARIES}
-)
+target_link_libraries(SDL2Test SDL2::Main SDL2::Image)

@@ -51,7 +51,7 @@ void init(game_state_t& gs)
 void loadMedia(game_resources_t& gr, game_state_t& gs) 
 {
 	printf("Loading background\n");
-	gr.bkTexture = sdl_utilities::load_texture_from_file("assets/background.png", gs.get_renderer());
+	gr.bkTexture = sdl_utilities::load_texture_from_file(basic_textures::background_texture_path, gs.get_renderer());
 	gr.buttonTextures.resize(buttons_meta::num_buttons);
 	printf("Loading start button\n");
 	gr.buttonTextures[button_types::START_BUTTON] = sdl_utilities::load_texture_from_file(std::string {basic_textures::menu_start_button_texture }, gs.get_renderer());
