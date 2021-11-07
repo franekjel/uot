@@ -68,7 +68,7 @@ void game_rendering::render_menu_planet(const std::shared_ptr<SDL_Renderer>& r) 
 
     for (position pos : gs.clicked_positions)
     {
-        SDL_Rect d{pos.x - planets_meta::frame_width / 2, pos.y - planets_meta::frame_height / 2, planets_meta::frame_width, planets_meta::frame_height};
+        SDL_Rect d{static_cast<int>(pos.x) - planets_meta::frame_width / 2, static_cast<int>(pos.y) - planets_meta::frame_height / 2, planets_meta::frame_width, planets_meta::frame_height};
         SDL_RenderCopyEx(r.get(), texture.get(), &s, &d, 0, NULL, SDL_FLIP_NONE);
     }
 }

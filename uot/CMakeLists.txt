@@ -26,4 +26,4 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 
 
-target_link_libraries(SDL2Test SDL2::Main SDL2::Image)
+target_link_libraries(uot SDL2::Main SDL2::Image)
