@@ -3,12 +3,13 @@
 
 struct uncopiable
 {
-    private:
-        uncopiable(const uncopiable &uc);
+   private:
+    uncopiable(const uncopiable &uc);
 
-        const uncopiable& operator = (const uncopiable &uc);
-    protected:
-        uncopiable() {}
+    const uncopiable &operator=(const uncopiable &uc);
+
+   protected:
+    uncopiable() {}
 };
 
 #endif
