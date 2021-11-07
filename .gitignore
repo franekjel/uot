@@ -1,4 +1,8 @@
+CMakeSettings.json
 *.user
+uot/.vscode/
+build/
+build/*
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
