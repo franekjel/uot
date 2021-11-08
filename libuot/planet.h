@@ -68,6 +68,8 @@ const PlanetaryFeatures SmallMetalsDeposits = {{{MetalsMine, 2}}};
 const PlanetaryFeatures MediumMetalsDeposits = {{{MetalsMine, 4}}};
 const PlanetaryFeatures BigMetalsDeposits = {{{MetalsMine, 8}}};
 
+struct Colony;
+
 // habitable planet
 struct Planet : SectorObject
 {
@@ -81,6 +83,7 @@ struct Planet : SectorObject
     int size;
     std::set<PlanetaryFeatures> planetary_features;
     std::map<Building, int> possible_buildings;
+    std::shared_ptr<Colony> colony;
 
     Planet(const SectorObject& o, const PlanetClimate c, const std::set<PlanetaryFeatures>& f)
         : SectorObject(o), climate(c), planetary_features(f)
@@ -92,7 +95,7 @@ struct Planet : SectorObject
                 possible_buildings[building.first] += building.second;
             }
         }
-        size = 20 * SectorObject::size;
+        size = int(20.0f * SectorObject::size);
     }
 };
 

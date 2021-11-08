@@ -3,11 +3,12 @@
 struct Point
 {
     float x, y;
+    Point() = default;
     Point(const float x, const float y) : x(x), y(y) {}
 
-    float dotProduct(const Point& p) { return x * p.x + y * p.y; }
+    float dotProduct(const Point& p) const { return x * p.x + y * p.y; }
 
-    float squaredLength() { return x * x + y * y; }
+    float squaredLength() const { return x * x + y * y; }
 
     Point& operator-()
     {

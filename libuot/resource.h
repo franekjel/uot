@@ -2,7 +2,6 @@
 
 #include <map>
 
-// TODO - more fancy names
 enum class Resource
 {
     // base
@@ -13,14 +12,13 @@ enum class Resource
     // uncommon - used for better modules and building
     RareMetals,
     Crystals,
-    RESOURCE_UNCOMMON_3,
+    Polymers,
 
     // rare - for unique modules and building
-    DarkMatter,
-    AncientNanobots,
-    RESOURCE_RARE_3,
-    RESOURCE_RARE_4,
-    RESOURCE_RARE_5,
+    DarkMatter,       // powerful weapons
+    AncientNanobots,  // hp regen modules, contruction
+    AncientRelics,    // for special projects
+    Spatium,          // for warp gates
 
     Food,  // Food is special
 };

@@ -124,7 +124,6 @@ struct Weapon
     int attack_count;
     float damage;
     float accurracy;
-    float critical_chance;
     float range;
 
     enum SpecialFeatures
@@ -136,12 +135,11 @@ struct Weapon
     };
     int special_features;
 
-    Weapon(const int attack_count, const float damage, const float accurracy, const float critical_chance,
-           const float range, const int special_features)
+    Weapon(const int attack_count, const float damage, const float accurracy, const float range,
+           const int special_features)
         : attack_count(attack_count),
           damage(damage),
           accurracy(accurracy),
-          critical_chance(critical_chance),
           range(range),
           special_features(special_features)
     {
@@ -151,16 +149,15 @@ struct Weapon
 struct WeaponModule : Module, Weapon
 {
     WeaponModule(const Module& m, const Weapon& w) : Module(m), Weapon(w) {}
-    // TODO: Maybe some variable like color - to display some kind of colorful lasers
 };
 
 const WeaponModule SmallLaser1Module(Module("Small laser", 1, 2.0f, {{Resource::Metals, 5.0f}}, {},
                                             Module::Front | Module::Sides | Module::Back),
-                                     Weapon(5, 4.0f, 0.8f, 0.05f, 20.0f, Weapon::ArmorDamageBonus));
+                                     Weapon(5, 4.0f, 0.8f, 20.0f, Weapon::ArmorDamageBonus));
 const WeaponModule SmallLaser2Module(Module("Improved small laser", 1, 2.0f,
                                             {{Resource::Metals, 5.0f}, {Resource::Crystals, 3.0f}}, {},
                                             Module::Front | Module::Sides | Module::Back),
-                                     Weapon(6, 6.0f, 0.85f, 0.05f, 25.0f, Weapon::ArmorDamageBonus));
+                                     Weapon(6, 6.0f, 0.85f, 25.0f, Weapon::ArmorDamageBonus));
 
 // TODO later: special modules like hp regeneration -
 
@@ -222,6 +219,16 @@ struct Ship
     float human_capacity;
     float engines_power;
     float engines_energy_consumtion;
+    float construction_points;
     std::vector<Weapon> weapons;
     std::shared_ptr<ShipDesign> design;
+};
+
+struct Fleet
+{
+    std::vector<std::shared_ptr<Ship>> ships;
+    float soldiers;
+    float civilians;
+    float human_capacity;
+    float construction_points;
 };
