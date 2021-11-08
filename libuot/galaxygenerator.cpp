@@ -38,18 +38,17 @@ static void GenerateBlackHoleSector(std::set<std::shared_ptr<SectorObject>> &sec
 }
 
 static std::shared_ptr<SectorObject> GenerateInhabitable(const Point &pos, InhabitableObject::ObjectType type,
-                                                         std::mt19937 &gen)
+                                                         std::mt19937 &gen,
+                                                         std::discrete_distribution<> resources_distribution)
 {
     Resource r = Resource::Metals;
-    std::discrete_distribution<> dist(
-        {40, 20, 8, 1, 1, 1});  // nothing, metals, antimatter, rare metals, crystlas, uncommon3
-    int resource = dist(gen);
+    int resource = resources_distribution(gen);
     if (resource == 0)
     {
         return std::shared_ptr<SectorObject>(
             new InhabitableObject(SectorObject{pos, float(size_distribution(gen))}, {}, type));
     }
-    dist = std::discrete_distribution<>({1, 1, 1, 1});
+    std::discrete_distribution<> dist({1, 1, 1, 1});
     int resource_count = dist(gen) + 1;
     switch (dist(gen))
     {
@@ -63,10 +62,10 @@ static std::shared_ptr<SectorObject> GenerateInhabitable(const Point &pos, Inhab
             r = Resource::RareMetals;
             break;
         case 4:
-            r = Resource::RareMetals;
+            r = Resource::Crystals;
             break;
         case 5:
-            r = Resource::RESOURCE_UNCOMMON_3;
+            r = Resource::Polymers;
             break;
     }
     return std::shared_ptr<SectorObject>(
@@ -123,8 +122,8 @@ static std::set<std::shared_ptr<SectorObject>> GenerateSectorObjects(const Galax
                 const int asteroids_number = dist(gen) + 1;
                 for (int j = 0; j < asteroids_number; j++)
                 {
-                    sector_objects.insert(
-                        GenerateInhabitable(PointOnCircle(r), InhabitableObject::ObjectType::Asteroid, gen));
+                    sector_objects.insert(GenerateInhabitable(PointOnCircle(r), InhabitableObject::ObjectType::Asteroid,
+                                                              gen, {40, 20, 8, 1, 1, 1}));
                 }
                 break;
             }
@@ -140,20 +139,16 @@ static std::set<std::shared_ptr<SectorObject>> GenerateSectorObjects(const Galax
                 }
                 else
                 {
-                    sector_objects.insert(
-                        GenerateInhabitable(PointOnCircle(r), InhabitableObject::ObjectType::InhabitablePlanet, gen));
+                    sector_objects.insert(GenerateInhabitable(
+                        PointOnCircle(r), InhabitableObject::ObjectType::InhabitablePlanet, gen, {40, 20, 8, 1, 1, 1}));
                 }
 
                 break;
             }
             case 2:
             {
-                sector_objects.insert(std::shared_ptr<SectorObject>(new InhabitableObject(
-                    SectorObject{PointOnCircle(r), float(size_distribution(gen))}, {},
-                    InhabitableObject::ObjectType::GasGiant)));  // TODO: should gas giant has some kind of resource?
-                                                                 // What kind? Maybe one of rare resource should be some
-                                                                 // kind of gas? (but gases are raher common in
-                                                                 // universe...)
+                sector_objects.insert(GenerateInhabitable(PointOnCircle(r), InhabitableObject::ObjectType::GasGiant,
+                                                          gen, {20, 0, 4, 0, 0, 1}));
                 break;
             }
         }
