@@ -23,7 +23,7 @@ struct Player
         player_id = player_id_;
         known_galaxy = known_galaxy_;
         owned_resources = {};
-        for (auto& resource : owned_resources_)
+        for (const auto& resource : owned_resources_)
         {
             owned_resources[resource.first] = resource.second;
         }

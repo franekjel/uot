@@ -95,7 +95,7 @@ struct Planet : SectorObject
                 possible_buildings[building.first] += building.second;
             }
         }
-        size = 20 * SectorObject::size;
+        size = int(20.0f * SectorObject::size);
     }
 };
 

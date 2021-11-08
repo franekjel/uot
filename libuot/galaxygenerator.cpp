@@ -14,7 +14,7 @@ static Point PointOnCircle(float r)
 {
     std::random_device dev;
     std::mt19937 gen(dev());
-    std::uniform_real_distribution<> dist(-1.0, 1.0);
+    std::uniform_real_distribution<float> dist(-1.0, 1.0);
     Point p = Point(dist(gen), dist(gen));
     p *= r / sqrtf(p.squaredLength());
     return p;
@@ -26,12 +26,11 @@ static const std::vector<Star::StarType> all_star_types = {Star::StarType::Sunny
 
 static void GenerateBlackHoleSector(std::set<std::shared_ptr<SectorObject>> &sector_objects, std::mt19937 &gen)
 {
-    std::uniform_real_distribution<> dist(-1.0, 1.0);
     std::discrete_distribution<> cloud_dist = std::discrete_distribution<>({12, 3, 1, 1});
-    int cloud_num = dist(gen);
+    int cloud_num = cloud_dist(gen);
     for (int i = 0; i < cloud_num; i++)
     {
-        Point pos = PointOnCircle(0.2 + (0.7 / cloud_num) * i);
+        Point pos = PointOnCircle(0.2f + (0.7f / float(cloud_num)) * float(i));
         sector_objects.insert(std::shared_ptr<SectorObject>(new InhabitableObject(
             SectorObject{pos, float(size_distribution(gen))}, {}, InhabitableObject::ObjectType::DarkMatterCloud)));
     }
@@ -112,7 +111,7 @@ static std::set<std::shared_ptr<SectorObject>> GenerateSectorObjects(const Galax
     float habitable_chance = habitable_planet_base_chance * parameters.habitable_planet_chance_multipler;
     for (int i = 0; i < num_objects; i++)
     {
-        const float r = 0.2 + (0.7 / num_objects) * i;
+        const float r = 0.2f + (0.7f / float(num_objects)) * float(i);
         dist = std::discrete_distribution<>({1, 3, 3});  // asteroids belt, planet, gas giant
         switch (dist(gen))
         {
@@ -160,7 +159,7 @@ Galaxy GenerateGalaxy(const GalaxyGeneratorParameters &parameters)
 {
     std::random_device dev;
     std::mt19937 gen(dev());
-    std::uniform_real_distribution<> dist(-1.0, 1.0);
+    std::uniform_real_distribution<float> dist(-1.0, 1.0);
 
     Galaxy galaxy;
 
@@ -183,7 +182,7 @@ Galaxy GenerateGalaxyTest(const GalaxyGeneratorParameters &parameters)
 {
     std::random_device dev;
     std::mt19937 gen(dev());
-    std::uniform_real_distribution<> dist(-1.0, 1.0);
+    std::uniform_real_distribution<float> dist(-1.0, 1.0);
 
     Galaxy galaxy;
 
