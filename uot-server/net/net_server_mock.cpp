@@ -1,11 +1,10 @@
 #include "net_server_mock.h"
-#include <synchapi.h>
 #include <iostream>
 using namespace std;
 
 //  TODO : copy dll/exes when building
 
-int main(void)
+int main()
 {
     cout << "Starting...\n";
     net_server_mock server;
