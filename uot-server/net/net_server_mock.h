@@ -1,8 +1,8 @@
 #ifndef UOT_NET_SERVER_MOCK_H
 #define UOT_NET_SERVER_MOCK_H
 
-#include "server_txrx.h"
 #include <vector>
+#include "server_txrx.h"
 
 class net_server_mock : public net_server
 {

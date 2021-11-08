@@ -2,10 +2,10 @@
 #define UOT_SERVER_TXRX_H
 
 #include <steam/steamnetworkingsockets.h>
-#include <string>
 #include <map>
-#include <thread>
 #include <queue>
+#include <string>
+#include <thread>
 using namespace std;
 
 class server_txrx
@@ -37,7 +37,8 @@ class net_server
     virtual void handle_message(const string& player_name, const string& data) = 0;
 };
 
-class sns_server_txrx : public server_txrx{
+class sns_server_txrx : public server_txrx
+{
    public:
     sns_server_txrx(net_server& served_server, unsigned long turn_dur);
     void send_reliable(const string& player_name, const string& message) override;
@@ -51,7 +52,8 @@ class sns_server_txrx : public server_txrx{
 
    protected:
     bool accept_cons;
-    struct sns_player_data{
+    struct sns_player_data
+    {
         HSteamNetConnection con;
         string name;
         thread* poller;

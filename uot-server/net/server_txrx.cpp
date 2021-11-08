@@ -19,7 +19,9 @@ static string ipv4_to_string(uint32 ipv4)
 }
 
 sns_server_txrx::sns_server_txrx(net_server& served_server, unsigned long turn_dur)
-    : server(served_server), accept_cons(false), socket(0), socket_opened(false), sleep_dur(turn_dur / 4){}
+    : server(served_server), accept_cons(false), socket(0), socket_opened(false), sleep_dur(turn_dur / 4)
+{
+}
 
 void sns_server_txrx::send_reliable(const string& player_name, const string& message)
 {
@@ -134,13 +136,13 @@ void sns_server_txrx::listen_thread()
                 *t = thread(&sns_server_txrx::rx_thread, this, con);
                 send_message(con, reliable_flags, "OK");
             }
-            else if (num_msg < 0) throw runtime_error("unknown connection is invalid");
+            else if (num_msg < 0)
+                throw runtime_error("unknown connection is invalid");
             else
             {
                 unknown_cons.push(con);
             }
         }
-
 
         std::this_thread::sleep_for(std::chrono::milliseconds(sleep_dur / 2));
     }
@@ -171,12 +173,10 @@ void sns_server_txrx::send_message(HSteamNetConnection con, int flags, const str
         throw runtime_error("Sending not successful");
 }
 
-void sns_server_txrx::disconnect_all()
-{
-    disconnect_all_local();
-}
+void sns_server_txrx::disconnect_all() { disconnect_all_local(); }
 
-void sns_server_txrx::disconnect_all_local() {
+void sns_server_txrx::disconnect_all_local()
+{
     stop_accepting();
 
     while (!name_to_player.empty())

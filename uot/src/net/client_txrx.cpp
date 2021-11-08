@@ -1,6 +1,6 @@
 #include "../../include/net/client_txrx.h"
-#include <sstream>
 #include <steam/isteamnetworkingutils.h>
+#include <sstream>
 //  TODO : disconnect in destructor
 sns_client_txrx* sns_client_txrx::cur_handler = nullptr;
 
@@ -10,7 +10,9 @@ const int sns_client_txrx::reliable_flags = k_nSteamNetworkingSend_Reliable;
 const int sns_client_txrx::unreliable_flags = k_nSteamNetworkingSend_Unreliable;
 
 sns_client_txrx::sns_client_txrx(net_client& served_client, unsigned long turn_dur)
-: client(served_client), state(con_state::disconnected), sleep_dur(turn_dur / 4), con(k_HSteamNetConnection_Invalid) {}
+    : client(served_client), state(con_state::disconnected), sleep_dur(turn_dur / 4), con(k_HSteamNetConnection_Invalid)
+{
+}
 
 void sns_client_txrx::send_reliable(const string& data) { send_message(con, reliable_flags, data); }
 void sns_client_txrx::send_unreliable(const string& data) { send_message(con, unreliable_flags, data); }
@@ -34,10 +36,7 @@ void sns_client_txrx::connect(const string& ipv4, unsigned short port_num)
     status_thread = thread(&sns_client_txrx::listen_thread, this);
 }
 
-void sns_client_txrx::disconnect()
-{
-    disconnect_local();
-}
+void sns_client_txrx::disconnect() { disconnect_local(); }
 
 void sns_client_txrx::handle_status_changed(SteamNetConnectionStatusChangedCallback_t* pInfo)
 {
