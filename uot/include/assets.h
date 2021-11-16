@@ -1,6 +1,7 @@
 #ifndef ASSETS_H
 #define ASSETS_H
 
+#include <array>
 #include <string_view>
 
 enum button_types
@@ -43,9 +44,9 @@ constexpr int button_width = 200;
 constexpr int button_x_offset = 25;
 constexpr int button_y_offset = 110;
 
-static const int all_button[] = {START_BUTTON, EXIT_BUTTON, GALAXY_BUTTON};
+static constexpr std::array<int, 3> all_button = {START_BUTTON, EXIT_BUTTON, GALAXY_BUTTON};
 
-static const int menu_buttons[] = {START_BUTTON, EXIT_BUTTON};
+static constexpr std::array<int, 2> menu_buttons = {START_BUTTON, EXIT_BUTTON};
 
 }  // namespace buttons_meta
 

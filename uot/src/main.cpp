@@ -6,13 +6,13 @@
 #include "SDL_image.h"
 #endif
 
-#include "../include/assets.h"
-#include "../include/game_renderer.h"
-#include "../include/game_resources.h"
-#include "../include/game_state.h"
-#include "../include/sdl_utilities.h"
-#include "../include/singleton.h"
-#include "../include/size_settings.h"
+#include "assets.h"
+#include "game_renderer.h"
+#include "game_resources.h"
+#include "game_state.h"
+#include "sdl_utilities.h"
+#include "singleton.h"
+#include "size_settings.h"
 
 #include <iostream>
 #include <optional>
