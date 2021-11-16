@@ -16,26 +16,26 @@ sns_client_txrx::sns_client_txrx(net_client& served_client, unsigned long turn_d
 {
 }
 
-void sns_client_txrx::send_reliable(const string& data) { send_message(con, reliable_flags, data); }
-void sns_client_txrx::send_unreliable(const string& data) { send_message(con, unreliable_flags, data); }
+void sns_client_txrx::send_reliable(const std::string& data) { send_message(con, reliable_flags, data); }
+void sns_client_txrx::send_unreliable(const std::string& data) { send_message(con, unreliable_flags, data); }
 
-void sns_client_txrx::connect(const string& ipv4, unsigned short port_num)
+void sns_client_txrx::connect(const std::string& ipv4, unsigned short port_num)
 {
     SteamDatagramErrMsg err_msg;
     if (!GameNetworkingSockets_Init(nullptr, err_msg))
-        throw runtime_error("Could not init GNS");
+        throw std::runtime_error("Could not init GNS");
     SteamNetworkingConfigValue_t opt{};
     SteamNetworkingIPAddr addrServer{};
     addrServer.Clear();
     if (!addrServer.ParseString(ipv4.c_str()))
-        throw runtime_error("invalid ip address format");
+        throw std::runtime_error("invalid ip address format");
     addrServer.m_port = port_num;
     opt.SetPtr(k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged, (void*)handle_status_changed);
     con = SteamNetworkingSockets()->ConnectByIPAddress(addrServer, 1, &opt);
     if (con == k_HSteamNetConnection_Invalid)
-        throw runtime_error("Could not connect to server");
+        throw std::runtime_error("Could not connect to server");
     state = con_state::connecting;
-    status_thread = thread(&sns_client_txrx::listen_thread, this);
+    status_thread = std::thread(&sns_client_txrx::listen_thread, this);
 }
 
 void sns_client_txrx::disconnect() { disconnect_local(); }
@@ -54,10 +54,10 @@ void sns_client_txrx::handle_status_changed_client(SteamNetConnectionStatusChang
         {
             send_message(pInfo->m_hConn, reliable_flags, client.get_name());
             state = con_state::connected;
-            read_thread = thread(&sns_client_txrx::rx_thread, this);
+            read_thread = std::thread(&sns_client_txrx::rx_thread, this);
         }
         else
-            throw runtime_error("Should not be connecting if state is not disconnected");
+            throw std::runtime_error("Should not be connecting if state is not disconnected");
     }
     else if (pInfo->m_info.m_eState == k_ESteamNetworkingConnectionState_ProblemDetectedLocally ||
              pInfo->m_info.m_eState == k_ESteamNetworkingConnectionState_ClosedByPeer ||
@@ -68,12 +68,12 @@ void sns_client_txrx::handle_status_changed_client(SteamNetConnectionStatusChang
     }
 }
 
-void sns_client_txrx::send_message(HSteamNetConnection con, int flags, const string& message)
+void sns_client_txrx::send_message(HSteamNetConnection con, int flags, const std::string& message)
 {
     auto status = SteamNetworkingSockets()->SendMessageToConnection(con, (void*)message.c_str(),
                                                                     message.length() * sizeof(char), flags, nullptr);
     if (status != k_EResultOK)
-        throw runtime_error("Sending not successful");
+        throw std::runtime_error("Sending not successful");
 }
 
 void sns_client_txrx::rx_thread()
@@ -83,7 +83,7 @@ void sns_client_txrx::rx_thread()
         SteamNetworkingMessage_t* message;
         int num_mes = SteamNetworkingSockets()->ReceiveMessagesOnConnection(con, &message, 1);
         if (num_mes < 0)
-            throw runtime_error("Connection handle is invalid");
+            throw std::runtime_error("Connection handle is invalid");
         if (num_mes)
         {
             if (state == con_state::connected)
@@ -92,7 +92,7 @@ void sns_client_txrx::rx_thread()
                 client.handle_status_change(net_client::net_status::ok);
                 continue;
             }
-            client.handle_message(string((char*)message->GetData(), message->GetSize()));
+            client.handle_message(std::string((char*)message->GetData(), message->GetSize()));
         }
     }
 }

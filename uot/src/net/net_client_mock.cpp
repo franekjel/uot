@@ -2,30 +2,28 @@
 
 #include "net/client_txrx.h"
 
-using namespace std;
-
 class net_client_mock : public net_client
 {
    private:
-    string name;
+    std::string name;
     sns_client_txrx txrx;
     bool getting_input;
-    thread input_reader;
+    std::thread input_reader;
     bool disconnected;
 
     void input_thread()
     {
-        cout << "Trying to get input\n";
+        std::cout << "Trying to get input\n";
         while (getting_input)
         {
-            cout << "Trying to get input\n";
+            std::cout << "Trying to get input\n";
             char line[256];
-            cin.getline(line, 256);
+            std::cin.getline(line, 256);
             if (line[0] == 'e')
                 disconnected = true;
-            cout << "Sending " << string(line) << "\n";
+            std::cout << "Sending " << std::string(line) << "\n";
             if (getting_input)
-                txrx.send_reliable(string(line));
+                txrx.send_reliable(std::string(line));
         }
     }
 
@@ -34,13 +32,13 @@ class net_client_mock : public net_client
     {
         srand(time(NULL));
         int id = rand() % 1000 + 1;
-        name = "player" + to_string(id);
+        name = "player" + std::to_string(id);
         txrx.set_as_handler();
     }
 
-    string get_name() override
+    std::string get_name() override
     {
-        cout << "Sending name: " << name << "\n";
+        std::cout << "Sending name: " << name << "\n";
         return name;
     }
 
@@ -48,20 +46,20 @@ class net_client_mock : public net_client
     {
         if (status == net_client::net_status::ok)
         {
-            cout << "Connection accepted :)\n";
+            std::cout << "Connection accepted :)\n";
             getting_input = true;
-            input_reader = thread(&net_client_mock::input_thread, this);
+            input_reader = std::thread(&net_client_mock::input_thread, this);
         }
         else
         {
-            cout << "Disconnected :(\n";
+            std::cout << "Disconnected :(\n";
             getting_input = false;
             input_reader.join();
             disconnected = true;
         }
     }
 
-    void handle_message(const string& data) override { cout << "Message :: " << data << "\n"; }
+    void handle_message(const std::string& data) override { std::cout << "Message :: " << data << "\n"; }
 
     void run()
     {
@@ -70,7 +68,7 @@ class net_client_mock : public net_client
 
         while (!disconnected)
         {
-            this_thread::sleep_for(std::chrono::milliseconds(500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
 
         txrx.disconnect();

@@ -9,9 +9,9 @@ const int sns_server_txrx::unreliable_flags = k_nSteamNetworkingSend_Unreliable;
 
 sns_server_txrx* sns_server_txrx::cur_handler = nullptr;
 
-static string ipv4_to_string(uint32 ipv4)
+static std::string ipv4_to_string(uint32 ipv4)
 {
-    stringstream ss;
+    std::stringstream ss;
     ss << (int)(ipv4 & 0xFF) << "." << (int)((ipv4 >> 8) & 0xFF) << "." << (int)((ipv4 >> 16) & 0xFF) << "."
        << (int)((ipv4 >> 24) & 0xFF);
 
@@ -23,19 +23,19 @@ sns_server_txrx::sns_server_txrx(net_server& served_server, unsigned long turn_d
 {
 }
 
-void sns_server_txrx::send_reliable(const string& player_name, const string& message)
+void sns_server_txrx::send_reliable(const std::string& player_name, const std::string& message)
 {
     auto con = name_to_player[player_name].con;
     send_message(con, reliable_flags, message);
 }
 
-void sns_server_txrx::send_unreliable(const string& player_name, const string& message)
+void sns_server_txrx::send_unreliable(const std::string& player_name, const std::string& message)
 {
     auto con = name_to_player[player_name].con;
     send_message(con, unreliable_flags, message);
 }
 
-void sns_server_txrx::disconnect_player(const string& player_name)
+void sns_server_txrx::disconnect_player(const std::string& player_name)
 {
     //  TODO : mutex for maps
     auto& player = name_to_player[player_name];
@@ -54,7 +54,7 @@ void sns_server_txrx::start_socket(unsigned short port)
 {
     SteamDatagramErrMsg err_msg;
     if (!GameNetworkingSockets_Init(nullptr, err_msg))
-        throw runtime_error("Could not init GNS");
+        throw std::runtime_error("Could not init GNS");
     SteamNetworkingIPAddr addr{};
     addr.Clear();
     addr.m_port = port;
@@ -64,10 +64,10 @@ void sns_server_txrx::start_socket(unsigned short port)
     socket = SteamNetworkingSockets()->CreateListenSocketIP(addr, 1, &opt);
 
     if (socket == k_HSteamListenSocket_Invalid)
-        throw runtime_error("Could not create a socket");
+        throw std::runtime_error("Could not create a socket");
 
     socket_opened = true;
-    listener = thread(&sns_server_txrx::listen_thread, this);
+    listener = std::thread(&sns_server_txrx::listen_thread, this);
 }
 
 void sns_server_txrx::stop_accepting() { accept_cons = false; }
@@ -93,7 +93,7 @@ void sns_server_txrx::handle_state_change_server(SteamNetConnectionStatusChanged
         if (con_to_name.count(pInfo->m_hConn) < 1)
             throw std::runtime_error("Unknown connection disconnected");
 
-        string name = con_to_name[pInfo->m_hConn];
+        std::string name = con_to_name[pInfo->m_hConn];
         server.handle_status_change(name, net_server::net_status::disconnect);
     }
 }
@@ -117,27 +117,27 @@ void sns_server_txrx::listen_thread()
             int num_msg = SteamNetworkingSockets()->ReceiveMessagesOnConnection(con, &msg, 1);
             if (num_msg > 0)
             {
-                string name((char*)msg->GetData(), msg->GetSize());
+                std::string name((char*)msg->GetData(), msg->GetSize());
                 SteamNetConnectionInfo_t con_info;
                 if (!SteamNetworkingSockets()->GetConnectionInfo(con, &con_info))
-                    throw runtime_error("Received message on invalid connection");
+                    throw std::runtime_error("Received message on invalid connection");
 
-                string addr = ipv4_to_string(con_info.m_addrRemote.GetIPv4());
+                std::string addr = ipv4_to_string(con_info.m_addrRemote.GetIPv4());
                 if (!server.accept_player({name, addr}))
                 {
                     SteamNetworkingSockets()->CloseConnection(con, 0, nullptr, false);
                     continue;
                 }
 
-                auto* t = new thread();
+                auto* t = new std::thread();
                 sns_player_data data = {con, name, t, true};
                 name_to_player.emplace(name, data);
                 con_to_name.emplace(con, name);
-                *t = thread(&sns_server_txrx::rx_thread, this, con);
+                *t = std::thread(&sns_server_txrx::rx_thread, this, con);
                 send_message(con, reliable_flags, "OK");
             }
             else if (num_msg < 0)
-                throw runtime_error("unknown connection is invalid");
+                throw std::runtime_error("unknown connection is invalid");
             else
             {
                 unknown_cons.push(con);
@@ -155,22 +155,22 @@ void sns_server_txrx::rx_thread(HSteamNetConnection con)
         SteamNetworkingMessage_t* message;
         int num_mes = SteamNetworkingSockets()->ReceiveMessagesOnConnection(con, &message, 1);
         if (num_mes < 0)
-            throw runtime_error("Connection handle is invalid");
+            throw std::runtime_error("Connection handle is invalid");
         if (num_mes)
         {
-            server.handle_message(con_to_name[con], string((char*)message->GetData(), message->GetSize()));
+            server.handle_message(con_to_name[con], std::string((char*)message->GetData(), message->GetSize()));
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(sleep_dur));
     }
 }
 
-void sns_server_txrx::send_message(HSteamNetConnection con, int flags, const string& message)
+void sns_server_txrx::send_message(HSteamNetConnection con, int flags, const std::string& message)
 {
     auto status = SteamNetworkingSockets()->SendMessageToConnection(con, (void*)message.c_str(),
                                                                     message.length() * sizeof(char), flags, nullptr);
     if (status != k_EResultOK)
-        throw runtime_error("Sending not successful");
+        throw std::runtime_error("Sending not successful");
 }
 
 void sns_server_txrx::disconnect_all() { disconnect_all_local(); }
@@ -181,7 +181,7 @@ void sns_server_txrx::disconnect_all_local()
 
     while (!name_to_player.empty())
     {
-        string name = name_to_player.begin()->first;
+        std::string name = name_to_player.begin()->first;
         disconnect_player(name);
     }
 

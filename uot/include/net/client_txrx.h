@@ -6,14 +6,12 @@
 
 #include <steam/steamnetworkingsockets.h>
 
-using namespace std;
-
 class client_txrx
 {
    public:
-    virtual void send_reliable(const string& data) = 0;
-    virtual void send_unreliable(const string& data) = 0;
-    virtual void connect(const string& ipv4, unsigned short port_num) = 0;
+    virtual void send_reliable(const std::string& data) = 0;
+    virtual void send_unreliable(const std::string& data) = 0;
+    virtual void connect(const std::string& ipv4, unsigned short port_num) = 0;
     virtual void disconnect() = 0;
 };
 
@@ -25,18 +23,18 @@ class net_client
         ok,
         disconnect
     };
-    virtual string get_name() = 0;
+    virtual std::string get_name() = 0;
     virtual void handle_status_change(net_status status) = 0;
-    virtual void handle_message(const string& data) = 0;
+    virtual void handle_message(const std::string& data) = 0;
 };
 
 class sns_client_txrx : public client_txrx
 {
    public:
     sns_client_txrx(net_client& served_client, unsigned long turn_dur);
-    void send_reliable(const string& data) override;
-    void send_unreliable(const string& data) override;
-    void connect(const string& ipv4, unsigned short port_num) override;
+    void send_reliable(const std::string& data) override;
+    void send_unreliable(const std::string& data) override;
+    void connect(const std::string& ipv4, unsigned short port_num) override;
     void disconnect() override;
     void set_as_handler();
     virtual ~sns_client_txrx();
@@ -50,8 +48,8 @@ class sns_client_txrx : public client_txrx
         disconnected
     };
     con_state state;
-    thread read_thread;
-    thread status_thread;
+    std::thread read_thread;
+    std::thread status_thread;
     net_client& client;
     HSteamNetConnection con;
     const static int reliable_flags;
@@ -59,7 +57,7 @@ class sns_client_txrx : public client_txrx
     static sns_client_txrx* cur_handler;
     static void handle_status_changed(SteamNetConnectionStatusChangedCallback_t* pInfo);
     void handle_status_changed_client(SteamNetConnectionStatusChangedCallback_t* pInfo);
-    static void send_message(HSteamNetConnection con, int flags, const string& message);
+    static void send_message(HSteamNetConnection con, int flags, const std::string& message);
     void rx_thread();
     void listen_thread();
     void disconnect_local();
