@@ -15,6 +15,9 @@ set(SRCS
     src/main.cpp
 )
 
+include_directories(include/)
+
+
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 

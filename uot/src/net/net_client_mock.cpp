@@ -1,6 +1,9 @@
 #include <iostream>
-#include "../../include/net/client_txrx.h"
+
+#include "net/client_txrx.h"
+
 using namespace std;
+
 class net_client_mock : public net_client
 {
    private:

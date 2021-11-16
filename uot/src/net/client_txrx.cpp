@@ -1,6 +1,8 @@
-#include "../../include/net/client_txrx.h"
 #include <steam/isteamnetworkingutils.h>
 #include <sstream>
+
+#include "net/client_txrx.h"
+
 //  TODO : disconnect in destructor
 sns_client_txrx* sns_client_txrx::cur_handler = nullptr;
 

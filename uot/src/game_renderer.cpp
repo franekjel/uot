@@ -1,8 +1,8 @@
-#include "../include/game_renderer.h"
-#include "../include/assets.h"
-#include "../include/game_resources.h"
-#include "../include/game_state.h"
-#include "../include/size_settings.h"
+#include "game_renderer.h"
+#include "assets.h"
+#include "game_resources.h"
+#include "game_state.h"
+#include "size_settings.h"
 
 void game_rendering::render_background(const std::shared_ptr<SDL_Renderer>& r)
 {

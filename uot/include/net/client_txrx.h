@@ -1,9 +1,11 @@
 #ifndef UOT_CLIENT_TXRX_H
 #define UOT_CLIENT_TXRX_H
 
-#include <steam/steamnetworkingsockets.h>
 #include <string>
 #include <thread>
+
+#include <steam/steamnetworkingsockets.h>
+
 using namespace std;
 
 class client_txrx

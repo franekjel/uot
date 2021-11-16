@@ -1,7 +1,8 @@
-#include "../include/game_state.h"
 #include <iostream>
-#include "../include/assets.h"
-#include "../include/game_renderer.h"
+
+#include "assets.h"
+#include "game_renderer.h"
+#include "game_state.h"
 
 void game_state_t::set_bk_texture(std::shared_ptr<SDL_Texture> bk) { bk_texture = bk; }
 
