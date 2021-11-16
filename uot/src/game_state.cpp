@@ -56,8 +56,8 @@ void game_state_t::handleMouse(Uint32 event_type, int x, int y)
             {
                 size_settings::play_area play_area;
                 position clickPosition;
-                clickPosition.x = x - play_area.x_offset;
-                clickPosition.y = y - play_area.y_offset;
+                clickPosition.x = float(x - play_area.x_offset);
+                clickPosition.y = float(y - play_area.y_offset);
                 clicked_positions.push_back(clickPosition);
             }
 

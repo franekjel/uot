@@ -1,3 +1,4 @@
+#include <array>
 #include <iostream>
 
 #include "net/client_txrx.h"
@@ -17,20 +18,20 @@ class net_client_mock : public net_client
         while (getting_input)
         {
             std::cout << "Trying to get input\n";
-            char line[256];
-            std::cin.getline(line, 256);
+            std::array<char, 256> line;
+            std::cin.getline(line.data(), 256);
             if (line[0] == 'e')
                 disconnected = true;
-            std::cout << "Sending " << std::string(line) << "\n";
+            std::cout << "Sending " << std::string(line.data()) << "\n";
             if (getting_input)
-                txrx.send_reliable(std::string(line));
+                txrx.send_reliable(std::string(line.data()));
         }
     }
 
    public:
     net_client_mock() : txrx(*this, 40), disconnected(true), getting_input(false)
     {
-        srand(time(NULL));
+        srand(time(nullptr));
         int id = rand() % 1000 + 1;
         name = "player" + std::to_string(id);
         txrx.set_as_handler();

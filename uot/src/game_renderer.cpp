@@ -7,8 +7,8 @@
 void game_rendering::render_background(const std::shared_ptr<SDL_Renderer>& r)
 {
     static const game_resources_t& gr = singleton<game_resources_t>::pointer();
-    SDL_RenderSetViewport(r.get(), NULL);
-    SDL_RenderCopyEx(r.get(), gr.bkTexture.get(), NULL, NULL, 0, NULL, SDL_FLIP_NONE);
+    SDL_RenderSetViewport(r.get(), nullptr);
+    SDL_RenderCopyEx(r.get(), gr.bkTexture.get(), nullptr, nullptr, 0, nullptr, SDL_FLIP_NONE);
 }
 
 void game_rendering::render_menu(const std::shared_ptr<SDL_Renderer>& r)
@@ -52,7 +52,7 @@ void game_rendering::render_button_sprite(const int button_id, const int ind, co
         buttons_meta::button_texture_width, buttons_meta::button_texture_height};
     SDL_Rect d{buttons_meta::button_x_offset, buttons_meta::button_y_offset * ind, buttons_meta::button_width,
                buttons_meta::button_height};
-    SDL_RenderCopyEx(r.get(), texture.get(), &s, &d, 0, NULL, SDL_FLIP_NONE);
+    SDL_RenderCopyEx(r.get(), texture.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 }
 
 // the other planet rendering function will be a batch one, this is the ONLY
@@ -74,21 +74,21 @@ void game_rendering::render_menu_planet(const std::shared_ptr<SDL_Renderer>& r)
                planets_meta::frame_width, planets_meta::frame_height};
     // SDL_Rect d { (vp_width - planets_meta::frame_width) / 2, (vp_height - planets_meta::frame_height) / 2,
     // planets_meta::frame_width, planets_meta::frame_height }; SDL_RenderCopyEx(r.get(), texture.get(), &s, &d, 0,
-    // NULL, SDL_FLIP_NONE);
+    // nullptr, SDL_FLIP_NONE);
 
     for (position pos : gs.clicked_positions)
     {
         SDL_Rect d{static_cast<int>(pos.x) - planets_meta::frame_width / 2,
                    static_cast<int>(pos.y) - planets_meta::frame_height / 2, planets_meta::frame_width,
                    planets_meta::frame_height};
-        SDL_RenderCopyEx(r.get(), texture.get(), &s, &d, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(r.get(), texture.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
     }
 }
 
 void game_rendering::render_universe() {}
 
-void game_rendering::render_galaxy(const unsigned int galaxyIdx) {}
+void game_rendering::render_galaxy(const unsigned int galaxy_idx) {}
 
-void game_rendering::render_planet(const unsigned int planetIdx) {}
+void game_rendering::render_planet(const unsigned int planet_idx) {}
 
-void game_rendering::render_ship(const unsigned int shipIdx) {}
+void game_rendering::render_ship(const unsigned int ship_idx) {}
