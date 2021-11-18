@@ -1,5 +1,5 @@
-#ifndef UTILITIES_H
-#define UTILITIES_H
+#ifndef SDL_UTILITIES_H
+#define SDL_UTILITIES_H
 
 #ifdef __linux__
 #include "SDL2/SDL.h"
@@ -40,6 +40,17 @@ bool check_view_area_collision(const int x, const int y)
 {
     // Mouse is left of the area
     if (x < X || x > X + W || y < Y || y > Y + H)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+inline bool check_sector_collision(const int x, const int y, const int box_x, const int box_y, const int w, const int h)
+{
+    // Mouse is left of the area
+    if (x < box_x || x > box_x + w || y < box_y || y > box_y + h)
     {
         return false;
     }

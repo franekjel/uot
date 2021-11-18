@@ -3,6 +3,7 @@
 #include <random>
 
 #include "common.h"
+#include <iostream>
 
 static unsigned int sector_object_id = 1;
 
@@ -159,6 +160,14 @@ static std::set<std::shared_ptr<SectorObject>> GenerateSectorObjects(const Galax
     return sector_objects;
 }
 
+bool too_close(std::vector<Point> all, Point b) {
+    for(const auto & p : all) {
+        if((b - p).squaredLength() <= 0.15)
+            return true;
+    }
+    return false;
+}
+
 Galaxy GenerateGalaxy(const GalaxyGeneratorParameters &parameters)
 {
     std::random_device dev;
@@ -166,17 +175,24 @@ Galaxy GenerateGalaxy(const GalaxyGeneratorParameters &parameters)
     std::uniform_real_distribution<float> dist(-1.0, 1.0);
 
     Galaxy galaxy;
+    std::vector<Point> sector_positions;
 
     for (int i = 0; i < parameters.size; i++)
     {
         Point pos(0, 0);
-        while (pos.squaredLength() < 1.0f && pos.squaredLength() > 0.1f)
+        while (pos.squaredLength() >= 1.0f || too_close(sector_positions, pos))
             pos = Point(dist(gen), dist(gen));
         // TODO: check if new sector isn't too close to other secotr
 
         const std::set<std::shared_ptr<SectorObject>> sector_objects = GenerateSectorObjects(parameters);
+        std::unordered_map<int, std::shared_ptr<SectorObject>> usable_format;
+        int obj_idx = 0;
+        for(const auto obj : sector_objects) {
+            usable_format[obj_idx++] = obj;
+        }
 
-        galaxy.sectors.insert(std::shared_ptr<Sector>(new Sector{i, pos, {}, sector_objects}));
+        galaxy.sectors[i] = (std::shared_ptr<Sector>(new Sector{i, pos, {}, usable_format}));
+        sector_positions.push_back(pos);
         // TODO: neighbour find - brute force or use kd-trees (nanoflann?)
     }
     return galaxy;
@@ -196,17 +212,23 @@ Galaxy GenerateGalaxyTest(const GalaxyGeneratorParameters &parameters)
         // TODO: check if new sector isn't too close to other secotr
 
         const std::set<std::shared_ptr<SectorObject>> sector_objects = GenerateSectorObjects(parameters);
+        std::unordered_map<int, std::shared_ptr<SectorObject>> usable_format;
+        int obj_idx = 0;
+        for(const auto obj : sector_objects) {
+            usable_format[obj_idx++] = obj;
+        }
 
-        galaxy.sectors.insert(std::shared_ptr<Sector>(new Sector{i, pos, {}, sector_objects}));
+
+        galaxy.sectors[i] = (std::shared_ptr<Sector>(new Sector{i, pos, {}, usable_format}));
         // TODO: neighbour find - brute force or use kd-trees (nanoflann?)
     }
     for (auto sector1 : galaxy.sectors)
         for (auto sector2 : galaxy.sectors)
         {
-            if (sector1->sector_id + 1 == sector2->sector_id)
+            if (sector1.second->sector_id + 1 == sector2.second->sector_id)
             {
-                sector1->neighbors.insert(sector2);
-                sector2->neighbors.insert(sector1);
+                sector1.second->neighbors.insert(sector2.second);
+                sector2.second->neighbors.insert(sector1.second);
             }
         }
     return galaxy;

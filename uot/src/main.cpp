@@ -9,6 +9,7 @@
 #include "assets.h"
 #include "game_renderer.h"
 #include "game_resources.h"
+#include "game_gui.h"
 #include "game_state.h"
 #include "sdl_utilities.h"
 #include "singleton.h"
@@ -59,10 +60,21 @@ void loadMedia(game_resources_t& gr, game_state_t& gs)
     gr.buttonTextures[button_types::EXIT_BUTTON] =
         sdl_utilities::load_texture_from_file(std::string{basic_textures::menu_exit_button_texture}, gs.get_renderer());
 
+    printf("Loading universe button\n");
+    gr.buttonTextures[button_types::UNIVERSE_BUTTON] =
+        sdl_utilities::load_texture_from_file(std::string{basic_textures::menu_universe_button}, gs.get_renderer());
     // load only the waiting screen planet texture
     gr.planetTextures.resize(planets_meta::num_planets);
+
+    printf("Loading sector object buttons\n");
     gr.planetTextures[planet_types::TERRAN_START_PLANET] =
         sdl_utilities::load_texture_from_file(std::string{basic_textures::menu_planet_texture_path}, gs.get_renderer());
+    
+    // load utility selection textures
+    printf("Loading selection textures\n");
+    gr.selectionTextures.resize(selection_meta::num_selection_textures);
+    gr.selectionTextures[selection_types::SECTOR_SELECTION] =
+        sdl_utilities::load_texture_from_file(std::string{basic_textures::sector_selection}, gs.get_renderer());
 }
 
 void close()
@@ -78,6 +90,8 @@ int main(int argc, char* argv[])
     game_resources_t& gameResources = singleton<game_resources_t>::pointer();
 
     init(gameState);
+    gameState.reset_galaxy();
+    gameState.set_gui();
     loadMedia(gameResources, gameState);
 
     bool quit = false;
@@ -94,7 +108,7 @@ int main(int argc, char* argv[])
             {
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                gameState.handleMouse(e.type, x, y);
+                gameState.handleMouse(e.type, e.button, x, y);
             }
         }
 

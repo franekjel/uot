@@ -2,7 +2,8 @@
 
 #include "assets.h"
 #include "game_renderer.h"
-#include "game_state.h"
+#include "game_gui.h"
+#include <galaxygenerator.h>
 
 void game_state_t::set_bk_texture(std::shared_ptr<SDL_Texture> bk) { bk_texture = bk; }
 
@@ -16,9 +17,14 @@ void game_state_t::draw()
     switch (game_view)
     {
         case game_view_t::menu_view:
-            game_rendering::render_menu(renderer);
+            game_rendering::render_menu_view(renderer);
             break;
-
+        case game_view_t::universe_view:
+            game_rendering::render_universe_view(renderer);
+            break;
+        case game_view_t::galaxy_view:
+            game_rendering::render_sector_view(renderer);
+            break;
         default:
             break;
     }
@@ -35,35 +41,34 @@ std::shared_ptr<SDL_Renderer>& game_state_t::get_renderer() { return renderer; }
 
 std::shared_ptr<SDL_Window>& game_state_t::get_window() { return window; }
 
-void game_state_t::handleMouse(Uint32 event_type, int x, int y)
-{
-    switch (event_type)
-    {
-        case SDL_MOUSEMOTION:
-            // check if menu area
-            if (sdl_utilities::check_view_area_collision<size_settings::button_area>(x, y))
-            {
-                focused_button = (y - size_settings::button_area::y_offset) / buttons_meta::button_y_offset;
-            }
-            else
-            {
-                focused_button.reset();
-            }
-            break;
 
-        case SDL_MOUSEBUTTONDOWN:
-            if (sdl_utilities::check_view_area_collision<size_settings::play_area>(x, y))
-            {
-                size_settings::play_area play_area;
-                position clickPosition;
-                clickPosition.x = float(x - play_area.x_offset);
-                clickPosition.y = float(y - play_area.y_offset);
-                clicked_positions.push_back(clickPosition);
-            }
+void game_state_t::reset_galaxy() {
+    galaxy = GenerateGalaxy({generation_meta::num_sectors, generation_meta::multiplier});
+}
 
-            break;
-
-        default:
-            break;
+void game_state_t::handleMouse(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y) {
+    if (sdl_utilities::check_view_area_collision<size_settings::play_area>(x, y)) {
+        gui->template handleMouse<size_settings::play_area>(event_type, m, x, y);
+        return;
     }
+
+    if (sdl_utilities::check_view_area_collision<size_settings::button_area>(x, y)) {
+        gui->template handleMouse<size_settings::button_area>(event_type, m, x, y);
+        return;
+    }
+
+    if (sdl_utilities::check_view_area_collision<size_settings::context_area>(x, y)) {
+        gui->template handleMouse<size_settings::context_area>(event_type, m, x, y);
+        return;
+    }
+
+    if (sdl_utilities::check_view_area_collision<size_settings::window_area>(x, y)) {
+        gui->template handleMouse<size_settings::window_area>(event_type, m, x, y);
+        return;
+    }
+
+}
+
+void game_state_t::set_gui(){
+    gui = std::make_unique<game_gui>();
 }

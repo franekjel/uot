@@ -19,6 +19,7 @@ struct game_resources_t : public uncopiable
     std::vector<std::shared_ptr<SDL_Texture>> buttonTextures;
     // access by texture_id
     std::vector<std::shared_ptr<SDL_Texture>> planetTextures;
+    std::vector<std::shared_ptr<SDL_Texture>> selectionTextures;
     std::vector<std::shared_ptr<SDL_Texture>> menuItemTextures;
     std::shared_ptr<SDL_Texture> bkTexture;
 };
