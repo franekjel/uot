@@ -1,2 +1,3 @@
 [ ] Move interfaces to general interfaces and implementation interfaces
 [ ] Add exception handling for debug mode
+[ ] Dodać aliasy dla długich namespaces
