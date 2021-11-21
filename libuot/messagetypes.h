@@ -2,43 +2,45 @@
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
-#include
+
 enum MessageType
 {
+    None,
     StartMessage
 };
+
 struct Message
 {
     MessageType messageType;
     std::string payload;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Message, messageType, payload)
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Message, messageType, payload)
 
 struct BasePayload
 {
-    virtual MessageType GetType() = 0;
-    virtual std::string Serialize() = 0;
+    virtual MessageType GetType() { return MessageType::StartMessage; };
+    virtual std::string Serialize() { return ""; };
 };
 
 struct StartGamePayload : BasePayload
 {
     int jakiesPole1;
     std::string jakiesPole2;
-    MessageType GetType() { return MessageType::StartMessage; }
+    MessageType GetType() override { return MessageType::StartMessage; }
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StartGamePayload, jakiesPole1, jakiesPole2)
     std::string Serialize() override
     {
-        nlohmann::json jsonPayoload = this;
+        nlohmann::json jsonPayload = (*this);
         Message message;
         message.messageType = MessageType::StartMessage;
-        message.payload = jsonPayoload.dump();
-        nlohmann::json jsonMessage;
+        message.payload = jsonPayload.dump();
+        nlohmann::json jsonMessage = message;
         return jsonMessage.dump();
     }
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(StartGamePayload, jakiesPole1, jakiesPole2)
 
-
-BasePayload Deserialize(std::string strMessage) { 
+std::shared_ptr<BasePayload> Deserialize(std::string strMessage)
+{
     nlohmann::json jsonMessage = nlohmann::json::parse(strMessage);
     Message message = jsonMessage.get<Message>();
     nlohmann::json jsonPayload = nlohmann::json::parse(message.payload);
@@ -46,9 +48,20 @@ BasePayload Deserialize(std::string strMessage) {
     switch (message.messageType)
     {
         case MessageType::StartMessage:
-            return jsonPayload.get<StartGamePayload>();
+            return std::make_shared<StartGamePayload>(std::move(jsonPayload.get<StartGamePayload>()));
             break;
     }
 
-    return BasePayload;
+    return {};
 }
+
+//SAMPLE:
+/*
+    StartGamePayload sgp;
+    sgp.jakiesPole1 = 12;
+    sgp.jakiesPole2 = "33";
+    auto ser = sgp.Serialize();
+    std::shared_ptr<BasePayload> des = Deserialize(ser);
+    auto type = des->GetType();
+    auto cast = std::dynamic_pointer_cast<StartGamePayload>(des);
+*/
