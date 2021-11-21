@@ -17,4 +17,5 @@ class PlayersList
     std::map<Resource, float> GetStartingResources();
     std::shared_ptr<Colony> GetStartingColony(long player_id, std::shared_ptr<Galaxy> startingGalaxy);
     void AddPlayer(std::shared_ptr<Galaxy> wholeGalaxy);
+    void CountNumbers();
 };

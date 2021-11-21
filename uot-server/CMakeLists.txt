@@ -3,10 +3,10 @@ set(APP_NAME "uot-server")
 include_directories(${net_SOURCE_DIR}/include)
 set(SRCS
     main.cpp
-    "headers/players.h"
-    "headers/server.h"
-    "src/server.cpp"
-    "src/players.cpp"
+    headers/players.h
+    headers/server.h
+    src/server.cpp
+    src/players.cpp
     net/server_txrx.cpp
     net/server_txrx.h
     net/net_server_uot.cpp

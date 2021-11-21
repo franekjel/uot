@@ -14,6 +14,8 @@ class net_server_uot : public net_server
     void handle_message(const std::string& player_name, const std::string& data) override;
     void run();
     void set_accept_player_callback(std::function<void()> callback);
+    void send_new_tour_message(int tour_number);
+    void send_game_begin_message(/*TBD*/);
    protected:
     bool running;
     std::thread read_thread;

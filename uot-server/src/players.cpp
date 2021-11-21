@@ -3,6 +3,7 @@
 std::shared_ptr<Galaxy> PlayersList::GetStartingGalaxy(std::shared_ptr<Galaxy> wholeGalaxy)
 {
     // TODO: Copy one empty (without another player) sector with at least one planet from wholeGalaxy
+    return wholeGalaxy;
     return std::make_shared<Galaxy>();
 }
 
@@ -44,3 +45,5 @@ std::map<Resource, float> PlayersList::GetStartingResources()
         std::make_shared<Player>(id, startingGalaxy, GetStartingResources(), startingColony);
     players[id] = new_player;
 }
+
+void PlayersList::CountNumbers() {}
