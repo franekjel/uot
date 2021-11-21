@@ -16,6 +16,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Message, messageType, payload)
 
 struct BasePayload
 {
+    virtual MessageType GetType() = 0;
     virtual std::string Serialize() = 0;
 };
 
@@ -23,6 +24,7 @@ struct StartGamePayload : BasePayload
 {
     int jakiesPole1;
     std::string jakiesPole2;
+    MessageType GetType() { return MessageType::StartMessage; }
     std::string Serialize() override
     {
         nlohmann::json jsonPayoload = this;
