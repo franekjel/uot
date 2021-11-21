@@ -1,8 +1,13 @@
 set(APP_NAME "uot-server")
 
+include_directories(${net_SOURCE_DIR}/include)
 set(SRCS
     main.cpp
     players.h
+    net/server_txrx.cpp
+    net/server_txrx.h
+    net/net_server_uot.cpp
+    net/net_server_uot.h
 )
 
 add_executable(${APP_NAME}
@@ -10,8 +15,8 @@ add_executable(${APP_NAME}
 )
 
 target_link_libraries(${APP_NAME}
-    PRIVATE
-    libuot
+    PRIVATE libuot
+    GameNetworkingSockets::GameNetworkingSockets
 )
 
 set(NET_TEST_SRCS

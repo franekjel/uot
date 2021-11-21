@@ -1,15 +1,6 @@
 #include "net_server_uot.h"
 #include <iostream>
 
-//  TODO : copy dll/exes when building
-
-int main()
-{
-    std::cout << "Starting...\n";
-    net_server_uot server;
-    server.run();
-}
-
 net_server_uot::net_server_uot() : txrx(*this, 40), running(false) { txrx.set_as_handler(); }
 
 bool net_server_uot::accept_player(const server_txrx::net_player& player)
@@ -65,7 +56,7 @@ void net_server_uot::run()
     read_thread.join();
 }
 void net_server_uot::set_accept_player_callback(std::function<void()> callback) {
-    uot_accept_player = on_accept_player;
+    uot_accept_player = callback;
 }
 void net_server_uot::read_input()
 {
