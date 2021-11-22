@@ -3,6 +3,17 @@
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 
+
+/*
+How to add new message
+    1. Add new MessageType to enum
+    2. Create new struct inheriting BasePayload
+    3. Add properties - should have at least one
+    4. Use NLOHMANN_DEFINE_TYPE_INTRUSIVE macro
+    5. Implement GetType and Serialize (copy-paste with enum replacing)
+    6. Add new message to Deserialize (copy-paste with enum replacing)
+*/
+
 namespace messageTypes
 {
 enum MessageType
