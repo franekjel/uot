@@ -3,10 +3,13 @@
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 
+namespace messageTypes
+{
 enum MessageType
 {
     None,
-    StartMessage
+    StartGame,
+    AcceptJoin
 };
 
 struct Message
@@ -18,7 +21,7 @@ struct Message
 
 struct BasePayload
 {
-    virtual MessageType GetType() { return MessageType::StartMessage; };
+    virtual MessageType GetType() { return MessageType::None; };
     virtual std::string Serialize() { return ""; };
 };
 
@@ -26,42 +29,47 @@ struct StartGamePayload : BasePayload
 {
     int jakiesPole1;
     std::string jakiesPole2;
-    MessageType GetType() override { return MessageType::StartMessage; }
+    MessageType GetType() override { return MessageType::StartGame; }
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(StartGamePayload, jakiesPole1, jakiesPole2)
     std::string Serialize() override
     {
         nlohmann::json jsonPayload = (*this);
         Message message;
-        message.messageType = MessageType::StartMessage;
+        message.messageType = MessageType::StartGame;
         message.payload = jsonPayload.dump();
         nlohmann::json jsonMessage = message;
         return jsonMessage.dump();
     }
 };
 
-std::shared_ptr<BasePayload> Deserialize(std::string strMessage)
+struct AcceptJoinPayload : BasePayload
 {
-    nlohmann::json jsonMessage = nlohmann::json::parse(strMessage);
-    Message message = jsonMessage.get<Message>();
-    nlohmann::json jsonPayload = nlohmann::json::parse(message.payload);
-
-    switch (message.messageType)
+    bool ok;
+    MessageType GetType() override { return MessageType::AcceptJoin; }
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(AcceptJoinPayload, ok)
+    std::string Serialize() override
     {
-        case MessageType::StartMessage:
-            return std::make_shared<StartGamePayload>(std::move(jsonPayload.get<StartGamePayload>()));
-            break;
+        nlohmann::json jsonPayload = (*this);
+        Message message;
+        message.messageType = MessageType::AcceptJoin;
+        message.payload = jsonPayload.dump();
+        nlohmann::json jsonMessage = message;
+        return jsonMessage.dump();
     }
+};
 
-    return {};
-}
+std::shared_ptr<BasePayload> Deserialize(std::string strMessage);
 
-//SAMPLE:
+
+// SAMPLE:
 /*
-    StartGamePayload sgp;
+    messageTypes::StartGamePayload sgp;
     sgp.jakiesPole1 = 12;
     sgp.jakiesPole2 = "33";
     auto ser = sgp.Serialize();
-    std::shared_ptr<BasePayload> des = Deserialize(ser);
+    std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
     auto type = des->GetType();
-    auto cast = std::dynamic_pointer_cast<StartGamePayload>(des);
+    auto cast = std::dynamic_pointer_cast<messageTypes::StartGamePayload>(des);
 */
+
+}  // namespace messageTypes

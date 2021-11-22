@@ -15,9 +15,9 @@ class Server
 
     void StartGame();
     int PlayersCount() { return players.PlayersCount(); }
-    int start_players_count = -1;
+    int players_count_game_start = -1;
    private:
-    void accept_player();
+    void accept_player(std::string player_name);
     void run();
 
     PlayersList players;

@@ -18,6 +18,8 @@ set(SRCS
     technology.h
     structs.h
     spacebase.h
+    player.h
+    messagetypes.cpp
 )
 
 add_library(${LIB_NAME}

@@ -6,9 +6,9 @@
 
 void StoreValue(Server& server, std::string key, std::string value)
 {
-    if (key == "start_players_count")
+    if (key == "players_count_game_start")
     {
-        server.start_players_count = atoi(value.c_str());
+        server.players_count_game_start = atoi(value.c_str());
     }
 }
 
@@ -50,7 +50,7 @@ int main()
         else
             std::cout << "Unknown command " << std::string(&command, 1);
 
-        if (s.start_players_count == s.PlayersCount())
+        if (s.players_count_game_start == s.PlayersCount())
             s.StartGame();
     }
 

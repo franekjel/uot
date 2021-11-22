@@ -13,7 +13,7 @@ std::map<Resource, float> PlayersList::GetStartingResources()
     return {};
 }
 
-   std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shared_ptr<Galaxy> startingGalaxy)
+std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shared_ptr<Galaxy> startingGalaxy)
 {
     std::shared_ptr<Planet> planet = nullptr;
     for (auto& sector : startingGalaxy->sectors)
@@ -36,13 +36,13 @@ std::map<Resource, float> PlayersList::GetStartingResources()
     return startingColony;
 }
 
-   void PlayersList::AddPlayer(std::shared_ptr<Galaxy> wholeGalaxy)
+void PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy> wholeGalaxy)
 {
     long id = player_id++;
     std::shared_ptr<Galaxy> startingGalaxy = GetStartingGalaxy(wholeGalaxy);
     std::shared_ptr<Colony> startingColony = GetStartingColony(id, startingGalaxy);
     std::shared_ptr<Player> new_player =
-        std::make_shared<Player>(id, startingGalaxy, GetStartingResources(), startingColony);
+        std::make_shared<Player>(id, player_net_name, startingGalaxy, GetStartingResources(), startingColony);
     players[id] = new_player;
 }
 

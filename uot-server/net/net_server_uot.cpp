@@ -7,7 +7,7 @@ bool net_server_uot::accept_player(const server_txrx::net_player& player)
 {
     std::cout << "Player " << player.name << " wants to connect with address " << player.IP << "\n";
     players.push_back(player.name);
-    uot_accept_player();
+    uot_accept_player(player.name);
     return true;
 }
 
@@ -56,21 +56,32 @@ void net_server_uot::run()
     read_thread.join();
 }
 
-void net_server_uot::set_accept_player_callback(std::function<void()> callback) {
-    uot_accept_player = callback; }
-
-void net_server_uot::send_new_tour_message(int tour_number) { 
-      for (auto& s : players)
+void net_server_uot::set_accept_player_callback(std::function<void(std::string player_name)> callback)
+{
+    uot_accept_player = callback;
+}
+void net_server_uot::send_new_tour_message(int tour_number)
+{
+    for (auto& s : players)
     {
-        txrx.send_reliable(s, std::to_string(tour_number)); // TODO change to propper message, when messaging will be done
+        txrx.send_reliable(s,
+                           std::to_string(tour_number));  // TODO change to propper message, when messaging will be done
     }
 }
 
-void net_server_uot::send_game_begin_message() {
+void net_server_uot::send_game_begin_message()
+{
     for (auto& s : players)
     {
         txrx.send_reliable(s, "blabla");  // TODO change to propper message, when messaging will be done
     }
+}
+
+void net_server_uot::send_accept_join_message(std::string player_name)
+{
+    messageTypes::AcceptJoinPayload payload;
+    payload.ok = true;
+    txrx.send_reliable(player_name, payload.Serialize());
 }
 
 void net_server_uot::read_input()
