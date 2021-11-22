@@ -104,16 +104,16 @@ struct ContructionModule : Module
     ContructionModule(const Module& m, float contruction_speed) : Module(m), contruction_speed(contruction_speed){};
 };
 
-ContructionModule BasicContructionModule(Module("Basic construction module", 8, 4.0f, {{Resource::Metals, 10.0f}}, {},
-                                                Module::Front || Module::Sides),
-                                         1.0f);
-ContructionModule AdvancedContructionModule(
+const ContructionModule BasicContructionModule(Module("Basic construction module", 8, 4.0f, {{Resource::Metals, 10.0f}},
+                                                      {}, Module::Front || Module::Sides),
+                                               1.0f);
+const ContructionModule AdvancedContructionModule(
     Module("Advanced construction module", 8, 4.0f,
            {{Resource::Metals, 12.0f}, {Resource::RareMetals, 5.0f}, {Resource::Crystals, 2.0f}}, {},
            Module::Front || Module::Sides),
     3.0f);
 
-ContructionModule NanobotsContructionModule(
+const ContructionModule NanobotsContructionModule(
     Module("Nanobots construction module", 8, 4.0f,
            {{Resource::Metals, 10.0f}, {Resource::RareMetals, 4.0f}, {Resource::AncientNanobots, 4.0f}}, {},
            Module::All),
