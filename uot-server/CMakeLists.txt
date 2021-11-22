@@ -12,7 +12,7 @@ set(SRCS
     net/net_server_uot.cpp
     net/net_server_uot.h
 )
-
+configure_file(config.txt config.txt COPYONLY)
 add_executable(${APP_NAME}
     ${SRCS})
 

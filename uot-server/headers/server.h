@@ -14,7 +14,8 @@ class Server
     ~Server();
 
     void StartGame();
-
+    int PlayersCount() { return players.PlayersCount(); }
+    int start_players_count = -1;
    private:
     void accept_player();
     void run();
