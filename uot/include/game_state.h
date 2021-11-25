@@ -8,7 +8,7 @@
 #include "sdl_utilities.h"
 #include "singleton.h"
 #include "uncopiable.h"
-#include <galaxy.h>
+#include "../../libuot/galaxy.h"
 
 struct game_gui;
 

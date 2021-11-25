@@ -97,8 +97,9 @@ struct game_gui {
     void handleMouse(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
 
 
-    template<MouseButton Button, typename AreaType, game_view_t GameView>
-    typename std::enable_if<get_click_type<AreaType, GameView>() == click_type::menu_view_menu_click, void>::type 
+    template<MouseButton Button, typename AreaType, game_view_t GameView,
+    typename std::enable_if_t<get_click_type<AreaType, GameView>() == click_type::menu_view_menu_click, void>* = nullptr>
+    void 
     click_handler(int x, int y, SDL_MouseButtonEvent m){
 
         const auto clicked_button = buttons_meta::menu_buttons[y / buttons_meta::button_y_offset];
@@ -114,8 +115,9 @@ struct game_gui {
         }
     }
 
-    template<MouseButton Button, typename AreaType, game_view_t GameView>
-    typename std::enable_if<get_click_type<AreaType, GameView>() == click_type::galaxy_view_menu_click, void>::type 
+    template<MouseButton Button, typename AreaType, game_view_t GameView,
+    typename std::enable_if_t<get_click_type<AreaType, GameView>() == click_type::galaxy_view_menu_click, void> * = nullptr>
+    void
     click_handler(int x, int y, SDL_MouseButtonEvent m){
 
         const auto clicked_button = buttons_meta::galaxy_buttons[y / buttons_meta::button_y_offset];
@@ -133,8 +135,9 @@ struct game_gui {
         }
     }
 
-    template<MouseButton Button, typename AreaType, game_view_t GameView>
-    typename std::enable_if<get_click_type<AreaType, GameView>() == click_type::universe_view_menu_click, void>::type 
+    template<MouseButton Button, typename AreaType, game_view_t GameView,
+    typename std::enable_if_t<get_click_type<AreaType, GameView>() == click_type::universe_view_menu_click, void> * = nullptr>
+    void
     click_handler(int x, int y, SDL_MouseButtonEvent m){
         const auto clicked_button = buttons_meta::universe_buttons[y / buttons_meta::button_y_offset];
         if(clicked_button == button_types::EXIT_BUTTON) {
@@ -144,8 +147,9 @@ struct game_gui {
         }
     }
 
-    template<MouseButton Button, typename AreaType, game_view_t GameView>
-    typename std::enable_if<get_click_type<AreaType, GameView>() == click_type::universe_view_play_click, void>::type 
+    template<MouseButton Button, typename AreaType, game_view_t GameView,
+    typename std::enable_if_t<get_click_type<AreaType, GameView>() == click_type::universe_view_play_click, void> * = nullptr>
+    void
     click_handler(int x, int y, SDL_MouseButtonEvent m){
         for(const auto s : gs.galaxy.value().sectors) {
             if(sdl_utilities::check_sector_collision(x, y, size_settings::play_area::width * (0.8f + 0.8f * s.second->position.x) / 2, 
@@ -162,8 +166,9 @@ struct game_gui {
         }
     }
 
-    template<MouseButton Button, typename AreaType, game_view_t GameView>
-    typename std::enable_if<get_click_type<AreaType, GameView>() == click_type::galaxy_view_play_click, void>::type 
+    template <MouseButton Button, typename AreaType, game_view_t GameView,
+              typename std::enable_if_t<get_click_type<AreaType, GameView>() == click_type::galaxy_view_play_click, void>* = nullptr>
+    void
     click_handler(int x, int y, SDL_MouseButtonEvent m){
         const auto& sectors = gs.galaxy.value().sectors;
         const auto& curr = sectors.at(gs.gui->current_sector.value());
@@ -185,20 +190,21 @@ struct game_gui {
     }
 
 
-    template<MouseButton Button, typename AreaType, game_view_t GameView>
-    typename std::enable_if<!is_implemented(get_click_type<AreaType, GameView>()), void>::type 
+    template<MouseButton Button, typename AreaType, game_view_t GameView,
+    typename std::enable_if_t<!is_implemented(get_click_type<AreaType, GameView>()), void> * = nullptr>
+    void
     click_handler(int x, int y, SDL_MouseButtonEvent m){
 
     }
 
     template<typename AreaType, game_view_t GameView>
-    typename std::enable_if<std::is_same<AreaType, size_settings::button_area>::value, void>::type 
+    typename std::enable_if_t<std::is_same<AreaType, size_settings::button_area>::value, void>
     motion_handler(int x, int y) {
         focused_button = y / buttons_meta::button_y_offset;
     }
 
     template<typename AreaType, game_view_t GameView>
-    typename std::enable_if<!std::is_same<AreaType, size_settings::button_area>::value, void>::type 
+    typename std::enable_if_t<!std::is_same<AreaType, size_settings::button_area>::value, void>
     motion_handler(int x, int y) {
         focused_button.reset();
     }

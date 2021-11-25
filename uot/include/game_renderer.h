@@ -3,7 +3,7 @@
 
 #include <memory>
 #include "sdl_utilities.h"
-#include <sector.h>
+#include "../../libuot/sector.h"
 
 
 namespace game_rendering
