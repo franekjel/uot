@@ -16,6 +16,8 @@ set(SRCS
     player.h
     player.cpp
     technology.h
+    structs.h
+    spacebase.h
 )
 
 add_library(${LIB_NAME}
