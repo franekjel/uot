@@ -20,7 +20,8 @@ enum class Resource
     AncientRelics,    // for special projects
     Spatium,          // for warp gates
 
-    Food,  // Food is special
+    Food,        // Food is special
+    Technology,  // Technology is also special
 };
 
 std::map<Resource, float> operator+(std::map<Resource, float> a, const std::map<Resource, float>& b);

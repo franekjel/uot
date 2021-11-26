@@ -1,9 +1,9 @@
 #include "player.h"
 
-Player::Player(const long player_id_, const std::shared_ptr<Galaxy> &known_galaxy_,
+Player::Player(const long id_, const std::shared_ptr<Galaxy> &known_galaxy_,
                const std::map<Resource, float> &owned_resources_, const std::shared_ptr<Colony> &starting_colony)
 {
-    player_id = player_id_;
+    id = id_;
     known_galaxy = known_galaxy_;
     owned_resources = {};
     for (const auto &resource : owned_resources_)

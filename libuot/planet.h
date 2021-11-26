@@ -100,12 +100,13 @@ struct Planet : SectorObject
 
 struct Colony
 {
+    unsigned int id;
     std::shared_ptr<Planet> planet;
     std::map<Building, int> buildings;
     float population;
     std::shared_ptr<Player> owner;
 
-    Colony(const std::shared_ptr<Planet> planet_)
+    Colony(const unsigned int id, const std::shared_ptr<Planet> planet_) : id(id)
     {
         population = 1;
         buildings = {};

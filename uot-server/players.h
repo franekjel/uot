@@ -6,7 +6,9 @@
 #include "galaxy.h"
 #include "player.h"
 
-static long player_id = 1;
+static unsigned int player_id = 1;
+static unsigned int colony_id = 1;
+
 class PlayersList
 {
    private:
@@ -44,13 +46,13 @@ class PlayersList
         }
         if (!planet)
             throw std::runtime_error("No empty planet found");
-        std::shared_ptr<Colony> startingColony = std::make_shared<Colony>(planet);
+        std::shared_ptr<Colony> startingColony = std::make_shared<Colony>(colony_id++, planet);
         return startingColony;
     }
 
     void AddPlayer(std::shared_ptr<Galaxy> wholeGalaxy)
     {
-        long id = player_id++;
+        unsigned int id = player_id++;
         std::shared_ptr<Galaxy> startingGalaxy = GetStartingGalaxy(wholeGalaxy);
         std::shared_ptr<Colony> startingColony = GetStartingColony(startingGalaxy);
         std::shared_ptr<Player> new_player =
