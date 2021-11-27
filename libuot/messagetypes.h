@@ -1,9 +1,9 @@
 #pragma once
+#include <planet.h>
+#include <resource.h>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
-#include <resource.h>
-
 
 /*
 How to add new message
@@ -72,11 +72,13 @@ struct AcceptJoinPayload : BasePayload
     }
 };
 
-struct ActionsPayload : BasePayload //Player's actions
+struct ActionsPayload : BasePayload  // Player's actions
 {
-    bool ok;
+    std::vector<std::tuple<BuildingType, int>> buildActions; /*buildingType, colonyId*/
+    std::vector<int> createBaseActions; /*objectId*/
+    std::vector<int> createColonyActions; /*objectId*/
     MessageType GetType() override { return MessageType::Actions; }
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ActionsPayload, ok)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ActionsPayload, buildActions, createBaseActions, createColonyActions)
     std::string Serialize() override
     {
         nlohmann::json jsonPayload = (*this);
@@ -105,7 +107,6 @@ struct NewTourPayload : BasePayload  // New tour
 };
 
 std::shared_ptr<BasePayload> Deserialize(std::string strMessage);
-
 
 // SAMPLE:
 /*

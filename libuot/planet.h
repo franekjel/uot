@@ -8,12 +8,22 @@
 #include "sectorobject.h"
 #include "structs.h"
 
+enum BuildingType
+{
+    planetaryAdministration,
+    improvedMetalsMine,
+    metalsMine,
+    farm,
+    greenhouses
+};
+
 struct Building
 {
     const std::map<Resource, float> cost;
     const std::map<Resource, float> upkeep;
     const float workers;
     const std::map<Resource, float> production;
+    const BuildingType buildingType;
 
     const Building* upgrade;
 
@@ -27,30 +37,35 @@ const Building PlanetaryAdministration{{{Resource::Metals, 50.0f}},
                                        {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
                                        10.0f,
                                        {},
+                                       BuildingType::planetaryAdministration,
                                        nullptr};
 
 const Building ImprovedMetalsMine{{{Resource::Metals, 50.0f}, {Resource::Crystals, 10.0f}},
                                   {{Resource::Antimatter, 2.0f}, {Resource::Cryptocurrencies, 15.0f}},
                                   15.0f,
                                   {{Resource::Metals, 20.0f}},
+                                  BuildingType::improvedMetalsMine,
                                   nullptr};
 
 const Building MetalsMine{{{Resource::Metals, 50.0f}},
                           {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
                           10.0f,
                           {{Resource::Metals, 10.0f}},
+                          BuildingType::metalsMine,
                           &ImprovedMetalsMine};
 
 const Building Farm{{{Resource::Metals, 30.0f}},
                     {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
                     10.0f,
                     {{Resource::Food, 10.0f}},
+                    BuildingType::farm,
                     &ImprovedMetalsMine};
 
 const Building Greenhouses{{{Resource::Metals, 50.0f}},
                            {{Resource::Antimatter, 3.0f}, {Resource::Cryptocurrencies, 12.0f}},
                            10.0f,
                            {{Resource::Food, 7.0f}},
+                           BuildingType::greenhouses,
                            nullptr};
 
 // buildable buildings here

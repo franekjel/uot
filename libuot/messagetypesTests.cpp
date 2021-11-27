@@ -35,10 +35,31 @@ void NewTourPayloadTest()
     }
 }
 
+void ActionsPayloadTest()
+{
+    messageTypes::ActionsPayload ap;
+
+    auto ser = ap.Serialize();
+    std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
+    auto type = des->GetType();
+    if (type != messageTypes::MessageType::Actions)
+    {
+        std::cout << "Actions - wrong message type\n";
+    }
+    auto cast = std::dynamic_pointer_cast<messageTypes::ActionsPayload>(des);
+
+    if (cast->buildActions.size() != 0)
+    {
+        std::cout << "Actions - wrong resources size\n";
+    }
+
+}
+
 int main() { 
     std::cout << "Tests started\n";
 
     NewTourPayloadTest();
+    ActionsPayloadTest();
 
     std::cout << "Tests finished\n";
     std::cin.get();
