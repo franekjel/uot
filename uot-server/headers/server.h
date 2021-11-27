@@ -7,6 +7,8 @@
 #include <mutex>
 #include <thread>
 
+#define WEEK_LENGTH 49
+
 class Server
 {
    public:

@@ -23,8 +23,10 @@ void Server::run()
     {
         {
             std::lock_guard<std::mutex> locking_numbers(counting_numbers);
-            players.CountNumbers();
-            messaging_service.send_new_tour_message(++tour_number);
+            players.CountEveryTourNumbers();
+            if (++tour_number % WEEK_LENGTH == 0)
+                players.CountWeeklyNumbers();
+            messaging_service.send_new_tour_message(tour_number);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         std::cout << "dupa, dzialam se juz " << tour_number << " tur\n";

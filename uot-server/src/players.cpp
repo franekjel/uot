@@ -46,4 +46,81 @@ void PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy>
     players[id] = new_player;
 }
 
-void PlayersList::CountNumbers() {}
+void PlayersList::CountWeeklyNumbers()
+{
+    std::vector<std::thread> player_threads(players.size());
+    int player_num = 0;
+    for(auto& player : players)
+        player_threads[player_num++] = std::thread(CountWeeklyNumbersPlayer, player.second);
+    
+    for (auto& thread : player_threads)
+        thread.join();
+}
+
+void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player) {
+    auto& player_resources = player->owned_resources;
+    auto& player_colonies = player->owned_colonies;
+    auto& player_galaxy = player->known_galaxy;
+    auto& player_ships = player->owned_ships;
+
+    // calculate expenses and gains of player colonies
+    for (auto& colony : player_colonies)
+    {
+        std::map<Resource, float> colony_gains = {};
+        std::map<Resource, float> colony_expenses = {};
+        int neccessary_workers = 0;
+
+        for (auto& building : colony->buildings)
+        {
+            int number_of_buildings = building.second;
+            neccessary_workers += number_of_buildings * building.first.workers;
+            for (auto& gains : building.first.production)
+            {
+                if (colony_gains.count(gains.first) == 0)
+                    colony_gains[gains.first] = gains.second * number_of_buildings;
+                else
+                    colony_gains[gains.first] += gains.second * number_of_buildings;
+            }
+
+            for (auto& expense : building.first.upkeep)
+            {
+                if (colony_expenses.count(expense.first) == 0)
+                    colony_expenses[expense.first] = expense.second * number_of_buildings;
+                else
+                    colony_expenses[expense.first] += expense.second * number_of_buildings;
+            }
+        }
+
+        float colony_efficency =
+            neccessary_workers > colony->population ? colony->population / neccessary_workers : 1.0f;
+
+        if (colony_efficency < 1.0f)
+        {
+            colony_gains = colony_gains * colony_efficency;
+            colony_expenses = colony_expenses * colony_efficency;
+            // I assumed that if building is less efficient it is also cheaper to upkeep
+        }
+
+        player_resources += colony_gains;
+        for (auto& expense : colony_expenses)
+            player_resources[expense.first] -= expense.second;
+        // what if there are less resources available than there are needed to operate colony?
+        // currently I assume that negative number is possible (like public debt XD)
+    }
+
+    // calculate bilans of inhabitable objects
+
+    for (auto & sector: player_galaxy->sectors)
+    {
+        for (auto& object : sector->objects)
+        {
+            auto inhabitable_object = std::dynamic_pointer_cast<InhabitableObject>(object);
+            if (!inhabitable_object)
+                continue;
+            // TODO create inhabitable object mines mechanic
+        }
+    }
+}
+
+
+void PlayersList::CountEveryTourNumbers() {}
