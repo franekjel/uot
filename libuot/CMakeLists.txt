@@ -19,6 +19,7 @@ set(SRCS
     structs.h
     spacebase.h
     player.h
+    messagetypes.h
     messagetypes.cpp
 )
 
@@ -37,3 +38,15 @@ target_link_libraries(${LIB_NAME}
     PUBLIC
     nlohmann_json::nlohmann_json
 )
+
+set(MSG_TEST_SRCS
+    messagetypes.h
+    messagetypes.cpp
+    messagetypesTests.cpp
+)
+
+add_executable(MsgTest
+        ${MSG_TEST_SRCS})
+
+target_include_directories(MsgTest PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+target_link_libraries(MsgTest PUBLIC nlohmann_json::nlohmann_json)

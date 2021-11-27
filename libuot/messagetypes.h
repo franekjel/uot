@@ -2,6 +2,7 @@
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
+#include <resource.h>
 
 
 /*
@@ -20,7 +21,9 @@ enum MessageType
 {
     None,
     StartGame,
-    AcceptJoin
+    AcceptJoin,
+    Actions,
+    NewTour
 };
 
 struct Message
@@ -63,6 +66,38 @@ struct AcceptJoinPayload : BasePayload
         nlohmann::json jsonPayload = (*this);
         Message message;
         message.messageType = MessageType::AcceptJoin;
+        message.payload = jsonPayload.dump();
+        nlohmann::json jsonMessage = message;
+        return jsonMessage.dump();
+    }
+};
+
+struct ActionsPayload : BasePayload //Player's actions
+{
+    bool ok;
+    MessageType GetType() override { return MessageType::Actions; }
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ActionsPayload, ok)
+    std::string Serialize() override
+    {
+        nlohmann::json jsonPayload = (*this);
+        Message message;
+        message.messageType = MessageType::Actions;
+        message.payload = jsonPayload.dump();
+        nlohmann::json jsonMessage = message;
+        return jsonMessage.dump();
+    }
+};
+
+struct NewTourPayload : BasePayload  // New tour
+{
+    std::map<Resource, float> updated_resources;
+    MessageType GetType() override { return MessageType::NewTour; }
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(NewTourPayload, updated_resources)
+    std::string Serialize() override
+    {
+        nlohmann::json jsonPayload = (*this);
+        Message message;
+        message.messageType = MessageType::NewTour;
         message.payload = jsonPayload.dump();
         nlohmann::json jsonMessage = message;
         return jsonMessage.dump();

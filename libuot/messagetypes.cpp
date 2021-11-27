@@ -14,6 +14,12 @@ std::shared_ptr<messageTypes::BasePayload> messageTypes::Deserialize(std::string
         case MessageType::AcceptJoin:
             return std::make_shared<AcceptJoinPayload>(std::move(jsonPayload.get<AcceptJoinPayload>()));
             break;
+        case MessageType::Actions:
+            return std::make_shared<ActionsPayload>(std::move(jsonPayload.get<ActionsPayload>()));
+            break;
+        case MessageType::NewTour:
+            return std::make_shared<NewTourPayload>(std::move(jsonPayload.get<NewTourPayload>()));
+            break;
     }
 
     return std::make_shared<BasePayload>();
