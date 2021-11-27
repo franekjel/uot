@@ -50,14 +50,15 @@ void PlayersList::CountWeeklyNumbers()
 {
     std::vector<std::thread> player_threads(players.size());
     int player_num = 0;
-    for(auto& player : players)
+    for (auto& player : players)
         player_threads[player_num++] = std::thread(CountWeeklyNumbersPlayer, player.second);
-    
+
     for (auto& thread : player_threads)
         thread.join();
 }
 
-void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player) {
+void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
+{
     auto& player_resources = player->owned_resources;
     auto& player_colonies = player->owned_colonies;
     auto& player_galaxy = player->known_galaxy;
@@ -108,19 +109,25 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player) {
         // currently I assume that negative number is possible (like public debt XD)
     }
 
-    // calculate bilans of inhabitable objects
-
-    for (auto & sector: player_galaxy->sectors)
+    // calculate bilans of inhabitable objects currently mines has no upkeep cost - let's assume that they are run by
+    // robots and operates on solar energy etc.
+    for (auto& sector : player_galaxy->sectors)
     {
         for (auto& object : sector->objects)
         {
             auto inhabitable_object = std::dynamic_pointer_cast<InhabitableObject>(object);
             if (!inhabitable_object)
                 continue;
-            // TODO create inhabitable object mines mechanic
+            if (inhabitable_object->owner_id == player->player_id)
+                for (auto& mine : inhabitable_object->resurce_mine_built)
+                {
+                    if (mine.second)
+                    {
+                        player_resources[mine.first] += inhabitable_object->resurce_deposit[mine.first];
+                    }
+                }
         }
     }
 }
-
 
 void PlayersList::CountEveryTourNumbers() {}
