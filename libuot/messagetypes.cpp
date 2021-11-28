@@ -11,9 +11,6 @@ std::shared_ptr<messageTypes::BasePayload> messageTypes::Deserialize(std::string
         case MessageType::StartGame:
             return std::make_shared<StartGamePayload>(std::move(jsonPayload.get<StartGamePayload>()));
             break;
-        case MessageType::AcceptJoin:
-            return std::make_shared<AcceptJoinPayload>(std::move(jsonPayload.get<AcceptJoinPayload>()));
-            break;
         case MessageType::Actions:
             return std::make_shared<ActionsPayload>(std::move(jsonPayload.get<ActionsPayload>()));
             break;

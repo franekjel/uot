@@ -21,7 +21,6 @@ enum MessageType
 {
     None,
     StartGame,
-    AcceptJoin,
     Actions,
     NewTour
 };
@@ -50,22 +49,6 @@ struct StartGamePayload : BasePayload
         nlohmann::json jsonPayload = (*this);
         Message message;
         message.messageType = MessageType::StartGame;
-        message.payload = jsonPayload.dump();
-        nlohmann::json jsonMessage = message;
-        return jsonMessage.dump();
-    }
-};
-
-struct AcceptJoinPayload : BasePayload
-{
-    bool ok;
-    MessageType GetType() override { return MessageType::AcceptJoin; }
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(AcceptJoinPayload, ok)
-    std::string Serialize() override
-    {
-        nlohmann::json jsonPayload = (*this);
-        Message message;
-        message.messageType = MessageType::AcceptJoin;
         message.payload = jsonPayload.dump();
         nlohmann::json jsonMessage = message;
         return jsonMessage.dump();

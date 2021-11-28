@@ -37,6 +37,5 @@ void Server::accept_player(std::string player_name)
     if (!game_in_progress)
     {
         players.AddPlayer(player_name, galaxy);
-        messaging_service.send_accept_join_message(player_name);
     }
 }

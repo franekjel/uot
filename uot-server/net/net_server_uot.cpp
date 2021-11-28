@@ -82,13 +82,6 @@ void net_server_uot::send_game_begin_message()
     }
 }
 
-void net_server_uot::send_accept_join_message(std::string player_name)
-{
-    messageTypes::AcceptJoinPayload payload;
-    payload.ok = true;
-    txrx.send_reliable(player_name, payload.Serialize());
-}
-
 void net_server_uot::read_input()
 {
     while (running)
