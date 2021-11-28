@@ -13,7 +13,6 @@ class Server
 {
    public:
     Server();
-    ~Server();
 
     void StartGame();
     int PlayersCount() { return players.PlayersCount(); }
