@@ -6,6 +6,7 @@
 
 #include "galaxy.h"
 #include "player.h"
+#include "../net/net_server_uot.h"
 
 static long player_id = 1;
 class PlayersList
@@ -22,5 +23,7 @@ class PlayersList
     void CountWeeklyNumbers();
     void CountEveryTourNumbers();
     int PlayersCount() { return players.size(); }
+    void SendNewTourMessage(int tour_number, net_server_uot& messaging_service);
     static void CountWeeklyNumbersPlayer(std::shared_ptr<Player> player);
+    static void CountEveryTourNumbersPlayer(std::shared_ptr<Player> player);
 };

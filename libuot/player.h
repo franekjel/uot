@@ -19,6 +19,7 @@ struct Player
     std::shared_ptr<Galaxy> known_galaxy;
     std::vector<std::shared_ptr<Ship>> owned_ships;
     std::map<Resource, float> owned_resources;
+    std::map<Resource, bool> resources_changed;
 
     std::set<const Technology*> known_technologies;
     std::set<const Technology*> available_technologies;

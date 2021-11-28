@@ -60,13 +60,11 @@ void net_server_uot::set_accept_player_callback(std::function<void(std::string p
 {
     uot_accept_player = callback;
 }
-void net_server_uot::send_new_tour_message(int tour_number)
+void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Player>& player, std::string player_net_name)
 {
-    for (auto& s : players)
-    {
-        txrx.send_reliable(s,
-                           std::to_string(tour_number));  // TODO change to propper message, when messaging will be done
-    }
+    // TODO make message from player and change send message to this propper one.
+    txrx.send_reliable(player_net_name,
+                       std::to_string(tour_number));  // TODO change to propper message, when messaging will be done
 }
 
 void net_server_uot::send_game_begin_message()

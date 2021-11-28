@@ -6,9 +6,11 @@ Player::Player(const long id_, const std::shared_ptr<Galaxy> &known_galaxy_,
     id = id_;
     known_galaxy = known_galaxy_;
     owned_resources = {};
+    resources_changed = {};
     for (const auto &resource : owned_resources_)
     {
         owned_resources[resource.first] = resource.second;
+        resources_changed[resource.first] = true;
     }
     owned_colonies = {};
     owned_colonies.push_back(starting_colony);

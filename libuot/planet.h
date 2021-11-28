@@ -123,6 +123,7 @@ struct Colony
     std::shared_ptr<Planet> planet;
     std::map<Building, int> buildings;
     float population;
+    bool population_changed;
     std::shared_ptr<Player> owner;
 
     Colony(const unsigned int id, const std::shared_ptr<Planet> planet_) : id(id)
