@@ -16,9 +16,9 @@ std::map<Resource, float> PlayersList::GetStartingResources()
 std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shared_ptr<Galaxy> startingGalaxy)
 {
     std::shared_ptr<Planet> planet = nullptr;
-    for (auto& sector : startingGalaxy->sectors)
+    for (const auto& sector : startingGalaxy->sectors)
     {
-        for (auto& sector_object : sector->objects)
+        for (const auto& sector_object : sector->objects)
         {
             std::shared_ptr<Planet> is_planet = std::dynamic_pointer_cast<Planet>(sector_object);
             if (!!is_planet)

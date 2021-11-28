@@ -19,8 +19,8 @@ set(SRCS
     structs.h
     spacebase.h
     player.h
-    messagetypes.h
-    messagetypes.cpp
+    ../msg/messagetypes.h
+    ../msg/messagetypes.cpp
 )
 
 add_library(${LIB_NAME}
@@ -40,9 +40,9 @@ target_link_libraries(${LIB_NAME}
 )
 
 set(MSG_TEST_SRCS
-    messagetypes.h
-    messagetypes.cpp
-    messagetypesTests.cpp
+    ../msg/messagetypes.h
+    ../msg/messagetypes.cpp
+    ../msg/messagetypesTests.cpp
 )
 
 add_executable(MsgTest
