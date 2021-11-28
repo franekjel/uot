@@ -43,19 +43,6 @@ void net_server_uot::run()
     txrx.start_socket(port_num);
     std::cout << "Server listening on port " << port_num;
     running = true;
-    read_thread = std::thread(&net_server_uot::read_input, this);
-
-    while (running)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        std::string send_str = "Server is up";
-        for (auto& s : players)
-        {
-            txrx.send_reliable(s, send_str);
-        }
-    }
-
-    read_thread.join();
 }
 
 void net_server_uot::set_accept_player_callback(std::function<bool(std::string player_name)> callback)

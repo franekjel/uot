@@ -83,11 +83,12 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
         std::map<Resource, float> colony_expenses = {};
         int neccessary_workers = 0;
 
-        for (auto& building : colony->buildings)
+        for (auto& buildingType : colony->buildings)
         {
-            int number_of_buildings = building.second;
-            neccessary_workers += number_of_buildings * building.first.workers;
-            for (auto& gains : building.first.production)
+            auto& building = Colony::GetBuildingFromType(buildingType.first);
+            int number_of_buildings = buildingType.second;
+            neccessary_workers += number_of_buildings * building.workers;
+            for (auto& gains : building.production)
             {
                 if (colony_gains.count(gains.first) == 0)
                     colony_gains[gains.first] = gains.second * number_of_buildings;
@@ -95,7 +96,7 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
                     colony_gains[gains.first] += gains.second * number_of_buildings;
             }
 
-            for (auto& expense : building.first.upkeep)
+            for (auto& expense : building.upkeep)
             {
                 if (colony_expenses.count(expense.first) == 0)
                     colony_expenses[expense.first] = expense.second * number_of_buildings;

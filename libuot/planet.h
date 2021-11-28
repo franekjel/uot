@@ -117,17 +117,19 @@ struct Planet : SectorObject
     }
 };
 
-const float population_food_usage = 1.0f;  // TODO change to better value
+const float population_food_usage = 0.0f;  // TODO change to better value
 
 struct Colony
 {
     unsigned int id;
     std::shared_ptr<Planet> planet;
-    std::map<Building, int> buildings;
+    std::map<BuildingType, int> buildings;
     float population;
     bool population_changed;
     float base_population_growth = 0.05f;
     std::shared_ptr<Player> owner;
+
+    static const Building& GetBuildingFromType(BuildingType type) { return (*Buildings.find(type)).second; }
 
     Colony(const unsigned int id, const std::shared_ptr<Planet> planet_) : id(id)
     {

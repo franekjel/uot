@@ -5,9 +5,8 @@ Server::Server() : players(), messaging_service(), game_in_progress(false)
     messaging_service.set_accept_player_callback([&](std::string player_name) { return this->accept_player(player_name); });
     messaging_thread = std::thread(&net_server_uot::run, &messaging_service);
     galaxy = std::make_shared<Galaxy>(GenerateGalaxy({galaxy_size, galaxy_habitable_planet_chance_multipler}));
+    messaging_thread.join();
 }
-
-Server::~Server() { messaging_thread.join(); }
 
 void Server::StartGame()
 {
@@ -28,7 +27,7 @@ void Server::run()
                 players.CountWeeklyNumbers();
             players.SendNewTourMessage(tour_number, messaging_service);
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
         std::cout << "dupa, dzialam se juz " << tour_number << " tur\n";
     }
 }
