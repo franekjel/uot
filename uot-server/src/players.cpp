@@ -68,81 +68,90 @@ void PlayersList::SendNewTourMessage(int tour_number, net_server_uot& messaging_
 }
 
 void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
+{
+    auto& player_resources = player->owned_resources;
+    auto& player_resources_change = player->resources_changed;
+    auto& player_colonies = player->owned_colonies;
+    auto& player_space_bases = player->owned_space_bases;
+    auto& player_galaxy = player->known_galaxy;
+    auto& player_ships = player->owned_ships;
+
+    // calculate expenses and gains of player colonies
+    for (auto& colony : player_colonies)
     {
-        auto& player_resources = player->owned_resources;
-        auto& player_colonies = player->owned_colonies;
-        auto& player_space_bases = player->owned_space_bases;
-        auto& player_galaxy = player->known_galaxy;
-        auto& player_ships = player->owned_ships;
+        std::map<Resource, float> colony_gains = {};
+        std::map<Resource, float> colony_expenses = {};
+        int neccessary_workers = 0;
 
-        // calculate expenses and gains of player colonies
-        for (auto& colony : player_colonies)
+        for (auto& building : colony->buildings)
         {
-            std::map<Resource, float> colony_gains = {};
-            std::map<Resource, float> colony_expenses = {};
-            int neccessary_workers = 0;
-
-            for (auto& building : colony->buildings)
+            int number_of_buildings = building.second;
+            neccessary_workers += number_of_buildings * building.first.workers;
+            for (auto& gains : building.first.production)
             {
-                int number_of_buildings = building.second;
-                neccessary_workers += number_of_buildings * building.first.workers;
-                for (auto& gains : building.first.production)
-                {
-                    if (colony_gains.count(gains.first) == 0)
-                        colony_gains[gains.first] = gains.second * number_of_buildings;
-                    else
-                        colony_gains[gains.first] += gains.second * number_of_buildings;
-                }
-
-                for (auto& expense : building.first.upkeep)
-                {
-                    if (colony_expenses.count(expense.first) == 0)
-                        colony_expenses[expense.first] = expense.second * number_of_buildings;
-                    else
-                        colony_expenses[expense.first] += expense.second * number_of_buildings;
-                }
+                if (colony_gains.count(gains.first) == 0)
+                    colony_gains[gains.first] = gains.second * number_of_buildings;
+                else
+                    colony_gains[gains.first] += gains.second * number_of_buildings;
             }
 
-            float colony_efficency =
-                neccessary_workers > colony->population ? colony->population / neccessary_workers : 1.0f;
-
-            if (colony_efficency < 1.0f)
+            for (auto& expense : building.first.upkeep)
             {
-                colony_gains = colony_gains * colony_efficency;
-                colony_expenses = colony_expenses * colony_efficency;
-                // I assumed that if building is less efficient it is also cheaper to upkeep
+                if (colony_expenses.count(expense.first) == 0)
+                    colony_expenses[expense.first] = expense.second * number_of_buildings;
+                else
+                    colony_expenses[expense.first] += expense.second * number_of_buildings;
             }
-
-            player_resources += colony_gains;
-            for (auto& expense : colony_expenses)
-                player_resources[expense.first] -= expense.second;
-            // what if there are less resources available than there are needed to operate colony?
-            // currently I assume that negative number is possible (like public debt XD)
         }
 
-        // calculate bilans of inhabitable objects
+        float colony_efficency =
+            neccessary_workers > colony->population ? colony->population / neccessary_workers : 1.0f;
 
-        for (auto& space_base : player_space_bases)
+        if (colony_efficency < 1.0f)
         {
-            for (auto& resource : space_base->object->resurce_deposit)
-            {
-                player_resources[resource.first] += resource.second;
-            }
-
-            // If space base get some upkeep cost, calculate it here;
+            colony_gains = colony_gains * colony_efficency;
+            colony_expenses = colony_expenses * colony_efficency;
+            // I assumed that if building is less efficient it is also cheaper to upkeep
         }
+
+        for (auto& gain : colony_gains)
+        {
+            player_resources[gain.first] += gain.second;
+            player_resources_change[gain.first] = true;
+        }
+        for (auto& expense : colony_expenses)
+        {
+            player_resources[expense.first] -= expense.second;
+            player_resources_change[expense.first] = true;
+        }
+        // what if there are less resources available than there are needed to operate colony?
+        // currently I assume that negative number is possible (like public debt XD)
     }
 
-    void PlayersList::CountEveryTourNumbersPlayer(std::shared_ptr<Player> player) {}
+    // calculate bilans of inhabitable objects
 
-    void PlayersList::CountEveryTourNumbers()
+    for (auto& space_base : player_space_bases)
     {
-        // Async Part like ships upkeep costs
-        std::vector<std::thread> player_threads(players.size());
-        int player_num = 0;
-        for (auto& player : players)
-            player_threads[player_num++] = std::thread(CountEveryTourNumbersPlayer, player.second);
+        for (auto& resource : space_base->object->resurce_deposit)
+        {
+            player_resources[resource.first] += resource.second;
+            player_resources_change[resource.first] = true;
+        }
 
-        for (auto& thread : player_threads)
-            thread.join();
+        // If space base get some upkeep cost, calculate it here;
     }
+}
+
+void PlayersList::CountEveryTourNumbersPlayer(std::shared_ptr<Player> player) {}
+
+void PlayersList::CountEveryTourNumbers()
+{
+    // Async Part like ships upkeep costs
+    std::vector<std::thread> player_threads(players.size());
+    int player_num = 0;
+    for (auto& player : players)
+        player_threads[player_num++] = std::thread(CountEveryTourNumbersPlayer, player.second);
+
+    for (auto& thread : player_threads)
+        thread.join();
+}
