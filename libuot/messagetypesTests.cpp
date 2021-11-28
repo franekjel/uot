@@ -7,11 +7,11 @@ void NewTourPayloadTest()
 
     float food_init = 100.0, metals_init = 10.0;
     float p1_init = 100.0, p10_init = 10.0;
-    ntp.updated_resources.insert(std::pair<Resource, int>(Resource::Food, food_init));
-    ntp.updated_resources.insert(std::pair<Resource, int>(Resource::Metals, metals_init));
+    ntp.updated_resources[Resource::Food] = food_init;
+    ntp.updated_resources[Resource::Metals] = metals_init;
 
-    ntp.updated_populations.insert(std::pair<int, int>(1, p1_init));
-    ntp.updated_populations.insert(std::pair<int, int>(10, p10_init));
+    ntp.updated_populations[1] = p1_init;
+    ntp.updated_populations[10] = p10_init;
 
     auto ser = ntp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
