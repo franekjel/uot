@@ -60,7 +60,7 @@ void ActionsPayloadTest()
     }
     auto cast = std::dynamic_pointer_cast<messageTypes::ActionsPayload>(des);
 
-    if (cast->createBaseActions.size() != 0)
+    if (!cast->createBaseActions.empty())
     {
         std::cout << "Actions - wrong resources size\n";
     }

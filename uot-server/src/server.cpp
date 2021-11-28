@@ -1,4 +1,4 @@
-#include "..\headers\server.h"
+#include "../headers/server.h"
 
 Server::Server() : players(), messaging_service(), game_in_progress(false)
 {

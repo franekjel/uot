@@ -16,9 +16,9 @@ std::map<Resource, float> PlayersList::GetStartingResources()
 std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shared_ptr<Galaxy> startingGalaxy)
 {
     std::shared_ptr<Planet> planet = nullptr;
-    for (auto& sector : startingGalaxy->sectors)
+    for (const auto& sector : startingGalaxy->sectors)
     {
-        for (auto& sector_object : sector->objects)
+        for (const auto& sector_object : sector->objects)
         {
             std::shared_ptr<Planet> is_planet = std::dynamic_pointer_cast<Planet>(sector_object);
             if (!!is_planet)
@@ -83,7 +83,7 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
         std::map<Resource, float> colony_expenses = {};
         int neccessary_workers = 0;
 
-        for (auto& buildingType : colony->buildings)
+        for (const auto& buildingType : colony->buildings)
         {
             auto& building = Colony::GetBuildingFromType(buildingType.first);
             int number_of_buildings = buildingType.second;
@@ -96,7 +96,7 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
                     colony_gains[gains.first] += gains.second * number_of_buildings;
             }
 
-            for (auto& expense : building.upkeep)
+            for (const auto& expense : building.upkeep)
             {
                 if (colony_expenses.count(expense.first) == 0)
                     colony_expenses[expense.first] = expense.second * number_of_buildings;
