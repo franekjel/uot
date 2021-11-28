@@ -7,9 +7,10 @@ net_server_uot::net_server_uot() : txrx(*this, 40), running(false) { txrx.set_as
 bool net_server_uot::accept_player(const server_txrx::net_player& player)
 {
     std::cout << "Player " << player.name << " wants to connect with address " << player.IP << "\n";
-    players.push_back(player.name);
-    uot_accept_player(player.name);
-    return true;
+    auto res = uot_accept_player(player.name);
+    if (res)
+        players.push_back(player.name);
+    return res;
 }
 
 void net_server_uot::handle_status_change(const std::string& player_name, net_server::net_status status)
@@ -57,7 +58,7 @@ void net_server_uot::run()
     read_thread.join();
 }
 
-void net_server_uot::set_accept_player_callback(std::function<void(std::string player_name)> callback)
+void net_server_uot::set_accept_player_callback(std::function<bool(std::string player_name)> callback)
 {
     uot_accept_player = callback;
 }

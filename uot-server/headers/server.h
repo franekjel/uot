@@ -19,7 +19,7 @@ class Server
     int PlayersCount() { return players.PlayersCount(); }
     int players_count_game_start = -1;
    private:
-    void accept_player(std::string player_name);
+    bool accept_player(std::string player_name);
     void run();
 
     PlayersList players;
