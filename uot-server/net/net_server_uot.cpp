@@ -1,4 +1,5 @@
 #include "net_server_uot.h"
+#include <player.h>
 #include <iostream>
 
 net_server_uot::net_server_uot() : txrx(*this, 40), running(false) { txrx.set_as_handler(); }
@@ -60,11 +61,30 @@ void net_server_uot::set_accept_player_callback(std::function<void(std::string p
 {
     uot_accept_player = callback;
 }
-void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Player>& player, std::string player_net_name)
+void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Player>& player,
+                                           std::string player_net_name)
 {
-    // TODO make message from player and change send message to this propper one.
-    txrx.send_reliable(player_net_name,
-                       std::to_string(tour_number));  // TODO change to propper message, when messaging will be done
+    messageTypes::NewTourPayload payload;
+
+    for (auto& resource : player->owned_resources)
+    {
+        if (player->resources_changed[resource.first])
+        {
+            payload.updated_resources[resource.first] = resource.second;
+            player->resources_changed[resource.first] = false;
+        }
+    }
+
+    for (auto& colony : player->owned_colonies)
+    {
+        if (colony->population_changed)
+        {
+            payload.updated_populations[colony->id] = colony->population;
+            colony->population_changed = false;
+        }
+    }
+
+    txrx.send_reliable(player_net_name, payload.Serialize());
 }
 
 void net_server_uot::send_game_begin_message()
