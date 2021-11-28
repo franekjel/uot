@@ -12,6 +12,7 @@ Player::Player(const long id_, const std::shared_ptr<Galaxy> &known_galaxy_,
     }
     owned_colonies = {};
     owned_colonies.push_back(starting_colony);
+    owned_space_bases = {};
     owned_ships = {};
     DiscoverTechnology(&Engineering);
 }
