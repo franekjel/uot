@@ -58,8 +58,8 @@ struct StartGamePayload : BasePayload
 struct ActionsPayload : BasePayload  // Player's actions
 {
     /*TBD*/
-    //std::vector<std::tuple<BuildingType, int>> buildActions; /*buildingType, colonyId*/
-    //std::vector<int> createColonyActions; /*objectId*/
+    // std::vector<std::tuple<BuildingType, int>> buildActions; /*buildingType, colonyId*/
+    // std::vector<int> createColonyActions; /*objectId*/
     std::vector<int> createBaseActions; /*objectId*/
     MessageType GetType() override { return MessageType::Actions; }
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ActionsPayload, createBaseActions)
@@ -77,7 +77,7 @@ struct ActionsPayload : BasePayload  // Player's actions
 struct NewTourPayload : BasePayload  // New tour
 {
     std::map<Resource, float> updated_resources; /*resource, amount*/
-    std::map<int, int> updated_populations; /*colony_id, population*/
+    std::map<int, int> updated_populations;      /*colony_id, population*/
     MessageType GetType() override { return MessageType::NewTour; }
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(NewTourPayload, updated_resources, updated_populations)
     std::string Serialize() override

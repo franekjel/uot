@@ -126,7 +126,7 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
             player_resources[expense.first] -= expense.second;
             player_resources_change[expense.first] = true;
         }
-        
+
         player_resources[Resource::Food] -= colony->population * population_food_usage;
         player_resources_change[Resource::Food] = true;
 
