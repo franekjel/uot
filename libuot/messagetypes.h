@@ -93,9 +93,10 @@ struct ActionsPayload : BasePayload  // Player's actions
 
 struct NewTourPayload : BasePayload  // New tour
 {
-    std::map<Resource, float> updated_resources;
+    std::map<Resource, float> updated_resources; /*resource, amount*/
+    std::map<int, int> updated_populations; /*colony_id, population*/
     MessageType GetType() override { return MessageType::NewTour; }
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(NewTourPayload, updated_resources)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(NewTourPayload, updated_resources, updated_populations)
     std::string Serialize() override
     {
         nlohmann::json jsonPayload = (*this);
