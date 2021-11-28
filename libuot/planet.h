@@ -117,6 +117,8 @@ struct Planet : SectorObject
     }
 };
 
+const float population_food_usage = 1.0f;  // TODO change to better value
+
 struct Colony
 {
     unsigned int id;
@@ -124,6 +126,7 @@ struct Colony
     std::map<Building, int> buildings;
     float population;
     bool population_changed;
+    float base_population_growth = 0.05f;
     std::shared_ptr<Player> owner;
 
     Colony(const unsigned int id, const std::shared_ptr<Planet> planet_) : id(id)
