@@ -119,11 +119,27 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
             player_resources[gain.first] += gain.second;
             player_resources_change[gain.first] = true;
         }
+
         for (auto& expense : colony_expenses)
         {
             player_resources[expense.first] -= expense.second;
             player_resources_change[expense.first] = true;
         }
+        
+        player_resources[Resource::Food] -= colony->population * population_food_usage;
+        player_resources_change[Resource::Food] = true;
+
+        if (player_resources[Resource::Food] >= 0)
+        {
+            colony->population += colony->population * colony->base_population_growth;
+            colony->population_changed = true;
+        }
+        else
+        {
+            colony->population -= colony->population * colony->base_population_growth;
+            colony->population_changed = true;
+        }
+
         // what if there are less resources available than there are needed to operate colony?
         // currently I assume that negative number is possible (like public debt XD)
     }
