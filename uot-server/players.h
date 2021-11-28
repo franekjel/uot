@@ -30,9 +30,9 @@ class PlayersList
         std::shared_ptr<Planet> planet = nullptr;
         for (auto& sector : startingGalaxy->sectors)
         {
-            for (auto& sector_object : sector.second->objects)
+            for (auto& sector_object : sector->objects)
             {
-                std::shared_ptr<Planet> is_planet = std::dynamic_pointer_cast<Planet>(sector_object.second);
+                std::shared_ptr<Planet> is_planet = std::dynamic_pointer_cast<Planet>(sector_object);
                 if (!!is_planet)
                 {
                     planet = is_planet;

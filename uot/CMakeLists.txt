@@ -1,15 +1,16 @@
 set(APP_NAME "uot")
 set(SRCS
     include/assets.h
-    include/game_renderer.h
-    include/game_resources.h
+    include/game_rendering.h
+    include/resource_manager.h
     include/game_state.h
     include/sdl_utilities.h
     include/singleton.h
     include/size_settings.h
     include/uncopiable.h
 
-    src/game_renderer.cpp
+    src/input_handlers.cpp
+    src/game_rendering.cpp
     src/game_state.cpp
     src/sdl_utilities.cpp
     src/main.cpp

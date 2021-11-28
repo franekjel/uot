@@ -53,5 +53,5 @@ struct Sector
     int sector_id;
     Point position;  // position on galaxy map
     std::set<std::shared_ptr<Sector>> neighbors;
-    std::unordered_map<int, std::shared_ptr<SectorObject>> objects;  // stars, planets, asteroid
+    std::set<std::shared_ptr<SectorObject>> objects;  // stars, planets, asteroid
 };

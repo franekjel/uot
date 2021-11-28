@@ -1,11 +1,11 @@
 #pragma once
 
 #include <memory>
-#include <unordered_map>
+#include <set>
 
 #include "sector.h"
 
 struct Galaxy
 {
-    std::unordered_map<int, std::shared_ptr<Sector>> sectors;
+    std::set<std::shared_ptr<Sector>> sectors;
 };

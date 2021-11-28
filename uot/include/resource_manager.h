@@ -8,12 +8,13 @@
 #include "singleton.h"
 #include "uncopiable.h"
 
-struct game_resources_t : public uncopiable
+// used for graphics / audio resources
+struct resource_manager : public uncopiable
 {
    protected:
-    game_resources_t() {}
+    resource_manager() {}
 
-    friend singleton<game_resources_t>;
+    friend singleton<resource_manager>;
 
    public:
     std::vector<std::shared_ptr<SDL_Texture>> buttonTextures;
@@ -21,7 +22,7 @@ struct game_resources_t : public uncopiable
     std::vector<std::shared_ptr<SDL_Texture>> planetTextures;
     std::vector<std::shared_ptr<SDL_Texture>> selectionTextures;
     std::vector<std::shared_ptr<SDL_Texture>> menuItemTextures;
-    std::shared_ptr<SDL_Texture> bkTexture;
+    std::shared_ptr<SDL_Texture> bk_texture;
 };
 
 #endif
