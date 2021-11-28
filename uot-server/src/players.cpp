@@ -81,63 +81,36 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     {
         std::map<Resource, float> colony_gains = {};
         std::map<Resource, float> colony_expenses = {};
-        int neccessary_workers = 0;
 
-        for (auto& buildingType : colony->buildings)
-        {
-            auto& building = Colony::GetBuildingFromType(buildingType.first);
-            int number_of_buildings = buildingType.second;
-            neccessary_workers += number_of_buildings * building.workers;
-            for (auto& gains : building.production)
-            {
-                if (colony_gains.count(gains.first) == 0)
-                    colony_gains[gains.first] = gains.second * number_of_buildings;
-                else
-                    colony_gains[gains.first] += gains.second * number_of_buildings;
-            }
-
-            for (auto& expense : building.upkeep)
-            {
-                if (colony_expenses.count(expense.first) == 0)
-                    colony_expenses[expense.first] = expense.second * number_of_buildings;
-                else
-                    colony_expenses[expense.first] += expense.second * number_of_buildings;
-            }
-        }
-
-        float colony_efficency =
-            neccessary_workers > colony->population ? colony->population / neccessary_workers : 1.0f;
-
-        if (colony_efficency < 1.0f)
-        {
-            colony_gains = colony_gains * colony_efficency;
-            colony_expenses = colony_expenses * colony_efficency;
-            // I assumed that if building is less efficient it is also cheaper to upkeep
-        }
+        colony_gains = colony->GetColonyGains();
+        colony_expenses = colony->GetColonyExpenses();
 
         for (auto& gain : colony_gains)
         {
+            if (gain.first == Resource::Food)
+                continue;
             player_resources[gain.first] += gain.second;
             player_resources_change[gain.first] = true;
         }
 
         for (auto& expense : colony_expenses)
         {
+            if (expense.first == Resource::Food)
+                continue;
             player_resources[expense.first] -= expense.second;
             player_resources_change[expense.first] = true;
         }
 
-        player_resources[Resource::Food] -= colony->population * population_food_usage;
-        player_resources_change[Resource::Food] = true;
+        float food_bilans = colony_gains[Resource::Food] - colony->population * population_food_usage;
 
-        if (player_resources[Resource::Food] >= 0)
+        if (food_bilans >= 0)
         {
             colony->population += colony->population * colony->base_population_growth;
             colony->population_changed = true;
         }
         else
         {
-            colony->population -= colony->population * colony->base_population_growth;
+            colony->population -= colony->population * colony->base_population_starving_death;
             colony->population_changed = true;
         }
 

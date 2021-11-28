@@ -127,9 +127,66 @@ struct Colony
     float population;
     bool population_changed;
     float base_population_growth = 0.05f;
+    float base_population_starving_death = 0.025f;
     std::shared_ptr<Player> owner;
 
     static const Building& GetBuildingFromType(BuildingType type) { return (*Buildings.find(type)).second; }
+
+    std::map<Resource, float> GetColonyGains()
+    {
+        std::map<Resource, float> colony_gains = {};
+        int neccessary_workers = 0;
+
+        for (auto& buildingType : buildings)
+        {
+            auto& building = Colony::GetBuildingFromType(buildingType.first);
+            int number_of_buildings = buildingType.second;
+            neccessary_workers += number_of_buildings * building.workers;
+            for (auto& gains : building.production)
+            {
+                if (colony_gains.count(gains.first) == 0)
+                    colony_gains[gains.first] = gains.second * number_of_buildings;
+                else
+                    colony_gains[gains.first] += gains.second * number_of_buildings;
+            }
+        }
+
+        float colony_efficency = neccessary_workers > population ? population / neccessary_workers : 1.0f;
+
+        if (colony_efficency < 1.0f)
+            colony_gains = colony_gains * colony_efficency;
+
+        return colony_gains;
+    }
+
+    std::map<Resource, float> GetColonyExpenses()
+    {
+        std::map<Resource, float> colony_expenses = {};
+        int neccessary_workers = 0;
+
+        for (auto& buildingType : buildings)
+        {
+            auto& building = Colony::GetBuildingFromType(buildingType.first);
+            int number_of_buildings = buildingType.second;
+            neccessary_workers += number_of_buildings * building.workers;
+
+            for (auto& expense : building.upkeep)
+            {
+                if (colony_expenses.count(expense.first) == 0)
+                    colony_expenses[expense.first] = expense.second * number_of_buildings;
+                else
+                    colony_expenses[expense.first] += expense.second * number_of_buildings;
+            }
+        }
+
+        float colony_efficency = neccessary_workers > population ? population / neccessary_workers : 1.0f;
+
+        if (colony_efficency < 1.0f)
+            colony_expenses = colony_expenses * colony_efficency;
+        // I assumed that if building is less efficient it is also cheaper to upkeep
+
+        return colony_expenses;
+    }
 
     Colony(const unsigned int id, const std::shared_ptr<Planet> planet_) : id(id)
     {
