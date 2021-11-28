@@ -6,7 +6,7 @@
 
 struct Technology
 {
-    int id;
+    unsigned int id;
     std::string name;
     std::string description;
     float cost;

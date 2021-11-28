@@ -6,6 +6,7 @@
 
 #include "resource.h"
 #include "sectorobject.h"
+#include "structs.h"
 
 struct Building
 {
@@ -68,8 +69,6 @@ const PlanetaryFeatures SmallMetalsDeposits = {{{MetalsMine, 2}}};
 const PlanetaryFeatures MediumMetalsDeposits = {{{MetalsMine, 4}}};
 const PlanetaryFeatures BigMetalsDeposits = {{{MetalsMine, 8}}};
 
-struct Colony;
-
 // habitable planet
 struct Planet : SectorObject
 {
@@ -101,14 +100,14 @@ struct Planet : SectorObject
 
 struct Colony
 {
+    unsigned int id;
     std::shared_ptr<Planet> planet;
     std::map<Building, int> buildings;
     float population;
-    long owner_id = 0;
+    std::shared_ptr<Player> owner;
 
-    Colony(const long& owner_id_, const std::shared_ptr<Planet> planet_)
+    Colony(const unsigned int id, const std::shared_ptr<Planet> planet_) : id(id)
     {
-        owner_id = owner_id_;
         population = 1;
         buildings = {};
         planet = planet_;

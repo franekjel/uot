@@ -8,6 +8,7 @@
 #include "planet.h"
 #include "resource.h"
 #include "sectorobject.h"
+#include "structs.h"
 
 struct Star : SectorObject
 {
@@ -31,7 +32,8 @@ const std::map<Star::StarType, float> StarTypeToHabitablePlanetChance = {
 // asteroid, inhabitable planet, gas giants
 struct InhabitableObject : SectorObject
 {
-    std::map<Resource, float> resurce_deposit;  // resource gain after building mine
+    std::map<Resource, float> resurce_deposit;
+    std::shared_ptr<SpaceBase> base;
     enum class ObjectType
     {
         InhabitablePlanet,

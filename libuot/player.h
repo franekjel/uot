@@ -11,7 +11,7 @@
 
 struct Player
 {
-    long player_id;
+    unsigned int id;
 
     std::vector<std::shared_ptr<Colony>> owned_colonies;
     std::shared_ptr<Galaxy> known_galaxy;
@@ -27,6 +27,6 @@ struct Player
     void DiscoverTechnology(const Technology* const technology);
 };
 
-inline bool operator==(const Player& lhs, const Player& rhs) { return lhs.player_id == rhs.player_id; }
+inline bool operator==(const Player& lhs, const Player& rhs) { return lhs.id == rhs.id; }
 
 inline bool operator!=(const Player& lhs, const Player& rhs) { return !(lhs == rhs); }

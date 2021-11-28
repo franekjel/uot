@@ -187,6 +187,7 @@ const ShipHull MediumShipHull(6, 12, 4, 10, {{Resource::Metals, 80.0f}}, {{Resou
 
 struct ShipDesign
 {
+    unsigned int id;
     std::string name;
     ShipHull hull;
     std::set<Module> front;
@@ -198,12 +199,13 @@ struct ShipDesign
 
     static constexpr float percentage_cost_upkeep = 0.01;  // which part of ship cost goes to (monthly?) upkeep
 
-    ShipDesign(const std::string& name, const ShipHull& hull, const std::set<Module>& front,
+    ShipDesign(const unsigned int id, const std::string& name, const ShipHull& hull, const std::set<Module>& front,
                const std::set<Module>& sides, const std::set<Module>& back, const std::set<Module>& inside);
 };
 
 struct Ship
 {
+    unsigned int id;
     float hp;
     float max_hp;
     float hp_regen;
@@ -226,6 +228,7 @@ struct Ship
 
 struct Fleet
 {
+    unsigned int id;
     std::vector<std::shared_ptr<Ship>> ships;
     float soldiers;
     float civilians;
