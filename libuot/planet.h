@@ -10,11 +10,12 @@
 
 enum BuildingType
 {
-    planetaryAdministration,
-    improvedMetalsMine,
-    metalsMine,
-    farm,
-    greenhouses
+    None,
+    PlanetaryAdministration,
+    ImprovedMetalsMine,
+    MetalsMine,
+    Farm,
+    Greenhouses
 };
 
 struct Building
@@ -23,9 +24,8 @@ struct Building
     const std::map<Resource, float> upkeep;
     const float workers;
     const std::map<Resource, float> production;
-    const BuildingType buildingType;
 
-    const Building* upgrade;
+    const BuildingType upgrade;
 
     bool operator<(const Building& b) const  // whatever, needed to make sets and maps
     {
@@ -33,56 +33,60 @@ struct Building
     }
 };
 
-const Building PlanetaryAdministration{{{Resource::Metals, 50.0f}},
-                                       {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
-                                       10.0f,
-                                       {},
-                                       BuildingType::planetaryAdministration,
-                                       nullptr};
+// all buildings
+const std::map<BuildingType, Building> Buildings{
 
-const Building ImprovedMetalsMine{{{Resource::Metals, 50.0f}, {Resource::Crystals, 10.0f}},
-                                  {{Resource::Antimatter, 2.0f}, {Resource::Cryptocurrencies, 15.0f}},
-                                  15.0f,
-                                  {{Resource::Metals, 20.0f}},
-                                  BuildingType::improvedMetalsMine,
-                                  nullptr};
+    {BuildingType::PlanetaryAdministration,
+     {{{Resource::Metals, 50.0f}},
+      {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
+      10.0f,
+      {},
+      BuildingType::None}},
 
-const Building MetalsMine{{{Resource::Metals, 50.0f}},
-                          {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
-                          10.0f,
-                          {{Resource::Metals, 10.0f}},
-                          BuildingType::metalsMine,
-                          &ImprovedMetalsMine};
+    {BuildingType::ImprovedMetalsMine,
+     {{{Resource::Metals, 50.0f}, {Resource::Crystals, 10.0f}},
+      {{Resource::Antimatter, 2.0f}, {Resource::Cryptocurrencies, 15.0f}},
+      15.0f,
+      {{Resource::Metals, 20.0f}},
+      BuildingType::None}},
 
-const Building Farm{{{Resource::Metals, 30.0f}},
-                    {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
-                    10.0f,
-                    {{Resource::Food, 10.0f}},
-                    BuildingType::farm,
-                    &ImprovedMetalsMine};
+    {BuildingType::MetalsMine,
+     {{{Resource::Metals, 50.0f}},
+      {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
+      10.0f,
+      {{Resource::Metals, 10.0f}},
+      BuildingType::ImprovedMetalsMine}},
 
-const Building Greenhouses{{{Resource::Metals, 50.0f}},
-                           {{Resource::Antimatter, 3.0f}, {Resource::Cryptocurrencies, 12.0f}},
-                           10.0f,
-                           {{Resource::Food, 7.0f}},
-                           BuildingType::greenhouses,
-                           nullptr};
+    {BuildingType::Farm,
+     {{{Resource::Metals, 30.0f}},
+      {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
+      10.0f,
+      {{Resource::Food, 10.0f}},
+      BuildingType::ImprovedMetalsMine}},
+
+    {BuildingType::Greenhouses,
+     {{{Resource::Metals, 50.0f}},
+      {{Resource::Antimatter, 3.0f}, {Resource::Cryptocurrencies, 12.0f}},
+      10.0f,
+      {{Resource::Food, 7.0f}},
+      BuildingType::None}},
+};
 
 // buildable buildings here
-const std::set<Building> LimitedBuildings = {Farm, MetalsMine};
-const std::set<Building> UnlimitedBuildings = {Greenhouses};
+const std::set<BuildingType> LimitedBuildings = {BuildingType::Farm, BuildingType::MetalsMine};
+const std::set<BuildingType> UnlimitedBuildings = {BuildingType::Greenhouses};
 
 struct PlanetaryFeatures
 {
-    const std::map<Building, int> feature_buildings;
+    const std::map<BuildingType, int> feature_buildings;
 };
 
-const PlanetaryFeatures TemperateClimate = {{{Farm, 6}}};
-const PlanetaryFeatures HotClimate = {{{Farm, 2}}};
-const PlanetaryFeatures ColdClimate = {{{Farm, 2}}};
-const PlanetaryFeatures SmallMetalsDeposits = {{{MetalsMine, 2}}};
-const PlanetaryFeatures MediumMetalsDeposits = {{{MetalsMine, 4}}};
-const PlanetaryFeatures BigMetalsDeposits = {{{MetalsMine, 8}}};
+const PlanetaryFeatures TemperateClimate = {{{BuildingType::Farm, 6}}};
+const PlanetaryFeatures HotClimate = {{{BuildingType::Farm, 2}}};
+const PlanetaryFeatures ColdClimate = {{{BuildingType::Farm, 2}}};
+const PlanetaryFeatures SmallMetalsDeposits = {{{BuildingType::MetalsMine, 2}}};
+const PlanetaryFeatures MediumMetalsDeposits = {{{BuildingType::MetalsMine, 4}}};
+const PlanetaryFeatures BigMetalsDeposits = {{{BuildingType::MetalsMine, 8}}};
 
 // habitable planet
 struct Planet : SectorObject
@@ -96,7 +100,7 @@ struct Planet : SectorObject
     PlanetClimate climate;
     int size;
     std::set<PlanetaryFeatures> planetary_features;
-    std::map<Building, int> possible_buildings;
+    std::map<BuildingType, int> possible_buildings;
     std::shared_ptr<Colony> colony;
 
     Planet(const SectorObject& o, const PlanetClimate c, const std::set<PlanetaryFeatures>& f)

@@ -12,7 +12,7 @@ class PlayersList
 {
    private:
     std::map<long, std::shared_ptr<Player>> players = {};
-    
+    std::map<long, std::string> players_net_names = {};
 
    public:
     std::shared_ptr<Galaxy> GetStartingGalaxy(std::shared_ptr<Galaxy> wholeGalaxy);

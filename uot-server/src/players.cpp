@@ -42,8 +42,9 @@ void PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy>
     std::shared_ptr<Galaxy> startingGalaxy = GetStartingGalaxy(wholeGalaxy);
     std::shared_ptr<Colony> startingColony = GetStartingColony(id, startingGalaxy);
     std::shared_ptr<Player> new_player =
-        std::make_shared<Player>(id, player_net_name, startingGalaxy, GetStartingResources(), startingColony);
+        std::make_shared<Player>(id, startingGalaxy, GetStartingResources(), startingColony);
     players[id] = new_player;
+    players_net_names[id] = player_net_name;
 }
 
 void PlayersList::CountWeeklyNumbers()
