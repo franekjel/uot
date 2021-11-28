@@ -33,6 +33,7 @@ std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shar
     if (!planet)
         throw std::runtime_error("No empty planet found");
     std::shared_ptr<Colony> startingColony = std::make_shared<Colony>(player_id, planet);
+
     return startingColony;
 }
 
@@ -60,6 +61,7 @@ void PlayersList::CountWeeklyNumbers()
 void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player) {
     auto& player_resources = player->owned_resources;
     auto& player_colonies = player->owned_colonies;
+    auto& player_space_bases = player->owned_space_bases;
     auto& player_galaxy = player->known_galaxy;
     auto& player_ships = player->owned_ships;
 
@@ -110,15 +112,14 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player) {
 
     // calculate bilans of inhabitable objects
 
-    for (auto & sector: player_galaxy->sectors)
+    for (auto& space_base : player_space_bases)
     {
-        for (auto& object : sector->objects)
+        for (auto& resource : space_base->object->resurce_deposit)
         {
-            auto inhabitable_object = std::dynamic_pointer_cast<InhabitableObject>(object);
-            if (!inhabitable_object)
-                continue;
-            // TODO create inhabitable object mines mechanic
+            player_resources[resource.first] += resource.second;
         }
+
+        // If space base get some upkeep cost, calculate it here;
     }
 }
 
