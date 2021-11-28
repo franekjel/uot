@@ -1,12 +1,12 @@
 #pragma once
 #include <memory>
 #include <stdexcept>
-#include <vector>
 #include <thread>
+#include <vector>
 
+#include "../net/net_server_uot.h"
 #include "galaxy.h"
 #include "player.h"
-#include "../net/net_server_uot.h"
 
 static long player_id = 1;
 class PlayersList

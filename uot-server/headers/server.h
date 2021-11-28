@@ -17,6 +17,7 @@ class Server
     void StartGame();
     int PlayersCount() { return players.PlayersCount(); }
     int players_count_game_start = -1;
+
    private:
     bool accept_player(std::string player_name);
     void run();

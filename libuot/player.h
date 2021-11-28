@@ -7,8 +7,8 @@
 #include "planet.h"
 #include "resource.h"
 #include "ship.h"
-#include "technology.h"
 #include "spacebase.h"
+#include "technology.h"
 
 struct Player
 {
