@@ -13,7 +13,7 @@ void Server::StartGame()
 {
     game_in_progress = true;
     // TODO: Send players info about beginning of the game
-    messaging_service.send_game_begin_message();
+    players.SendStartGameMessage(messaging_service);
     run();
 }
 

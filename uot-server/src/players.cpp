@@ -109,7 +109,8 @@ std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shar
     {
         if (sector->sector_id != starting_sector_id)
             continue;
-        for (auto& pl : sector->objects) {
+        for (auto& pl : sector->objects)
+        {
             if (pl->id != planet->id)
                 continue;
             auto& plan = std::dynamic_pointer_cast<Planet>(pl);
@@ -127,6 +128,7 @@ void PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy>
 
     std::shared_ptr<Player> new_player =
         std::make_shared<Player>(id, startingGalaxy, GetStartingResources(), startingColony);
+    startingColony->owner = new_player;
     players[id] = new_player;
     players_net_names[id] = player_net_name;
 }
@@ -147,6 +149,14 @@ void PlayersList::SendNewTourMessage(int tour_number, net_server_uot& messaging_
     for (auto& player : players)
     {
         messaging_service.send_new_tour_message(tour_number, player.second, players_net_names[player.first]);
+    }
+}
+
+void PlayersList::SendStartGameMessage(net_server_uot& messaging_service)
+{
+    for (auto& player : players)
+    {
+        messaging_service.send_game_begin_message(player.second, players_net_names[player.first]);
     }
 }
 

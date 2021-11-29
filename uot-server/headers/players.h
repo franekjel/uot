@@ -25,6 +25,7 @@ class PlayersList
     void CountEveryTourNumbers();
     int PlayersCount() { return players.size(); }
     void SendNewTourMessage(int tour_number, net_server_uot& messaging_service);
+    void SendStartGameMessage(net_server_uot& messaging_service);
     static void CountWeeklyNumbersPlayer(std::shared_ptr<Player> player);
     static void CountEveryTourNumbersPlayer(std::shared_ptr<Player> player);
 };
