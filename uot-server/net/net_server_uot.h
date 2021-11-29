@@ -3,7 +3,7 @@
 
 #include <functional>
 #include <vector>
-#include "../msg/messagetypes.h"
+#include "../libuot/msg/messagetypes.h"
 #include "server_txrx.h"
 
 class net_server_uot : public net_server

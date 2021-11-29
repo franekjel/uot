@@ -35,8 +35,10 @@ struct MsgInhabitable
     float object_size;
     std::map<Resource, float> resurce_deposit;
     InhabitableObject::ObjectType object_type;
+    bool base_exists;
     MsgBase base;
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgInhabitable, id, position, object_size, resurce_deposit, object_type, base)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgInhabitable, id, position, object_size, resurce_deposit, object_type, base_exists,
+                                   base)
     MsgInhabitable();
     MsgInhabitable(const std::shared_ptr<InhabitableObject>& inhabitable);
 };
@@ -61,9 +63,10 @@ struct MsgPlanet
     int planet_size;
     std::set<PlanetaryFeatures::PlanetaryFeatureType> planetary_features;
     std::map<Building::BuildingType, int> possible_buildings;
+    bool colony_exists;
     MsgColony colony;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgPlanet, id, position, object_size, climate, planet_size, planetary_features,
-                                   possible_buildings, colony)
+                                   possible_buildings, colony_exists, colony)
     MsgPlanet();
     MsgPlanet(const std::shared_ptr<Planet>& planet);
 };

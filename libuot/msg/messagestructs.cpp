@@ -6,13 +6,18 @@ messageTypes::MsgStar::MsgStar(const std::shared_ptr<Star>& star)
 {
 }
 
-messageTypes::MsgBase::MsgBase() { id = -1; }
+messageTypes::MsgBase::MsgBase() {}
 messageTypes::MsgBase::MsgBase(const std::shared_ptr<SpaceBase>& spaceBase)
     : id(spaceBase->id), owner_id(spaceBase->owner->id)
 {
 }
 
-messageTypes::MsgInhabitable::MsgInhabitable() { resurce_deposit = {}; }
+messageTypes::MsgInhabitable::MsgInhabitable()
+{
+    resurce_deposit = {};
+    base = {};
+    base_exists = false;
+}
 messageTypes::MsgInhabitable::MsgInhabitable(const std::shared_ptr<InhabitableObject>& inhabitable)
     : id(inhabitable->id),
       position(inhabitable->position),
@@ -21,13 +26,17 @@ messageTypes::MsgInhabitable::MsgInhabitable(const std::shared_ptr<InhabitableOb
 {
     for (auto resource : inhabitable->resurce_deposit)
         resurce_deposit[resource.first] = resource.second;
+
+    if (!!inhabitable->base)
+    {
+        base = MsgBase(inhabitable->base);
+        base_exists = true;
+    }
+    else
+        base_exists = false;
 }
 
-messageTypes::MsgColony::MsgColony()
-{
-    buildings = {};
-    id = -1;
-}
+messageTypes::MsgColony::MsgColony() { buildings = {}; }
 messageTypes::MsgColony::MsgColony(const std::shared_ptr<Colony>& colony)
     : id(colony->id), population(colony->population), owner_id(colony->owner->id)
 {
@@ -39,6 +48,7 @@ messageTypes::MsgPlanet::MsgPlanet()
 {
     planetary_features = {};
     possible_buildings = {};
+    colony_exists = false;
     colony = {};
 }
 messageTypes::MsgPlanet::MsgPlanet(const std::shared_ptr<Planet>& planet)
@@ -49,7 +59,12 @@ messageTypes::MsgPlanet::MsgPlanet(const std::shared_ptr<Planet>& planet)
       planet_size(planet->Planet::size)
 {
     if (!!planet->colony)
+    {
         colony = MsgColony(planet->colony);
+        colony_exists = true;
+    }
+    else
+        colony_exists = false;
 
     for (auto feature : planet->planetary_features)
         planetary_features.insert(feature);

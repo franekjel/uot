@@ -3,9 +3,9 @@
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 #include "galaxy.h"
-#include "messagestructs.h"
 #include "player.h"
 #include "resource.h"
+#include "messagestructs.h"
 
 /*
 How to add new message
