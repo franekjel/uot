@@ -4,7 +4,7 @@
 template <typename T>
 struct singleton
 {
-    static T& pointer()
+    static T& reference()
     {
         static T t;
         return t;

@@ -159,6 +159,16 @@ static std::set<std::shared_ptr<SectorObject>> GenerateSectorObjects(const Galax
     return sector_objects;
 }
 
+bool too_close(std::vector<Point> all, Point b)
+{
+    for (const auto &p : all)
+    {
+        if ((b - p).squaredLength() <= 0.15)
+            return true;
+    }
+    return false;
+}
+
 Galaxy GenerateGalaxy(const GalaxyGeneratorParameters &parameters)
 {
     std::random_device dev;
@@ -166,17 +176,17 @@ Galaxy GenerateGalaxy(const GalaxyGeneratorParameters &parameters)
     std::uniform_real_distribution<float> dist(-1.0, 1.0);
 
     Galaxy galaxy;
+    std::vector<Point> sector_positions;
 
     for (int i = 0; i < parameters.size; i++)
     {
         Point pos(0, 0);
-        while (pos.squaredLength() < 1.0f && pos.squaredLength() > 0.1f)
+        while (pos.squaredLength() >= 1.0f || too_close(sector_positions, pos))
             pos = Point(dist(gen), dist(gen));
-        // TODO: check if new sector isn't too close to other secotr
-
         const std::set<std::shared_ptr<SectorObject>> sector_objects = GenerateSectorObjects(parameters);
-
         galaxy.sectors.insert(std::shared_ptr<Sector>(new Sector{i, pos, {}, sector_objects}));
+        sector_positions.push_back(pos);
+
         // TODO: neighbour find - brute force or use kd-trees (nanoflann?)
     }
     return galaxy;
@@ -196,7 +206,6 @@ Galaxy GenerateGalaxyTest(const GalaxyGeneratorParameters &parameters)
         // TODO: check if new sector isn't too close to other secotr
 
         const std::set<std::shared_ptr<SectorObject>> sector_objects = GenerateSectorObjects(parameters);
-
         galaxy.sectors.insert(std::shared_ptr<Sector>(new Sector{i, pos, {}, sector_objects}));
         // TODO: neighbour find - brute force or use kd-trees (nanoflann?)
     }

@@ -47,6 +47,6 @@ if(MSYS2_BUILD)
   target_link_libraries(GameNetworkingSockets PUBLIC winmm ws2_32)
 endif()
 
+add_subdirectory(libuot)
 add_subdirectory(uot)
 add_subdirectory(uot-server)
-add_subdirectory(libuot)
