@@ -4,7 +4,6 @@ std::shared_ptr<Galaxy> PlayersList::GetStartingGalaxy(std::shared_ptr<Galaxy> w
 {
     // TODO: Copy one empty (without another player) sector with at least one planet from wholeGalaxy
     auto known_galaxy = std::make_shared<Galaxy>();
-    std::shared_ptr<Sector> starting_sector;
     for (const auto& sector : wholeGalaxy->sectors)
     {
         int num_of_planets = 0;
@@ -39,9 +38,9 @@ std::shared_ptr<Galaxy> PlayersList::GetStartingGalaxy(std::shared_ptr<Galaxy> w
 
             for (auto& obj : sector->objects)
             {
-                auto& star = std::dynamic_pointer_cast<Star>(obj);
-                auto& inhabitable = std::dynamic_pointer_cast<InhabitableObject>(obj);
-                auto& planet = std::dynamic_pointer_cast<Planet>(obj);
+                const auto& star = std::dynamic_pointer_cast<Star>(obj);
+                const auto& inhabitable = std::dynamic_pointer_cast<InhabitableObject>(obj);
+                const auto& planet = std::dynamic_pointer_cast<Planet>(obj);
 
                 if (!!star)
                 {
@@ -97,7 +96,7 @@ std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shar
                 break;
             }
         }
-        if (!!planet)
+        if (!planet)
             break;
         starting_sector_id = sector->sector_id;
     }
