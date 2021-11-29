@@ -18,7 +18,8 @@ class PlayersList
    public:
     std::shared_ptr<Galaxy> GetStartingGalaxy(std::shared_ptr<Galaxy> wholeGalaxy);
     std::map<Resource, float> GetStartingResources();
-    std::shared_ptr<Colony> GetStartingColony(long player_id, std::shared_ptr<Galaxy> startingGalaxy);
+    std::shared_ptr<Colony> GetStartingColony(long player_id, std::shared_ptr<Galaxy> startingGalaxy,
+                                              std::shared_ptr<Galaxy> wholeGalaxy);
     void AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy> wholeGalaxy);
     void CountWeeklyNumbers();
     void CountEveryTourNumbers();

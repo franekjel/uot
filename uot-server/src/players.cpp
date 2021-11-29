@@ -3,8 +3,76 @@
 std::shared_ptr<Galaxy> PlayersList::GetStartingGalaxy(std::shared_ptr<Galaxy> wholeGalaxy)
 {
     // TODO: Copy one empty (without another player) sector with at least one planet from wholeGalaxy
-    return wholeGalaxy;
-    return std::make_shared<Galaxy>();
+    auto known_galaxy = std::make_shared<Galaxy>();
+    std::shared_ptr<Sector> starting_sector;
+    for (const auto& sector : wholeGalaxy->sectors)
+    {
+        int num_of_planets = 0;
+        for (const auto& sector_object : sector->objects)
+        {
+            std::shared_ptr<Planet> is_planet = std::dynamic_pointer_cast<Planet>(sector_object);
+            if (!!is_planet)
+            {
+                num_of_planets++;
+                if (!!(is_planet->colony))
+                {
+                    num_of_planets = -1;
+                    break;
+                }
+            }
+        }
+        if (num_of_planets > 0)
+        {
+            std::shared_ptr<Sector> new_sector = std::make_shared<Sector>();
+
+            new_sector->sector_id = sector->sector_id;
+            new_sector->position = sector->position;
+
+            for (auto& neigh : sector->neighbors)
+            {
+                auto new_neigh = std::make_shared<Sector>();
+                new_neigh->sector_id = neigh->sector_id;
+                new_neigh->position = neigh->position;
+                new_sector->neighbors.insert(new_neigh);
+                known_galaxy->sectors.insert(new_neigh);
+            }
+
+            for (auto& obj : sector->objects)
+            {
+                auto& star = std::dynamic_pointer_cast<Star>(obj);
+                auto& inhabitable = std::dynamic_pointer_cast<InhabitableObject>(obj);
+                auto& planet = std::dynamic_pointer_cast<Planet>(obj);
+
+                if (!!star)
+                {
+                    new_sector->objects.insert(
+                        std::make_shared<Star>(SectorObject(star->id, star->position, star->size), star->star_type));
+                }
+                else if (!!inhabitable)
+                {
+                    new_sector->objects.insert(std::make_shared<InhabitableObject>(
+                        SectorObject(inhabitable->id, inhabitable->position, inhabitable->size),
+                        std::map<Resource, float>(), inhabitable->object_type));
+                }
+                else if (!!planet)
+                {
+                    auto new_planetary_features = std::set<PlanetaryFeatures::PlanetaryFeatureType>();
+                    for (auto feat : planet->planetary_features)
+                    {
+                        new_planetary_features.insert(feat);
+                    }
+                    new_sector->objects.insert(
+                        std::make_shared<Planet>(SectorObject(planet->id, planet->position, planet->size),
+                                                 planet->climate, new_planetary_features));
+                }
+            }
+
+            known_galaxy->sectors.insert(new_sector);
+            break;
+        }
+    }
+
+    return known_galaxy;
 }
 
 std::map<Resource, float> PlayersList::GetStartingResources()
@@ -13,15 +81,17 @@ std::map<Resource, float> PlayersList::GetStartingResources()
     return {};
 }
 
-std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shared_ptr<Galaxy> startingGalaxy)
+std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shared_ptr<Galaxy> startingGalaxy,
+                                                       std::shared_ptr<Galaxy> wholeGalaxy)
 {
     std::shared_ptr<Planet> planet = nullptr;
+    int starting_sector_id = -1;
     for (const auto& sector : startingGalaxy->sectors)
     {
         for (const auto& sector_object : sector->objects)
         {
             std::shared_ptr<Planet> is_planet = std::dynamic_pointer_cast<Planet>(sector_object);
-            if (!!is_planet)
+            if (!!is_planet && !(is_planet->colony))
             {
                 planet = is_planet;
                 break;
@@ -29,11 +99,23 @@ std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shar
         }
         if (!!planet)
             break;
+        starting_sector_id = sector->sector_id;
     }
     if (!planet)
         throw std::runtime_error("No empty planet found");
     std::shared_ptr<Colony> startingColony = std::make_shared<Colony>(player_id, planet);
-
+    planet->colony = startingColony;
+    for (auto& sector : wholeGalaxy->sectors)
+    {
+        if (sector->sector_id != starting_sector_id)
+            continue;
+        for (auto& pl : sector->objects) {
+            if (pl->id != planet->id)
+                continue;
+            auto& plan = std::dynamic_pointer_cast<Planet>(pl);
+            plan->colony = startingColony;
+        }
+    }
     return startingColony;
 }
 
@@ -41,7 +123,8 @@ void PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy>
 {
     unsigned int id = player_id++;
     std::shared_ptr<Galaxy> startingGalaxy = GetStartingGalaxy(wholeGalaxy);
-    std::shared_ptr<Colony> startingColony = GetStartingColony(id, startingGalaxy);
+    std::shared_ptr<Colony> startingColony = GetStartingColony(id, startingGalaxy, wholeGalaxy);
+
     std::shared_ptr<Player> new_player =
         std::make_shared<Player>(id, startingGalaxy, GetStartingResources(), startingColony);
     players[id] = new_player;
