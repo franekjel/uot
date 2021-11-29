@@ -1,0 +1,1 @@
+players_count_game_start=2

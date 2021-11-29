@@ -7,6 +7,7 @@
 #include "planet.h"
 #include "resource.h"
 #include "ship.h"
+#include "spacebase.h"
 #include "technology.h"
 
 struct Player
@@ -14,9 +15,11 @@ struct Player
     unsigned int id;
 
     std::vector<std::shared_ptr<Colony>> owned_colonies;
+    std::vector<std::shared_ptr<SpaceBase>> owned_space_bases;
     std::shared_ptr<Galaxy> known_galaxy;
     std::vector<std::shared_ptr<Ship>> owned_ships;
     std::map<Resource, float> owned_resources;
+    std::map<Resource, bool> resources_changed;
 
     std::set<const Technology*> known_technologies;
     std::set<const Technology*> available_technologies;

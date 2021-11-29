@@ -10,12 +10,22 @@
 
 struct Building
 {
+    enum BuildingType
+    {
+        None,
+        PlanetaryAdministration,
+        ImprovedMetalsMine,
+        MetalsMine,
+        Farm,
+        Greenhouses
+    };
+
     const std::map<Resource, float> cost;
     const std::map<Resource, float> upkeep;
     const float workers;
     const std::map<Resource, float> production;
 
-    const Building* upgrade;
+    const BuildingType upgrade;
 
     bool operator<(const Building& b) const  // whatever, needed to make sets and maps
     {
@@ -23,51 +33,61 @@ struct Building
     }
 };
 
-const Building PlanetaryAdministration{{{Resource::Metals, 50.0f}},
-                                       {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
-                                       10.0f,
-                                       {},
-                                       nullptr};
+// all buildings
+const std::map<Building::BuildingType, Building> Buildings{
 
-const Building ImprovedMetalsMine{{{Resource::Metals, 50.0f}, {Resource::Crystals, 10.0f}},
-                                  {{Resource::Antimatter, 2.0f}, {Resource::Cryptocurrencies, 15.0f}},
-                                  15.0f,
-                                  {{Resource::Metals, 20.0f}},
-                                  nullptr};
+    {Building::BuildingType::PlanetaryAdministration,
+     {{{Resource::Metals, 50.0f}},
+      {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
+      10.0f,
+      {},
+      Building::BuildingType::None}},
 
-const Building MetalsMine{{{Resource::Metals, 50.0f}},
-                          {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
-                          10.0f,
-                          {{Resource::Metals, 10.0f}},
-                          &ImprovedMetalsMine};
+    {Building::BuildingType::ImprovedMetalsMine,
+     {{{Resource::Metals, 50.0f}, {Resource::Crystals, 10.0f}},
+      {{Resource::Antimatter, 2.0f}, {Resource::Cryptocurrencies, 15.0f}},
+      15.0f,
+      {{Resource::Metals, 20.0f}},
+      Building::BuildingType::None}},
 
-const Building Farm{{{Resource::Metals, 30.0f}},
-                    {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
-                    10.0f,
-                    {{Resource::Food, 10.0f}},
-                    &ImprovedMetalsMine};
+    {Building::BuildingType::MetalsMine,
+     {{{Resource::Metals, 50.0f}},
+      {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
+      10.0f,
+      {{Resource::Metals, 10.0f}},
+      Building::BuildingType::ImprovedMetalsMine}},
 
-const Building Greenhouses{{{Resource::Metals, 50.0f}},
-                           {{Resource::Antimatter, 3.0f}, {Resource::Cryptocurrencies, 12.0f}},
-                           10.0f,
-                           {{Resource::Food, 7.0f}},
-                           nullptr};
+    {Building::BuildingType::Farm,
+     {{{Resource::Metals, 30.0f}},
+      {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
+      10.0f,
+      {{Resource::Food, 10.0f}},
+      Building::BuildingType::ImprovedMetalsMine}},
+
+    {Building::BuildingType::Greenhouses,
+     {{{Resource::Metals, 50.0f}},
+      {{Resource::Antimatter, 3.0f}, {Resource::Cryptocurrencies, 12.0f}},
+      10.0f,
+      {{Resource::Food, 7.0f}},
+      Building::BuildingType::None}},
+};
 
 // buildable buildings here
-const std::set<Building> LimitedBuildings = {Farm, MetalsMine};
-const std::set<Building> UnlimitedBuildings = {Greenhouses};
+const std::set<Building::BuildingType> LimitedBuildings = {Building::BuildingType::Farm,
+                                                           Building::BuildingType::MetalsMine};
+const std::set<Building::BuildingType> UnlimitedBuildings = {Building::BuildingType::Greenhouses};
 
 struct PlanetaryFeatures
 {
-    const std::map<Building, int> feature_buildings;
+    const std::map<Building::BuildingType, int> feature_buildings;
 };
 
-const PlanetaryFeatures TemperateClimate = {{{Farm, 6}}};
-const PlanetaryFeatures HotClimate = {{{Farm, 2}}};
-const PlanetaryFeatures ColdClimate = {{{Farm, 2}}};
-const PlanetaryFeatures SmallMetalsDeposits = {{{MetalsMine, 2}}};
-const PlanetaryFeatures MediumMetalsDeposits = {{{MetalsMine, 4}}};
-const PlanetaryFeatures BigMetalsDeposits = {{{MetalsMine, 8}}};
+const PlanetaryFeatures TemperateClimate = {{{Building::BuildingType::Farm, 6}}};
+const PlanetaryFeatures HotClimate = {{{Building::BuildingType::Farm, 2}}};
+const PlanetaryFeatures ColdClimate = {{{Building::BuildingType::Farm, 2}}};
+const PlanetaryFeatures SmallMetalsDeposits = {{{Building::BuildingType::MetalsMine, 2}}};
+const PlanetaryFeatures MediumMetalsDeposits = {{{Building::BuildingType::MetalsMine, 4}}};
+const PlanetaryFeatures BigMetalsDeposits = {{{Building::BuildingType::MetalsMine, 8}}};
 
 // habitable planet
 struct Planet : SectorObject
@@ -81,7 +101,7 @@ struct Planet : SectorObject
     PlanetClimate climate;
     int size;
     std::set<PlanetaryFeatures> planetary_features;
-    std::map<Building, int> possible_buildings;
+    std::map<Building::BuildingType, int> possible_buildings;
     std::shared_ptr<Colony> colony;
 
     Planet(const SectorObject& o, const PlanetClimate c, const std::set<PlanetaryFeatures>& f)
@@ -98,13 +118,76 @@ struct Planet : SectorObject
     }
 };
 
+const float population_food_usage = 0.0f;  // TODO change to better value
+
 struct Colony
 {
     unsigned int id;
     std::shared_ptr<Planet> planet;
-    std::map<Building, int> buildings;
+    std::map<Building::BuildingType, int> buildings;
     float population;
+    bool population_changed;
+    float base_population_growth = 0.05f;
+    float base_population_starving_death = 0.025f;
     std::shared_ptr<Player> owner;
+
+    static const Building& GetBuildingFromType(Building::BuildingType type) { return (*Buildings.find(type)).second; }
+
+    std::map<Resource, float> GetColonyGains()
+    {
+        std::map<Resource, float> colony_gains = {};
+        int neccessary_workers = 0;
+
+        for (auto& buildingType : buildings)
+        {
+            auto& building = Colony::GetBuildingFromType(buildingType.first);
+            int number_of_buildings = buildingType.second;
+            neccessary_workers += number_of_buildings * building.workers;
+            for (auto& gains : building.production)
+            {
+                if (colony_gains.count(gains.first) == 0)
+                    colony_gains[gains.first] = gains.second * number_of_buildings;
+                else
+                    colony_gains[gains.first] += gains.second * number_of_buildings;
+            }
+        }
+
+        float colony_efficency = neccessary_workers > population ? population / neccessary_workers : 1.0f;
+
+        if (colony_efficency < 1.0f)
+            colony_gains = colony_gains * colony_efficency;
+
+        return colony_gains;
+    }
+
+    std::map<Resource, float> GetColonyExpenses()
+    {
+        std::map<Resource, float> colony_expenses = {};
+        int neccessary_workers = 0;
+
+        for (auto& buildingType : buildings)
+        {
+            auto& building = Colony::GetBuildingFromType(buildingType.first);
+            int number_of_buildings = buildingType.second;
+            neccessary_workers += number_of_buildings * building.workers;
+
+            for (auto& expense : building.upkeep)
+            {
+                if (colony_expenses.count(expense.first) == 0)
+                    colony_expenses[expense.first] = expense.second * number_of_buildings;
+                else
+                    colony_expenses[expense.first] += expense.second * number_of_buildings;
+            }
+        }
+
+        float colony_efficency = neccessary_workers > population ? population / neccessary_workers : 1.0f;
+
+        if (colony_efficency < 1.0f)
+            colony_expenses = colony_expenses * colony_efficency;
+        // I assumed that if building is less efficient it is also cheaper to upkeep
+
+        return colony_expenses;
+    }
 
     Colony(const unsigned int id, const std::shared_ptr<Planet> planet_) : id(id)
     {
