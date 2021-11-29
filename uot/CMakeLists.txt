@@ -16,21 +16,22 @@ set(SRCS
     src/main.cpp
 )
 
-include_directories(include/)
-include_directories(../libuot/)
 
+include_directories(include/)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
-find_library(LIBUOT libuot "${CMAKE_CURRENT_BINARY_DIR}/../libuot/")
 
 add_executable(${APP_NAME} ${SRCS})
+
 target_link_libraries(${APP_NAME} SDL2::Main SDL2::Image)
+target_link_libraries(${APP_NAME} libuot)
 
-target_link_libraries(${APP_NAME} ${LIBUOT})
-
-
-file(COPY assets DESTINATION ${CMAKE_BINARY_DIR}/${APP_NAME})
+add_custom_command(
+        TARGET ${APP_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_CURRENT_SOURCE_DIR}/assets/
+                ${CMAKE_CURRENT_BINARY_DIR}/assets/)
 
 set(NET_TEST_SRCS
     include/net/client_txrx.h
