@@ -101,7 +101,7 @@ std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shar
         starting_sector_id = sector->sector_id;
     }
     if (!planet)
-        throw std::runtime_error("No empty planet found");
+        return {};
     std::shared_ptr<Colony> startingColony = std::make_shared<Colony>(player_id, planet);
     planet->colony = startingColony;
     for (auto& sector : wholeGalaxy->sectors)
@@ -119,17 +119,23 @@ std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shar
     return startingColony;
 }
 
-void PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy> wholeGalaxy)
+bool PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy> wholeGalaxy)
 {
     unsigned int id = player_id++;
     std::shared_ptr<Galaxy> startingGalaxy = GetStartingGalaxy(wholeGalaxy);
+    if (!startingGalaxy)
+        return false;
     std::shared_ptr<Colony> startingColony = GetStartingColony(id, startingGalaxy, wholeGalaxy);
-
+    if (!startingColony)
+        return false;
     std::shared_ptr<Player> new_player =
         std::make_shared<Player>(id, startingGalaxy, GetStartingResources(), startingColony);
+    if (!new_player)
+        return false;
     startingColony->owner = new_player;
     players[id] = new_player;
     players_net_names[id] = player_net_name;
+    return true;
 }
 
 void PlayersList::CountWeeklyNumbers()
