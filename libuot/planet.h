@@ -73,7 +73,8 @@ const std::map<Building::BuildingType, Building> Buildings{
 };
 
 // buildable buildings here
-const std::set<Building::BuildingType> LimitedBuildings = {Building::BuildingType::Farm, Building::BuildingType::MetalsMine};
+const std::set<Building::BuildingType> LimitedBuildings = {Building::BuildingType::Farm,
+                                                           Building::BuildingType::MetalsMine};
 const std::set<Building::BuildingType> UnlimitedBuildings = {Building::BuildingType::Greenhouses};
 
 struct PlanetaryFeatures
