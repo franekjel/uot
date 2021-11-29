@@ -79,15 +79,26 @@ const std::set<Building::BuildingType> UnlimitedBuildings = {Building::BuildingT
 
 struct PlanetaryFeatures
 {
+    enum PlanetaryFeatureType
+    {
+        TemperateClimate,
+        HotClimate,
+        ColdClimate,
+        SmallMetalsDeposits,
+        MediumMetalsDeposits,
+        BigMetalsDeposits
+    };
     const std::map<Building::BuildingType, int> feature_buildings;
 };
 
-const PlanetaryFeatures TemperateClimate = {{{Building::BuildingType::Farm, 6}}};
-const PlanetaryFeatures HotClimate = {{{Building::BuildingType::Farm, 2}}};
-const PlanetaryFeatures ColdClimate = {{{Building::BuildingType::Farm, 2}}};
-const PlanetaryFeatures SmallMetalsDeposits = {{{Building::BuildingType::MetalsMine, 2}}};
-const PlanetaryFeatures MediumMetalsDeposits = {{{Building::BuildingType::MetalsMine, 4}}};
-const PlanetaryFeatures BigMetalsDeposits = {{{Building::BuildingType::MetalsMine, 8}}};
+// all features
+const std::map<PlanetaryFeatures::PlanetaryFeatureType, PlanetaryFeatures> PlanetaryFeaturesTypes{
+    {PlanetaryFeatures::PlanetaryFeatureType::TemperateClimate, {{{Building::BuildingType::Farm, 6}}}},
+    {PlanetaryFeatures::PlanetaryFeatureType::HotClimate, {{{Building::BuildingType::Farm, 2}}}},
+    {PlanetaryFeatures::PlanetaryFeatureType::ColdClimate, {{{Building::BuildingType::Farm, 2}}}},
+    {PlanetaryFeatures::PlanetaryFeatureType::SmallMetalsDeposits, {{{Building::BuildingType::MetalsMine, 2}}}},
+    {PlanetaryFeatures::PlanetaryFeatureType::MediumMetalsDeposits, {{{Building::BuildingType::MetalsMine, 4}}}},
+    {PlanetaryFeatures::PlanetaryFeatureType::BigMetalsDeposits, {{{Building::BuildingType::MetalsMine, 8}}}}};
 
 // habitable planet
 struct Planet : SectorObject
@@ -100,16 +111,16 @@ struct Planet : SectorObject
     };
     PlanetClimate climate;
     int size;
-    std::set<PlanetaryFeatures> planetary_features;
+    std::set<PlanetaryFeatures::PlanetaryFeatureType> planetary_features;
     std::map<Building::BuildingType, int> possible_buildings;
     std::shared_ptr<Colony> colony;
 
-    Planet(const SectorObject& o, const PlanetClimate c, const std::set<PlanetaryFeatures>& f)
+    Planet(const SectorObject& o, const PlanetClimate c, const std::set<PlanetaryFeatures::PlanetaryFeatureType>& f)
         : SectorObject(o), climate(c), planetary_features(f)
     {
         for (const auto& feature : planetary_features)
         {
-            for (const auto& building : feature.feature_buildings)
+            for (const auto& building : PlanetaryFeaturesTypes.at(feature).feature_buildings)
             {
                 possible_buildings[building.first] += building.second;
             }
@@ -131,7 +142,7 @@ struct Colony
     float base_population_starving_death = 0.025f;
     std::shared_ptr<Player> owner;
 
-    static const Building& GetBuildingFromType(Building::BuildingType type) { return (*Buildings.find(type)).second; }
+    static const Building& GetBuildingFromType(Building::BuildingType type) { return Buildings.at(type); }
 
     std::map<Resource, float> GetColonyGains()
     {
