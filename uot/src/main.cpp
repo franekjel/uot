@@ -7,15 +7,15 @@
 #endif
 
 #include "assets.h"
-#include "game_rendering.h"
-#include "resource_manager.h"
+#include "client_context.h"
 #include "game_gui.h"
+#include "game_rendering.h"
 #include "game_state.h"
+#include "input_handlers.h"
+#include "resource_manager.h"
 #include "sdl_utilities.h"
 #include "singleton.h"
 #include "size_settings.h"
-#include "client_context.h"
-#include "input_handlers.h"
 
 #include <iostream>
 #include <optional>
@@ -34,13 +34,11 @@ void init(client_context& context)
         throw std::runtime_error("SDL coudl not initialize! SDL Error: %s\n" + std::string(SDL_GetError()));
     }
 
-    context.w = 
-        sdl_utilities::sdl_create_window("UOT Sketch", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                                   size_settings::window_area::width,
-                                                   size_settings::window_area::height, SDL_WINDOW_SHOWN);
+    context.w = sdl_utilities::sdl_create_window("UOT Sketch", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                                 size_settings::window_area::width, size_settings::window_area::height,
+                                                 SDL_WINDOW_SHOWN);
 
-    context.r = 
-        sdl_utilities::sdl_create_renderer(context.w, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    context.r = sdl_utilities::sdl_create_renderer(context.w, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags))
@@ -61,8 +59,8 @@ void loadMedia(client_context& context)
         sdl_utilities::load_texture_from_file(std::string(basic_textures::background_texture_path), context.r);
     gr.buttonTextures.resize(buttons_meta::num_buttons);
     printf("Loading start button\n");
-    gr.buttonTextures[button_types::START_BUTTON] = sdl_utilities::load_texture_from_file(
-        std::string{basic_textures::menu_start_button_texture}, context.r);
+    gr.buttonTextures[button_types::START_BUTTON] =
+        sdl_utilities::load_texture_from_file(std::string{basic_textures::menu_start_button_texture}, context.r);
     printf("Loading exit button\n");
     gr.buttonTextures[button_types::EXIT_BUTTON] =
         sdl_utilities::load_texture_from_file(std::string{basic_textures::menu_exit_button_texture}, context.r);
@@ -76,7 +74,7 @@ void loadMedia(client_context& context)
     printf("Loading sector object buttons\n");
     gr.planetTextures[planet_types::TERRAN_START_PLANET] =
         sdl_utilities::load_texture_from_file(std::string{basic_textures::menu_planet_texture_path}, context.r);
-    
+
     // load utility selection textures
     printf("Loading selection textures\n");
     gr.selectionTextures.resize(selection_meta::num_selection_textures);
@@ -93,13 +91,12 @@ void close()
 int main(int argc, char* argv[])
 {
     // no need for shared pointer, singleton is stack managed
-    client_context context { singleton<resource_manager>::reference(), singleton<game_state_t>::reference() };
+    client_context context{singleton<resource_manager>::reference(), singleton<game_state_t>::reference()};
 
     init(context);
     context.gs.reset_galaxy();
     context.gs.set_gui();
     loadMedia(context);
-
 
     bool quit = false;
     SDL_Event e;

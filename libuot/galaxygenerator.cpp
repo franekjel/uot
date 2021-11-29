@@ -159,9 +159,11 @@ static std::set<std::shared_ptr<SectorObject>> GenerateSectorObjects(const Galax
     return sector_objects;
 }
 
-bool too_close(std::vector<Point> all, Point b) {
-    for(const auto & p : all) {
-        if((b - p).squaredLength() <= 0.15)
+bool too_close(std::vector<Point> all, Point b)
+{
+    for (const auto &p : all)
+    {
+        if ((b - p).squaredLength() <= 0.15)
             return true;
     }
     return false;
@@ -186,7 +188,6 @@ Galaxy GenerateGalaxy(const GalaxyGeneratorParameters &parameters)
         sector_positions.push_back(pos);
 
         // TODO: neighbour find - brute force or use kd-trees (nanoflann?)
-
     }
     return galaxy;
 }
