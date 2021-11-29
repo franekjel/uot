@@ -21,6 +21,8 @@ set(SRCS
     player.h
     ../msg/messagetypes.h
     ../msg/messagetypes.cpp
+    ../msg/messagestructs.h
+    ../msg/messagestructs.cpp
 )
 
 add_library(${LIB_NAME}
@@ -42,6 +44,8 @@ target_link_libraries(${LIB_NAME}
 set(MSG_TEST_SRCS
     ../msg/messagetypes.h
     ../msg/messagetypes.cpp
+    ../msg/messagestructs.h
+    ../msg/messagestructs.cpp
     ../msg/messagetypesTests.cpp
 )
 
