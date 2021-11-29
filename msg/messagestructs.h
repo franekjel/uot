@@ -86,6 +86,6 @@ struct MsgGalaxy
     std::vector<MsgSector> sectors;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgGalaxy, sectors)
     MsgGalaxy();
-    MsgGalaxy(const Galaxy& galaxy);
+    MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy);
 };
 }  // namespace messageTypes

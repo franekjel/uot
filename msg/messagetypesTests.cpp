@@ -83,7 +83,7 @@ void StartGamePayloadTest()
 {
     messageTypes::StartGamePayload sgp;
 
-    Galaxy galaxy;
+    auto galaxy = std::make_shared<Galaxy>();
     auto sector1 = std::make_shared<Sector>();
     sector1->sector_id = 1;
     sector1->position = Point(1.0f, 2.0f);
@@ -108,9 +108,9 @@ void StartGamePayloadTest()
     // auto planet = std::make_shared<Planet>();
     // sector1->objects.insert(planet);
 
-    galaxy.sectors.insert(sector1);
-    galaxy.sectors.insert(sector2);
-    galaxy.sectors.insert(sector3);
+    galaxy->sectors.insert(sector1);
+    galaxy->sectors.insert(sector2);
+    galaxy->sectors.insert(sector3);
 
     sgp.galaxy = messageTypes::MsgGalaxy(galaxy);
     auto ser = sgp.Serialize();

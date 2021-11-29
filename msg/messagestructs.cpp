@@ -85,8 +85,8 @@ messageTypes::MsgSector::MsgSector(const std::shared_ptr<Sector>& sector)
 }
 
 messageTypes::MsgGalaxy::MsgGalaxy() { sectors = {}; }
-messageTypes::MsgGalaxy::MsgGalaxy(const Galaxy& galaxy)
+messageTypes::MsgGalaxy::MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy)
 {
-    for (auto sector : galaxy.sectors)
+    for (auto sector : galaxy->sectors)
         sectors.push_back(MsgSector(sector));
 }

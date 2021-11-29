@@ -16,7 +16,7 @@ class net_server_uot : public net_server
     void run();
     void set_accept_player_callback(std::function<bool(std::string player_name)> callback);
     void send_new_tour_message(int tour_number, std::shared_ptr<Player>& player, std::string player_net_name);
-    void send_game_begin_message(/*TBD*/);
+    void send_game_begin_message(std::shared_ptr<Player>& player, std::string player_net_name);
 
    protected:
     bool running;
