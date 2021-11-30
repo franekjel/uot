@@ -112,7 +112,7 @@ std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shar
         {
             if (pl->id != planet->id)
                 continue;
-            auto& plan = std::dynamic_pointer_cast<Planet>(pl);
+            const auto& plan = std::dynamic_pointer_cast<Planet>(pl);
             plan->colony = startingColony;
         }
     }
