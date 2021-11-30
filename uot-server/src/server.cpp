@@ -13,7 +13,7 @@ void Server::StartGame()
 {
     game_in_progress = true;
     // TODO: Send players info about beginning of the game
-    messaging_service.send_game_begin_message();
+    players.SendStartGameMessage(messaging_service);
     run();
 }
 
@@ -37,8 +37,7 @@ bool Server::accept_player(std::string player_name)
 {
     if (!game_in_progress)
     {
-        players.AddPlayer(player_name, galaxy);
-        return true;
+        return players.AddPlayer(player_name, galaxy);
     }
     return false;
 }

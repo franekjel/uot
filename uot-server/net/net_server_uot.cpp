@@ -75,12 +75,13 @@ void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Play
     txrx.send_reliable(player_net_name, payload.Serialize());
 }
 
-void net_server_uot::send_game_begin_message()
+void net_server_uot::send_game_begin_message(std::shared_ptr<Player>& player, std::string player_net_name)
 {
-    for (auto& s : players)
-    {
-        txrx.send_reliable(s, "blabla");  // TODO change to propper message, when messaging will be done
-    }
+    messageTypes::StartGamePayload payload;
+
+    payload.galaxy = messageTypes::MsgGalaxy(player->known_galaxy);
+
+    txrx.send_reliable(player_net_name, payload.Serialize());
 }
 
 void net_server_uot::read_input()

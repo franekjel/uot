@@ -1,9 +1,11 @@
 #pragma once
-#include <planet.h>
-#include <resource.h>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
+#include "galaxy.h"
+#include "messagestructs.h"
+#include "player.h"
+#include "resource.h"
 
 /*
 How to add new message
@@ -40,10 +42,9 @@ struct BasePayload
 
 struct StartGamePayload : BasePayload
 {
-    int jakiesPole1;
-    std::string jakiesPole2;
+    MsgGalaxy galaxy;
     MessageType GetType() override { return MessageType::StartGame; }
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StartGamePayload, jakiesPole1, jakiesPole2)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StartGamePayload, galaxy)
     std::string Serialize() override
     {
         nlohmann::json jsonPayload = (*this);

@@ -1,4 +1,6 @@
 #pragma once
+#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 struct Point
 {
@@ -39,6 +41,8 @@ struct Point
         y *= v;
         return *this;
     }
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Point, x, y)
 };
 
 inline Point operator+(Point lhs, const Point& rhs)
