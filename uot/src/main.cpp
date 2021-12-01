@@ -46,6 +46,10 @@ void init(client_context& context)
         throw std::runtime_error("Couldn't initialize SDL_image");
     }
 
+    if(TTF_Init() == -1) {
+        throw std::runtime_error("Couldn't initialize SDL_ttf");
+    }
+
     gs.set_view(game_view_t::menu_view);
 }
 
@@ -57,6 +61,10 @@ void loadMedia(client_context& context)
     printf("Loading background\n");
     gr.bk_texture =
         sdl_utilities::load_texture_from_file(std::string(basic_textures::background_texture_path), context.r);
+    gr.sky_texture =
+        sdl_utilities::load_texture_from_file(std::string(basic_textures::sky_texture_path), context.r);
+    gr.resource_texture =
+        sdl_utilities::load_texture_from_file(std::string(resources_meta::resources_path), context.r);
     gr.buttonTextures.resize(buttons_meta::num_buttons);
     printf("Loading start button\n");
     gr.buttonTextures[button_types::START_BUTTON] =
@@ -71,21 +79,38 @@ void loadMedia(client_context& context)
     // load only the waiting screen planet texture
     gr.planetTextures.resize(planets_meta::num_planets);
 
-    printf("Loading sector object buttons\n");
-    gr.planetTextures[planet_types::TERRAN_START_PLANET] =
-        sdl_utilities::load_texture_from_file(std::string{basic_textures::menu_planet_texture_path}, context.r);
+    printf("Loading sector object textures\n");
+    for(int i = 0; i < planets_meta::num_planets; ++i) {
+        gr.planetTextures[i] =
+            texture_t {planets_meta::texture_size[i], planets_meta::texture_size[i], sdl_utilities::load_texture_from_file(std::string{planets_meta::planet_texture_paths[i]}, context.r)};
+    }
 
     // load utility selection textures
     printf("Loading selection textures\n");
     gr.selectionTextures.resize(selection_meta::num_selection_textures);
     gr.selectionTextures[selection_types::SECTOR_SELECTION] =
         sdl_utilities::load_texture_from_file(std::string{basic_textures::sector_selection}, context.r);
+    
+
+    // FONTS
+    gr.main_font = sdl_utilities::load_font(std::string(fonts::main_font), fonts::main_font_size);
+
+    gr.secondary_font = sdl_utilities::load_font(std::string(fonts::secondary_font), 25);
+
+    gr.resource_font = sdl_utilities::load_font(std::string(fonts::secondary_font), fonts::resource_font_size);
 }
 
-void close()
+void close(client_context& context)
 {
+    //Free global font
+
+    // RAII (custom shared_ptr deleters) used everywhere so no need to close 
+    // textures and/or fonts manually
+
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
+    
 }
 
 int main(int argc, char* argv[])
@@ -108,6 +133,9 @@ int main(int argc, char* argv[])
             {
                 quit = true;
             }
+            else if (e.type == SDL_KEYDOWN) {
+                input_handlers::handle_keydown(context, e.key.keysym.sym);
+            }
             else if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP)
             {
                 int x, y;
@@ -119,6 +147,6 @@ int main(int argc, char* argv[])
         game_rendering::draw(context);
     }
 
-    close();
+    close(context);
     return 0;
 }

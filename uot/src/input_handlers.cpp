@@ -7,28 +7,51 @@
 void input_handlers::handleMouse(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m, int x, int y)
 {
     auto& gui = context.gs.gui;
+    auto& gs = context.gs;
 
-    if (sdl_utilities::check_view_area_collision<size_settings::play_area>(x, y))
+        // check if menu area
+    switch (gs.get_view())
     {
-        gui->template handleMouse<size_settings::play_area>(context, event_type, m, x, y);
-        return;
+        case game_view_t::menu_view:
+            gui->template handleMouse<game_view_t::menu_view>(context, event_type, m, x, y);
+            break;
+        case game_view_t::galaxy_view:
+            gui->template handleMouse<game_view_t::galaxy_view>(context, event_type, m, x, y);
+            break;
+        case game_view_t::universe_view:
+            gui->template handleMouse<game_view_t::universe_view>(context, event_type, m, x, y);
+            break;
+        default:
+            break;
     }
+}
 
-    if (sdl_utilities::check_view_area_collision<size_settings::button_area>(x, y))
-    {
-        gui->template handleMouse<size_settings::button_area>(context, event_type, m, x, y);
-        return;
-    }
+void input_handlers::handle_keydown(client_context& context, Uint16 k) {
+    auto& gui = context.gs.gui;
+    auto& gs = context.gs;
 
-    if (sdl_utilities::check_view_area_collision<size_settings::context_area>(x, y))
-    {
-        gui->template handleMouse<size_settings::context_area>(context, event_type, m, x, y);
-        return;
-    }
-
-    if (sdl_utilities::check_view_area_collision<size_settings::window_area>(x, y))
-    {
-        gui->template handleMouse<size_settings::window_area>(context, event_type, m, x, y);
-        return;
+    if(k == SDLK_ESCAPE) {
+        switch (gs.get_view())
+        {
+            case game_view_t::menu_view:
+                // TODO add exiting the game with popup 
+                break;
+            case game_view_t::galaxy_view:
+                // TODO add popup asking whether you want to finish the game
+                gs.gui->current_object.reset();
+                gs.set_view(game_view_t::universe_view);
+                break;
+            case game_view_t::universe_view:
+                gs.gui->current_sector.reset();
+                gs.set_view(game_view_t::universe_view);
+                gs.set_view(game_view_t::menu_view);
+                break;
+            case game_view_t::planet_view:
+                gs.set_view(game_view_t::galaxy_view);
+                break;
+            
+            default:
+                break;
+        }
     }
 }

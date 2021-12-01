@@ -163,7 +163,7 @@ bool too_close(std::vector<Point> all, Point b)
 {
     for (const auto &p : all)
     {
-        if ((b - p).squaredLength() <= 0.15)
+        if ((b - p).squaredLength() <= 0.02)
             return true;
     }
     return false;
