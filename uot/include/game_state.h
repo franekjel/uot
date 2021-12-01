@@ -33,7 +33,6 @@ struct game_state_t : public uncopiable
     game_state_t() {}
     std::atomic<game_view_t> game_view;
     friend singleton<game_state_t>;
-    friend game_gui;
 
    public:
     void reset_galaxy();

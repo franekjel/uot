@@ -7,6 +7,7 @@
 namespace input_handlers
 {
 void handleMouse(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
-}
+void handle_keydown(client_context& context, Uint16 k);
+}  // namespace input_handlers
 
 #endif

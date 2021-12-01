@@ -14,4 +14,8 @@ void game_state_t::reset_galaxy()
     galaxy = GenerateGalaxy({generation_meta::num_sectors, generation_meta::multiplier});
 }
 
-void game_state_t::set_gui() { gui = std::make_unique<game_gui>(); }
+void game_state_t::set_gui()
+{
+    gui = std::make_unique<game_gui>();
+    gui->popup_buttons = std::vector(begin(ui_menu_lists::start_menu), end(ui_menu_lists::start_menu));
+}

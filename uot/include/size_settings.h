@@ -18,15 +18,23 @@ struct area_properties
 struct window_area : area_properties<1600, 900, 0, 0>
 {
 };
-struct button_area : area_properties<250, 300, 25, 50>
+
+struct resource_area : area_properties<1550, 80, 25, 800>
 {
 };
-struct play_area : area_properties<800, 800, 350, 50>
+
+struct play_area : area_properties<1100, 700, 25, 50>
 {
 };
-struct context_area : area_properties<350, 800, 1225, 50>
+
+struct context_area : area_properties<350, 700, 1225, 50>
 {
 };
+
+struct popup_menu_area : area_properties<400, 600, 600, 150>
+{
+};
+
 }  // namespace size_settings
 
 #endif

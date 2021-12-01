@@ -21,10 +21,11 @@ include_directories(include/)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
+find_package(SDL2_ttf REQUIRED)
 
 add_executable(${APP_NAME} ${SRCS})
 
-target_link_libraries(${APP_NAME} SDL2::Main SDL2::Image)
+target_link_libraries(${APP_NAME} SDL2::Main SDL2::Image SDL2::TTF)
 target_link_libraries(${APP_NAME} libuot)
 
 add_custom_command(
