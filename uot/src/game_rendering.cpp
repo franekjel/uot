@@ -171,7 +171,7 @@ void game_rendering::render_selected_sector_info(const client_context& context) 
                         gr.planetTextures[sector_id]);
 
     // render planet info
-    sdl_utilities::render_text(r.get(), gr.secondary_font, " sector index: " + std::to_string(sector_id) + "\n sector info 1\n sector info 2\n sector info 3", 40, 450, size_settings::context_area::width - 50, 
+    sdl_utilities::render_text(r.get(), gr.secondary_font, " sector index: " + std::to_string(gs.gui->current_sector.value()->sector_id) + "\n sector info 1\n sector info 2\n sector info 3", 40, 450, size_settings::context_area::width - 50, 
     {0xFF, 0xFF, 0xFF, 0xFF});
 }
 
