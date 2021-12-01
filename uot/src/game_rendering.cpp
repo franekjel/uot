@@ -93,14 +93,14 @@ void game_rendering::render_sector_selection(const client_context& context)
     sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
 
     const auto curr = gs.gui->current_sector.value();
-
+    const int tex_size = planets_meta::texture_size[SECTOR_1] * planets_meta::sector_multiplier;
     const int x =
-        size_settings::play_area::width * (0.5f * curr->position.x + 0.5f) - planets_meta::texture_size[SECTOR_1] / 2;
+        size_settings::play_area::width * (0.5f * curr->position.x + 0.5f) - tex_size / 2;
     const int y =
-        size_settings::play_area::height * (0.5f * curr->position.y + 0.5f) - planets_meta::texture_size[SECTOR_1] / 2;
+        size_settings::play_area::height * (0.5f * curr->position.y + 0.5f) - tex_size / 2;
     SDL_Rect s{0, 0, selection_meta::texture_width, selection_meta::texture_height};
 
-    SDL_Rect d{x, y, planets_meta::texture_size[SECTOR_1], planets_meta::texture_size[SECTOR_1]};
+    SDL_Rect d{x, y, tex_size, tex_size};
 
     SDL_RenderCopyEx(r.get(), gr.selectionTextures[selection_types::SECTOR_SELECTION].get(), &s, &d,
                      SDL_GetTicks() / 100, NULL, SDL_FLIP_NONE);
@@ -125,11 +125,16 @@ void game_rendering::render_object_selection(const client_context& context)
     const int x = size_settings::play_area::width * (curr->position.x + 1.0f) / 2;
     const int y = size_settings::play_area::height * (curr->position.y + 1.0f) / 2;
 
+    const int tex_id = GAS_GIANT_1 + curr->id % (planets_meta::num_planets - GAS_GIANT_1);
+    // render always the smallest possible selection
+    const int tex_size = planets_meta::texture_size[GAS_GIANT_1];
+
     SDL_Rect s{0, 0, selection_meta::texture_width, selection_meta::texture_height};
 
-    SDL_Rect d{static_cast<int>(x - 0.5 * planets_meta::frame_width),
-               static_cast<int>(y - 0.5 * planets_meta::frame_height), planets_meta::frame_width,
-               planets_meta::frame_height};
+    SDL_Rect d{static_cast<int>(x - 0.5 * tex_size),
+               static_cast<int>(y - 0.5 * tex_size), 
+               tex_size,
+               tex_size};
 
     SDL_RenderCopyEx(r.get(), gr.selectionTextures[selection_types::SECTOR_SELECTION].get(), &s, &d,
                      SDL_GetTicks() / 100, NULL, SDL_FLIP_NONE);

@@ -192,10 +192,13 @@ struct game_gui
         for (const auto& sec_obj : curr->objects)
         {
             const auto& pos = sec_obj->position;
-            const auto tex_size = planets_meta::texture_size[11 + sec_obj->id % 18];
+            const auto tex_size = planets_meta::texture_size[GAS_GIANT_1];
             if (sdl_utilities::check_collision(
-                    x, y, size_settings::play_area::width * (1.0f + pos.x) * 0.5f - 0.5 * tex_size,
-                    size_settings::play_area::height * (1.0f + pos.y) * 0.5f - 0.5 * tex_size, tex_size, tex_size))
+                    x, y, 
+                    size_settings::play_area::width * (1.0f + pos.x) * 0.5f - 0.5 * tex_size,
+                    size_settings::play_area::height * (1.0f + pos.y) * 0.5f - 0.5 * tex_size, 
+                    tex_size, 
+                    tex_size))
             {
                 if (current_object.has_value() && current_object.value()->position == sec_obj->position)
                 {
