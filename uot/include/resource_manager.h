@@ -6,8 +6,8 @@
 #include <vector>
 #include "sdl_utilities.h"
 #include "singleton.h"
-#include "uncopiable.h"
 #include "texture.h"
+#include "uncopiable.h"
 
 // used for graphics / audio resources
 struct resource_manager : public uncopiable

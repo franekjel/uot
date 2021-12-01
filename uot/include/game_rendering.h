@@ -6,8 +6,8 @@
 #include "client_context.h"
 #include "game_state.h"
 #include "resource_manager.h"
-#include "ui_button.h"
 #include "sdl_utilities.h"
+#include "ui_button.h"
 
 namespace game_rendering
 {
@@ -39,13 +39,12 @@ void render_sector_view(const client_context& context);
 void render_object_selection(const client_context& context);
 
 void render_current_popup_menu(const client_context& context);
- 
+
 void render_selected_object_info(const client_context& context);
 
 void render_selected_sector_info(const client_context& context);
 
 void render_resource_bar(const client_context& context);
-
 
 }  // namespace game_rendering
 

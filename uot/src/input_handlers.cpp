@@ -9,7 +9,7 @@ void input_handlers::handleMouse(client_context& context, Uint32 event_type, SDL
     auto& gui = context.gs.gui;
     auto& gs = context.gs;
 
-        // check if menu area
+    // check if menu area
     switch (gs.get_view())
     {
         case game_view_t::menu_view:
@@ -26,15 +26,17 @@ void input_handlers::handleMouse(client_context& context, Uint32 event_type, SDL
     }
 }
 
-void input_handlers::handle_keydown(client_context& context, Uint16 k) {
+void input_handlers::handle_keydown(client_context& context, Uint16 k)
+{
     auto& gui = context.gs.gui;
     auto& gs = context.gs;
 
-    if(k == SDLK_ESCAPE) {
+    if (k == SDLK_ESCAPE)
+    {
         switch (gs.get_view())
         {
             case game_view_t::menu_view:
-                // TODO add exiting the game with popup 
+                // TODO add exiting the game with popup
                 break;
             case game_view_t::galaxy_view:
                 // TODO add popup asking whether you want to finish the game
@@ -49,7 +51,7 @@ void input_handlers::handle_keydown(client_context& context, Uint16 k) {
             case game_view_t::planet_view:
                 gs.set_view(game_view_t::galaxy_view);
                 break;
-            
+
             default:
                 break;
         }

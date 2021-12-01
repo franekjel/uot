@@ -7,8 +7,8 @@
 #include "assets.h"
 #include "client_context.h"
 #include "game_state.h"
-#include "ui_menu_lists.h"
 #include "ui_button.h"
+#include "ui_menu_lists.h"
 
 enum class MouseButton
 {
@@ -108,16 +108,14 @@ struct game_gui
 
     game_gui() {}
 
-    int get_next_button_id() {
-        return user_button_id++;
-    }
+    int get_next_button_id() { return user_button_id++; }
 
     template <game_view_t view>
     void handleMouse(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
 
-    template <MouseButton Button, typename AreaType, game_view_t GameView,
-              typename std::enable_if_t<get_click_type<AreaType, GameView>() == click_type::menu_view_click,
-                                        void>* = nullptr>
+    template <
+        MouseButton Button, typename AreaType, game_view_t GameView,
+        typename std::enable_if_t<get_click_type<AreaType, GameView>() == click_type::menu_view_click, void>* = nullptr>
     void click_handler(client_context& context, int x, int y, SDL_MouseButtonEvent m)
     {
         auto& gs = context.gs;
@@ -125,8 +123,10 @@ struct game_gui
         x = x - size_settings::popup_menu_area::x_offset;
         y = y - size_settings::popup_menu_area::y_offset;
 
-        for(const auto& b : popup_buttons) {
-            if(sdl_utilities::check_collision(x, y, b.x, b.y, b.w, b.h)) {
+        for (const auto& b : popup_buttons)
+        {
+            if (sdl_utilities::check_collision(x, y, b.x, b.y, b.w, b.h))
+            {
                 // calling a lambda, possibly losing a few instructions
                 b.click_handler(context);
             }
@@ -142,8 +142,8 @@ struct game_gui
     }
 
     template <MouseButton Button, typename AreaType, game_view_t GameView,
-              typename std::enable_if_t<get_click_type<AreaType, GameView>() == click_type::universe_view_resource_click,
-                                        void>* = nullptr>
+              typename std::enable_if_t<
+                  get_click_type<AreaType, GameView>() == click_type::universe_view_resource_click, void>* = nullptr>
     void click_handler(client_context& context, int x, int y, SDL_MouseButtonEvent m)
     {
         auto& gs = context.gs;
@@ -163,8 +163,7 @@ struct game_gui
         for (const auto s : gs.galaxy.value().sectors)
         {
             if (sdl_utilities::check_collision(
-                    x, y, 
-                    size_settings::play_area::width * (0.5f + 0.5f * s->position.x) - sprite_off,
+                    x, y, size_settings::play_area::width * (0.5f + 0.5f * s->position.x) - sprite_off,
                     size_settings::play_area::height * (0.5f + 0.5f * s->position.y) - sprite_off,
                     planets_meta::texture_size[SECTOR_1] * planets_meta::sector_multiplier,
                     planets_meta::texture_size[SECTOR_1] * planets_meta::sector_multiplier))
@@ -185,7 +184,6 @@ struct game_gui
                                         void>* = nullptr>
     void click_handler(client_context& context, int x, int y, SDL_MouseButtonEvent m)
     {
-
         x = x - AreaType::x_offset;
         y = y - AreaType::y_offset;
 
@@ -196,10 +194,8 @@ struct game_gui
             const auto& pos = sec_obj->position;
             const auto tex_size = planets_meta::texture_size[11 + sec_obj->id % 18];
             if (sdl_utilities::check_collision(
-                    x, y, 
-                    size_settings::play_area::width * (1.0f + pos.x) * 0.5f - 0.5 * tex_size,
-                    size_settings::play_area::height * (1.0f + pos.y) * 0.5f - 0.5 * tex_size,
-                    tex_size, tex_size))
+                    x, y, size_settings::play_area::width * (1.0f + pos.x) * 0.5f - 0.5 * tex_size,
+                    size_settings::play_area::height * (1.0f + pos.y) * 0.5f - 0.5 * tex_size, tex_size, tex_size))
             {
                 if (current_object.has_value() && current_object.value()->position == sec_obj->position)
                 {
@@ -225,15 +221,16 @@ struct game_gui
     {
         x = x - AreaType::x_offset;
         y = y - AreaType::y_offset;
-        for(auto& b : context.gs.gui->popup_buttons) {
-            if(sdl_utilities::check_collision(x, y, b.x, b.y, b.w, b.h)) {
+        for (auto& b : context.gs.gui->popup_buttons)
+        {
+            if (sdl_utilities::check_collision(x, y, b.x, b.y, b.w, b.h))
+            {
                 focused_button = b.button_id;
                 return;
             }
         }
         focused_button.reset();
     }
-
 
     template <typename AreaType, game_view_t GameView>
     typename std::enable_if_t<!std::is_same<AreaType, size_settings::popup_menu_area>::value, void> motion_handler(
@@ -246,22 +243,22 @@ struct game_gui
 template <game_view_t view>
 void game_gui::handleMouse(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m, int x, int y)
 {
-
     auto& gs = context.gs;
 
     switch (event_type)
     {
         case SDL_MOUSEMOTION:
         {
-            if constexpr (view == game_view_t::menu_view) {
+            if constexpr (view == game_view_t::menu_view)
+            {
                 if (sdl_utilities::check_view_area_collision<size_settings::popup_menu_area>(x, y))
-                { 
+                {
                     motion_handler<size_settings::popup_menu_area, view>(context, x, y);
                     return;
                 }
             }
             if (sdl_utilities::check_view_area_collision<size_settings::play_area>(x, y))
-            { 
+            {
                 motion_handler<size_settings::play_area, view>(context, x, y);
                 return;
             }
@@ -289,7 +286,7 @@ void game_gui::handleMouse(client_context& context, Uint32 event_type, SDL_Mouse
         case SDL_MOUSEBUTTONDOWN:
         {
             if (sdl_utilities::check_view_area_collision<size_settings::play_area>(x, y))
-            { 
+            {
                 m.button == SDL_BUTTON_LEFT
                     ? click_handler<MouseButton::MOUSE_LEFT, size_settings::play_area, view>(context, x, y, m)
                     : click_handler<MouseButton::MOUSE_RIGHT, size_settings::play_area, view>(context, x, y, m);

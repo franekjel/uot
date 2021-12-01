@@ -1,12 +1,12 @@
 #ifndef UI_BUTTON_H
 #define UI_BUTTON_H
 
+#include <functional>
 #include "assets.h"
 #include "client_context.h"
-#include <functional>
 
-struct ui_button {
-
+struct ui_button
+{
     int button_id;
     int x;
     int y;
@@ -15,7 +15,6 @@ struct ui_button {
     button_types type;
 
     std::function<void(client_context&)> click_handler;
-
 };
 
 #endif

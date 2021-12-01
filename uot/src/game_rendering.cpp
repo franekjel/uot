@@ -14,7 +14,8 @@ void game_rendering::render_background(const client_context& context)
     SDL_RenderCopyEx(r.get(), gr.bk_texture.get(), nullptr, nullptr, 0, nullptr, SDL_FLIP_NONE);
 }
 
-void game_rendering::render_current_popup_menu(const client_context& context) {
+void game_rendering::render_current_popup_menu(const client_context& context)
+{
     auto& gr = context.gr;
 
     game_rendering::render_planet_helper(context, 1.0f, size_settings::popup_menu_area::width / 2,
@@ -52,11 +53,11 @@ void game_rendering::render_button_sprite(ui_button& button, const client_contex
 
     const auto texture = gr.buttonTextures[button.type];
     SDL_Rect s{0,
-                 (gs.gui->focused_button.has_value() && gs.gui->focused_button.value() == button.button_id)
+               (gs.gui->focused_button.has_value() && gs.gui->focused_button.value() == button.button_id)
                    ? buttons_meta::button_texture_height
                    : 0,
                buttons_meta::button_texture_width, buttons_meta::button_texture_height};
-    SDL_Rect d{button.x , button.y , button.w, button.h };
+    SDL_Rect d{button.x, button.y, button.w, button.h};
     SDL_RenderCopyEx(r.get(), texture.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 }
 
@@ -66,12 +67,10 @@ void game_rendering::render_planet_helper(const client_context& context, const f
     auto& r = context.r;
     auto& gs = context.gs;
 
-    SDL_Rect s{(gs.planet_frame / planets_meta::frame_duration) * tex.w, 0,
-               tex.w, tex.h};
+    SDL_Rect s{(gs.planet_frame / planets_meta::frame_duration) * tex.w, 0, tex.w, tex.h};
 
     SDL_Rect d{static_cast<int>(x_off - size_multiplier * 0.5f * tex.w),
-               static_cast<int>(y_off - size_multiplier * 0.5f * tex.h),
-               static_cast<int>(tex.w * size_multiplier),
+               static_cast<int>(y_off - size_multiplier * 0.5f * tex.h), static_cast<int>(tex.w * size_multiplier),
                static_cast<int>(tex.h * size_multiplier)};
 
     SDL_RenderCopyEx(r.get(), tex.t.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
@@ -95,11 +94,13 @@ void game_rendering::render_sector_selection(const client_context& context)
 
     const auto curr = gs.gui->current_sector.value();
 
-    const int x = size_settings::play_area::width * (0.5f * curr->position.x + 0.5f) - planets_meta::texture_size[SECTOR_1] / 2;
-    const int y = size_settings::play_area::height * (0.5f * curr->position.y + 0.5f) - planets_meta::texture_size[SECTOR_1] / 2;
+    const int x =
+        size_settings::play_area::width * (0.5f * curr->position.x + 0.5f) - planets_meta::texture_size[SECTOR_1] / 2;
+    const int y =
+        size_settings::play_area::height * (0.5f * curr->position.y + 0.5f) - planets_meta::texture_size[SECTOR_1] / 2;
     SDL_Rect s{0, 0, selection_meta::texture_width, selection_meta::texture_height};
 
-    SDL_Rect d{x, y, planets_meta::texture_size[SECTOR_1] , planets_meta::texture_size[SECTOR_1]};
+    SDL_Rect d{x, y, planets_meta::texture_size[SECTOR_1], planets_meta::texture_size[SECTOR_1]};
 
     SDL_RenderCopyEx(r.get(), gr.selectionTextures[selection_types::SECTOR_SELECTION].get(), &s, &d,
                      SDL_GetTicks() / 100, NULL, SDL_FLIP_NONE);
@@ -133,53 +134,56 @@ void game_rendering::render_object_selection(const client_context& context)
     SDL_RenderCopyEx(r.get(), gr.selectionTextures[selection_types::SECTOR_SELECTION].get(), &s, &d,
                      SDL_GetTicks() / 100, NULL, SDL_FLIP_NONE);
 
-    render_planet_helper(context, 0.8, x, y,
-                            gr.planetTextures[11 + curr->id % 18]);
-
-
+    render_planet_helper(context, 0.8, x, y, gr.planetTextures[11 + curr->id % 18]);
 }
 
-void game_rendering::render_selected_object_info(const client_context& context) {
+void game_rendering::render_selected_object_info(const client_context& context)
+{
     auto& r = context.r;
     auto& gs = context.gs;
     auto& gr = context.gr;
 
     auto object_id = GAS_GIANT_1 + gs.gui->current_object.value()->id % (planets_meta::num_planets - GAS_GIANT_1);
-    sdl_utilities::render_text(r.get(), gr.main_font, "PLANET NAME", 30, 10, size_settings::context_area::width - 50, 
-    {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text(r.get(), gr.main_font, "PLANET NAME", 30, 10, size_settings::context_area::width - 50,
+                               {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
-    render_planet_helper(context, 2.0, size_settings::context_area::width / 2, std::min(250, planets_meta::texture_size[object_id] * 2),
-                        gr.planetTextures[object_id]);
+    render_planet_helper(context, 2.0, size_settings::context_area::width / 2,
+                         std::min(250, planets_meta::texture_size[object_id] * 2), gr.planetTextures[object_id]);
 
     // render planet info
-    sdl_utilities::render_text(r.get(), gr.secondary_font, " planet index: " + std::to_string(gs.gui->current_object.value()->id) + "\n planet info 1\n planet info 2\n planet info 3", 40, 450, size_settings::context_area::width - 50, 
-    {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text(r.get(), gr.secondary_font,
+                               " planet index: " + std::to_string(gs.gui->current_object.value()->id) +
+                                   "\n planet info 1\n planet info 2\n planet info 3",
+                               40, 450, size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 }
 
-void game_rendering::render_selected_sector_info(const client_context& context) {
+void game_rendering::render_selected_sector_info(const client_context& context)
+{
     auto& r = context.r;
     auto& gs = context.gs;
     auto& gr = context.gr;
 
     auto sector_id = gs.gui->current_sector.value()->sector_id % 10 + 1;
-    sdl_utilities::render_text(r.get(), gr.main_font, "SECTOR NAME", 30, 10, size_settings::context_area::width - 50, 
-    {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text(r.get(), gr.main_font, "SECTOR NAME", 30, 10, size_settings::context_area::width - 50,
+                               {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
-    render_planet_helper(context, 2.0, size_settings::context_area::width / 2, std::min(250, planets_meta::texture_size[sector_id] * 2),
-                        gr.planetTextures[sector_id]);
+    render_planet_helper(context, 2.0, size_settings::context_area::width / 2,
+                         std::min(250, planets_meta::texture_size[sector_id] * 2), gr.planetTextures[sector_id]);
 
     // render planet info
-    sdl_utilities::render_text(r.get(), gr.secondary_font, " sector index: " + std::to_string(gs.gui->current_sector.value()->sector_id) + "\n sector info 1\n sector info 2\n sector info 3", 40, 450, size_settings::context_area::width - 50, 
-    {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text(r.get(), gr.secondary_font,
+                               " sector index: " + std::to_string(gs.gui->current_sector.value()->sector_id) +
+                                   "\n sector info 1\n sector info 2\n sector info 3",
+                               40, 450, size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 }
 
 void game_rendering::render_universe_view(const client_context& context)
 {
     // draw the above astronaut buttons
     auto& gs = context.gs;
-    auto &gr = context.gr;
+    auto& gr = context.gr;
     auto& r = context.r;
 
     sdl_utilities::set_render_viewport<size_settings::resource_area>(r.get());
@@ -204,7 +208,8 @@ void game_rendering::render_universe_view(const client_context& context)
     sdl_utilities::set_render_viewport<size_settings::context_area>(r.get());
     sdl_utilities::paint_frame(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, SDL_Color{0x00, 0x00, 0x00, 0xFF});
 
-    if(gs.gui->current_sector.has_value()) {
+    if (gs.gui->current_sector.has_value())
+    {
         game_rendering::render_selected_sector_info(context);
     }
 
@@ -213,19 +218,29 @@ void game_rendering::render_universe_view(const client_context& context)
     render_resource_bar(context);
 }
 
-void game_rendering::render_resource_bar(const client_context& context) {
-    constexpr std::array<int,8> positions {0, 0, resources_meta::single_size, 0, 0, resources_meta::single_size, resources_meta::single_size, resources_meta::single_size };
-    constexpr std::array<int, 4> amounts {45, 87, 563, 2};
+void game_rendering::render_resource_bar(const client_context& context)
+{
+    constexpr std::array<int, 8> positions{0,
+                                           0,
+                                           resources_meta::single_size,
+                                           0,
+                                           0,
+                                           resources_meta::single_size,
+                                           resources_meta::single_size,
+                                           resources_meta::single_size};
+    constexpr std::array<int, 4> amounts{45, 87, 563, 2};
     constexpr int num_resources = 4;
     int x_off = 20;
     constexpr int y_off = (size_settings::resource_area::height - fonts::resource_font_size) / 2;
-    for( int i = 0; i < num_resources; ++i) {
-        SDL_Rect s {positions[i], positions[i + 1], resources_meta::single_size, resources_meta::single_size};
-        SDL_Rect d {x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
+    for (int i = 0; i < num_resources; ++i)
+    {
+        SDL_Rect s{positions[i], positions[i + 1], resources_meta::single_size, resources_meta::single_size};
+        SDL_Rect d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
         SDL_RenderCopyEx(context.r.get(), context.gr.resource_texture.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 
         x_off += fonts::resource_font_size;
-        sdl_utilities::render_text(context.r.get(), context.gr.resource_font, ": " + std::to_string(amounts[i]), x_off, y_off, 150, {0xFF, 0xFF, 0xFF, 0xFF} );
+        sdl_utilities::render_text(context.r.get(), context.gr.resource_font, ": " + std::to_string(amounts[i]), x_off,
+                                   y_off, 150, {0xFF, 0xFF, 0xFF, 0xFF});
         x_off += 180;
     }
 }
@@ -235,7 +250,7 @@ void game_rendering::render_sector_view(const client_context& context)
     // draw the above astronaut buttons
     auto& r = context.r;
     auto& gs = context.gs;
-    auto &gr = context.gr;
+    auto& gr = context.gr;
 
     sdl_utilities::set_render_viewport<size_settings::resource_area>(r.get());
 
@@ -256,7 +271,8 @@ void game_rendering::render_sector_view(const client_context& context)
     sdl_utilities::set_render_viewport<size_settings::context_area>(r.get());
     sdl_utilities::paint_frame(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, SDL_Color{0x00, 0x00, 0x00, 0xFF});
 
-    if(gs.gui->current_object.has_value()) {
+    if (gs.gui->current_object.has_value())
+    {
         render_selected_object_info(context);
     }
 
@@ -276,15 +292,15 @@ void game_rendering::render_sector_helper(const client_context& context, const s
         const auto corrected_x = size_settings::play_area::width * (0.5f + 0.5f * sector->position.x);
         const auto corrected_y = size_settings::play_area::height * (0.5f + 0.5f * sector->position.y);
         render_planet_helper(context, planets_meta::sector_multiplier, corrected_x, corrected_y,
-                            gr.planetTextures[sector->sector_id % 10 + 1]);
+                             gr.planetTextures[sector->sector_id % 10 + 1]);
 
         SDL_SetRenderDrawColor(context.r.get(), 0xFF, 0xFF, 0xFF, 0xFF);
 
-        for(const auto& n : sector->neighbors) {
+        for (const auto& n : sector->neighbors)
+        {
             const auto n_x = size_settings::play_area::width * (0.5f + 0.5f * n->position.x);
             const auto n_y = size_settings::play_area::height * (0.5f + 0.5f * n->position.y);
-            SDL_RenderDrawLine(context.r.get(),
-                       corrected_x, corrected_y, n_x, n_y);
+            SDL_RenderDrawLine(context.r.get(), corrected_x, corrected_y, n_x, n_y);
         }
     }
     else
@@ -294,8 +310,7 @@ void game_rendering::render_sector_helper(const client_context& context, const s
         {
             const auto planet_x = size_settings::play_area::width * (1.0f + 1.0f * p->position.x) * 0.5f;
             const auto planet_y = size_settings::play_area::height * (1.0f + 1.0f * p->position.y) * 0.5f;
-            render_planet_helper(context, 0.8, planet_x, planet_y,
-                                 gr.planetTextures[11 + p->id % 18]);
+            render_planet_helper(context, 0.8, planet_x, planet_y, gr.planetTextures[11 + p->id % 18]);
         }
     }
 }

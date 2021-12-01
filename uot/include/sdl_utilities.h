@@ -13,25 +13,23 @@
 
 #include <memory>
 #include <string>
-#include "stdexcept"
 #include "size_settings.h"
-
+#include "stdexcept"
 
 namespace sdl_utilities
 {
-
-void render_text(SDL_Renderer* r, std::shared_ptr<TTF_Font> font, const std::string& t, int x, int y, int w, SDL_Color c);
+void render_text(SDL_Renderer* r, std::shared_ptr<TTF_Font> font, const std::string& t, int x, int y, int w,
+                 SDL_Color c);
 
 std::shared_ptr<SDL_Texture> load_texture_from_file(const std::string& path, const std::shared_ptr<SDL_Renderer>& r);
 
 void paint_background(SDL_Renderer* r, const SDL_Color& c);
 
-void paint_frame(SDL_Renderer* r, const SDL_Color& f, const SDL_Color& b ); 
+void paint_frame(SDL_Renderer* r, const SDL_Color& f, const SDL_Color& b);
 
-void paint_frame_textured(SDL_Renderer* r, const SDL_Color& f, std::shared_ptr<SDL_Texture> t); 
+void paint_frame_textured(SDL_Renderer* r, const SDL_Color& f, std::shared_ptr<SDL_Texture> t);
 
 std::shared_ptr<TTF_Font> load_font(const std::string& font_name, int size);
-
 
 std::shared_ptr<SDL_Window> sdl_create_window(const std::string title, int x, int y, int w, int h, Uint32 flags);
 std::shared_ptr<SDL_Renderer> sdl_create_renderer(const std::shared_ptr<SDL_Window>& w, int index, Uint32 flags);
