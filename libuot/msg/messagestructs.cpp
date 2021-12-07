@@ -113,3 +113,11 @@ messageTypes::MsgNewBuilding::MsgNewBuilding(int colony_id_, Building::BuildingT
     : colony_id(colony_id_), building_type(building_type_), upgrade_of(upgrade_of_), count(count_)
 {
 }
+
+messageTypes::MsgBuildRequest::MsgBuildRequest() {}
+
+messageTypes::MsgBuildRequest::MsgBuildRequest(int colony_id_, Building::BuildingType building_type_,
+                                               Building::BuildingType upgrade_from_)
+    : colony_id(colony_id_), building_type(building_type_), upgrade_from(upgrade_from_)
+{
+}

@@ -88,6 +88,11 @@ bool operator==(messageTypes::MsgNewBuilding& b1, messageTypes::MsgNewBuilding& 
            b1.count == b2.count;
 }
 
+bool operator==(messageTypes::MsgBuildRequest& b1, messageTypes::MsgBuildRequest& b2)
+{
+    return b1.colony_id == b2.colony_id && b1.building_type == b2.building_type && b1.upgrade_from == b2.upgrade_from;
+}
+
 void StartGamePayloadTest()
 {
     messageTypes::StartGamePayload sgp;
@@ -235,6 +240,12 @@ void ActionsPayloadTest()
 {
     messageTypes::ActionsPayload ap;
 
+    messageTypes::MsgBuildRequest buildRequest1 = {2, Building::BuildingType::Farm, Building::BuildingType::None};
+    messageTypes::MsgBuildRequest buildRequest2 = {3, Building::BuildingType::ImprovedMetalsMine,
+                                                   Building::BuildingType::MetalsMine};
+    ap.buildRequests.push_back(buildRequest1);
+    ap.buildRequests.push_back(buildRequest2);
+
     auto ser = ap.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
     auto type = des->GetType();
@@ -242,8 +253,13 @@ void ActionsPayloadTest()
         std::cout << "Actions - wrong message type\n";
     auto cast = std::dynamic_pointer_cast<messageTypes::ActionsPayload>(des);
 
-    if (!cast->createBaseActions.empty())
-        std::cout << "Actions - wrong resources size\n";
+    if (cast->buildRequests.size() != 2)
+        std::cout << "Actions - wrong build actions size\n";
+
+    auto b1 = cast->buildRequests[0];
+    auto b2 = cast->buildRequests[1];
+    if (!(b1 == buildRequest1) || !(b2 == buildRequest2))
+        std::cout << "Actions - wrong build requests\n";
 }
 
 int main()

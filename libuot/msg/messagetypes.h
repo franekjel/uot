@@ -59,11 +59,11 @@ struct StartGamePayload : BasePayload
 struct ActionsPayload : BasePayload  // Player's actions
 {
     /*TBD*/
-    // std::vector<std::tuple<BuildingType, int>> buildActions; /*buildingType, colonyId*/
     // std::vector<int> createColonyActions; /*objectId*/
-    std::vector<int> createBaseActions; /*objectId*/
+    // std::vector<int> createBaseActions; /*objectId*/
+    std::vector<MsgBuildRequest> buildRequests;
     MessageType GetType() override { return MessageType::Actions; }
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ActionsPayload, createBaseActions)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ActionsPayload, buildRequests)
     std::string Serialize() override
     {
         nlohmann::json jsonPayload = (*this);
