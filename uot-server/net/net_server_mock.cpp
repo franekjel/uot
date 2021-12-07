@@ -19,6 +19,8 @@ bool net_server_mock::accept_player(const server_txrx::net_player& player)
     return true;
 }
 
+void net_server_mock::after_accept_player() {}
+
 void net_server_mock::handle_status_change(const std::string& player_name, net_server::net_status status)
 {
     if (status == net_server::net_status::disconnect)
