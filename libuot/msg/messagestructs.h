@@ -91,4 +91,16 @@ struct MsgGalaxy
     MsgGalaxy();
     MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy);
 };
+
+struct MsgNewBuilding
+{
+    int colony_id;
+    Building::BuildingType building_type;
+    Building::BuildingType upgrade_of; // set if new building is upgrade of another, otherwise, set to None
+    int count;  // number of newly created buildings
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgNewBuilding, colony_id, building_type, upgrade_of, count)
+    MsgNewBuilding();
+    MsgNewBuilding(int colony_id_, Building::BuildingType building_type_, Building::BuildingType upgrade_of_,
+                   int count_);
+};
 }  // namespace messageTypes
