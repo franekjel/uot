@@ -82,6 +82,11 @@ bool operator==(std::shared_ptr<Planet> p1, messageTypes::MsgPlanet& p2)
     return true;
 }
 
+bool operator==(messageTypes::MsgTechnologyUpdate& t1, messageTypes::MsgTechnologyUpdate& t2)
+{
+    return t1.technology_type == t2.technology_type && t1.days_remaining == t2.days_remaining;
+}
+
 void StartGamePayloadTest()
 {
     messageTypes::StartGamePayload sgp;
@@ -187,6 +192,8 @@ void NewTourPayloadTest()
     ntp.updated_populations[1] = p1_init;
     ntp.updated_populations[10] = p10_init;
 
+    ntp.technology_update = {Technology::TechnologyType::HyperquantumPhysics, 10};
+
     auto ser = ntp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
     auto type = des->GetType();
@@ -209,11 +216,16 @@ void NewTourPayloadTest()
     auto p10 = cast->updated_populations[10];
     if (p1 != p1_init || p10 != p10_init)
         std::cout << "NewTour - wrong people values\n";
+
+    if (!(ntp.technology_update == cast->technology_update))
+        std::cout << "NewTour - wrong technology update\n";
 }
 
 void ActionsPayloadTest()
 {
     messageTypes::ActionsPayload ap;
+
+    ap.technologyRequest = Technology::Engineering;
 
     auto ser = ap.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
@@ -224,6 +236,9 @@ void ActionsPayloadTest()
 
     if (!cast->createBaseActions.empty())
         std::cout << "Actions - wrong resources size\n";
+
+    if (cast->technologyRequest != ap.technologyRequest)
+        std::cout << "Actions - wrong technology request\n";
 }
 
 int main()

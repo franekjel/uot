@@ -8,6 +8,7 @@ struct Technology
 {
     enum TechnologyType
     {
+        None,
         HyperquantumPhysics,
         SpaceEngineering,
         Engineering,
