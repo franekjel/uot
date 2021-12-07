@@ -18,7 +18,7 @@ set(SRCS
     technology.h
     structs.h
     spacebase.h
-    player.h
+    planet.cpp
     msg/messagetypes.h
     msg/messagetypes.cpp
     msg/messagestructs.h
@@ -27,7 +27,7 @@ set(SRCS
 
 add_library(${LIB_NAME}
     ${SRCS}
-  "planet.cpp")
+)
 
 #this allow to include libuot headers from other modules (without prefixes)
 target_include_directories(${LIB_NAME}
@@ -50,7 +50,7 @@ set(MSG_TEST_SRCS
 )
 
 add_executable(MsgTest
-        ${MSG_TEST_SRCS} "planet.cpp")
+        ${MSG_TEST_SRCS})
 
 target_include_directories(MsgTest PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
 target_link_libraries(MsgTest 

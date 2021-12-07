@@ -65,24 +65,24 @@ void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Play
 
     for (auto& colony : player->owned_colonies)
     {
-        if (colony->population_changed)
+        if (colony.second->population_changed)
         {
-            payload.updated_populations[colony->id] = colony->population;
-            colony->population_changed = false;
+            payload.updated_populations[colony.second->id] = colony.second->population;
+            colony.second->population_changed = false;
         }
 
-        if (colony->building_queue_changed)
+        if (colony.second->building_queue_changed)
         {
             float work_offset = 0.0f;
-            for (const auto& building : colony->building_queue)
+            for (const auto& building : colony.second->building_queue)
             {
                 work_offset += building.worker_week_units_left /
-                               (colony->population_building_modificator * colony->unemployed_population);
-                payload.buildings_updates.push_back(
-                        messageTypes::MsgBuildingsUpdates::MsgBuildingsUpdates(colony->id, building.type,
+                               (colony.second->population_building_modificator * colony.second->unemployed_population);
+                payload.buildings_updates.push_back(messageTypes::MsgBuildingsUpdates::MsgBuildingsUpdates(
+                    colony.second->id, building.type,
                                                                                building.upgrade_of, work_offset));
             }
-            colony->building_queue_changed = false;
+            colony.second->building_queue_changed = false;
         }
     }
 

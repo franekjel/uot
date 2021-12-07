@@ -135,7 +135,18 @@ bool PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy>
     startingColony->owner = new_player;
     players[id] = new_player;
     players_net_names[id] = player_net_name;
+    players_net_names_rev[player_net_name] = id;
     return true;
+}
+
+bool PlayersList::HandlePlayerRequests(std::string player_net_name, messageTypes::ActionsPayload payload)
+{
+    auto player = players[players_net_names_rev[player_net_name]];
+    for (const auto& build : payload.buildRequests)
+    {
+        player->HandleBuildRequest(build.building_type,build.upgrade_from,build.colony_id);
+    }
+    return false;
 }
 
 void PlayersList::CountWeeklyNumbers()
@@ -180,8 +191,8 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
         std::map<Resource, float> colony_gains = {};
         std::map<Resource, float> colony_expenses = {};
 
-        colony_gains = colony->GetColonyGains();
-        colony_expenses = colony->GetColonyExpenses();
+        colony_gains = colony.second->GetColonyGains();
+        colony_expenses = colony.second->GetColonyExpenses();
 
         for (auto& gain : colony_gains)
         {
@@ -199,31 +210,31 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
             player_resources_change[expense.first] = true;
         }
 
-        float food_bilans = colony_gains[Resource::Food] - colony->population * population_food_usage;
+        float food_bilans = colony_gains[Resource::Food] - colony.second->population * population_food_usage;
 
         if (food_bilans >= 0)
         {
-            colony->population += colony->population * colony->base_population_growth;
-            colony->population_changed = true;
+            colony.second->population += colony.second->population * colony.second->base_population_growth;
+            colony.second->population_changed = true;
         }
         else
         {
-            colony->population -= colony->population * colony->base_population_starving_death;
-            colony->population_changed = true;
+            colony.second->population -= colony.second->population * colony.second->base_population_starving_death;
+            colony.second->population_changed = true;
         }
 
         // what if there are less resources available than there are needed to operate colony?
         // currently I assume that negative number is possible (like public debt XD)
 
         // update building queue
-        colony->UpdateBuildingQueue();
+        colony.second->UpdateBuildingQueue();
     }
 
     // calculate bilans of inhabitable objects
 
     for (auto& space_base : player_space_bases)
     {
-        for (auto& resource : space_base->object->resurce_deposit)
+        for (auto& resource : space_base.second->object->resurce_deposit)
         {
             player_resources[resource.first] += resource.second;
             player_resources_change[resource.first] = true;

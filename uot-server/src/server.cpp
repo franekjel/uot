@@ -41,3 +41,12 @@ bool Server::accept_player(std::string player_name)
     }
     return false;
 }
+
+bool Server::handle_player_action(std::string player_name, messageTypes::ActionsPayload payload) {
+    if (!game_in_progress)
+    {
+        return false;
+    }
+   
+    return players.HandlePlayerRequests(player_name, payload);
+}

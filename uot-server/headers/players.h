@@ -14,6 +14,7 @@ class PlayersList
    private:
     std::map<long, std::shared_ptr<Player>> players = {};
     std::map<long, std::string> players_net_names = {};
+    std::map<std::string, long> players_net_names_rev = {};
 
    public:
     std::shared_ptr<Galaxy> GetStartingGalaxy(std::shared_ptr<Galaxy> wholeGalaxy);
@@ -21,6 +22,7 @@ class PlayersList
     std::shared_ptr<Colony> GetStartingColony(long player_id, std::shared_ptr<Galaxy> startingGalaxy,
                                               std::shared_ptr<Galaxy> wholeGalaxy);
     bool AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy> wholeGalaxy);
+    bool HandlePlayerRequests(std::string player_net_name, messageTypes::ActionsPayload payload);
     void CountWeeklyNumbers();
     void CountEveryTourNumbers();
     int PlayersCount() { return players.size(); }
