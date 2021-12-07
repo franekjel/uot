@@ -19,6 +19,7 @@ class net_server_uot : public net_server
     void send_new_tour_message(int tour_number, std::shared_ptr<Player>& player, std::string player_net_name);
     void send_game_begin_message(std::shared_ptr<Player>& player, std::string player_net_name);
     void after_accept_player();
+
    protected:
     bool running;
     std::thread read_thread;
