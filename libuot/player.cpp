@@ -16,13 +16,14 @@ Player::Player(const long id_, const std::shared_ptr<Galaxy> &known_galaxy_,
     owned_colonies.push_back(starting_colony);
     owned_space_bases = {};
     owned_ships = {};
-    DiscoverTechnology(&Engineering);
+    DiscoverTechnology(Technology::TechnologyType::Engineering);
 }
 
-void Player::DiscoverTechnology(const Technology *const technology)
+void Player::DiscoverTechnology(Technology::TechnologyType technology)
 {
     known_technologies.insert(technology);
-    for (const auto &t : technology->unlock)
+    auto tech = Technologies.at(technology);
+    for (const auto &t : tech.unlock)
     {
         available_technologies.insert(t);
     }

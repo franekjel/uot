@@ -21,13 +21,13 @@ struct Player
     std::map<Resource, float> owned_resources;
     std::map<Resource, bool> resources_changed;
 
-    std::set<const Technology*> known_technologies;
-    std::set<const Technology*> available_technologies;
+    std::set<Technology::TechnologyType> known_technologies;
+    std::set<Technology::TechnologyType> available_technologies;
 
     Player(const long player_id_, const std::shared_ptr<Galaxy>& known_galaxy_,
            const std::map<Resource, float>& owned_resources_, const std::shared_ptr<Colony>& starting_colony);
 
-    void DiscoverTechnology(const Technology* const technology);
+    void DiscoverTechnology(Technology::TechnologyType technology);
 };
 
 inline bool operator==(const Player& lhs, const Player& rhs) { return lhs.id == rhs.id; }
