@@ -214,6 +214,9 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
 
         // what if there are less resources available than there are needed to operate colony?
         // currently I assume that negative number is possible (like public debt XD)
+
+        // update building queue
+        colony->UpdateBuildingQueue();
     }
 
     // calculate bilans of inhabitable objects

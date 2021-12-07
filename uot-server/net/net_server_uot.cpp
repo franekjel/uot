@@ -70,6 +70,20 @@ void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Play
             payload.updated_populations[colony->id] = colony->population;
             colony->population_changed = false;
         }
+
+        if (colony->building_queue_changed)
+        {
+            float work_offset = 0.0f;
+            for (const auto& building : colony->building_queue)
+            {
+                work_offset += building.worker_week_units_left /
+                               (colony->population_building_modificator * colony->unemployed_population);
+                payload.buildings_updates.push_back(
+                        messageTypes::MsgBuildingsUpdates::MsgBuildingsUpdates(colony->id, building.type,
+                                                                               building.upgrade_of, work_offset));
+            }
+            colony->building_queue_changed = false;
+        }
     }
 
     txrx.send_reliable(player_net_name, payload.Serialize());
