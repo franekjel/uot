@@ -49,9 +49,6 @@ int main()
             s.StartGame();
         else
             std::cout << "Unknown command " << std::string(&command, 1);
-
-        if (s.players_count_game_start == s.PlayersCount())
-            s.StartGame();
     }
 
     // PlayersList players_list = {};

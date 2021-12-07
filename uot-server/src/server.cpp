@@ -4,6 +4,8 @@ Server::Server() : players(), messaging_service(), game_in_progress(false)
 {
     messaging_service.set_accept_player_callback([&](std::string player_name)
                                                  { return this->accept_player(player_name); });
+    messaging_service.set_after_accept_player_callback([&]()
+                                                 { this->after_accept_player(); });
     messaging_thread = std::thread(&net_server_uot::run, &messaging_service);
     galaxy = std::make_shared<Galaxy>(GenerateGalaxy({galaxy_size, galaxy_habitable_planet_chance_multipler}));
     messaging_thread.join();
@@ -40,4 +42,11 @@ bool Server::accept_player(std::string player_name)
         return players.AddPlayer(player_name, galaxy);
     }
     return false;
+}
+
+
+void Server::after_accept_player()
+{
+    if (players_count_game_start == PlayersCount())
+        StartGame();
 }

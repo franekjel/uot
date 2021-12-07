@@ -12,7 +12,7 @@ class net_server_mock : public net_server
     void handle_status_change(const std::string& player_name, net_status status) override;
     void handle_message(const std::string& player_name, const std::string& data) override;
     void run();
-
+    void after_accept_player();
    protected:
     bool running;
     std::thread read_thread;

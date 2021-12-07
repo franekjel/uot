@@ -135,6 +135,7 @@ void sns_server_txrx::listen_thread()
                 con_to_name.emplace(con, name);
                 *t = std::thread(&sns_server_txrx::rx_thread, this, con);
                 send_message(con, reliable_flags, "OK");
+                server.after_accept_player();
             }
             else if (num_msg < 0)
                 throw std::runtime_error("unknown connection is invalid");
