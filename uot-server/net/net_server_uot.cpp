@@ -13,6 +13,8 @@ bool net_server_uot::accept_player(const server_txrx::net_player& player)
     return res;
 }
 
+void net_server_uot::after_accept_player() { uot_after_accept_player(); }
+
 void net_server_uot::handle_status_change(const std::string& player_name, net_server::net_status status)
 {
     if (status == net_server::net_status::disconnect)
@@ -49,6 +51,12 @@ void net_server_uot::set_accept_player_callback(std::function<bool(std::string p
 {
     uot_accept_player = callback;
 }
+
+void net_server_uot::set_after_accept_player_callback(std::function<void()> callback)
+{
+    uot_after_accept_player = callback;
+}
+
 void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Player>& player,
                                            std::string player_net_name)
 {

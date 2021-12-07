@@ -20,6 +20,7 @@ class Server
 
    private:
     bool accept_player(std::string player_name);
+    void after_accept_player();
     void run();
 
     PlayersList players;

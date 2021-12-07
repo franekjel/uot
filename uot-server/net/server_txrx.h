@@ -34,6 +34,7 @@ class net_server
     virtual bool accept_player(const server_txrx::net_player& player) = 0;
     virtual void handle_status_change(const std::string& player_name, net_status status) = 0;
     virtual void handle_message(const std::string& player_name, const std::string& data) = 0;
+    virtual void after_accept_player() = 0;
 };
 
 class sns_server_txrx : public server_txrx
