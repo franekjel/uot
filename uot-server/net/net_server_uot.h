@@ -15,6 +15,7 @@ class net_server_uot : public net_server
     void handle_message(const std::string& player_name, const std::string& data) override;
     void run();
     void set_accept_player_callback(std::function<bool(std::string player_name)> callback);
+    void set_handle_actions_callback(std::function<void(std::shared_ptr<messageTypes::ActionsPayload>)> callback);
     void send_new_tour_message(int tour_number, std::shared_ptr<Player>& player, std::string player_net_name);
     void send_game_begin_message(std::shared_ptr<Player>& player, std::string player_net_name);
 
@@ -27,6 +28,7 @@ class net_server_uot : public net_server
 
    private:
     std::function<bool(std::string player_name)> uot_accept_player;
+    std::function<void(std::shared_ptr<messageTypes::ActionsPayload>)> uot_handle_actions;
 };
 
 #endif  // UOT_NET_SERVER_MOCK_H
