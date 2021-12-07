@@ -92,16 +92,16 @@ struct MsgGalaxy
     MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy);
 };
 
-struct MsgNewBuilding
+struct MsgBuildingsUpdates
 {
     int colony_id;
     Building::BuildingType building_type;
     Building::BuildingType upgrade_of; // set if new building is upgrade of another, otherwise, set to None
-    int count;  // number of newly created buildings
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgNewBuilding, colony_id, building_type, upgrade_of, count)
-    MsgNewBuilding();
-    MsgNewBuilding(int colony_id_, Building::BuildingType building_type_, Building::BuildingType upgrade_of_,
-                   int count_);
+    int days_remaining; // days reamaining to build end, 0 means end of build
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgBuildingsUpdates, colony_id, building_type, upgrade_of, days_remaining)
+    MsgBuildingsUpdates();
+    MsgBuildingsUpdates(int colony_id_, Building::BuildingType building_type_, Building::BuildingType upgrade_of_,
+                        int days_remaining_);
 };
 
 struct MsgBuildRequest

@@ -82,10 +82,10 @@ bool operator==(std::shared_ptr<Planet> p1, messageTypes::MsgPlanet& p2)
     return true;
 }
 
-bool operator==(messageTypes::MsgNewBuilding& b1, messageTypes::MsgNewBuilding& b2)
+bool operator==(messageTypes::MsgBuildingsUpdates& b1, messageTypes::MsgBuildingsUpdates& b2)
 {
     return b1.colony_id == b2.colony_id && b1.building_type == b2.building_type && b1.upgrade_of == b2.upgrade_of &&
-           b1.count == b2.count;
+           b1.days_remaining == b2.days_remaining;
 }
 
 bool operator==(messageTypes::MsgBuildRequest& b1, messageTypes::MsgBuildRequest& b2)
@@ -198,11 +198,11 @@ void NewTourPayloadTest()
     ntp.updated_populations[1] = p1_init;
     ntp.updated_populations[10] = p10_init;
 
-    messageTypes::MsgNewBuilding newBuilding1{2, Building::BuildingType::Greenhouses, Building::BuildingType::None, 3};
-    messageTypes::MsgNewBuilding newBuilding2{3, Building::BuildingType::ImprovedMetalsMine,
+    messageTypes::MsgBuildingsUpdates buildUpdate1{2, Building::BuildingType::Greenhouses, Building::BuildingType::None, 3};
+    messageTypes::MsgBuildingsUpdates buildUpdate2{3, Building::BuildingType::ImprovedMetalsMine,
                                               Building::BuildingType::MetalsMine, 1};
-    ntp.new_buildings.push_back(newBuilding1);
-    ntp.new_buildings.push_back(newBuilding2);
+    ntp.buildings_updates.push_back(buildUpdate1);
+    ntp.buildings_updates.push_back(buildUpdate2);
 
     auto ser = ntp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
@@ -217,7 +217,7 @@ void NewTourPayloadTest()
     if (cast->updated_populations.size() != 2)
         std::cout << "NewTour - wrong populations size\n";
 
-    if (cast->new_buildings.size() != 2)
+    if (cast->buildings_updates.size() != 2)
         std::cout << "NewTour - wrong new buildings size\n";
 
     auto food = cast->updated_resources[Resource::Food];
@@ -230,9 +230,9 @@ void NewTourPayloadTest()
     if (p1 != p1_init || p10 != p10_init)
         std::cout << "NewTour - wrong people values\n";
 
-    auto b1 = cast->new_buildings[0];
-    auto b2 = cast->new_buildings[1];
-    if (!(b1 == newBuilding1) || !(b2 == newBuilding2))
+    auto b1 = cast->buildings_updates[0];
+    auto b2 = cast->buildings_updates[1];
+    if (!(b1 == buildUpdate1) || !(b2 == buildUpdate2))
         std::cout << "NewTour - wrong new buildings\n";
 }
 
