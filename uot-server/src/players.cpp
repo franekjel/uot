@@ -145,7 +145,7 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
     auto player = players[players_net_names_rev[player_net_name]];
     for (const auto& build : payload->buildRequests)
     {
-        player->HandleBuildRequest(build.building_type,build.upgrade_from,build.colony_id);
+        player->HandleBuildRequest(build.building_type, build.upgrade_from, build.colony_id);
     }
     return false;
 }

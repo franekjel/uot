@@ -52,8 +52,10 @@ bool Server::handle_player_actions(std::string player_name, std::shared_ptr<mess
     {
         return false;
     }
-   
+
     return players.HandlePlayerRequests(player_name, payload);
+}
+
 void Server::after_accept_player()
 {
     if (players_count_game_start == PlayersCount())

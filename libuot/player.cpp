@@ -1,6 +1,5 @@
 #include "player.h"
 
-
 Player::Player(const long id_, const std::shared_ptr<Galaxy> &known_galaxy_,
                const std::map<Resource, float> &owned_resources_, const std::shared_ptr<Colony> &starting_colony)
 {
@@ -30,7 +29,7 @@ void Player::DiscoverTechnology(const Technology *const technology)
 }
 
 void Player::HandleBuildRequest(Building::BuildingType type, Building::BuildingType upgrade_from,
-                                 unsigned int colony_id)
+                                unsigned int colony_id)
 {
     auto building = Colony::GetBuildingFromType(type);
     auto colony = owned_colonies.find(colony_id);

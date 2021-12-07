@@ -152,7 +152,6 @@ struct BuildingBuildProgress
     {
         worker_week_units_left = Buildings.at(new_building).worker_weeks_cost;
     }
-
 };
 
 struct Colony
