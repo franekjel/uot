@@ -198,9 +198,10 @@ void NewTourPayloadTest()
     ntp.updated_populations[1] = p1_init;
     ntp.updated_populations[10] = p10_init;
 
-    messageTypes::MsgBuildingsUpdates buildUpdate1{2, Building::BuildingType::Greenhouses, Building::BuildingType::None, 3};
+    messageTypes::MsgBuildingsUpdates buildUpdate1{2, Building::BuildingType::Greenhouses, Building::BuildingType::None,
+                                                   3};
     messageTypes::MsgBuildingsUpdates buildUpdate2{3, Building::BuildingType::ImprovedMetalsMine,
-                                              Building::BuildingType::MetalsMine, 1};
+                                                   Building::BuildingType::MetalsMine, 1};
     ntp.buildings_updates.push_back(buildUpdate1);
     ntp.buildings_updates.push_back(buildUpdate2);
 
@@ -262,6 +263,13 @@ void ActionsPayloadTest()
         std::cout << "Actions - wrong build requests\n";
 }
 
+void InvalidMessageTest()
+{
+    auto des = messageTypes::Deserialize("gswgnioewhfog");
+    if (!!des)
+        std::cout << "InvalidMessage - wrong behaviour\n";
+}
+
 int main()
 {
     std::cout << "Tests started\n";
@@ -269,6 +277,7 @@ int main()
     NewTourPayloadTest();
     ActionsPayloadTest();
     StartGamePayloadTest();
+    InvalidMessageTest();
 
     std::cout << "Tests finished\n";
     std::cin.get();

@@ -2,7 +2,9 @@
 
 std::shared_ptr<messageTypes::BasePayload> messageTypes::Deserialize(std::string strMessage)
 {
-    nlohmann::json jsonMessage = nlohmann::json::parse(strMessage);
+    nlohmann::json jsonMessage = nlohmann::json::parse(strMessage, nullptr, false);
+    if (jsonMessage.is_discarded())
+        return {};
     Message message = jsonMessage.get<Message>();
     nlohmann::json jsonPayload = nlohmann::json::parse(message.payload);
 

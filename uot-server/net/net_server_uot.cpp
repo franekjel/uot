@@ -31,9 +31,15 @@ void net_server_uot::handle_status_change(const std::string& player_name, net_se
 void net_server_uot::handle_message(const std::string& player_name, const std::string& data)
 {
     std::cout << player_name << ": " << data << "\n";
-    for (auto& s : players)
+
+    auto deserialized = messageTypes::Deserialize(data);
+    if (!!deserialized)
     {
-        txrx.send_reliable(s, data);
+        if (deserialized->GetType() == messageTypes::MessageType::Actions)
+        {
+            auto cast = std::dynamic_pointer_cast<messageTypes::ActionsPayload>(deserialized);
+            uot_handle_actions(cast);
+        }
     }
 }
 
@@ -48,6 +54,12 @@ void net_server_uot::run()
 void net_server_uot::set_accept_player_callback(std::function<bool(std::string player_name)> callback)
 {
     uot_accept_player = callback;
+}
+
+void net_server_uot::set_handle_actions_callback(
+    std::function<void(std::shared_ptr<messageTypes::ActionsPayload>)> callback)
+{
+    uot_handle_actions = callback;
 }
 void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Player>& player,
                                            std::string player_net_name)
@@ -78,9 +90,8 @@ void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Play
             {
                 work_offset += building.worker_week_units_left /
                                (colony->population_building_modificator * colony->unemployed_population);
-                payload.buildings_updates.push_back(
-                        messageTypes::MsgBuildingsUpdates::MsgBuildingsUpdates(colony->id, building.type,
-                                                                               building.upgrade_of, work_offset));
+                payload.buildings_updates.push_back(messageTypes::MsgBuildingsUpdates::MsgBuildingsUpdates(
+                    colony->id, building.type, building.upgrade_of, work_offset));
             }
             colony->building_queue_changed = false;
         }

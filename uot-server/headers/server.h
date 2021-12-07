@@ -20,6 +20,7 @@ class Server
 
    private:
     bool accept_player(std::string player_name);
+    void handle_actions(std::shared_ptr<messageTypes::ActionsPayload> actions);
     void run();
 
     PlayersList players;
