@@ -17,8 +17,10 @@ class net_server_uot : public net_server
     void set_accept_player_callback(std::function<bool(std::string player_name)> callback);
     void set_handle_actions_callback(
         std::function<void(std::string, std::shared_ptr<messageTypes::ActionsPayload>)> callback);
+    void set_after_accept_player_callback(std::function<void()> callback);
     void send_new_tour_message(int tour_number, std::shared_ptr<Player>& player, std::string player_net_name);
     void send_game_begin_message(std::shared_ptr<Player>& player, std::string player_net_name);
+    void after_accept_player();
 
    protected:
     bool running;
@@ -30,6 +32,7 @@ class net_server_uot : public net_server
    private:
     std::function<bool(std::string player_name)> uot_accept_player;
     std::function<void(std::string, std::shared_ptr<messageTypes::ActionsPayload>)> uot_handle_actions;
+    std::function<void()> uot_after_accept_player;
 };
 
 #endif  // UOT_NET_SERVER_MOCK_H
