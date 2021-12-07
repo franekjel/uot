@@ -105,3 +105,10 @@ messageTypes::MsgGalaxy::MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy)
     for (auto sector : galaxy->sectors)
         sectors.push_back(MsgSector(sector));
 }
+
+messageTypes::MsgTechnologyUpdate::MsgTechnologyUpdate() {}
+
+messageTypes::MsgTechnologyUpdate::MsgTechnologyUpdate(Technology::TechnologyType technology_type_, int days_remaining_)
+    : technology_type(technology_type_), days_remaining(days_remaining_)
+{
+}

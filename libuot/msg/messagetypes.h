@@ -62,8 +62,9 @@ struct ActionsPayload : BasePayload  // Player's actions
     // std::vector<std::tuple<BuildingType, int>> buildActions; /*buildingType, colonyId*/
     // std::vector<int> createColonyActions; /*objectId*/
     std::vector<int> createBaseActions; /*objectId*/
+    Technology::TechnologyType technologyRequest; // if none requested, set to None
     MessageType GetType() override { return MessageType::Actions; }
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ActionsPayload, createBaseActions)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ActionsPayload, createBaseActions, technologyRequest)
     std::string Serialize() override
     {
         nlohmann::json jsonPayload = (*this);
@@ -79,8 +80,9 @@ struct NewTourPayload : BasePayload  // New tour
 {
     std::map<Resource, float> updated_resources; /*resource, amount*/
     std::map<int, int> updated_populations;      /*colony_id, population*/
+    MsgTechnologyUpdate technology_update;
     MessageType GetType() override { return MessageType::NewTour; }
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(NewTourPayload, updated_resources, updated_populations)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(NewTourPayload, updated_resources, updated_populations, technology_update)
     std::string Serialize() override
     {
         nlohmann::json jsonPayload = (*this);
