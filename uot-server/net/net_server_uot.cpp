@@ -38,7 +38,7 @@ void net_server_uot::handle_message(const std::string& player_name, const std::s
         if (deserialized->GetType() == messageTypes::MessageType::Actions)
         {
             auto cast = std::dynamic_pointer_cast<messageTypes::ActionsPayload>(deserialized);
-            uot_handle_actions(cast);
+            uot_handle_actions(player_name, cast);
         }
     }
 }
@@ -57,7 +57,7 @@ void net_server_uot::set_accept_player_callback(std::function<bool(std::string p
 }
 
 void net_server_uot::set_handle_actions_callback(
-    std::function<void(std::shared_ptr<messageTypes::ActionsPayload>)> callback)
+    std::function<void(std::string, std::shared_ptr<messageTypes::ActionsPayload>)> callback)
 {
     uot_handle_actions = callback;
 }

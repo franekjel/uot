@@ -139,10 +139,11 @@ bool PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy>
     return true;
 }
 
-bool PlayersList::HandlePlayerRequests(std::string player_net_name, messageTypes::ActionsPayload payload)
+bool PlayersList::HandlePlayerRequests(std::string player_net_name,
+                                       std::shared_ptr<messageTypes::ActionsPayload> payload)
 {
     auto player = players[players_net_names_rev[player_net_name]];
-    for (const auto& build : payload.buildRequests)
+    for (const auto& build : payload->buildRequests)
     {
         player->HandleBuildRequest(build.building_type,build.upgrade_from,build.colony_id);
     }
