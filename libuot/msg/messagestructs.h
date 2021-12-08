@@ -100,4 +100,26 @@ struct MsgTechnologyUpdate
     MsgTechnologyUpdate();
     MsgTechnologyUpdate(Technology::TechnologyType technology_type_, int days_remaining_);
 };
+
+struct MsgBuildingsUpdates
+{
+    int colony_id;
+    Building::BuildingType building_type;
+    Building::BuildingType upgrade_of;  // set if new building is upgrade of another, otherwise, set to None
+    int days_remaining;                 // days reamaining to build end, 0 means end of build
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgBuildingsUpdates, colony_id, building_type, upgrade_of, days_remaining)
+    MsgBuildingsUpdates();
+    MsgBuildingsUpdates(int colony_id_, Building::BuildingType building_type_, Building::BuildingType upgrade_of_,
+                        int days_remaining_);
+};
+
+struct MsgBuildRequest
+{
+    int colony_id;
+    Building::BuildingType building_type;
+    Building::BuildingType upgrade_from;  // set if some building should be upgraded, otherwise, set to None
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgBuildRequest, colony_id, building_type, upgrade_from)
+    MsgBuildRequest();
+    MsgBuildRequest(int colony_id_, Building::BuildingType building_type_, Building::BuildingType upgrade_from_);
+};
 }  // namespace messageTypes

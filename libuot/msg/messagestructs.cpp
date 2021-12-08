@@ -112,3 +112,19 @@ messageTypes::MsgTechnologyUpdate::MsgTechnologyUpdate(Technology::TechnologyTyp
     : technology_type(technology_type_), days_remaining(days_remaining_)
 {
 }
+
+messageTypes::MsgBuildingsUpdates::MsgBuildingsUpdates() {}
+
+messageTypes::MsgBuildingsUpdates::MsgBuildingsUpdates(int colony_id_, Building::BuildingType building_type_,
+                                                       Building::BuildingType upgrade_of_, int days_remaining_)
+    : colony_id(colony_id_), building_type(building_type_), upgrade_of(upgrade_of_), days_remaining(days_remaining_)
+{
+}
+
+messageTypes::MsgBuildRequest::MsgBuildRequest() {}
+
+messageTypes::MsgBuildRequest::MsgBuildRequest(int colony_id_, Building::BuildingType building_type_,
+                                               Building::BuildingType upgrade_from_)
+    : colony_id(colony_id_), building_type(building_type_), upgrade_from(upgrade_from_)
+{
+}

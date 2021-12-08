@@ -33,9 +33,15 @@ void net_server_uot::handle_status_change(const std::string& player_name, net_se
 void net_server_uot::handle_message(const std::string& player_name, const std::string& data)
 {
     std::cout << player_name << ": " << data << "\n";
-    for (auto& s : players)
+
+    auto deserialized = messageTypes::Deserialize(data);
+    if (!!deserialized)
     {
-        txrx.send_reliable(s, data);
+        if (deserialized->GetType() == messageTypes::MessageType::Actions)
+        {
+            auto cast = std::dynamic_pointer_cast<messageTypes::ActionsPayload>(deserialized);
+            uot_handle_actions(player_name, cast);
+        }
     }
 }
 
@@ -50,6 +56,12 @@ void net_server_uot::run()
 void net_server_uot::set_accept_player_callback(std::function<bool(std::string player_name)> callback)
 {
     uot_accept_player = callback;
+}
+
+void net_server_uot::set_handle_actions_callback(
+    std::function<void(std::string, std::shared_ptr<messageTypes::ActionsPayload>)> callback)
+{
+    uot_handle_actions = callback;
 }
 
 void net_server_uot::set_after_accept_player_callback(std::function<void()> callback)
@@ -73,10 +85,23 @@ void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Play
 
     for (auto& colony : player->owned_colonies)
     {
-        if (colony->population_changed)
+        if (colony.second->population_changed)
         {
-            payload.updated_populations[colony->id] = colony->population;
-            colony->population_changed = false;
+            payload.updated_populations[colony.second->id] = colony.second->population;
+            colony.second->population_changed = false;
+        }
+
+        if (colony.second->building_queue_changed)
+        {
+            float work_offset = 0.0f;
+            for (const auto& building : colony.second->building_queue)
+            {
+                work_offset += building.worker_week_units_left /
+                               (colony.second->population_building_modificator * colony.second->unemployed_population);
+                payload.buildings_updates.push_back(messageTypes::MsgBuildingsUpdates(
+                    colony.second->id, building.type, building.upgrade_of, work_offset));
+            }
+            colony.second->building_queue_changed = false;
         }
     }
 

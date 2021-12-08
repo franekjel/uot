@@ -87,6 +87,17 @@ bool operator==(messageTypes::MsgTechnologyUpdate& t1, messageTypes::MsgTechnolo
     return t1.technology_type == t2.technology_type && t1.days_remaining == t2.days_remaining;
 }
 
+bool operator==(messageTypes::MsgBuildingsUpdates& b1, messageTypes::MsgBuildingsUpdates& b2)
+{
+    return b1.colony_id == b2.colony_id && b1.building_type == b2.building_type && b1.upgrade_of == b2.upgrade_of &&
+           b1.days_remaining == b2.days_remaining;
+}
+
+bool operator==(messageTypes::MsgBuildRequest& b1, messageTypes::MsgBuildRequest& b2)
+{
+    return b1.colony_id == b2.colony_id && b1.building_type == b2.building_type && b1.upgrade_from == b2.upgrade_from;
+}
+
 void StartGamePayloadTest()
 {
     messageTypes::StartGamePayload sgp;
@@ -194,6 +205,13 @@ void NewTourPayloadTest()
 
     ntp.technology_update = {Technology::TechnologyType::HyperquantumPhysics, 10};
 
+    messageTypes::MsgBuildingsUpdates buildUpdate1{2, Building::BuildingType::Greenhouses, Building::BuildingType::None,
+                                                   3};
+    messageTypes::MsgBuildingsUpdates buildUpdate2{3, Building::BuildingType::ImprovedMetalsMine,
+                                                   Building::BuildingType::MetalsMine, 1};
+    ntp.buildings_updates.push_back(buildUpdate1);
+    ntp.buildings_updates.push_back(buildUpdate2);
+
     auto ser = ntp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
     auto type = des->GetType();
@@ -207,6 +225,9 @@ void NewTourPayloadTest()
     if (cast->updated_populations.size() != 2)
         std::cout << "NewTour - wrong populations size\n";
 
+    if (cast->buildings_updates.size() != 2)
+        std::cout << "NewTour - wrong new buildings size\n";
+
     auto food = cast->updated_resources[Resource::Food];
     auto metals = cast->updated_resources[Resource::Metals];
     if (food != food_init || metals != metals_init)
@@ -219,11 +240,22 @@ void NewTourPayloadTest()
 
     if (!(ntp.technology_update == cast->technology_update))
         std::cout << "NewTour - wrong technology update\n";
+
+    auto b1 = cast->buildings_updates[0];
+    auto b2 = cast->buildings_updates[1];
+    if (!(b1 == buildUpdate1) || !(b2 == buildUpdate2))
+        std::cout << "NewTour - wrong new buildings\n";
 }
 
 void ActionsPayloadTest()
 {
     messageTypes::ActionsPayload ap;
+
+    messageTypes::MsgBuildRequest buildRequest1 = {2, Building::BuildingType::Farm, Building::BuildingType::None};
+    messageTypes::MsgBuildRequest buildRequest2 = {3, Building::BuildingType::ImprovedMetalsMine,
+                                                   Building::BuildingType::MetalsMine};
+    ap.buildRequests.push_back(buildRequest1);
+    ap.buildRequests.push_back(buildRequest2);
 
     ap.technologyRequest = Technology::Engineering;
 
@@ -239,6 +271,20 @@ void ActionsPayloadTest()
 
     if (cast->technologyRequest != ap.technologyRequest)
         std::cout << "Actions - wrong technology request\n";
+    if (cast->buildRequests.size() != 2)
+        std::cout << "Actions - wrong build actions size\n";
+
+    auto b1 = cast->buildRequests[0];
+    auto b2 = cast->buildRequests[1];
+    if (!(b1 == buildRequest1) || !(b2 == buildRequest2))
+        std::cout << "Actions - wrong build requests\n";
+}
+
+void InvalidMessageTest()
+{
+    auto des = messageTypes::Deserialize("gswgnioewhfog");
+    if (!!des)
+        std::cout << "InvalidMessage - wrong behaviour\n";
 }
 
 int main()
@@ -248,6 +294,7 @@ int main()
     NewTourPayloadTest();
     ActionsPayloadTest();
     StartGamePayloadTest();
+    InvalidMessageTest();
 
     std::cout << "Tests finished\n";
     std::cin.get();

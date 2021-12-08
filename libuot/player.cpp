@@ -13,7 +13,7 @@ Player::Player(const long id_, const std::shared_ptr<Galaxy> &known_galaxy_,
         resources_changed[resource.first] = true;
     }
     owned_colonies = {};
-    owned_colonies.push_back(starting_colony);
+    owned_colonies[starting_colony->id] = starting_colony;
     owned_space_bases = {};
     owned_ships = {};
     DiscoverTechnology(Technology::TechnologyType::Engineering);
@@ -27,4 +27,26 @@ void Player::DiscoverTechnology(Technology::TechnologyType technology)
     {
         available_technologies.insert(t);
     }
+}
+
+void Player::HandleBuildRequest(Building::BuildingType type, Building::BuildingType upgrade_from,
+                                unsigned int colony_id)
+{
+    auto building = Colony::GetBuildingFromType(type);
+    auto colony = owned_colonies.find(colony_id);
+    if (colony == owned_colonies.end())
+        return;
+    for (const auto &res : building.cost)
+    {
+        if (owned_resources[res.first] < res.second)
+            return;
+    }
+
+    for (const auto &res : building.cost)
+    {
+        owned_resources[res.first] -= res.second;
+        resources_changed[res.first] = true;
+    }
+
+    colony->second->AddBuildingToQueue(type, upgrade_from);
 }

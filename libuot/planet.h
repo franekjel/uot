@@ -24,6 +24,7 @@ struct Building
     const std::map<Resource, float> upkeep;
     const float workers;
     const std::map<Resource, float> production;
+    const float worker_weeks_cost;
 
     const BuildingType upgrade;
 
@@ -41,6 +42,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
       10.0f,
       {},
+      300.0f,
       Building::BuildingType::None}},
 
     {Building::BuildingType::ImprovedMetalsMine,
@@ -48,6 +50,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       {{Resource::Antimatter, 2.0f}, {Resource::Cryptocurrencies, 15.0f}},
       15.0f,
       {{Resource::Metals, 20.0f}},
+      300.0f,
       Building::BuildingType::None}},
 
     {Building::BuildingType::MetalsMine,
@@ -55,6 +58,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
       10.0f,
       {{Resource::Metals, 10.0f}},
+      300.0f,
       Building::BuildingType::ImprovedMetalsMine}},
 
     {Building::BuildingType::Farm,
@@ -62,6 +66,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
       10.0f,
       {{Resource::Food, 10.0f}},
+      300.0f,
       Building::BuildingType::ImprovedMetalsMine}},
 
     {Building::BuildingType::Greenhouses,
@@ -69,6 +74,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       {{Resource::Antimatter, 3.0f}, {Resource::Cryptocurrencies, 12.0f}},
       10.0f,
       {{Resource::Food, 7.0f}},
+      300.0f,
       Building::BuildingType::None}},
 };
 
@@ -131,8 +137,26 @@ struct Planet : SectorObject
 
 const float population_food_usage = 0.0f;  // TODO change to better value
 
+struct BuildingBuildProgress
+{
+    Building::BuildingType type;
+    float worker_week_units_left;
+    Building::BuildingType upgrade_of;
+
+    BuildingBuildProgress()
+        : type(Building::BuildingType::None), upgrade_of(Building::BuildingType::None), worker_week_units_left(0.0f){};
+
+    BuildingBuildProgress(Building::BuildingType new_building,
+                          Building::BuildingType upgraded_building = Building::BuildingType::None)
+        : type(new_building), upgrade_of(upgraded_building)
+    {
+        worker_week_units_left = Buildings.at(new_building).worker_weeks_cost;
+    }
+};
+
 struct Colony
 {
+    static float population_building_modificator;
     unsigned int id;
     std::shared_ptr<Planet> planet;
     std::map<Building::BuildingType, int> buildings;
@@ -141,6 +165,9 @@ struct Colony
     float base_population_growth = 0.05f;
     float base_population_starving_death = 0.025f;
     std::shared_ptr<Player> owner;
+    float unemployed_population;
+    std::vector<BuildingBuildProgress> building_queue = {};
+    bool building_queue_changed;
 
     static const Building& GetBuildingFromType(Building::BuildingType type) { return Buildings.at(type); }
 
@@ -164,6 +191,7 @@ struct Colony
         }
 
         float colony_efficency = neccessary_workers > population ? population / neccessary_workers : 1.0f;
+        unemployed_population = population - neccessary_workers;
 
         if (colony_efficency < 1.0f)
             colony_gains = colony_gains * colony_efficency;
@@ -200,10 +228,60 @@ struct Colony
         return colony_expenses;
     }
 
+    void UpdateBuildingQueue()
+    {
+        while (building_queue.size() != 0 && building_queue.front().worker_week_units_left == 0.0f)
+        {
+            if (building_queue.front().upgrade_of != Building::BuildingType::None)
+                buildings[building_queue.front().upgrade_of]--;
+            buildings[building_queue.front().type]++;
+            building_queue.erase(building_queue.begin());
+        }
+
+        if (building_queue.size() == 0)
+            return;
+
+        float people_weeks_to_distribute = unemployed_population * population_building_modificator;
+        auto itr = building_queue.begin();
+        while (people_weeks_to_distribute > 0.0f && itr != building_queue.end())
+        {
+            if (itr->worker_week_units_left < people_weeks_to_distribute)
+            {
+                people_weeks_to_distribute -= itr->worker_week_units_left;
+                itr->worker_week_units_left = 0.0f;
+            }
+            else
+            {
+                itr->worker_week_units_left -= people_weeks_to_distribute;
+                people_weeks_to_distribute = 0.0f;
+            }
+            itr++;
+        }
+        building_queue_changed = true;
+        return;
+    }
+
+    void AddBuildingToQueue(Building::BuildingType type,
+                            Building::BuildingType upgrade_from = Building::BuildingType::None)
+    {
+        building_queue.push_back({type, upgrade_from});
+        building_queue_changed = true;
+    }
+
+    void RemoveBuildingFromQueueOnPosition(unsigned int position)
+    {
+        if (position < building_queue.size())
+            building_queue.erase(building_queue.begin() + position);
+        building_queue_changed = true;
+    }
+
     Colony(const unsigned int id, const std::shared_ptr<Planet> planet_) : id(id)
     {
         population = 1;
         buildings = {};
         planet = planet_;
+        unemployed_population = population;
+        building_queue = {};
+        building_queue_changed = false;
     }
 };
