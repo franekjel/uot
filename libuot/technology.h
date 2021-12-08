@@ -15,7 +15,7 @@ struct Technology
         Spaceships,
 
         // always leave as the last one
-        None, // special type for aborting research :D
+        None,  // special type for aborting research :D
     };
 
     unsigned int id;

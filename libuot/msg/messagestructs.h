@@ -94,8 +94,8 @@ struct MsgGalaxy
 
 struct MsgTechnologyUpdate
 {
-    Technology::TechnologyType technology_type; // if none in progress, set to None
-    int days_remaining;  // days reamaining to research end, 0 means end of research
+    Technology::TechnologyType technology_type;  // if none in progress, set to None
+    int days_remaining;                          // days reamaining to research end, 0 means end of research
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgTechnologyUpdate, technology_type, days_remaining)
     MsgTechnologyUpdate();
     MsgTechnologyUpdate(Technology::TechnologyType technology_type_, int days_remaining_);
