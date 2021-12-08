@@ -148,7 +148,7 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
         player->HandleBuildRequest(build.building_type, build.upgrade_from, build.colony_id);
     }
 
-    if (payload->technologyRequest != Technology::TechnologyType::None)
+    if (payload->technologyRequest != Technology::TechnologyType::Empty)
         player->HandleStartTechnologyResearch(payload->technologyRequest);
 
     return true;

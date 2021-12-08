@@ -34,6 +34,9 @@ void Player::HandleStartTechnologyResearch(Technology::TechnologyType technology
 {
     if (available_technologies.count(technology) > 0 && known_technologies.count(technology) == 0)
         researched_technology = {technology};
+
+    if (technology == Technology::TechnologyType::None)
+        researched_technology = {};
 }
 
 void Player::HandleBuildRequest(Building::BuildingType type, Building::BuildingType upgrade_from,

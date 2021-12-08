@@ -8,14 +8,14 @@ struct Technology
 {
     enum TechnologyType
     {
-        None,
+        Empty,
         HyperquantumPhysics,
         SpaceEngineering,
         Engineering,
         Spaceships,
 
         // always leave as the last one
-        Empty, // special type for aborting research :D
+        None, // special type for aborting research :D
     };
 
     unsigned int id;
@@ -51,7 +51,7 @@ struct TechnologyProgress
     Technology::TechnologyType technology;
     float progress_left;
 
-    TechnologyProgress() : technology(Technology::TechnologyType::Empty), progress_left(-10.0f) {}
+    TechnologyProgress() : technology(Technology::TechnologyType::None), progress_left(-10.0f) {}
 
     TechnologyProgress(Technology::TechnologyType technology_)
         : technology(technology_), progress_left(Technologies.at(technology_).cost)
@@ -60,6 +60,6 @@ struct TechnologyProgress
 
     operator bool() const
     {
-        return technology != Technology::TechnologyType::None && technology != Technology::TechnologyType::Empty;
+        return technology != Technology::TechnologyType::Empty && technology != Technology::TechnologyType::None;
     }
 };
