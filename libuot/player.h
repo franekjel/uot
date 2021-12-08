@@ -14,10 +14,10 @@ struct Player
 {
     unsigned int id;
 
-    std::vector<std::shared_ptr<Colony>> owned_colonies;
-    std::vector<std::shared_ptr<SpaceBase>> owned_space_bases;
+    std::map<unsigned int, std::shared_ptr<Colony>> owned_colonies;
+    std::map<unsigned int, std::shared_ptr<SpaceBase>> owned_space_bases;
     std::shared_ptr<Galaxy> known_galaxy;
-    std::vector<std::shared_ptr<Ship>> owned_ships;
+    std::map<unsigned int, std::shared_ptr<Ship>> owned_ships;
     std::map<Resource, float> owned_resources;
     std::map<Resource, bool> resources_changed;
 
@@ -28,6 +28,7 @@ struct Player
            const std::map<Resource, float>& owned_resources_, const std::shared_ptr<Colony>& starting_colony);
 
     void DiscoverTechnology(const Technology* const technology);
+    void HandleBuildRequest(Building::BuildingType type, Building::BuildingType upgrade_from, unsigned int colony_id);
 };
 
 inline bool operator==(const Player& lhs, const Player& rhs) { return lhs.id == rhs.id; }

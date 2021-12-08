@@ -18,7 +18,7 @@ set(SRCS
     technology.h
     structs.h
     spacebase.h
-    player.h
+    planet.cpp
     msg/messagetypes.h
     msg/messagetypes.cpp
     msg/messagestructs.h
@@ -27,7 +27,7 @@ set(SRCS
 
 add_library(${LIB_NAME}
     ${SRCS}
- )
+)
 
 #this allow to include libuot headers from other modules (without prefixes)
 target_include_directories(${LIB_NAME}
