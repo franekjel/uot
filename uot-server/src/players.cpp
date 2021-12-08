@@ -147,7 +147,11 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
     {
         player->HandleBuildRequest(build.building_type, build.upgrade_from, build.colony_id);
     }
-    return false;
+
+    if (payload->technologyRequest != Technology::TechnologyType::None)
+        player->HandleStartTechnologyResearch(payload->technologyRequest);
+
+    return true;
 }
 
 void PlayersList::CountWeeklyNumbers()
@@ -185,6 +189,7 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     auto& player_space_bases = player->owned_space_bases;
     auto& player_galaxy = player->known_galaxy;
     auto& player_ships = player->owned_ships;
+    auto& player_research = player->researched_technology;
 
     // calculate expenses and gains of player colonies
     for (auto& colony : player_colonies)
@@ -243,6 +248,22 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
 
         // If space base get some upkeep cost, calculate it here;
     }
+
+    // use technology points to research technology if any is being researched
+    if (player_research)
+    {
+        if (player_resources[Resource::Technology] >= player_research.progress_left)
+        {
+            player_research.progress_left = 0.0f;
+            player->DiscoverTechnology(player_research.technology);
+            player_research = {};
+        }
+        else
+            player_research.progress_left -= player_resources[Resource::Technology];
+    }
+
+    // technology points are special, as they disappear if not used
+    player_resources[Resource::Technology] = 0.0f;
 }
 
 void PlayersList::CountEveryTourNumbersPlayer(std::shared_ptr<Player> player) {}

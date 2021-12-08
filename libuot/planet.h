@@ -230,14 +230,6 @@ struct Colony
 
     void UpdateBuildingQueue()
     {
-        while (building_queue.size() != 0 && building_queue.front().worker_week_units_left == 0.0f)
-        {
-            if (building_queue.front().upgrade_of != Building::BuildingType::None)
-                buildings[building_queue.front().upgrade_of]--;
-            buildings[building_queue.front().type]++;
-            building_queue.erase(building_queue.begin());
-        }
-
         if (building_queue.size() == 0)
             return;
 
@@ -257,6 +249,15 @@ struct Colony
             }
             itr++;
         }
+
+        while (building_queue.size() != 0 && building_queue.front().worker_week_units_left == 0.0f)
+        {
+            if (building_queue.front().upgrade_of != Building::BuildingType::None)
+                buildings[building_queue.front().upgrade_of]--;
+            buildings[building_queue.front().type]++;
+            building_queue.erase(building_queue.begin());
+        }
+
         building_queue_changed = true;
         return;
     }

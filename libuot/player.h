@@ -23,11 +23,13 @@ struct Player
 
     std::set<Technology::TechnologyType> known_technologies;
     std::set<Technology::TechnologyType> available_technologies;
+    TechnologyProgress researched_technology;
 
     Player(const long player_id_, const std::shared_ptr<Galaxy>& known_galaxy_,
            const std::map<Resource, float>& owned_resources_, const std::shared_ptr<Colony>& starting_colony);
 
     void HandleBuildRequest(Building::BuildingType type, Building::BuildingType upgrade_from, unsigned int colony_id);
+    void HandleStartTechnologyResearch(Technology::TechnologyType technology);
     void DiscoverTechnology(Technology::TechnologyType technology);
 };
 

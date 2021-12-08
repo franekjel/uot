@@ -13,6 +13,9 @@ struct Technology
         SpaceEngineering,
         Engineering,
         Spaceships,
+
+        // always leave as the last one
+        Empty, // special type for aborting research :D
     };
 
     unsigned int id;
@@ -42,3 +45,21 @@ const std::map<Technology::TechnologyType, Technology> Technologies{
     {Technology::TechnologyType::Spaceships,
      Technology(0, "Spaceships", "Starting technology. Allows constructing base spaceships and base modules", 0,
                 {Technology::TechnologyType::HyperquantumPhysics})}};
+
+struct TechnologyProgress
+{
+    Technology::TechnologyType technology;
+    float progress_left;
+
+    TechnologyProgress() : technology(Technology::TechnologyType::Empty), progress_left(-10.0f) {}
+
+    TechnologyProgress(Technology::TechnologyType technology_)
+        : technology(technology_), progress_left(Technologies.at(technology_).cost)
+    {
+    }
+
+    operator bool() const
+    {
+        return technology != Technology::TechnologyType::None && technology != Technology::TechnologyType::Empty;
+    }
+};
