@@ -98,7 +98,7 @@ void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Play
             {
                 work_offset += building.worker_week_units_left /
                                (colony.second->population_building_modificator * colony.second->unemployed_population);
-                payload.buildings_updates.push_back(messageTypes::MsgBuildingsUpdates::MsgBuildingsUpdates(
+                payload.buildings_updates.push_back(messageTypes::MsgBuildingsUpdates(
                     colony.second->id, building.type, building.upgrade_of, work_offset));
             }
             colony.second->building_queue_changed = false;
