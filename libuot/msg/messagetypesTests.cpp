@@ -82,6 +82,11 @@ bool operator==(std::shared_ptr<Planet> p1, messageTypes::MsgPlanet& p2)
     return true;
 }
 
+bool operator==(messageTypes::MsgTechnologyUpdate& t1, messageTypes::MsgTechnologyUpdate& t2)
+{
+    return t1.technology_type == t2.technology_type && t1.days_remaining == t2.days_remaining;
+}
+
 bool operator==(messageTypes::MsgBuildingsUpdates& b1, messageTypes::MsgBuildingsUpdates& b2)
 {
     return b1.colony_id == b2.colony_id && b1.building_type == b2.building_type && b1.upgrade_of == b2.upgrade_of &&
@@ -198,6 +203,8 @@ void NewTourPayloadTest()
     ntp.updated_populations[1] = p1_init;
     ntp.updated_populations[10] = p10_init;
 
+    ntp.technology_update = {Technology::TechnologyType::HyperquantumPhysics, 10};
+
     messageTypes::MsgBuildingsUpdates buildUpdate1{2, Building::BuildingType::Greenhouses, Building::BuildingType::None,
                                                    3};
     messageTypes::MsgBuildingsUpdates buildUpdate2{3, Building::BuildingType::ImprovedMetalsMine,
@@ -231,6 +238,9 @@ void NewTourPayloadTest()
     if (p1 != p1_init || p10 != p10_init)
         std::cout << "NewTour - wrong people values\n";
 
+    if (!(ntp.technology_update == cast->technology_update))
+        std::cout << "NewTour - wrong technology update\n";
+
     auto b1 = cast->buildings_updates[0];
     auto b2 = cast->buildings_updates[1];
     if (!(b1 == buildUpdate1) || !(b2 == buildUpdate2))
@@ -247,6 +257,8 @@ void ActionsPayloadTest()
     ap.buildRequests.push_back(buildRequest1);
     ap.buildRequests.push_back(buildRequest2);
 
+    ap.technologyRequest = Technology::TechnologyType::Engineering;
+
     auto ser = ap.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
     auto type = des->GetType();
@@ -254,6 +266,11 @@ void ActionsPayloadTest()
         std::cout << "Actions - wrong message type\n";
     auto cast = std::dynamic_pointer_cast<messageTypes::ActionsPayload>(des);
 
+    if (!cast->createBaseActions.empty())
+        std::cout << "Actions - wrong resources size\n";
+
+    if (cast->technologyRequest != ap.technologyRequest)
+        std::cout << "Actions - wrong technology request\n";
     if (cast->buildRequests.size() != 2)
         std::cout << "Actions - wrong build actions size\n";
 

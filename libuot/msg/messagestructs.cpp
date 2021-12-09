@@ -106,6 +106,13 @@ messageTypes::MsgGalaxy::MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy)
         sectors.push_back(MsgSector(sector));
 }
 
+messageTypes::MsgTechnologyUpdate::MsgTechnologyUpdate() {}
+
+messageTypes::MsgTechnologyUpdate::MsgTechnologyUpdate(Technology::TechnologyType technology_type_, int days_remaining_)
+    : technology_type(technology_type_), days_remaining(days_remaining_)
+{
+}
+
 messageTypes::MsgBuildingsUpdates::MsgBuildingsUpdates() {}
 
 messageTypes::MsgBuildingsUpdates::MsgBuildingsUpdates(int colony_id_, Building::BuildingType building_type_,

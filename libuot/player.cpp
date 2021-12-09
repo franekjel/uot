@@ -16,16 +16,27 @@ Player::Player(const long id_, const std::shared_ptr<Galaxy> &known_galaxy_,
     owned_colonies[starting_colony->id] = starting_colony;
     owned_space_bases = {};
     owned_ships = {};
-    DiscoverTechnology(&Engineering);
+    researched_technology = {};
+    DiscoverTechnology(Technology::TechnologyType::Engineering);
 }
 
-void Player::DiscoverTechnology(const Technology *const technology)
+void Player::DiscoverTechnology(Technology::TechnologyType technology)
 {
     known_technologies.insert(technology);
-    for (const auto &t : technology->unlock)
+    auto tech = Technologies.at(technology);
+    for (const auto &t : tech.unlock)
     {
         available_technologies.insert(t);
     }
+}
+
+void Player::HandleStartTechnologyResearch(Technology::TechnologyType technology)
+{
+    if (available_technologies.count(technology) > 0 && known_technologies.count(technology) == 0)
+        researched_technology = {technology};
+
+    if (technology == Technology::TechnologyType::None)
+        researched_technology = {};
 }
 
 void Player::HandleBuildRequest(Building::BuildingType type, Building::BuildingType upgrade_from,
