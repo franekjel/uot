@@ -1,12 +1,13 @@
 #pragma once
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
 struct Technology
 {
-    enum TechnologyType
+    enum class TechnologyType
     {
         Empty,
         HyperquantumPhysics,

@@ -257,7 +257,7 @@ void ActionsPayloadTest()
     ap.buildRequests.push_back(buildRequest1);
     ap.buildRequests.push_back(buildRequest2);
 
-    ap.technologyRequest = Technology::Engineering;
+    ap.technologyRequest = Technology::TechnologyType::Engineering;
 
     auto ser = ap.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
