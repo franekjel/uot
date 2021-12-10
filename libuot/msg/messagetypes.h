@@ -42,9 +42,10 @@ struct BasePayload
 
 struct StartGamePayload : BasePayload
 {
+    int player_id;
     MsgGalaxy galaxy;
     MessageType GetType() override { return MessageType::StartGame; }
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StartGamePayload, galaxy)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StartGamePayload, player_id, galaxy)
     std::string Serialize() override
     {
         nlohmann::json jsonPayload = (*this);
