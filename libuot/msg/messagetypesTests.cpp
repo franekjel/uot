@@ -103,7 +103,16 @@ void StartGamePayloadTest()
     messageTypes::StartGamePayload sgp;
 
     std::map<Resource, float> resources_t;
-    auto player = std::make_shared<Player>(20, nullptr, resources_t, nullptr);
+    std::set<PlanetaryFeatures::PlanetaryFeatureType> features = {
+        PlanetaryFeatures::PlanetaryFeatureType::HotClimate,
+        PlanetaryFeatures::PlanetaryFeatureType::MediumMetalsDeposits};
+    auto planet =
+        std::make_shared<Planet>(SectorObject(3, Point(5.0f, 6.0f), 3.0f), Planet::PlanetClimate::Hot, features);
+    auto colony = std::make_shared<Colony>(33, planet);
+    planet->colony = colony;
+
+    auto player = std::make_shared<Player>(20, nullptr, resources_t, colony);
+    colony->owner = player;
 
     auto galaxy = std::make_shared<Galaxy>();
     auto sector1 = std::make_shared<Sector>();
@@ -132,21 +141,13 @@ void StartGamePayloadTest()
     inhabitable->base = base;
     sector1->objects.insert(inhabitable);
 
-    std::set<PlanetaryFeatures::PlanetaryFeatureType> features = {
-        PlanetaryFeatures::PlanetaryFeatureType::HotClimate,
-        PlanetaryFeatures::PlanetaryFeatureType::MediumMetalsDeposits};
-    auto planet =
-        std::make_shared<Planet>(SectorObject(3, Point(5.0f, 6.0f), 3.0f), Planet::PlanetClimate::Hot, features);
-    auto colony = std::make_shared<Colony>(33, planet);
-    colony->owner = player;
-    planet->colony = colony;
-
     sector1->objects.insert(planet);
 
     galaxy->sectors.insert(sector1);
     galaxy->sectors.insert(sector2);
     galaxy->sectors.insert(sector3);
 
+    sgp.player_id = player->id;
     sgp.galaxy = messageTypes::MsgGalaxy(galaxy);
     auto ser = sgp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
@@ -189,6 +190,9 @@ void StartGamePayloadTest()
 
     if (!(planet == s0.planets[0]))
         std::cout << "StartGame - Planet not correct\n";
+
+    if (player->id != cast->player_id)
+        std::cout << "StartGame - Wrong player id\n";
 }
 
 void NewTourPayloadTest()
