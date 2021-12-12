@@ -6,25 +6,23 @@
 #include "SDL_image.h"
 #endif
 
-#include "assets.h"
-#include "game_gui.h"
-#include "game_resources.h"
-#include "game_state.h"
-#include "rendering.h"
-
-#include "rendering_all_views.h"
-
-#include "sdl_utilities.h"
-#include "setup_utils.h"
-#include "singleton.h"
-#include "size_settings.h"
-
 #include <iostream>
 #include <optional>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "assets.h"
+#include "game_gui.h"
+#include "game_resources.h"
+#include "game_state.h"
+#include "rendering.h"
+#include "rendering_all_views.h"
+#include "sdl_utilities.h"
+#include "setup_utils.h"
+#include "singleton.h"
+#include "size_settings.h"
+#include "uot_net_client.h"
 
 namespace su = setup_utils;
 
@@ -43,6 +41,7 @@ void close(client_context& context)
 int main(int argc, char* argv[])
 {
     client_context context{singleton<game_resources>::reference(), singleton<game_state>::reference()};
+    uot_net_client nc(context);
 
     su::init(context);
     su::loadMedia(context);
