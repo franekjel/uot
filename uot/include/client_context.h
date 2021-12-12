@@ -12,8 +12,8 @@
 
 struct client_context
 {
-    game_resources& gr;
-    game_state& gs;
+    std::shared_ptr<game_resources> gr;
+    std::shared_ptr<game_state> gs;
     rendering::view_t view;
     std::shared_ptr<SDL_Renderer> r;
     std::shared_ptr<SDL_Window> w;

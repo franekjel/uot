@@ -17,7 +17,7 @@ void rendering::render_sector_view::_draw(const client_context& context)
     // =======================================================
     // draw the left, main game panel
     sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
-    sdl_utilities::paint_frame_textured(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, gr.sky_texture);
+    sdl_utilities::paint_frame_textured(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, gr->sky_texture);
     sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
     if (gui->current_sector.has_value())
     {
@@ -68,10 +68,10 @@ void rendering::render_object_selection(const client_context& context)
 
     SDL_Rect d{static_cast<int>(x - 0.5 * tex_size), static_cast<int>(y - 0.5 * tex_size), tex_size, tex_size};
 
-    SDL_RenderCopyEx(r.get(), gr.selectionTextures[selection_types::SECTOR_SELECTION].get(), &s, &d,
+    SDL_RenderCopyEx(r.get(), gr->selectionTextures[selection_types::SECTOR_SELECTION].get(), &s, &d,
                      SDL_GetTicks() / 100, NULL, SDL_FLIP_NONE);
 
-    render_planet_helper(context, 0.8, x, y, gr.planetTextures[11 + curr->id % 18]);
+    render_planet_helper(context, 0.8, x, y, gr->planetTextures[11 + curr->id % 18]);
 }
 
 void rendering::render_selected_object_info(const client_context& context)
@@ -82,15 +82,15 @@ void rendering::render_selected_object_info(const client_context& context)
     auto& gui = context.gui;
 
     auto object_id = GAS_GIANT_1 + gui->current_object.value()->id % (planets_meta::num_planets - GAS_GIANT_1);
-    sdl_utilities::render_text(r.get(), gr.main_font, "PLANET NAME", 30, 10, size_settings::context_area::width - 50,
+    sdl_utilities::render_text(r.get(), gr->main_font, "PLANET NAME", 30, 10, size_settings::context_area::width - 50,
                                {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
     render_planet_helper(context, 2.0, size_settings::context_area::width / 2,
-                         std::min(250, planets_meta::texture_size[object_id] * 2), gr.planetTextures[object_id]);
+                         std::min(250, planets_meta::texture_size[object_id] * 2), gr->planetTextures[object_id]);
 
     // render planet info
-    sdl_utilities::render_text(r.get(), gr.secondary_font,
+    sdl_utilities::render_text(r.get(), gr->secondary_font,
                                " planet index: " + std::to_string(gui->current_object.value()->id) +
                                    "\n planet info 1\n planet info 2\n planet info 3",
                                40, 450, size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
@@ -105,7 +105,7 @@ void rendering::render_sector_galaxy_helper(const client_context& context, const
     {
         const auto planet_x = size_settings::play_area::width * (1.0f + 1.0f * p->position.x) * 0.5f;
         const auto planet_y = size_settings::play_area::height * (1.0f + 1.0f * p->position.y) * 0.5f;
-        render_planet_helper(context, 0.8, planet_x, planet_y, gr.planetTextures[11 + p->id % 18]);
+        render_planet_helper(context, 0.8, planet_x, planet_y, gr->planetTextures[11 + p->id % 18]);
     }
 }
 

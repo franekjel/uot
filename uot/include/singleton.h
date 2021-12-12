@@ -1,12 +1,14 @@
 #ifndef SINGLETON_H
 #define SINGLETON_H
 
+#include <memory>
+
 template <typename T>
 struct singleton
 {
-    static T& reference()
+    static std::shared_ptr<T> ptr()
     {
-        static T t;
+        static std::shared_ptr<T> t(new T);
         return t;
     }
 };

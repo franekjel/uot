@@ -7,7 +7,7 @@ void rendering::render_background(const client_context& context)
     auto& gr = context.gr;
 
     SDL_RenderSetViewport(r.get(), nullptr);
-    SDL_RenderCopyEx(r.get(), gr.bk_texture.get(), nullptr, nullptr, 0, nullptr, SDL_FLIP_NONE);
+    SDL_RenderCopyEx(r.get(), gr->bk_texture.get(), nullptr, nullptr, 0, nullptr, SDL_FLIP_NONE);
 }
 
 void rendering::render_button_sprite(ui_button& button, const client_context& context)
@@ -17,7 +17,7 @@ void rendering::render_button_sprite(ui_button& button, const client_context& co
     auto& gs = context.gs;
     auto& gui = context.gui;
 
-    const auto texture = gr.buttonTextures[button.type];
+    const auto texture = gr->buttonTextures[button.type];
     SDL_Rect s{0,
                (gui->focused_button.has_value() && gui->focused_button.value() == button.button_id)
                    ? buttons_meta::button_texture_height
@@ -62,10 +62,10 @@ void rendering::render_resource_bar(const client_context& context)
     {
         SDL_Rect s{positions[i], positions[i + 1], resources_meta::single_size, resources_meta::single_size};
         SDL_Rect d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-        SDL_RenderCopyEx(context.r.get(), context.gr.resource_texture.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(context.r.get(), context.gr->resource_texture.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 
         x_off += fonts::resource_font_size;
-        sdl_utilities::render_text(context.r.get(), context.gr.resource_font, ": " + std::to_string(amounts[i]), x_off,
+        sdl_utilities::render_text(context.r.get(), context.gr->resource_font, ": " + std::to_string(amounts[i]), x_off,
                                    y_off, 150, {0xFF, 0xFF, 0xFF, 0xFF});
         x_off += 180;
     }

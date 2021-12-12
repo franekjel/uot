@@ -1,7 +1,7 @@
-#include "rendering_universe.h"
+#include "rendering/rendering_universe.h"
 #include "client_context.h"
 #include "game_gui.h"
-#include "input_utilities.h"
+#include "utilities/input_utilities.h"
 
 void rendering::render_selected_sector_info(const client_context& context)
 {
@@ -11,15 +11,15 @@ void rendering::render_selected_sector_info(const client_context& context)
     auto& gui = context.gui;
 
     auto sector_id = gui->current_sector.value()->sector_id % 10 + 1;
-    sdl_utilities::render_text(r.get(), gr.main_font, "SECTOR NAME", 30, 10, size_settings::context_area::width - 50,
+    sdl_utilities::render_text(r.get(), gr->main_font, "SECTOR NAME", 30, 10, size_settings::context_area::width - 50,
                                {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
     render_planet_helper(context, 2.0, size_settings::context_area::width / 2,
-                         std::min(250, planets_meta::texture_size[sector_id] * 2), gr.planetTextures[sector_id]);
+                         std::min(250, planets_meta::texture_size[sector_id] * 2), gr->planetTextures[sector_id]);
 
     // render planet info
-    sdl_utilities::render_text(r.get(), gr.secondary_font,
+    sdl_utilities::render_text(r.get(), gr->secondary_font,
                                " sector index: " + std::to_string(gui->current_sector.value()->sector_id) +
                                    "\n sector info 1\n sector info 2\n sector info 3",
                                40, 450, size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
@@ -39,13 +39,13 @@ void rendering::render_universe_view::_draw(const client_context& context)
 
     // draw the left, main game panel
     sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
-    sdl_utilities::paint_frame_textured(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, gr.sky_texture);
+    sdl_utilities::paint_frame_textured(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, gr->sky_texture);
     sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
-    if (gs.galaxy.has_value())
+    if (gs->galaxy.has_value())
     {
         // universe render here
         int u = 1;
-        for (const auto& sector : gs.galaxy.value()->sectors)
+        for (const auto& sector : gs->galaxy.value()->sectors)
         {
             render_sector_universe_helper(context, sector);
         }
@@ -90,7 +90,7 @@ void rendering::render_sector_selection(const client_context& context)
 
     SDL_Rect d{x, y, tex_size, tex_size};
 
-    SDL_RenderCopyEx(r.get(), gr.selectionTextures[selection_types::SECTOR_SELECTION].get(), &s, &d,
+    SDL_RenderCopyEx(r.get(), gr->selectionTextures[selection_types::SECTOR_SELECTION].get(), &s, &d,
                      SDL_GetTicks() / 100, NULL, SDL_FLIP_NONE);
     render_sector_universe_helper(context, gui->current_sector.value());
 }
@@ -103,7 +103,7 @@ void rendering::render_sector_universe_helper(const client_context& context, con
     const auto corrected_x = size_settings::play_area::width * (0.5f + 0.5f * sector->position.x);
     const auto corrected_y = size_settings::play_area::height * (0.5f + 0.5f * sector->position.y);
     render_planet_helper(context, planets_meta::sector_multiplier, corrected_x, corrected_y,
-                         gr.planetTextures[sector->sector_id % 10 + 1]);
+                         gr->planetTextures[sector->sector_id % 10 + 1]);
 
     SDL_SetRenderDrawColor(context.r.get(), 0xFF, 0xFF, 0xFF, 0xFF);
 
@@ -134,7 +134,7 @@ void rendering::render_universe_view::_mouse_handler(client_context& context, Ui
         x = x - AreaType::x_offset;
         y = y - AreaType::y_offset;
         const int sprite_off = planets_meta::texture_size[SECTOR_1] * planets_meta::sector_multiplier * 0.5f;
-        for (const auto s : gs.galaxy.value()->sectors)
+        for (const auto s : gs->galaxy.value()->sectors)
         {
             if (iu::check_collision(x, y, size_settings::play_area::width * (0.5f + 0.5f * s->position.x) - sprite_off,
                                     size_settings::play_area::height * (0.5f + 0.5f * s->position.y) - sprite_off,

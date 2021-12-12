@@ -8,7 +8,7 @@ void rendering::render_current_popup_menu(const client_context& context)
     auto& gr = context.gr;
 
     rendering::render_planet_helper(context, 1.0f, size_settings::popup_menu_area::width / 2,
-                                    0.5f * planets_meta::frame_height, gr.planetTextures[planet_types::MENU_PLANET]);
+                                    0.5f * planets_meta::frame_height, gr->planetTextures[planet_types::MENU_PLANET]);
 
     int i = 0;
     for (auto& elem : context.gui->popup_buttons)

@@ -1,45 +1,49 @@
 set(APP_NAME "uot")
 set(SRCS
-    include/assets.h
+    include/constants/assets.h
     include/client_context.h
     include/game_gui.h
     include/game_resources.h
     include/game_state.h
-    include/input_utilities.h
+    include/utilities/input_utilities.h
     include/net/client_txrx.h
-    include/rendering.h
-    include/rendering_all_views.h
-    include/rendering_common.h
-    include/rendering_galaxy.h
-    include/rendering_menu.h
-    include/rendering_planet.h
-    include/rendering_universe.h
-    include/rendering_views.h
-    include/sdl_utilities.h
-    include/setup_utils.h
+    include/rendering/rendering.h
+    include/rendering/rendering_all_views.h
+    include/rendering/rendering_common.h
+    include/rendering/rendering_galaxy.h
+    include/rendering/rendering_menu.h
+    include/rendering/rendering_planet.h
+    include/rendering/rendering_universe.h
+    include/rendering/rendering_views.h
+    include/utilities/sdl_utilities.h
+    include/utilities/setup_utils.h
     include/singleton.h
-    include/size_settings.h
-    include/texture.h
-    include/ui_button.h
-    include/ui_menu_lists.h
+    include/constants/size_settings.h
+    include/rendering/texture.h
+    include/rendering/ui_button.h
+    include/rendering/ui_menu_lists.h
     include/uncopiable.h
-    include/uot_net_client.h
+    include/net/uot_net_client.h
 
     src/game_state.cpp
-    src/input_utilities.cpp
+    src/utilities/input_utils.cpp
     src/main.cpp
     src/net/client_txrx.cpp
-    src/rendering_common.cpp
-    src/rendering_galaxy.cpp
-    src/rendering_menu.cpp
-    src/rendering_universe.cpp
-    src/sdl_utilities.cpp
-    src/setup_utils.cpp
-    src/uot_net_client.cpp
+    src/rendering/rendering_common.cpp
+    src/rendering/rendering_galaxy.cpp
+    src/rendering/rendering_menu.cpp
+    src/rendering/rendering_universe.cpp
+    src/utilities/sdl_utils.cpp
+    src/utilities/setup_utils.cpp
+    src/net/uot_net_client.cpp
 )
 
 
 include_directories(include/)
+include_directories(include/rendering)
+include_directories(include/constants)
+include_directories(include/utilities)
+include_directories(include/net)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
