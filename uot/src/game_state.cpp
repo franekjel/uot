@@ -6,5 +6,5 @@
 
 void game_state::reset_galaxy()
 {
-    galaxy = GenerateGalaxy({generation_meta::num_sectors, generation_meta::multiplier});
+    galaxy = std::make_shared<Galaxy>(GenerateGalaxy({generation_meta::num_sectors, generation_meta::multiplier}));
 }

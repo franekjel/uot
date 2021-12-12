@@ -25,7 +25,7 @@ struct game_state : public uncopiable
 
    public:
     void reset_galaxy();
-    std::optional<Galaxy> galaxy;
+    std::optional<std::shared_ptr<Galaxy>> galaxy;
 };
 
 #endif
