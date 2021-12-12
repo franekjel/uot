@@ -6,7 +6,6 @@
 
 namespace rendering
 {
-
 struct render_menu_view : render_view<render_menu_view>
 {
     view_t _up();

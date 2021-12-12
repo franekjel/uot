@@ -2,7 +2,6 @@
 
 namespace input_utilities
 {
-
 uot_event_type get_event_type(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y)
 {
     switch (event_type)

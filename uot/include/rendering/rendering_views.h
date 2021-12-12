@@ -9,7 +9,6 @@ struct client_context;
 
 namespace rendering
 {
-
 enum class MouseButton
 {
     MOUSE_LEFT,

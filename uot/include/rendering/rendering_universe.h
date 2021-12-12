@@ -5,7 +5,6 @@
 
 namespace rendering
 {
-
 struct render_universe_view : render_view<render_universe_view>
 {
     view_t _up();

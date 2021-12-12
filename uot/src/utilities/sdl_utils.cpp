@@ -1,6 +1,6 @@
-#include "sdl_utilities.h"
 #include <algorithm>
 #include "assets.h"
+#include "sdl_utilities.h"
 
 void sdl_texture_deleter(SDL_Texture* t) { SDL_DestroyTexture(t); }
 

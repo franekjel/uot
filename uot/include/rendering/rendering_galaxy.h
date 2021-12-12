@@ -5,7 +5,6 @@
 
 namespace rendering
 {
-
 struct render_sector_view : render_view<render_sector_view>
 {
     view_t _up();

@@ -7,7 +7,6 @@ struct client_context;
 
 namespace rendering
 {
-
 void render_background(const client_context& context);
 
 void render_button_sprite(ui_button& button, const client_context& context);

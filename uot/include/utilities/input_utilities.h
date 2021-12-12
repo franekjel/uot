@@ -4,7 +4,6 @@
 
 namespace input_utilities
 {
-
 enum class uot_event_type
 {
     motion_play,

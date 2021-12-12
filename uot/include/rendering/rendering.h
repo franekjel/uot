@@ -6,7 +6,6 @@
 
 namespace rendering
 {
-
 struct render_menu_view;
 struct render_universe_view;
 struct render_sector_view;
