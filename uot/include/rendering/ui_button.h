@@ -3,7 +3,8 @@
 
 #include <functional>
 #include "assets.h"
-#include "client_context.h"
+
+struct client_context;
 
 struct ui_button
 {

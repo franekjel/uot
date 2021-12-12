@@ -14,7 +14,8 @@ const std::vector<ui_button> start_menu = {
     ui_button{0, (size_settings::popup_menu_area::width - buttons_meta::button_width) / 2,
               planets_meta::frame_height / 2 + 60 + buttons_meta::button_y_offset, buttons_meta::button_width,
               buttons_meta::button_height, START_BUTTON,
-              [](client_context& context) -> void { context.gs.set_view(game_view_t::universe_view); }},
+              [](client_context& context) -> void
+              { context.view = std::make_shared<rendering::render_universe_view>(); }},
     ui_button{1, (size_settings::popup_menu_area::width - buttons_meta::button_width) / 2,
               planets_meta::frame_height / 2 + 60 + 2 * buttons_meta::button_y_offset, buttons_meta::button_width,
               buttons_meta::button_height, EXIT_BUTTON,

@@ -10,12 +10,12 @@
 #include "uncopiable.h"
 
 // used for graphics / audio resources
-struct resource_manager : public uncopiable
+struct game_resources : public uncopiable
 {
    protected:
-    resource_manager() {}
+    game_resources() {}
 
-    friend singleton<resource_manager>;
+    friend singleton<game_resources>;
 
    public:
     std::vector<std::shared_ptr<SDL_Texture>> buttonTextures;
