@@ -10,11 +10,10 @@ void rendering::render_background(const client_context& context)
     SDL_RenderCopyEx(r.get(), gr->bk_texture.get(), nullptr, nullptr, 0, nullptr, SDL_FLIP_NONE);
 }
 
-void rendering::render_button_sprite(ui_button& button, const client_context& context)
+void rendering::render_button_sprite(ui_button& button, client_context& context)
 {
     auto& r = context.r;
     auto& gr = context.gr;
-    auto& gs = context.gs;
     auto& gui = context.gui;
 
     const auto texture = gr->buttonTextures[button.type];
@@ -31,8 +30,6 @@ void rendering::render_planet_helper(const client_context& context, const float 
                                      const int y_off, const texture_t& tex)
 {
     auto& r = context.r;
-    auto& gs = context.gs;
-    auto& view = context.view;
     auto& gui = context.gui;
 
     SDL_Rect s{(gui->planet_frame / planets_meta::frame_duration) * tex.w, 0, tex.w, tex.h};

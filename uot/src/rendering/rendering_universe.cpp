@@ -6,7 +6,6 @@
 void rendering::render_selected_sector_info(const client_context& context)
 {
     auto& r = context.r;
-    auto& gs = context.gs;
     auto& gr = context.gr;
     auto& gui = context.gui;
 
@@ -25,11 +24,12 @@ void rendering::render_selected_sector_info(const client_context& context)
                                40, 450, size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 }
 
-void rendering::render_universe_view::_draw(const client_context& context)
+void rendering::render_universe_view::_draw(client_context& context)
 {
     render_background(context);
     // draw the above astronaut buttons
-    auto& gs = context.gs;
+    auto state = context.getGameState();
+    auto& gs = state.value;
     auto& gr = context.gr;
     auto& r = context.r;
     auto& gui = context.gui;
@@ -72,7 +72,6 @@ void rendering::render_sector_selection(const client_context& context)
 
     auto& r = context.r;
     auto& gr = context.gr;
-    auto& gs = context.gs;
     auto& gui = context.gui;
 
     if (!gui->current_sector.has_value())
@@ -127,7 +126,8 @@ void rendering::render_universe_view::_mouse_handler(client_context& context, Ui
     if (et == iu::uot_event_type::left_click_play)
     {
         using AreaType = size_settings::play_area;
-        auto& gs = context.gs;
+        auto state = context.getGameState();
+        auto& gs = state.value;
         auto& gr = context.gr;
         auto& current_sector = context.gui->current_sector;
 

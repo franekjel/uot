@@ -3,7 +3,7 @@
 #include "game_gui.h"
 #include "input_utilities.h"
 
-void rendering::render_current_popup_menu(const client_context& context)
+void rendering::render_current_popup_menu(client_context& context)
 {
     auto& gr = context.gr;
 
@@ -17,7 +17,7 @@ void rendering::render_current_popup_menu(const client_context& context)
     }
 }
 
-void rendering::render_menu_view::_draw(const client_context& context)
+void rendering::render_menu_view::_draw(client_context& context)
 {
     render_background(context);
     auto& r = context.r;
@@ -46,8 +46,6 @@ void rendering::render_menu_view::_mouse_handler(client_context& context, Uint32
     if (ev == iu::uot_event_type::left_click_resource || ev == iu::uot_event_type::left_click_context ||
         ev == iu::uot_event_type::left_click_play || ev == iu::uot_event_type::left_click_else)
     {
-        auto& gs = context.gs;
-
         x = x - size_settings::popup_menu_area::x_offset;
         y = y - size_settings::popup_menu_area::y_offset;
 

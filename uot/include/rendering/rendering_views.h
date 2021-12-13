@@ -18,7 +18,7 @@ enum class MouseButton
 template <typename T>
 struct render_view
 {
-    void draw(const client_context& context) { static_cast<T*>(this)->_draw(context); }
+    void draw(client_context& context) { static_cast<T*>(this)->_draw(context); }
     view_t up() { return static_cast<T*>(this)->_up(); };
     view_t down() { return static_cast<T*>(this)->_down(); };
     void mouse_handler(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m, int x, int y)

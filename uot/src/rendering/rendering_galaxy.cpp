@@ -8,7 +8,6 @@ void rendering::render_sector_view::_draw(const client_context& context)
     render_background(context);
     // draw the above astronaut buttons
     auto& r = context.r;
-    auto& gs = context.gs;
     auto& gr = context.gr;
     auto& gui = context.gui;
 
@@ -44,7 +43,6 @@ void rendering::render_sector_view::_draw(const client_context& context)
 void rendering::render_object_selection(const client_context& context)
 {
     auto& r = context.r;
-    auto& gs = context.gs;
     auto& gr = context.gr;
     auto& gui = context.gui;
 
@@ -77,7 +75,6 @@ void rendering::render_object_selection(const client_context& context)
 void rendering::render_selected_object_info(const client_context& context)
 {
     auto& r = context.r;
-    auto& gs = context.gs;
     auto& gr = context.gr;
     auto& gui = context.gui;
 
@@ -126,7 +123,6 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
         x = x - AreaType::x_offset;
         y = y - AreaType::y_offset;
 
-        auto& gs = context.gs;
         const auto& curr = current_sector.value();
         for (const auto& sec_obj : curr->objects)
         {
