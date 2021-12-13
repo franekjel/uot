@@ -220,7 +220,8 @@ void uot_net_client::handle_message(const std::string& data)
             galaxy_ptr->sectors = set_sectors;
 
             // TODO: Add mutex
-            context.gs->galaxy = galaxy_ptr;
+            auto state = context.getGameState();
+            state.value->galaxy = galaxy_ptr;
         }
         break;
 

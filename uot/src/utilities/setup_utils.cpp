@@ -8,7 +8,9 @@ namespace setup_utils
 {
 void init(client_context& context)
 {
-    auto& gs = context.gs;
+    auto state = context.getGameState();
+    auto& gs = state.value;
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         throw std::runtime_error("SDL coudl not initialize! SDL Error: %s\n" + std::string(SDL_GetError()));
@@ -31,7 +33,7 @@ void init(client_context& context)
         throw std::runtime_error("Couldn't initialize SDL_ttf");
     }
 
-    context.gs->reset_galaxy();
+    gs->reset_galaxy();
     context.gui = std::make_unique<game_gui>();
     context.gui->popup_buttons =
         std::vector(std::begin(ui_menu_lists::start_menu), std::end(ui_menu_lists::start_menu));
@@ -40,7 +42,6 @@ void init(client_context& context)
 void loadMedia(client_context& context)
 {
     auto& gr = context.gr;
-    auto& gs = context.gs;
 
     printf("Loading background\n");
     gr->bk_texture =

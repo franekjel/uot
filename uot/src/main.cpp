@@ -40,7 +40,7 @@ void close(client_context& context)
 
 int main(int argc, char* argv[])
 {
-    client_context context{singleton<game_resources>::ptr(), singleton<game_state>::ptr()};
+    client_context context(singleton<game_resources>::ptr(), singleton<game_state>::ptr());
     uot_net_client nc(context);
 
     su::init(context);
