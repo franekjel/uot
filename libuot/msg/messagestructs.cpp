@@ -135,3 +135,15 @@ messageTypes::MsgMoveFleetRequest::MsgMoveFleetRequest(int fleet_id_, Point posi
     : fleet_id(fleet_id_), position(position_)
 {
 }
+
+messageTypes::MsgFleet::MsgFleet() {}
+
+messageTypes::MsgFleet::MsgFleet(const std::shared_ptr<Fleet>& fleet, unsigned int player_id_) : player_id(player_id_)
+{
+    id = fleet->id;
+    position = fleet->position;
+}
+
+messageTypes::MsgWatchedSectorUpdate::MsgWatchedSectorUpdate() {}
+
+messageTypes::MsgWatchedSectorUpdate::MsgWatchedSectorUpdate(int sector_id_) : sector_id(sector_id_) { fleets = {}; }

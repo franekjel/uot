@@ -103,6 +103,26 @@ bool operator==(messageTypes::MsgMoveFleetRequest& m1, messageTypes::MsgMoveFlee
     return m1.fleet_id == m2.fleet_id && m1.position == m2.position;
 }
 
+bool operator==(messageTypes::MsgFleet& f1, messageTypes::MsgFleet& f2)
+{
+    return f1.id == f2.id && f1.player_id == f2.player_id && f1.position == f2.position;
+}
+
+bool operator==(messageTypes::MsgWatchedSectorUpdate& u1, messageTypes::MsgWatchedSectorUpdate& u2)
+{
+    if (u1.sector_id != u2.sector_id)
+        return false;
+
+    if (u1.fleets.size() != u2.fleets.size())
+        return false;
+
+    for (int i = 0; i < u1.fleets.size(); ++i)
+        if (!(u1.fleets[i] == u2.fleets[i]))
+            return false;
+
+    return true;
+}
+
 void StartGamePayloadTest()
 {
     messageTypes::StartGamePayload sgp;
@@ -221,6 +241,32 @@ void NewTurnPayloadTest()
     ntp.buildings_updates.push_back(buildUpdate1);
     ntp.buildings_updates.push_back(buildUpdate2);
 
+    messageTypes::MsgWatchedSectorUpdate watchedSectorUpdate1{2};
+    messageTypes::MsgWatchedSectorUpdate watchedSectorUpdate2{4};
+
+    auto fl = std::make_shared<Fleet>();
+    fl->id = 3;
+    fl->position = {4.0f, 6.66f};
+    messageTypes::MsgFleet fleet1{fl, 7};
+
+    fl = std::make_shared<Fleet>();
+    fl->id = 4;
+    fl->position = {14.0f, 6.0f};
+    messageTypes::MsgFleet fleet2{fl, 8};
+
+    fl = std::make_shared<Fleet>();
+    fl->id = 5;
+    fl->position = {22.0f, 0.0f};
+    messageTypes::MsgFleet fleet3{fl, 9};
+
+    watchedSectorUpdate1.fleets.push_back(fleet1);
+    watchedSectorUpdate1.fleets.push_back(fleet2);
+
+    watchedSectorUpdate2.fleets.push_back(fleet3);
+
+    ntp.watched_sectors_updates.push_back(watchedSectorUpdate1);
+    ntp.watched_sectors_updates.push_back(watchedSectorUpdate2);
+
     auto ser = ntp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
     auto type = des->GetType();
@@ -236,6 +282,9 @@ void NewTurnPayloadTest()
 
     if (cast->buildings_updates.size() != 2)
         std::cout << "NewTurn - wrong new buildings size\n";
+
+    if (cast->watched_sectors_updates.size() != 2)
+        std::cout << "NewTurn - wrong watched sectors size\n";
 
     auto food = cast->updated_resources[Resource::Food];
     auto metals = cast->updated_resources[Resource::Metals];
@@ -254,6 +303,11 @@ void NewTurnPayloadTest()
     auto b2 = cast->buildings_updates[1];
     if (!(b1 == buildUpdate1) || !(b2 == buildUpdate2))
         std::cout << "NewTurn - wrong new buildings\n";
+
+    auto ws1 = cast->watched_sectors_updates[0];
+    auto ws2 = cast->watched_sectors_updates[1];
+    if (!(ws1 == watchedSectorUpdate1) || !(ws2 == watchedSectorUpdate2))
+        std::cout << "NewTurn - wrong watched sectors\n";
 }
 
 void ActionsPayloadTest()
