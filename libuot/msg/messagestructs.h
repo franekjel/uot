@@ -122,4 +122,13 @@ struct MsgBuildRequest
     MsgBuildRequest();
     MsgBuildRequest(int colony_id_, Building::BuildingType building_type_, Building::BuildingType upgrade_from_);
 };
+
+struct MsgMoveFleetRequest
+{
+    int fleet_id;
+    Point position;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgMoveFleetRequest, fleet_id, position)
+    MsgMoveFleetRequest();
+    MsgMoveFleetRequest(int fleet_id_, Point position_);
+};
 }  // namespace messageTypes

@@ -98,6 +98,11 @@ bool operator==(messageTypes::MsgBuildRequest& b1, messageTypes::MsgBuildRequest
     return b1.colony_id == b2.colony_id && b1.building_type == b2.building_type && b1.upgrade_from == b2.upgrade_from;
 }
 
+bool operator==(messageTypes::MsgMoveFleetRequest& m1, messageTypes::MsgMoveFleetRequest& m2)
+{
+    return m1.fleet_id == m2.fleet_id && m1.position == m2.position;
+}
+
 void StartGamePayloadTest()
 {
     messageTypes::StartGamePayload sgp;
@@ -258,10 +263,15 @@ void ActionsPayloadTest()
     messageTypes::MsgBuildRequest buildRequest1 = {2, Building::BuildingType::Farm, Building::BuildingType::None};
     messageTypes::MsgBuildRequest buildRequest2 = {3, Building::BuildingType::ImprovedMetalsMine,
                                                    Building::BuildingType::MetalsMine};
+
+    messageTypes::MsgMoveFleetRequest moveFleetRequest1 = {2, Point{44.0f, -41.0f}};
+
     ap.buildRequests.push_back(buildRequest1);
     ap.buildRequests.push_back(buildRequest2);
 
     ap.technologyRequest = Technology::TechnologyType::Engineering;
+
+    ap.moveFleetRequests.push_back(moveFleetRequest1);
 
     auto ser = ap.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
@@ -278,10 +288,16 @@ void ActionsPayloadTest()
     if (cast->buildRequests.size() != 2)
         std::cout << "Actions - wrong build actions size\n";
 
+    if (cast->moveFleetRequests.size() != 1)
+        std::cout << "Actions - wrong move fleet actions size\n";
+
     auto b1 = cast->buildRequests[0];
     auto b2 = cast->buildRequests[1];
     if (!(b1 == buildRequest1) || !(b2 == buildRequest2))
         std::cout << "Actions - wrong build requests\n";
+
+    if (!(cast->moveFleetRequests[0] == moveFleetRequest1))
+        std::cout << "Actions - wrong move fleet requests\n";
 }
 
 void InvalidMessageTest()
