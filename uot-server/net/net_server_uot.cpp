@@ -69,10 +69,10 @@ void net_server_uot::set_after_accept_player_callback(std::function<void()> call
     uot_after_accept_player = callback;
 }
 
-void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Player>& player,
+void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Player>& player,
                                            std::string player_net_name)
 {
-    messageTypes::NewTourPayload payload;
+    messageTypes::NewTurnPayload payload;
 
     for (auto& resource : player->owned_resources)
     {

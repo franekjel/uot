@@ -18,7 +18,7 @@ class net_server_uot : public net_server
     void set_handle_actions_callback(
         std::function<void(std::string, std::shared_ptr<messageTypes::ActionsPayload>)> callback);
     void set_after_accept_player_callback(std::function<void()> callback);
-    void send_new_tour_message(int tour_number, std::shared_ptr<Player>& player, std::string player_net_name);
+    void send_new_turn_message(int turn_number, std::shared_ptr<Player>& player, std::string player_net_name);
     void send_game_begin_message(std::shared_ptr<Player>& player, std::string player_net_name);
     void after_accept_player();
 

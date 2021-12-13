@@ -24,7 +24,7 @@ enum MessageType
     None,
     StartGame,
     Actions,
-    NewTour
+    NewTurn
 };
 
 struct Message
@@ -78,20 +78,20 @@ struct ActionsPayload : BasePayload  // Player's actions
     }
 };
 
-struct NewTourPayload : BasePayload  // New tour
+struct NewTurnPayload : BasePayload  // New turn
 {
     std::map<Resource, float> updated_resources; /*resource, amount*/
     std::map<int, int> updated_populations;      /*colony_id, population*/
     MsgTechnologyUpdate technology_update;
     std::vector<MsgBuildingsUpdates> buildings_updates;
-    MessageType GetType() override { return MessageType::NewTour; }
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(NewTourPayload, updated_resources, updated_populations, buildings_updates,
+    MessageType GetType() override { return MessageType::NewTurn; }
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(NewTurnPayload, updated_resources, updated_populations, buildings_updates,
                                    technology_update)
     std::string Serialize() override
     {
         nlohmann::json jsonPayload = (*this);
         Message message;
-        message.messageType = MessageType::NewTour;
+        message.messageType = MessageType::NewTurn;
         message.payload = jsonPayload.dump();
         nlohmann::json jsonMessage = message;
         return jsonMessage.dump();

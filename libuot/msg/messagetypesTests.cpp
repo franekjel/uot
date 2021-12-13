@@ -195,9 +195,9 @@ void StartGamePayloadTest()
         std::cout << "StartGame - Wrong player id\n";
 }
 
-void NewTourPayloadTest()
+void NewTurnPayloadTest()
 {
-    messageTypes::NewTourPayload ntp;
+    messageTypes::NewTurnPayload ntp;
 
     float food_init = 100.0, metals_init = 10.0;
     float p1_init = 100.0, p10_init = 10.0;
@@ -219,36 +219,36 @@ void NewTourPayloadTest()
     auto ser = ntp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
     auto type = des->GetType();
-    if (type != messageTypes::MessageType::NewTour)
-        std::cout << "NewTour - wrong message type\n";
-    auto cast = std::dynamic_pointer_cast<messageTypes::NewTourPayload>(des);
+    if (type != messageTypes::MessageType::NewTurn)
+        std::cout << "NewTurn - wrong message type\n";
+    auto cast = std::dynamic_pointer_cast<messageTypes::NewTurnPayload>(des);
 
     if (cast->updated_resources.size() != 2)
-        std::cout << "NewTour - wrong resources size\n";
+        std::cout << "NewTurn - wrong resources size\n";
 
     if (cast->updated_populations.size() != 2)
-        std::cout << "NewTour - wrong populations size\n";
+        std::cout << "NewTurn - wrong populations size\n";
 
     if (cast->buildings_updates.size() != 2)
-        std::cout << "NewTour - wrong new buildings size\n";
+        std::cout << "NewTurn - wrong new buildings size\n";
 
     auto food = cast->updated_resources[Resource::Food];
     auto metals = cast->updated_resources[Resource::Metals];
     if (food != food_init || metals != metals_init)
-        std::cout << "NewTour - wrong resource values\n";
+        std::cout << "NewTurn - wrong resource values\n";
 
     auto p1 = cast->updated_populations[1];
     auto p10 = cast->updated_populations[10];
     if (p1 != p1_init || p10 != p10_init)
-        std::cout << "NewTour - wrong people values\n";
+        std::cout << "NewTurn - wrong people values\n";
 
     if (!(ntp.technology_update == cast->technology_update))
-        std::cout << "NewTour - wrong technology update\n";
+        std::cout << "NewTurn - wrong technology update\n";
 
     auto b1 = cast->buildings_updates[0];
     auto b2 = cast->buildings_updates[1];
     if (!(b1 == buildUpdate1) || !(b2 == buildUpdate2))
-        std::cout << "NewTour - wrong new buildings\n";
+        std::cout << "NewTurn - wrong new buildings\n";
 }
 
 void ActionsPayloadTest()
@@ -295,7 +295,7 @@ int main()
 {
     std::cout << "Tests started\n";
 
-    NewTourPayloadTest();
+    NewTurnPayloadTest();
     ActionsPayloadTest();
     StartGamePayloadTest();
     InvalidMessageTest();

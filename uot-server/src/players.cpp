@@ -165,11 +165,11 @@ void PlayersList::CountWeeklyNumbers()
         thread.join();
 }
 
-void PlayersList::SendNewTourMessage(int tour_number, net_server_uot& messaging_service)
+void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_service)
 {
     for (auto& player : players)
     {
-        messaging_service.send_new_tour_message(tour_number, player.second, players_net_names[player.first]);
+        messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first]);
     }
 }
 
@@ -266,15 +266,15 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     player_resources[Resource::Technology] = 0.0f;
 }
 
-void PlayersList::CountEveryTourNumbersPlayer(std::shared_ptr<Player> player) {}
+void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player) {}
 
-void PlayersList::CountEveryTourNumbers()
+void PlayersList::CountEveryTurnNumbers()
 {
     // Async Part like ships upkeep costs
     std::vector<std::thread> player_threads(players.size());
     int player_num = 0;
     for (auto& player : players)
-        player_threads[player_num++] = std::thread(CountEveryTourNumbersPlayer, player.second);
+        player_threads[player_num++] = std::thread(CountEveryTurnNumbersPlayer, player.second);
 
     for (auto& thread : player_threads)
         thread.join();

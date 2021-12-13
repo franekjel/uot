@@ -232,11 +232,11 @@ void uot_net_client::handle_message(const std::string& data)
         }
         break;
 
-        case messageTypes::NewTour:
+        case messageTypes::NewTurn:
         {
-            auto payload_newtour = std::dynamic_pointer_cast<messageTypes::NewTourPayload>(des);
-            population_data = payload_newtour->updated_populations;
-            resource_data = payload_newtour->updated_resources;
+            auto payload_newturn = std::dynamic_pointer_cast<messageTypes::NewTurnPayload>(des);
+            population_data = payload_newturn->updated_populations;
+            resource_data = payload_newturn->updated_resources;
         }
         break;
         case messageTypes::None:
