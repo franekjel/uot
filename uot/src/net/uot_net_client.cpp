@@ -75,7 +75,7 @@ void uot_net_client::handle_message(const std::string& data)
 
             colony_ptr = std::make_shared<Colony>(0, nullptr);
 
-            long player_id = payload_start->player_id;
+            unsigned int player_id = payload_start->player_id;
 
             player_ptr = std::make_shared<Player>(player_id, galaxy_ptr, resource_data, colony_ptr);
 

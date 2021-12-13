@@ -80,7 +80,7 @@ std::map<Resource, float> PlayersList::GetStartingResources()
     return {};
 }
 
-std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shared_ptr<Galaxy> startingGalaxy,
+std::shared_ptr<Colony> PlayersList::GetStartingColony(unsigned int player_id, std::shared_ptr<Galaxy> startingGalaxy,
                                                        std::shared_ptr<Galaxy> wholeGalaxy)
 {
     std::shared_ptr<Planet> planet = nullptr;
@@ -114,6 +114,7 @@ std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shar
                 continue;
             const auto& plan = std::dynamic_pointer_cast<Planet>(pl);
             plan->colony = startingColony;
+            sector->watchers.insert(player_id);
         }
     }
     return startingColony;

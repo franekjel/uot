@@ -1,6 +1,6 @@
 #include "player.h"
 
-Player::Player(const long id_, const std::shared_ptr<Galaxy> &known_galaxy_,
+Player::Player(const unsigned int id_, const std::shared_ptr<Galaxy> &known_galaxy_,
                const std::map<Resource, float> &owned_resources_, const std::shared_ptr<Colony> &starting_colony)
 {
     id = id_;

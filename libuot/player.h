@@ -25,7 +25,7 @@ struct Player
     std::set<Technology::TechnologyType> available_technologies;
     TechnologyProgress researched_technology;
 
-    Player(const long player_id_, const std::shared_ptr<Galaxy>& known_galaxy_,
+    Player(const unsigned int player_id_, const std::shared_ptr<Galaxy>& known_galaxy_,
            const std::map<Resource, float>& owned_resources_, const std::shared_ptr<Colony>& starting_colony);
 
     void HandleBuildRequest(Building::BuildingType type, Building::BuildingType upgrade_from, unsigned int colony_id);

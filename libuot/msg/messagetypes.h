@@ -42,7 +42,7 @@ struct BasePayload
 
 struct StartGamePayload : BasePayload
 {
-    int player_id;
+    unsigned int player_id;
     MsgGalaxy galaxy;
     MessageType GetType() override { return MessageType::StartGame; }
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(StartGamePayload, player_id, galaxy)
