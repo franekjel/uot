@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "resource.h"
+#include "sector.h"
 
 // TODO These modules (like SmallReactor etc.) should be hold in some global set when we will be doing usable version
 struct Module
@@ -234,4 +235,6 @@ struct Fleet
     float civilians;
     float human_capacity;
     float construction_points;
+    std::shared_ptr<Sector> location_sector;
+    Point position;
 };

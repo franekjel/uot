@@ -17,7 +17,7 @@ struct Player
     std::map<unsigned int, std::shared_ptr<Colony>> owned_colonies;
     std::map<unsigned int, std::shared_ptr<SpaceBase>> owned_space_bases;
     std::shared_ptr<Galaxy> known_galaxy;
-    std::map<unsigned int, std::shared_ptr<Ship>> owned_ships;
+    std::map<unsigned int, std::shared_ptr<Fleet>> owned_fleets;
     std::map<Resource, float> owned_resources;
     std::map<Resource, bool> resources_changed;
 

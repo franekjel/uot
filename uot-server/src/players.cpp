@@ -188,7 +188,7 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     auto& player_colonies = player->owned_colonies;
     auto& player_space_bases = player->owned_space_bases;
     auto& player_galaxy = player->known_galaxy;
-    auto& player_ships = player->owned_ships;
+    auto& player_fleets = player->owned_fleets;
     auto& player_research = player->researched_technology;
 
     // calculate expenses and gains of player colonies

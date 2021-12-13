@@ -15,7 +15,7 @@ Player::Player(const long id_, const std::shared_ptr<Galaxy> &known_galaxy_,
     owned_colonies = {};
     owned_colonies[starting_colony->id] = starting_colony;
     owned_space_bases = {};
-    owned_ships = {};
+    owned_fleets = {};
     researched_technology = {};
     DiscoverTechnology(Technology::TechnologyType::Engineering);
 }
