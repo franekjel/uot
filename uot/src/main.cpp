@@ -48,6 +48,8 @@ int main(int argc, char* argv[])
 
     volatile bool quit = false;
     SDL_Event e;
+
+    nc.connect_to_server();
     while (!quit)
     {
         while (SDL_PollEvent(&e) != 0)
