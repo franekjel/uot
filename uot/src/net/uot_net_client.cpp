@@ -15,6 +15,8 @@ void uot_net_client::disconnect_from_server()
 
 void uot_net_client::run()
 {
+    auto state = context.getGameState();
+    state.value->player = std::make_shared<Player>();
     disconnected = false;
     txrx.connect("127.0.0.1", 7645);
 }
@@ -68,17 +70,25 @@ void uot_net_client::handle_message(const std::string& data)
             std::map<int, std::shared_ptr<SpaceBase>> spaceBases_map;
             std::map<int, std::shared_ptr<InhabitableObject>> inhabitables_map;
             std::vector<std::shared_ptr<Sector>> sectors_vec;
-            std::shared_ptr<Player> player_ptr;
-            std::shared_ptr<Galaxy> galaxy_ptr;
-            std::shared_ptr<Colony> colony_ptr;
 
-            galaxy_ptr = std::make_shared<Galaxy>();
-
-            colony_ptr = std::make_shared<Colony>(0, nullptr);
-
+            std::shared_ptr<Galaxy> galaxy_ptr = std::make_shared<Galaxy>();
+            std::shared_ptr<Colony> colony_ptr = std::make_shared<Colony>(0, nullptr);
             long player_id = payload_start->player_id;
+            std::map<Resource, float> resource_data;
+            resource_data.insert(std::pair<Resource, float>(Resource::Metals, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Antimatter, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Cryptocurrencies, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::RareMetals, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Crystals, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Polymers, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::DarkMatter, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::AncientNanobots, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::AncientRelics, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Spatium, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Food, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Technology, 0));
 
-            player_ptr = std::make_shared<Player>(player_id, galaxy_ptr, resource_data, colony_ptr);
+            std::shared_ptr<Player> player_ptr = std::make_shared<Player>(player_id, galaxy_ptr, resource_data, colony_ptr);
 
             for (int i = 0; i < msgGalaxy.sectors.size(); i++)
             {
@@ -222,6 +232,7 @@ void uot_net_client::handle_message(const std::string& data)
 
             // TODO: Add mutex
             auto state = context.getGameState();
+            state.value->player = player_ptr;
             state.value->galaxy = galaxy_ptr;
         }
         break;
@@ -236,8 +247,20 @@ void uot_net_client::handle_message(const std::string& data)
         case messageTypes::NewTour:
         {
             auto payload_newtour = std::dynamic_pointer_cast<messageTypes::NewTourPayload>(des);
-            population_data = payload_newtour->updated_populations;
-            resource_data = payload_newtour->updated_resources;
+            auto population_data = payload_newtour->updated_populations;
+            auto resource_data = payload_newtour->updated_resources;
+            auto state = context.getGameState();
+            if (state.value->player.has_value())
+            {
+                state.value->player.value()->owned_resources = resource_data;
+                for (int pop_idx = 0; population_data.size(); pop_idx++)
+                {
+                    auto pop = population_data.at(pop_idx);
+                    state.value->player.value()->owned_colonies.at(0)->population = pop;
+                    state.value->player.value()->owned_colonies.at(0)->population_changed = true;
+                }
+                
+            }
         }
         break;
         case messageTypes::None:
