@@ -15,8 +15,6 @@ void uot_net_client::disconnect_from_server()
 
 void uot_net_client::run()
 {
-    auto state = context.getGameState();
-    state.value->player = std::make_shared<Player>();
     disconnected = false;
     txrx.connect("127.0.0.1", 7645);
 }
@@ -257,7 +255,7 @@ void uot_net_client::handle_message(const std::string& data)
                 {
                     auto pop = population_data.at(pop_idx);
                     state.value->player.value()->owned_colonies.at(0)->population = pop;
-                    state.value->player.value()->owned_colonies.at(0)->population_changed = true;
+                    //state.value->player.value()->owned_colonies.at(0)->population_changed = true;
                 }
                 
             }
