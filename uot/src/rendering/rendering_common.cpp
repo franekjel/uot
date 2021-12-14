@@ -3,6 +3,7 @@
 #include "game_gui.h"
 #include "game_resources.h"
 #include "game_state.h"
+#include "player.h"
 
 void rendering::render_background(const client_context& context)
 {
@@ -28,8 +29,14 @@ void rendering::render_planet_helper(const client_context& context, const float 
     SDL_RenderCopyEx(r.get(), tex.t.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 }
 
-void rendering::render_resource_bar(const client_context& context)
+void rendering::render_resource_bar(client_context& context)
 {
+    auto state = context.getGameState();
+    auto& gs = state.value;
+    if (!gs->player)
+    {
+        return;
+    }
     constexpr std::array<int, 8> positions{0,
                                            0,
                                            resources_meta::single_size,
@@ -38,11 +45,10 @@ void rendering::render_resource_bar(const client_context& context)
                                            resources_meta::single_size,
                                            resources_meta::single_size,
                                            resources_meta::single_size};
-    constexpr std::array<int, 4> amounts{45, 87, 563, 2};
-    constexpr int num_resources = 10;
     int x_off = 20;
     constexpr int y_off = (size_settings::resource_area::height - fonts::resource_font_size) / 2;
-    for (int i = 0; i < num_resources; ++i)
+    int i = 0;
+    for (auto elem : gs->player->owned_resources)
     {
         SDL_Rect s{positions[(2 * i) & 7], positions[(2 * i + 1) & 7], resources_meta::single_size,
                    resources_meta::single_size};
@@ -50,9 +56,9 @@ void rendering::render_resource_bar(const client_context& context)
         SDL_RenderCopyEx(context.r.get(), context.gr->resource_texture.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 
         x_off += 20 + fonts::resource_font_size;
-        sdl_utilities::render_text(context.r.get(), context.gr->resource_font,
-                                   ":" + std::to_string(amounts[i & 3]) + " |", x_off + fonts::resource_font_size,
-                                   y_off + fonts::resource_font_size / 2, 150, {0xFF, 0xFF, 0xFF, 0xFF});
+        sdl_utilities::render_text(context.r.get(), context.gr->resource_font, ":" + std::to_string(elem.second) + " |",
+                                   x_off + fonts::resource_font_size, y_off + fonts::resource_font_size / 2, 150,
+                                   {0xFF, 0xFF, 0xFF, 0xFF});
         x_off += 90;
     }
 }

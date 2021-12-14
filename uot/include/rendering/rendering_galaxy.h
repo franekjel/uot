@@ -11,7 +11,7 @@ struct render_sector_view : render_view<render_sector_view>
     view_t _down();
     void _mouse_handler(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
     void key_handler(client_context& context, Uint16 k);
-    void _draw(const client_context& context);
+    void _draw(client_context& context);
 };
 
 void render_sector_galaxy_helper(const client_context& context, const std::shared_ptr<Sector>& sector);

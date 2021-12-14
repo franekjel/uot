@@ -86,7 +86,8 @@ void uot_net_client::handle_message(const std::string& data)
             resource_data.insert(std::pair<Resource, float>(Resource::Food, 0));
             resource_data.insert(std::pair<Resource, float>(Resource::Technology, 0));
 
-            std::shared_ptr<Player> player_ptr = std::make_shared<Player>(player_id, galaxy_ptr, resource_data, colony_ptr);
+            std::shared_ptr<Player> player_ptr =
+                std::make_shared<Player>(player_id, galaxy_ptr, resource_data, colony_ptr);
 
             for (int i = 0; i < msgGalaxy.sectors.size(); i++)
             {
@@ -231,7 +232,6 @@ void uot_net_client::handle_message(const std::string& data)
             // TODO: Add mutex
             auto state = context.getGameState();
             state.value->player = player_ptr;
-            state.value->galaxy = galaxy_ptr;
         }
         break;
 
@@ -248,16 +248,15 @@ void uot_net_client::handle_message(const std::string& data)
             auto population_data = payload_newtour->updated_populations;
             auto resource_data = payload_newtour->updated_resources;
             auto state = context.getGameState();
-            if (state.value->player.has_value())
+            if (state.value->player)
             {
-                state.value->player.value()->owned_resources = resource_data;
+                state.value->player->owned_resources = resource_data;
                 for (int pop_idx = 0; population_data.size(); pop_idx++)
                 {
                     auto pop = population_data.at(pop_idx);
-                    state.value->player.value()->owned_colonies.at(0)->population = pop;
-                    //state.value->player.value()->owned_colonies.at(0)->population_changed = true;
+                    state.value->player->owned_colonies.at(0)->population = pop;
+                    // state.value->player.value()->owned_colonies.at(0)->population_changed = true;
                 }
-                
             }
         }
         break;
