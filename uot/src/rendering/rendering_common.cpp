@@ -56,9 +56,9 @@ void rendering::render_resource_bar(client_context& context)
         SDL_RenderCopyEx(context.r.get(), context.gr->resource_texture.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 
         x_off += 20 + fonts::resource_font_size;
-        sdl_utilities::render_text(context.r.get(), context.gr->resource_font, ":" + std::to_string(elem.second) + " |",
-                                   x_off + fonts::resource_font_size, y_off + fonts::resource_font_size / 2, 150,
-                                   {0xFF, 0xFF, 0xFF, 0xFF});
+        sdl_utilities::render_text(context.r.get(), context.gr->resource_font,
+                                   ":" + std::to_string(int(elem.second)) + " |", x_off + fonts::resource_font_size,
+                                   y_off + fonts::resource_font_size / 2, 150, {0xFF, 0xFF, 0xFF, 0xFF});
         x_off += 90;
     }
 }
