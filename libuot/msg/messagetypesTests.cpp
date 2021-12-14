@@ -174,6 +174,10 @@ void StartGamePayloadTest()
 
     sgp.player_id = player->id;
     sgp.galaxy = messageTypes::MsgGalaxy(galaxy);
+
+    sgp.starting_resources[Resource::Antimatter] = 11.0f;
+    sgp.starting_resources[Resource::Crystals] = 21.0f;
+
     auto ser = sgp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
     auto type = des->GetType();
@@ -218,6 +222,12 @@ void StartGamePayloadTest()
 
     if (player->id != cast->player_id)
         std::cout << "StartGame - Wrong player id\n";
+
+    auto antimatter = cast->starting_resources[Resource::Antimatter];
+    auto crystals = cast->starting_resources[Resource::Crystals];
+    if (antimatter != sgp.starting_resources[Resource::Antimatter] ||
+        crystals != sgp.starting_resources[Resource::Crystals])
+        std::cout << "StartGame - wrong resource values\n";
 }
 
 void NewTurnPayloadTest()
