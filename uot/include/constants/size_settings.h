@@ -19,7 +19,7 @@ struct window_area : area_properties<1600, 900, 0, 0>
 {
 };
 
-struct resource_area : area_properties<1550, 80, 25, 800>
+struct resource_area : area_properties<1550, 40, 25, 800>
 {
 };
 

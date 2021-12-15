@@ -7,13 +7,6 @@
 #include <array>
 #include <string_view>
 
-enum button_types
-{
-    START_BUTTON = 0,
-    EXIT_BUTTON = 1,
-    UNIVERSE_BUTTON = 2
-};
-
 enum selection_types
 {
     SECTOR_SELECTION = 0,
@@ -97,11 +90,10 @@ constexpr std::array<std::string_view, num_planets> planet_texture_paths = {
 namespace basic_textures
 {
 constexpr std::string_view background_texture_path = "assets/background_texture.png";
-constexpr std::string_view menu_start_button_texture = "assets/menu_start_button.png";
-constexpr std::string_view menu_exit_button_texture = "assets/menu_exit_button.png";
 constexpr std::string_view menu_universe_button = "assets/menu_universe_button.png";
 constexpr std::string_view sector_selection = "assets/sector_selection.png";
 constexpr std::string_view sky_texture_path = "assets/sky.png";
+constexpr std::string_view building_sprite_path = "assets/buildings.png";
 }  // namespace basic_textures
 
 namespace fonts
@@ -109,13 +101,10 @@ namespace fonts
 constexpr std::string_view main_font = "assets/fonts/arcade.ttf";
 constexpr std::string_view secondary_font = "assets/fonts/secondary.ttf";
 constexpr int main_font_size = 50;
-constexpr int resource_font_size = 50;
+constexpr int resource_font_size = 25;
 }  // namespace fonts
 namespace buttons_meta
 {
-constexpr int num_buttons = 3;
-constexpr int button_texture_height = 100;
-constexpr int button_texture_width = 300;
 constexpr int button_height = 75;
 constexpr int button_width = 200;
 constexpr int button_x_offset = 25;

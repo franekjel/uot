@@ -2,7 +2,9 @@
 #include "assets.h"
 // all necessary headers come through game_gui
 #include "game_gui.h"
-#include "ui_menu_lists.h"
+#include "game_resources.h"
+#include "game_state.h"
+#include "gui/buttons.h"
 
 namespace setup_utils
 {
@@ -35,8 +37,8 @@ void init(client_context& context)
 
     gs->reset_galaxy();
     context.gui = std::make_unique<game_gui>();
-    context.gui->popup_buttons =
-        std::vector(std::begin(ui_menu_lists::start_menu), std::end(ui_menu_lists::start_menu));
+    context.gui->popup_buttons.push_back(std::make_unique<start_button>());
+    context.gui->popup_buttons.push_back(std::make_unique<exit_button>());
 }
 
 void loadMedia(client_context& context)
@@ -49,17 +51,6 @@ void loadMedia(client_context& context)
     gr->sky_texture = sdl_utilities::load_texture_from_file(std::string(basic_textures::sky_texture_path), context.r);
     gr->resource_texture =
         sdl_utilities::load_texture_from_file(std::string(resources_meta::resources_path), context.r);
-    gr->buttonTextures.resize(buttons_meta::num_buttons);
-    printf("Loading start button\n");
-    gr->buttonTextures[button_types::START_BUTTON] =
-        sdl_utilities::load_texture_from_file(std::string{basic_textures::menu_start_button_texture}, context.r);
-    printf("Loading exit button\n");
-    gr->buttonTextures[button_types::EXIT_BUTTON] =
-        sdl_utilities::load_texture_from_file(std::string{basic_textures::menu_exit_button_texture}, context.r);
-
-    printf("Loading universe button\n");
-    gr->buttonTextures[button_types::UNIVERSE_BUTTON] =
-        sdl_utilities::load_texture_from_file(std::string{basic_textures::menu_universe_button}, context.r);
     // load only the waiting screen planet texture
     gr->planetTextures.resize(planets_meta::num_planets);
 

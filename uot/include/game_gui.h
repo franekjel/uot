@@ -6,7 +6,7 @@
 #include <iostream>
 #include <optional>
 #include "assets.h"
-#include "ui_button.h"
+#include "gui/buttons.h"
 
 struct game_gui
 {
@@ -18,7 +18,7 @@ struct game_gui
     std::optional<std::shared_ptr<SectorObject>> current_object;
     std::optional<int> focused_button;
 
-    std::vector<ui_button> popup_buttons;
+    std::vector<popup_button> popup_buttons;
 
     game_gui() {}
 

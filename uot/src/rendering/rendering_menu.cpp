@@ -1,6 +1,8 @@
 #include "rendering_menu.h"
 #include "client_context.h"
 #include "game_gui.h"
+#include "game_resources.h"
+#include "game_state.h"
 #include "input_utilities.h"
 
 void rendering::render_current_popup_menu(client_context& context)
@@ -13,7 +15,7 @@ void rendering::render_current_popup_menu(client_context& context)
     int i = 0;
     for (auto& elem : context.gui->popup_buttons)
     {
-        rendering::render_button_sprite(elem, context);
+        std::visit([&](auto&& v) { v->draw(context, context.gui->focused_button == v->button_id); }, elem);
     }
 }
 
@@ -51,11 +53,17 @@ void rendering::render_menu_view::_mouse_handler(client_context& context, Uint32
 
         for (const auto& b : context.gui->popup_buttons)
         {
-            if (iu::check_collision(x, y, b.x, b.y, b.w, b.h))
-            {
-                // calling a lambda, possibly losing a few instructions
-                b.click_handler(context);
-            }
+            std::visit(
+                [&](auto&& v)
+                {
+                    const auto& pos = v->pos;
+                    if (iu::check_collision(x, y, pos.x, pos.y, pos.w, pos.h))
+                    {
+                        // calling a lambda, possibly losing a few instructions
+                        v->clicked(context);
+                    }
+                },
+                b);
         }
     }
     // motion in the popup buttons area
@@ -64,15 +72,27 @@ void rendering::render_menu_view::_mouse_handler(client_context& context, Uint32
         using AreaType = size_settings::popup_menu_area;
         x = x - AreaType::x_offset;
         y = y - AreaType::y_offset;
+        bool hit = false;
         for (auto& b : context.gui->popup_buttons)
         {
-            if (iu::check_collision(x, y, b.x, b.y, b.w, b.h))
-            {
-                context.gui->focused_button = b.button_id;
-                return;
-            }
+            std::visit(
+                [&](auto&& v)
+                {
+                    const auto& pos = v->pos;
+                    if (iu::check_collision(x, y, pos.x, pos.y, pos.w, pos.h))
+                    {
+                        context.gui->focused_button = v->button_id;
+                        std::cout << "changed focused button to " << v->button_id << std::endl;
+                        hit = true;
+                        return;
+                    }
+                },
+                b);
         }
-        context.gui->focused_button.reset();
+        if (!hit)
+        {
+            context.gui->focused_button.reset();
+        }
     }
 }
 

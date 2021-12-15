@@ -145,6 +145,6 @@ void sdl_utilities::render_text(SDL_Renderer* r, std::shared_ptr<TTF_Font> font,
     const auto w = textSurface->w;
     const auto h = textSurface->h;
 
-    SDL_Rect s{0, 0, w, h}, d{x, y, w, h};
+    SDL_Rect s{0, 0, w, h}, d{x - w / 2, y - h / 2, w, h};
     SDL_RenderCopyEx(r, tmp_tex.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 }
