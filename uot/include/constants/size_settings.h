@@ -3,7 +3,6 @@
 
 namespace size_settings
 {
-
 constexpr int frame_size = 8;
 template <int W, int H, int X, int Y>
 struct area_properties

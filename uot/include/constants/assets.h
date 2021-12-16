@@ -101,7 +101,6 @@ constexpr std::string_view building_blur_sprite_path = "assets/buildings_blurred
 
 namespace fonts
 {
-
 constexpr std::string_view main_font = "assets/fonts/arcade.ttf";
 constexpr std::string_view secondary_font = "assets/fonts/secondary.ttf";
 constexpr int main_font_size = 50;
