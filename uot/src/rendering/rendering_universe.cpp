@@ -81,7 +81,9 @@ void rendering::render_sector_selection(const client_context& context)
         return;
     }
 
+    sdl_utilities::set_custom_viewport<size_settings::play_area, size_settings::frame_size>(r.get());
     sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
+    sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
 
     const auto curr = gui->current_sector.value();
     const int tex_size = planets_meta::texture_size[SECTOR_1] * planets_meta::sector_multiplier;
@@ -159,6 +161,7 @@ void rendering::render_universe_view::key_handler(client_context& context, Uint1
 {
     if (k == SDLK_ESCAPE)
     {
+        context.gui->current_sector.reset();
         context.view = _up();
     }
 }

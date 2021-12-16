@@ -18,6 +18,7 @@ enum class MouseButton
 template <typename T>
 struct render_view
 {
+    friend T;
     void draw(client_context& context) { static_cast<T*>(this)->_draw(context); }
     view_t up() { return static_cast<T*>(this)->_up(); };
     view_t down() { return static_cast<T*>(this)->_down(); };
@@ -26,6 +27,10 @@ struct render_view
         static_cast<T*>(this)->_mouse_handler(context, event_type, m, x, y);
     }
     void key_handler(client_context& context, Uint16 k) { static_cast<T*>(this)->_key_handler(); }
+
+   private:
+    render_view<T>() = default;
+    render_view<T>(const render_view<T>&) = default;
 };
 
 }  // namespace rendering

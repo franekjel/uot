@@ -3,6 +3,8 @@
 
 namespace size_settings
 {
+
+constexpr int frame_size = 8;
 template <int W, int H, int X, int Y>
 struct area_properties
 {
@@ -28,6 +30,14 @@ struct play_area : area_properties<1100, 700, 25, 50>
 };
 
 struct context_area : area_properties<350, 700, 1225, 50>
+{
+};
+
+struct planet_play_area : area_properties<750, 700, 25, 50>
+{
+};
+
+struct planet_context_area : area_properties<700, 700, 850, 50>
 {
 };
 

@@ -82,7 +82,6 @@ void rendering::render_menu_view::_mouse_handler(client_context& context, Uint32
                     if (iu::check_collision(x, y, pos.x, pos.y, pos.w, pos.h))
                     {
                         context.gui->focused_button = v->button_id;
-                        std::cout << "changed focused button to " << v->button_id << std::endl;
                         hit = true;
                         return;
                     }

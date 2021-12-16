@@ -51,7 +51,9 @@ void rendering::render_object_selection(const client_context& context)
         return;
     }
 
+    sdl_utilities::set_custom_viewport<size_settings::play_area, size_settings::frame_size>(r.get());
     sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
+    sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
 
     const auto& curr = gui->current_object.value();
 
@@ -151,6 +153,7 @@ void rendering::render_sector_view::key_handler(client_context& context, Uint16 
 {
     if (k == SDLK_ESCAPE)
     {
+        context.gui->current_object.reset();
         context.view = _up();
     }
 }

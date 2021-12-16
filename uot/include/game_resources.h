@@ -25,7 +25,9 @@ struct game_resources : public uncopiable
 
     std::shared_ptr<SDL_Texture> bk_texture;
     std::shared_ptr<SDL_Texture> sky_texture;
+    std::shared_ptr<SDL_Texture> sky_square_texture;
     std::shared_ptr<SDL_Texture> buildings_sprite;
+    std::shared_ptr<SDL_Texture> buildings_blur_sprite;
     std::shared_ptr<SDL_Texture> resource_texture;
 
     std::shared_ptr<TTF_Font> main_font;

@@ -49,7 +49,7 @@ void sdl_utilities::paint_background(SDL_Renderer* r, const SDL_Color& c)
 
 void sdl_utilities::paint_frame_textured(SDL_Renderer* r, const SDL_Color& f, std::shared_ptr<SDL_Texture> t)
 {
-    constexpr int offset = 8;
+    constexpr int offset = size_settings::frame_size;
     // paint frame
     SDL_SetRenderDrawColor(r, f.r, f.g, f.b, f.a);
     SDL_RenderFillRect(r, nullptr);
@@ -71,7 +71,7 @@ void sdl_utilities::paint_frame_textured(SDL_Renderer* r, const SDL_Color& f, st
 
 void sdl_utilities::paint_frame(SDL_Renderer* r, const SDL_Color& f, const SDL_Color& b)
 {
-    constexpr int offset = 8;
+    constexpr int offset = size_settings::frame_size;
     // paint frame
     SDL_SetRenderDrawColor(r, f.r, f.g, f.b, f.a);
     SDL_RenderFillRect(r, nullptr);

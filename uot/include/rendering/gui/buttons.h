@@ -54,6 +54,7 @@ void draw_button(client_context& context, const std::string& text, const button_
 template <typename T>
 struct button
 {
+    friend T;
     int button_id;
     std::string text;
 
@@ -66,6 +67,10 @@ struct button
     {
         rendering::draw_button(context, text, pos, color_scheme, focused);
     }
+
+   private:
+    button<T>() = default;
+    button<T>(const button<T>& b) = default;
 };
 
 struct start_button : button<start_button>

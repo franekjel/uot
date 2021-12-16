@@ -25,6 +25,17 @@ std::shared_ptr<TTF_Font> load_font(const std::string& font_name, int size);
 std::shared_ptr<SDL_Window> sdl_create_window(const std::string title, int x, int y, int w, int h, Uint32 flags);
 std::shared_ptr<SDL_Renderer> sdl_create_renderer(const std::shared_ptr<SDL_Window>& w, int index, Uint32 flags);
 
+template <typename T, int offset, int X = T::x_offset, int Y = T::y_offset, int W = T::width, int H = T::height>
+void set_custom_viewport(SDL_Renderer* r)
+{
+    SDL_Rect buttonViewport;
+    buttonViewport.x = X + offset;
+    buttonViewport.y = Y + offset;
+    buttonViewport.w = W - 2 * offset;
+    buttonViewport.h = H - 2 * offset;
+    SDL_RenderSetViewport(r, &buttonViewport);
+}
+
 template <typename T, int X = T::x_offset, int Y = T::y_offset, int W = T::width, int H = T::height>
 void set_render_viewport(SDL_Renderer* r)
 {

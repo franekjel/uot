@@ -48,7 +48,18 @@ void loadMedia(client_context& context)
     printf("Loading background\n");
     gr->bk_texture =
         sdl_utilities::load_texture_from_file(std::string(basic_textures::background_texture_path), context.r);
+    printf("Loading sky\n");
     gr->sky_texture = sdl_utilities::load_texture_from_file(std::string(basic_textures::sky_texture_path), context.r);
+    gr->sky_square_texture =
+        sdl_utilities::load_texture_from_file(std::string(basic_textures::sky_square_texture_path), context.r);
+
+    printf("Loading buildings\n");
+    gr->buildings_sprite =
+        sdl_utilities::load_texture_from_file(std::string(basic_textures::building_sprite_path), context.r);
+    gr->buildings_blur_sprite =
+        sdl_utilities::load_texture_from_file(std::string(basic_textures::building_blur_sprite_path), context.r);
+
+    printf("Loading resources\n");
     gr->resource_texture =
         sdl_utilities::load_texture_from_file(std::string(resources_meta::resources_path), context.r);
     // load only the waiting screen planet texture
@@ -69,10 +80,13 @@ void loadMedia(client_context& context)
         sdl_utilities::load_texture_from_file(std::string{basic_textures::sector_selection}, context.r);
 
     // FONTS
+    printf("Loading the main font\n");
     gr->main_font = sdl_utilities::load_font(std::string(fonts::main_font), fonts::main_font_size);
 
-    gr->secondary_font = sdl_utilities::load_font(std::string(fonts::secondary_font), 25);
+    printf("Loading the secondary font\n");
+    gr->secondary_font = sdl_utilities::load_font(std::string(fonts::secondary_font), fonts::secondary_font_size);
 
+    printf("Loading the resources font\n");
     gr->resource_font = sdl_utilities::load_font(std::string(fonts::secondary_font), fonts::resource_font_size);
 }
 }  // namespace setup_utils
