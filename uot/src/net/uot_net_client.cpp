@@ -280,14 +280,12 @@ void uot_net_client::handle_message(const std::string& data)
 
                 if (resource_data.find(Resource::Crystals) != resource_data.end())
                 {
-                    state.value->player->owned_resources.at(Resource::Crystals) = 
-                        resource_data.at(Resource::Crystals);
+                    state.value->player->owned_resources.at(Resource::Crystals) = resource_data.at(Resource::Crystals);
                 }
 
                 if (resource_data.find(Resource::Polymers) != resource_data.end())
                 {
-                    state.value->player->owned_resources.at(Resource::Polymers) = 
-                        resource_data.at(Resource::Polymers);
+                    state.value->player->owned_resources.at(Resource::Polymers) = resource_data.at(Resource::Polymers);
                 }
 
                 if (resource_data.find(Resource::DarkMatter) != resource_data.end())
@@ -310,14 +308,12 @@ void uot_net_client::handle_message(const std::string& data)
 
                 if (resource_data.find(Resource::Spatium) != resource_data.end())
                 {
-                    state.value->player->owned_resources.at(Resource::Spatium) = 
-                        resource_data.at(Resource::Spatium);
+                    state.value->player->owned_resources.at(Resource::Spatium) = resource_data.at(Resource::Spatium);
                 }
 
                 if (resource_data.find(Resource::Food) != resource_data.end())
                 {
-                    state.value->player->owned_resources.at(Resource::Food) = 
-                        resource_data.at(Resource::Food);
+                    state.value->player->owned_resources.at(Resource::Food) = resource_data.at(Resource::Food);
                 }
 
                 if (resource_data.find(Resource::Technology) != resource_data.end())
