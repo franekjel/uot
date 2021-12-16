@@ -1,6 +1,8 @@
 #include "rendering_galaxy.h"
 #include "client_context.h"
 #include "game_gui.h"
+#include "game_resources.h"
+#include "game_state.h"
 #include "input_utilities.h"
 
 void rendering::render_sector_view::_draw(const client_context& context)
@@ -12,6 +14,8 @@ void rendering::render_sector_view::_draw(const client_context& context)
     auto& gui = context.gui;
 
     sdl_utilities::set_render_viewport<size_settings::resource_area>(r.get());
+    sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
+    render_resource_bar(context);
 
     // =======================================================
     // draw the left, main game panel
@@ -34,10 +38,6 @@ void rendering::render_sector_view::_draw(const client_context& context)
     {
         render_selected_object_info(context);
     }
-
-    sdl_utilities::set_render_viewport<size_settings::resource_area>(r.get());
-    sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
-    render_resource_bar(context);
 }
 
 void rendering::render_object_selection(const client_context& context)
@@ -51,7 +51,9 @@ void rendering::render_object_selection(const client_context& context)
         return;
     }
 
+    sdl_utilities::set_custom_viewport<size_settings::play_area, size_settings::frame_size>(r.get());
     sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
+    sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
 
     const auto& curr = gui->current_object.value();
 
@@ -79,7 +81,8 @@ void rendering::render_selected_object_info(const client_context& context)
     auto& gui = context.gui;
 
     auto object_id = GAS_GIANT_1 + gui->current_object.value()->id % (planets_meta::num_planets - GAS_GIANT_1);
-    sdl_utilities::render_text(r.get(), gr->main_font, "PLANET NAME", 30, 10, size_settings::context_area::width - 50,
+    sdl_utilities::render_text(r.get(), gr->main_font, "PLANET NAME", size_settings::context_area::width / 2,
+                               fonts::main_font_size / 2 + 30, size_settings::context_area::width - 50,
                                {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
@@ -90,7 +93,8 @@ void rendering::render_selected_object_info(const client_context& context)
     sdl_utilities::render_text(r.get(), gr->secondary_font,
                                " planet index: " + std::to_string(gui->current_object.value()->id) +
                                    "\n planet info 1\n planet info 2\n planet info 3",
-                               40, 450, size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+                               size_settings::context_area::width / 2, size_settings::context_area::height * 0.75,
+                               size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 }
 
 void rendering::render_sector_galaxy_helper(const client_context& context, const std::shared_ptr<Sector>& sector)
@@ -108,7 +112,7 @@ void rendering::render_sector_galaxy_helper(const client_context& context, const
 
 rendering::view_t rendering::render_sector_view::_up() { return std::make_shared<render_universe_view>(); }
 
-rendering::view_t rendering::render_sector_view::_down() { return std::make_shared<render_sector_view>(); }
+rendering::view_t rendering::render_sector_view::_down() { return std::make_shared<render_planet_view>(); }
 
 void rendering::render_sector_view::_mouse_handler(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m,
                                                    int x, int y)
@@ -149,6 +153,7 @@ void rendering::render_sector_view::key_handler(client_context& context, Uint16 
 {
     if (k == SDLK_ESCAPE)
     {
+        context.gui->current_object.reset();
         context.view = _up();
     }
 }

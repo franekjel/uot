@@ -4,13 +4,14 @@
 #include <mutex>
 #include <variant>
 
-#include "game_gui.h"
-#include "game_resources.h"
-#include "game_state.h"
 #include "rendering.h"
 #include "rendering_all_views.h"
 #include "rendering_views.h"
 #include "sdl_utilities.h"
+
+struct game_gui;
+struct game_resources;
+struct game_state;
 
 template <typename T>
 struct LockGuardedValue

@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "../libuot/msg/messagetypes.h"
+#include "game_state.h"
 
 void uot_net_client::connect_to_server() { run(); }
 

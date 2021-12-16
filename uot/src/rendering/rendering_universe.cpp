@@ -1,6 +1,8 @@
 #include "rendering/rendering_universe.h"
 #include "client_context.h"
 #include "game_gui.h"
+#include "game_resources.h"
+#include "game_state.h"
 #include "utilities/input_utilities.h"
 
 void rendering::render_selected_sector_info(const client_context& context)
@@ -10,7 +12,9 @@ void rendering::render_selected_sector_info(const client_context& context)
     auto& gui = context.gui;
 
     auto sector_id = gui->current_sector.value()->sector_id % 10 + 1;
-    sdl_utilities::render_text(r.get(), gr->main_font, "SECTOR NAME", 30, 10, size_settings::context_area::width - 50,
+
+    sdl_utilities::render_text(r.get(), gr->main_font, "SECTOR NAME", size_settings::context_area::width / 2,
+                               fonts::main_font_size / 2 + 30, size_settings::context_area::width - 50,
                                {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
@@ -20,8 +24,9 @@ void rendering::render_selected_sector_info(const client_context& context)
     // render planet info
     sdl_utilities::render_text(r.get(), gr->secondary_font,
                                " sector index: " + std::to_string(gui->current_sector.value()->sector_id) +
-                                   "\n sector info 1\n sector info 2\n sector info 3",
-                               40, 450, size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+                                   "\n planet info 1\n planet info 2\n planet info 3",
+                               size_settings::context_area::width / 2, size_settings::context_area::height * 0.75,
+                               size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 }
 
 void rendering::render_universe_view::_draw(client_context& context)
@@ -35,6 +40,7 @@ void rendering::render_universe_view::_draw(client_context& context)
     auto& gui = context.gui;
 
     sdl_utilities::set_render_viewport<size_settings::resource_area>(r.get());
+    sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
     render_resource_bar(context);
 
     // draw the left, main game panel
@@ -60,10 +66,6 @@ void rendering::render_universe_view::_draw(client_context& context)
     {
         rendering::render_selected_sector_info(context);
     }
-
-    sdl_utilities::set_render_viewport<size_settings::resource_area>(r.get());
-    sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
-    render_resource_bar(context);
 }
 void rendering::render_sector_selection(const client_context& context)
 {
@@ -79,7 +81,9 @@ void rendering::render_sector_selection(const client_context& context)
         return;
     }
 
+    sdl_utilities::set_custom_viewport<size_settings::play_area, size_settings::frame_size>(r.get());
     sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
+    sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
 
     const auto curr = gui->current_sector.value();
     const int tex_size = planets_meta::texture_size[SECTOR_1] * planets_meta::sector_multiplier;
@@ -157,6 +161,7 @@ void rendering::render_universe_view::key_handler(client_context& context, Uint1
 {
     if (k == SDLK_ESCAPE)
     {
+        context.gui->current_sector.reset();
         context.view = _up();
     }
 }
