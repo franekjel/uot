@@ -106,7 +106,6 @@ constexpr std::string_view secondary_font = "assets/fonts/secondary.ttf";
 constexpr int main_font_size = 50;
 constexpr int resource_font_size = 25;
 constexpr int secondary_font_size = 25;
-
 }  // namespace fonts
 namespace buttons_meta
 {

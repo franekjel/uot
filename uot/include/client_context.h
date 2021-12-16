@@ -17,10 +17,10 @@ template <typename T>
 struct LockGuardedValue
 {
     T& value;
-    LockGuardedValue(T& value, std::mutex& mutex) : value(value), lock(mutex) {}
+    LockGuardedValue(T& value, std::recursive_mutex& mutex) : value(value), lock(mutex) {}
 
    private:
-    std::unique_lock<std::mutex> lock;
+    std::unique_lock<std::recursive_mutex> lock;
 };
 
 struct client_context
@@ -38,7 +38,7 @@ struct client_context
     }
 
    private:
-    std::mutex gs_mutex;
+    std::recursive_mutex gs_mutex;
     std::shared_ptr<game_state> gs;
 };
 

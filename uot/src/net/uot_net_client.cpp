@@ -68,17 +68,26 @@ void uot_net_client::handle_message(const std::string& data)
             std::map<int, std::shared_ptr<SpaceBase>> spaceBases_map;
             std::map<int, std::shared_ptr<InhabitableObject>> inhabitables_map;
             std::vector<std::shared_ptr<Sector>> sectors_vec;
-            std::shared_ptr<Player> player_ptr;
-            std::shared_ptr<Galaxy> galaxy_ptr;
-            std::shared_ptr<Colony> colony_ptr;
 
-            galaxy_ptr = std::make_shared<Galaxy>();
-
-            colony_ptr = std::make_shared<Colony>(0, nullptr);
-
+            std::shared_ptr<Galaxy> galaxy_ptr = std::make_shared<Galaxy>();
+            std::shared_ptr<Colony> colony_ptr = std::make_shared<Colony>(0, nullptr);
             long player_id = payload_start->player_id;
+            std::map<Resource, float> resource_data;
+            resource_data.insert(std::pair<Resource, float>(Resource::Metals, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Antimatter, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Cryptocurrencies, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::RareMetals, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Crystals, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Polymers, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::DarkMatter, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::AncientNanobots, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::AncientRelics, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Spatium, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Food, 0));
+            resource_data.insert(std::pair<Resource, float>(Resource::Technology, 0));
 
-            player_ptr = std::make_shared<Player>(player_id, galaxy_ptr, resource_data, colony_ptr);
+            std::shared_ptr<Player> player_ptr =
+                std::make_shared<Player>(player_id, galaxy_ptr, resource_data, colony_ptr);
 
             for (int i = 0; i < msgGalaxy.sectors.size(); i++)
             {
@@ -118,8 +127,7 @@ void uot_net_client::handle_message(const std::string& data)
                         {
                             messageTypes::MsgStar star = stars[star_idx];
                             SectorObject _sectorObject = SectorObject(star.id, star.position, star.object_size);
-                            Star _star = Star(_sectorObject, star.starType);
-                            std::shared_ptr<Star> s_star = std::shared_ptr<Star>(&_star);
+                            std::shared_ptr<Star> s_star = std::make_shared<Star>(_sectorObject, star.starType);
                             stars_map.insert(std::pair<int, std::shared_ptr<Star>>(star.id, s_star));
                             sectors_vec[j]->objects.insert(s_star);
                         }
@@ -166,7 +174,6 @@ void uot_net_client::handle_message(const std::string& data)
                             }
 
                             _planet->possible_buildings = planet.possible_buildings;
-
                             planets_map.insert(std::pair<int, std::shared_ptr<Planet>>(planet.id, _planet));
                             sectors_vec[j]->objects.insert(_planet);
                         }
@@ -188,8 +195,8 @@ void uot_net_client::handle_message(const std::string& data)
                             messageTypes::MsgInhabitable inhabitable = inhabitables[inhabitable_idx];
                             SectorObject _sectorObject =
                                 SectorObject(inhabitable.id, inhabitable.position, inhabitable.object_size);
-                            InhabitableObject inhabitableObject =
-                                InhabitableObject(_sectorObject, inhabitable.resurce_deposit, inhabitable.object_type);
+                            std::shared_ptr<InhabitableObject> s_inhabitable = std::make_shared<InhabitableObject>(
+                                _sectorObject, inhabitable.resurce_deposit, inhabitable.object_type);
 
                             // If there is base
                             if (inhabitable.base_exists)
@@ -200,13 +207,11 @@ void uot_net_client::handle_message(const std::string& data)
                                 spaceBase->owner = player_ptr;
                                 spaceBases_map.insert(
                                     std::pair<int, std::shared_ptr<SpaceBase>>(spaceBase->id, spaceBase));
-                                inhabitableObject.base = spaceBase;
+                                s_inhabitable->base = spaceBase;
                             }
 
-                            std::shared_ptr<InhabitableObject> s_inhabitable =
-                                std::shared_ptr<InhabitableObject>(&inhabitableObject);
-                            inhabitables_map.insert(std::pair<int, std::shared_ptr<InhabitableObject>>(
-                                inhabitableObject.id, s_inhabitable));
+                            inhabitables_map.insert(
+                                std::pair<int, std::shared_ptr<InhabitableObject>>(s_inhabitable->id, s_inhabitable));
                             sectors_vec[j]->objects.insert(s_inhabitable);
                         }
                     }
@@ -222,7 +227,7 @@ void uot_net_client::handle_message(const std::string& data)
 
             // TODO: Add mutex
             auto state = context.getGameState();
-            state.value->galaxy = galaxy_ptr;
+            state.value->player = player_ptr;
         }
         break;
 
@@ -236,8 +241,87 @@ void uot_net_client::handle_message(const std::string& data)
         case messageTypes::NewTour:
         {
             auto payload_newtour = std::dynamic_pointer_cast<messageTypes::NewTourPayload>(des);
-            population_data = payload_newtour->updated_populations;
-            resource_data = payload_newtour->updated_resources;
+            auto population_data = payload_newtour->updated_populations;
+            auto resource_data = payload_newtour->updated_resources;
+            auto state = context.getGameState();
+            if (state.value->player != nullptr)
+            {
+                for (auto const& pop_data : population_data)
+                {
+                    if (state.value->player->owned_colonies.find(pop_data.first) !=
+                        state.value->player->owned_colonies.end())
+                    {
+                        state.value->player->owned_colonies.at(pop_data.first)->population = pop_data.second;
+                    }
+                }
+
+                if (resource_data.find(Resource::Metals) != resource_data.end())
+                {
+                    state.value->player->owned_resources.at(Resource::Metals) = resource_data.at(Resource::Metals);
+                }
+
+                if (resource_data.find(Resource::Antimatter) != resource_data.end())
+                {
+                    state.value->player->owned_resources.at(Resource::Antimatter) =
+                        resource_data.at(Resource::Antimatter);
+                }
+
+                if (resource_data.find(Resource::Cryptocurrencies) != resource_data.end())
+                {
+                    state.value->player->owned_resources.at(Resource::Cryptocurrencies) =
+                        resource_data.at(Resource::Cryptocurrencies);
+                }
+
+                if (resource_data.find(Resource::RareMetals) != resource_data.end())
+                {
+                    state.value->player->owned_resources.at(Resource::RareMetals) =
+                        resource_data.at(Resource::RareMetals);
+                }
+
+                if (resource_data.find(Resource::Crystals) != resource_data.end())
+                {
+                    state.value->player->owned_resources.at(Resource::Crystals) = resource_data.at(Resource::Crystals);
+                }
+
+                if (resource_data.find(Resource::Polymers) != resource_data.end())
+                {
+                    state.value->player->owned_resources.at(Resource::Polymers) = resource_data.at(Resource::Polymers);
+                }
+
+                if (resource_data.find(Resource::DarkMatter) != resource_data.end())
+                {
+                    state.value->player->owned_resources.at(Resource::DarkMatter) =
+                        resource_data.at(Resource::DarkMatter);
+                }
+
+                if (resource_data.find(Resource::AncientNanobots) != resource_data.end())
+                {
+                    state.value->player->owned_resources.at(Resource::AncientNanobots) =
+                        resource_data.at(Resource::AncientNanobots);
+                }
+
+                if (resource_data.find(Resource::AncientRelics) != resource_data.end())
+                {
+                    state.value->player->owned_resources.at(Resource::AncientRelics) =
+                        resource_data.at(Resource::AncientRelics);
+                }
+
+                if (resource_data.find(Resource::Spatium) != resource_data.end())
+                {
+                    state.value->player->owned_resources.at(Resource::Spatium) = resource_data.at(Resource::Spatium);
+                }
+
+                if (resource_data.find(Resource::Food) != resource_data.end())
+                {
+                    state.value->player->owned_resources.at(Resource::Food) = resource_data.at(Resource::Food);
+                }
+
+                if (resource_data.find(Resource::Technology) != resource_data.end())
+                {
+                    state.value->player->owned_resources.at(Resource::Technology) =
+                        resource_data.at(Resource::Technology);
+                }
+            }
         }
         break;
         case messageTypes::None:

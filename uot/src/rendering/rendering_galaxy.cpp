@@ -5,7 +5,7 @@
 #include "game_state.h"
 #include "input_utilities.h"
 
-void rendering::render_sector_view::_draw(const client_context& context)
+void rendering::render_sector_view::_draw(client_context& context)
 {
     render_background(context);
     // draw the above astronaut buttons

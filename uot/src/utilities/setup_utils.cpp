@@ -35,7 +35,6 @@ void init(client_context& context)
         throw std::runtime_error("Couldn't initialize SDL_ttf");
     }
 
-    gs->reset_galaxy();
     context.gui = std::make_unique<game_gui>();
     context.gui->popup_buttons.push_back(std::make_unique<start_button>());
     context.gui->popup_buttons.push_back(std::make_unique<exit_button>());
