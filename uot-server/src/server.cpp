@@ -33,7 +33,7 @@ void Server::run()
             players.SendNewTurnMessage(turn_number, messaging_service);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
-        std::cout << "dupa, dzialam se juz " << turn_number << " tur\n";
+        std::cout << "rozpoczyna sie tura: " << turn_number << "\n";
     }
 }
 
