@@ -149,6 +149,11 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
         player->HandleBuildRequest(build.building_type, build.upgrade_from, build.colony_id);
     }
 
+    for (const auto& move_request : payload->moveFleetRequests)
+    {
+        player->HandleMoveFleetRequest(move_request.fleet_id, move_request.position);
+    }
+
     if (payload->technologyRequest != Technology::TechnologyType::Empty)
         player->HandleStartTechnologyResearch(payload->technologyRequest);
 
@@ -267,7 +272,14 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     player_resources[Resource::Technology] = 0.0f;
 }
 
-void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player) {}
+void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player) {
+
+    for (const auto& fleet : player->owned_fleets)
+    {
+        fleet.second->UpdateFleet();
+    }
+
+}
 
 void PlayersList::CountEveryTurnNumbers()
 {

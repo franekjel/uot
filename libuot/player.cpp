@@ -60,3 +60,8 @@ void Player::HandleBuildRequest(Building::BuildingType type, Building::BuildingT
 
     colony->second->AddBuildingToQueue(type, upgrade_from);
 }
+
+void Player::HandleMoveFleetRequest(int fleet_id, Point position)
+{
+    owned_fleets[fleet_id]->wanted_position = position;
+}
