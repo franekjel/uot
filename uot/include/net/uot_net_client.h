@@ -10,8 +10,6 @@ struct uot_net_client : net_client
     uot_net_client(client_context& cc);
     client_context& context;
     std::string name;
-    std::map<int, int> population_data;
-    std::map<Resource, float> resource_data;
     sns_client_txrx txrx;
     bool getting_input;
     bool disconnected;

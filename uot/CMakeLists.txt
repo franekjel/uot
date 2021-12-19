@@ -1,6 +1,8 @@
 set(APP_NAME "uot")
 set(SRCS
     include/constants/assets.h
+    include/rendering/gui/buttons.h
+    include/utilities/sdl_include.h
     include/client_context.h
     include/game_gui.h
     include/game_resources.h
@@ -20,8 +22,6 @@ set(SRCS
     include/singleton.h
     include/constants/size_settings.h
     include/rendering/texture.h
-    include/rendering/ui_button.h
-    include/rendering/ui_menu_lists.h
     include/uncopiable.h
     include/net/uot_net_client.h
 
@@ -32,7 +32,9 @@ set(SRCS
     src/rendering/rendering_common.cpp
     src/rendering/rendering_galaxy.cpp
     src/rendering/rendering_menu.cpp
+    src/rendering/rendering_planet.cpp
     src/rendering/rendering_universe.cpp
+    src/rendering/buttons.cpp
     src/utilities/sdl_utils.cpp
     src/utilities/setup_utils.cpp
     src/net/uot_net_client.cpp
@@ -44,6 +46,7 @@ include_directories(include/rendering)
 include_directories(include/constants)
 include_directories(include/utilities)
 include_directories(include/net)
+include_directories(include/gui)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)

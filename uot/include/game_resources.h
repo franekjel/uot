@@ -18,7 +18,6 @@ struct game_resources : public uncopiable
     friend singleton<game_resources>;
 
    public:
-    std::vector<std::shared_ptr<SDL_Texture>> buttonTextures;
     // access by texture_id
     std::vector<texture_t> planetTextures;
     std::vector<std::shared_ptr<SDL_Texture>> selectionTextures;
@@ -26,6 +25,9 @@ struct game_resources : public uncopiable
 
     std::shared_ptr<SDL_Texture> bk_texture;
     std::shared_ptr<SDL_Texture> sky_texture;
+    std::shared_ptr<SDL_Texture> sky_square_texture;
+    std::shared_ptr<SDL_Texture> buildings_sprite;
+    std::shared_ptr<SDL_Texture> buildings_blur_sprite;
     std::shared_ptr<SDL_Texture> resource_texture;
 
     std::shared_ptr<TTF_Font> main_font;

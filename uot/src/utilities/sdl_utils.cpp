@@ -49,7 +49,7 @@ void sdl_utilities::paint_background(SDL_Renderer* r, const SDL_Color& c)
 
 void sdl_utilities::paint_frame_textured(SDL_Renderer* r, const SDL_Color& f, std::shared_ptr<SDL_Texture> t)
 {
-    constexpr int offset = 8;
+    constexpr int offset = size_settings::frame_size;
     // paint frame
     SDL_SetRenderDrawColor(r, f.r, f.g, f.b, f.a);
     SDL_RenderFillRect(r, nullptr);
@@ -71,7 +71,7 @@ void sdl_utilities::paint_frame_textured(SDL_Renderer* r, const SDL_Color& f, st
 
 void sdl_utilities::paint_frame(SDL_Renderer* r, const SDL_Color& f, const SDL_Color& b)
 {
-    constexpr int offset = 8;
+    constexpr int offset = size_settings::frame_size;
     // paint frame
     SDL_SetRenderDrawColor(r, f.r, f.g, f.b, f.a);
     SDL_RenderFillRect(r, nullptr);
@@ -145,6 +145,6 @@ void sdl_utilities::render_text(SDL_Renderer* r, std::shared_ptr<TTF_Font> font,
     const auto w = textSurface->w;
     const auto h = textSurface->h;
 
-    SDL_Rect s{0, 0, w, h}, d{x, y, w, h};
+    SDL_Rect s{0, 0, w, h}, d{x - w / 2, y - h / 2, w, h};
     SDL_RenderCopyEx(r, tmp_tex.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 }

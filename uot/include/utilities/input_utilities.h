@@ -18,6 +18,18 @@ enum class uot_event_type
     right_click_resource,
     right_click_context,
     right_click_else,
+    planet_motion_play,
+    planet_motion_context,
+    planet_motion_resource,
+    planet_motion_else,
+    planet_left_click_play,
+    planet_right_click_play,
+    planet_left_click_context,
+    planet_right_click_context,
+    planet_left_click_resource,
+    planet_right_click_resource,
+    planet_left_click_else,
+    planet_right_click_else,
     other
 };
 
@@ -45,6 +57,8 @@ inline bool check_collision(const int x, const int y, const int box_x, const int
 }
 
 uot_event_type get_event_type(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
+
+uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
 
 }  // namespace input_utilities
 

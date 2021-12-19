@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <variant>
+#include "gui/buttons.h"
 
 namespace rendering
 {
@@ -14,7 +15,8 @@ struct render_planet_view;
 template <typename T>
 using sp = std::shared_ptr<T>;
 
-typedef std::variant<sp<render_menu_view>, sp<render_universe_view>, sp<render_sector_view> > view_t;
+typedef std::variant<sp<render_menu_view>, sp<render_universe_view>, sp<render_sector_view>, sp<render_planet_view>>
+    view_t;
 
 }  // namespace rendering
 

@@ -6,13 +6,7 @@
 
 #include <array>
 #include <string_view>
-
-enum button_types
-{
-    START_BUTTON = 0,
-    EXIT_BUTTON = 1,
-    UNIVERSE_BUTTON = 2
-};
+#include "size_settings.h"
 
 enum selection_types
 {
@@ -66,7 +60,7 @@ namespace generation_meta
 constexpr bool use_uniform_sectors = false;
 constexpr int num_sectors = 64;
 constexpr int sqrt_num_sectors = 8;
-constexpr float multiplier = 5.0f;
+constexpr float multiplier = 100.f;
 }  // namespace generation_meta
 
 namespace planets_meta
@@ -97,11 +91,12 @@ constexpr std::array<std::string_view, num_planets> planet_texture_paths = {
 namespace basic_textures
 {
 constexpr std::string_view background_texture_path = "assets/background_texture.png";
-constexpr std::string_view menu_start_button_texture = "assets/menu_start_button.png";
-constexpr std::string_view menu_exit_button_texture = "assets/menu_exit_button.png";
 constexpr std::string_view menu_universe_button = "assets/menu_universe_button.png";
 constexpr std::string_view sector_selection = "assets/sector_selection.png";
 constexpr std::string_view sky_texture_path = "assets/sky.png";
+constexpr std::string_view sky_square_texture_path = "assets/sky_square.png";
+constexpr std::string_view building_sprite_path = "assets/buildings.png";
+constexpr std::string_view building_blur_sprite_path = "assets/buildings_blurred.png";
 }  // namespace basic_textures
 
 namespace fonts
@@ -109,13 +104,11 @@ namespace fonts
 constexpr std::string_view main_font = "assets/fonts/arcade.ttf";
 constexpr std::string_view secondary_font = "assets/fonts/secondary.ttf";
 constexpr int main_font_size = 50;
-constexpr int resource_font_size = 50;
+constexpr int resource_font_size = 25;
+constexpr int secondary_font_size = 25;
 }  // namespace fonts
 namespace buttons_meta
 {
-constexpr int num_buttons = 3;
-constexpr int button_texture_height = 100;
-constexpr int button_texture_width = 300;
 constexpr int button_height = 75;
 constexpr int button_width = 200;
 constexpr int button_x_offset = 25;
@@ -130,4 +123,30 @@ constexpr int total_size = 256;
 constexpr int single_size = 128;
 }  // namespace resources_meta
 
+namespace buildings_meta
+{
+static constexpr int num_buildings = 5;
+struct s_pos
+{
+    int x;
+    int y;
+    int w;
+    int h;
+};
+
+// PlanetaryAdministration, ImprovedMetalsMine, MetalsMine, Farm,
+// Greenhouses
+static constexpr std::array<s_pos, num_buildings> sprite_positions{
+    s_pos{247, 0, 89, 83}, s_pos{0, 100, 74, 78}, s_pos{73, 89, 74, 80}, s_pos{77, 170, 99, 80}, s_pos{344, 0, 96, 88}};
+static constexpr int screen_unit = size_settings::planet_play_area::width / 8;
+static constexpr int w = 1.2 * screen_unit;
+static constexpr int h = 1.2 * screen_unit;
+static constexpr std::array<std::string_view, num_buildings> names{"Planetary Administration", "Improved Metals Mine",
+                                                                   "Metals Mine", "Farm", "Greenhouses"};
+static constexpr std::array<s_pos, num_buildings> render_positions{
+    s_pos{1 * screen_unit, 2 * screen_unit, w, h}, s_pos{3 * screen_unit, 2 * screen_unit, w, h},
+    s_pos{1 * screen_unit, 4 * screen_unit, w, h}, s_pos{3 * screen_unit, 4 * screen_unit, w, h},
+    s_pos{5 * screen_unit, 4 * screen_unit, w, h},
+};
+}  // namespace buildings_meta
 #endif
