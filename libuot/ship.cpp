@@ -30,5 +30,4 @@ ShipDesign::ShipDesign(const unsigned int id, const std::string &name, const Shi
         ship_size += m.size;
     }
     upkeep += percentage_cost_upkeep * cost;
-
 }

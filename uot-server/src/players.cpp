@@ -77,7 +77,7 @@ std::shared_ptr<Galaxy> PlayersList::GetStartingGalaxy(std::shared_ptr<Galaxy> w
 std::map<Resource, float> PlayersList::GetStartingResources()
 {
     // TODO: Prepare set of starting resources
-    return {{Resource::Food,100.0f}, {Resource::Metals, 100.0f}};
+    return {{Resource::Food, 100.0f}, {Resource::Metals, 100.0f}};
 }
 
 std::shared_ptr<Colony> PlayersList::GetStartingColony(unsigned int player_id, std::shared_ptr<Galaxy> startingGalaxy,
@@ -176,7 +176,7 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
 {
     for (auto& player : players)
     {
-        messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first],galaxy);
+        messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first], galaxy);
     }
 }
 
@@ -273,13 +273,12 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     player_resources[Resource::Technology] = 0.0f;
 }
 
-void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player) {
-
+void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
+{
     for (const auto& fleet : player->owned_fleets)
     {
         fleet.second->UpdateFleet();
     }
-
 }
 
 void PlayersList::CountEveryTurnNumbers()
