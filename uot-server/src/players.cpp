@@ -77,7 +77,7 @@ std::shared_ptr<Galaxy> PlayersList::GetStartingGalaxy(std::shared_ptr<Galaxy> w
 std::map<Resource, float> PlayersList::GetStartingResources()
 {
     // TODO: Prepare set of starting resources
-    return {};
+    return {{Resource::Food,100.0f}, {Resource::Metals, 100.0f}};
 }
 
 std::shared_ptr<Colony> PlayersList::GetStartingColony(unsigned int player_id, std::shared_ptr<Galaxy> startingGalaxy,

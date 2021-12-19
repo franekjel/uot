@@ -126,6 +126,11 @@ void net_server_uot::send_game_begin_message(std::shared_ptr<Player>& player, st
 
     payload.player_id = player->id;
     payload.galaxy = messageTypes::MsgGalaxy(player->known_galaxy);
+    payload.starting_resources = {};
+    for (const auto& resource : player->owned_resources)
+    {
+        payload.starting_resources[resource.first] = resource.second;
+    }
 
     txrx.send_reliable(player_net_name, payload.Serialize());
 }
