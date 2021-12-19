@@ -171,11 +171,12 @@ void PlayersList::CountWeeklyNumbers()
         thread.join();
 }
 
-void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_service)
+void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_service,
+                                     std::shared_ptr<Galaxy>& galaxy)
 {
     for (auto& player : players)
     {
-        messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first]);
+        messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first],galaxy);
     }
 }
 

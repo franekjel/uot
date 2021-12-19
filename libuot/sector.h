@@ -55,4 +55,5 @@ struct Sector
     std::set<std::shared_ptr<Sector>> neighbors;
     std::set<std::shared_ptr<SectorObject>> objects;  // stars, planets, asteroid
     std::set<unsigned int> watchers;                  // players who are watching the sector, only for server purpose
+    std::set<std::shared_ptr<Fleet>> present_fleets;
 };

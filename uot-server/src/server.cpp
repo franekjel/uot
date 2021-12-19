@@ -30,7 +30,7 @@ void Server::run()
             players.CountEveryTurnNumbers();
             if (++turn_number % WEEK_LENGTH == 0)
                 players.CountWeeklyNumbers();
-            players.SendNewTurnMessage(turn_number, messaging_service);
+            players.SendNewTurnMessage(turn_number, messaging_service, galaxy);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
         std::cout << "rozpoczyna sie tura: " << turn_number << "\n";

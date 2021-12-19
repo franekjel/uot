@@ -26,7 +26,7 @@ class PlayersList
     void CountWeeklyNumbers();
     void CountEveryTurnNumbers();
     int PlayersCount() { return players.size(); }
-    void SendNewTurnMessage(int turn_number, net_server_uot& messaging_service);
+    void SendNewTurnMessage(int turn_number, net_server_uot& messaging_service, std::shared_ptr<Galaxy>& galaxy);
     void SendStartGameMessage(net_server_uot& messaging_service);
     static void CountWeeklyNumbersPlayer(std::shared_ptr<Player> player);
     static void CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player);

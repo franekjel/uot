@@ -274,6 +274,7 @@ struct Fleet
     Point wanted_position = {NAN, NAN};
     float fleet_speed_per_tour = -1.0f;
     bool empty_fleet = false;  // if true then fleet needs to be deleted
+    unsigned int owner_id;
 
     void UpdateFleet()
     {
