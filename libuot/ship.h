@@ -272,7 +272,7 @@ struct Fleet
     std::shared_ptr<Sector> location_sector;
     Point position;
     Point wanted_position = {NAN, NAN};
-    float fleet_speed_per_tour = -1.0f;
+    float fleet_speed_per_turn = -1.0f;
     bool empty_fleet = false;  // if true then fleet needs to be deleted
     unsigned int owner_id;
 
@@ -326,7 +326,7 @@ struct Fleet
                 minimum_speed = speed;
         }
 
-        fleet_speed_per_tour = minimum_speed;
+        fleet_speed_per_turn = minimum_speed;
     }
 
     void MoveFleet()
@@ -334,17 +334,17 @@ struct Fleet
         if (std::isnan(wanted_position.x) || wanted_position == position)
             return;
         UpdateFleetSpeed();
-        if (fleet_speed_per_tour <= 0.0f)
+        if (fleet_speed_per_turn <= 0.0f)
             return;
         auto movement_vec = position - wanted_position;
         float movement_length = std::sqrtf(movement_vec.squaredLength());
-        if (movement_length > fleet_speed_per_tour)
+        if (movement_length > fleet_speed_per_turn)
         {
             for (const auto& ship : ships)
             {
-                ship->MoveShip(fleet_speed_per_tour);
+                ship->MoveShip(fleet_speed_per_turn);
             }
-            movement_vec *= fleet_speed_per_tour / movement_length;
+            movement_vec *= fleet_speed_per_turn / movement_length;
             position += movement_vec;
         }
         else
