@@ -161,13 +161,11 @@ struct Colony
     std::shared_ptr<Planet> planet;
     std::map<Building::BuildingType, int> buildings;
     float population;
-    bool population_changed;
     float base_population_growth = 0.05f;
     float base_population_starving_death = 0.025f;
     std::shared_ptr<Player> owner;
     float unemployed_population;
     std::vector<BuildingBuildProgress> building_queue = {};
-    bool building_queue_changed;
 
     static const Building& GetBuildingFromType(Building::BuildingType type) { return Buildings.at(type); }
 
@@ -285,4 +283,8 @@ struct Colony
         building_queue = {};
         building_queue_changed = false;
     }
+
+    // fields below are server-only
+    bool population_changed;
+    bool building_queue_changed;
 };
