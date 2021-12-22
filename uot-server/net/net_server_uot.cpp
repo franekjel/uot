@@ -69,12 +69,12 @@ void net_server_uot::set_after_accept_player_callback(std::function<void()> call
     uot_after_accept_player = callback;
 }
 
-void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Player>& player,
-                                           std::string player_net_name)
+void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Player>& player,
+                                           std::string player_net_name, std::shared_ptr<Galaxy>& galaxy)
 {
-    messageTypes::NewTourPayload payload;
+    messageTypes::NewTurnPayload payload;
 
-    for (auto& resource : player->owned_resources)
+    for (const auto& resource : player->owned_resources)
     {
         if (player->resources_changed[resource.first])
         {
@@ -83,7 +83,7 @@ void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Play
         }
     }
 
-    for (auto& colony : player->owned_colonies)
+    for (const auto& colony : player->owned_colonies)
     {
         if (colony.second->population_changed)
         {
@@ -105,6 +105,18 @@ void net_server_uot::send_new_tour_message(int tour_number, std::shared_ptr<Play
         }
     }
 
+    for (const auto& sector : galaxy->sectors)
+    {
+        if (sector->watchers.count(player->id) != 0)
+        {
+            auto sector_update_msg = messageTypes::MsgWatchedSectorUpdate(sector->sector_id);
+            for (const auto& fleet : sector->present_fleets)
+            {
+                sector_update_msg.fleets.push_back(messageTypes::MsgFleet(fleet, fleet->owner_id));
+            }
+        }
+    }
+
     txrx.send_reliable(player_net_name, payload.Serialize());
 }
 
@@ -114,6 +126,11 @@ void net_server_uot::send_game_begin_message(std::shared_ptr<Player>& player, st
 
     payload.player_id = player->id;
     payload.galaxy = messageTypes::MsgGalaxy(player->known_galaxy);
+    payload.starting_resources = {};
+    for (const auto& resource : player->owned_resources)
+    {
+        payload.starting_resources[resource.first] = resource.second;
+    }
 
     txrx.send_reliable(player_net_name, payload.Serialize());
 }

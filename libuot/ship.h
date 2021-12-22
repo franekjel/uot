@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "resource.h"
+#include "sector.h"
 
 // TODO These modules (like SmallReactor etc.) should be hold in some global set when we will be doing usable version
 struct Module
@@ -196,6 +197,7 @@ struct ShipDesign
     std::set<Module> inside;
     std::map<Resource, float> cost;    // sum of costs of modules and hull
     std::map<Resource, float> upkeep;  // total upkeep
+    float ship_size = 0.0f;
 
     static constexpr float percentage_cost_upkeep = 0.01;  // which part of ship cost goes to (monthly?) upkeep
 
@@ -213,6 +215,8 @@ struct Ship
     float max_shield;
     static constexpr float shield_regen_percentage = 0.01;  // shield regenerating ratio
     static constexpr float shield_regen_energy_cost = 0.1;  // energy cost per shield point
+    static constexpr float shield_regen_energy_cost_reverse =
+        1.0 / shield_regen_energy_cost;  // energy cost per shield point but reverse;
     float energy;
     float energy_regen;
     float max_energy;
@@ -224,6 +228,37 @@ struct Ship
     float construction_points;
     std::vector<Weapon> weapons;
     std::shared_ptr<ShipDesign> design;
+    float ship_speed;
+
+    float GetShipSpeed()
+    {
+        ship_speed = (energy >= engines_energy_consumtion ? engines_power
+                                                          : engines_power * (energy / engines_energy_consumtion)) /
+                     design->ship_size;
+        return ship_speed;
+    }
+
+    void RegenShip()
+    {
+        energy += energy_regen;
+        energy = std::max(energy, max_energy);
+        hp += hp_regen;
+        hp = std::max(hp, max_hp);
+        float shield_regeneration = std::min(max_shield - shield, max_shield * shield_regen_percentage);
+        float shield_regen_cost = shield_regeneration * shield_regen_energy_cost;
+        if (energy >= shield_regen_cost)
+        {
+            shield += shield_regeneration;
+            energy -= shield_regen_cost;
+        }
+        else
+        {
+            shield += energy * shield_regen_energy_cost_reverse;
+            energy = 0.0f;
+        }
+    }
+
+    void MoveShip(float distance) { energy -= engines_energy_consumtion * (distance / ship_speed); }
 };
 
 struct Fleet
@@ -234,4 +269,91 @@ struct Fleet
     float civilians;
     float human_capacity;
     float construction_points;
+    std::shared_ptr<Sector> location_sector;
+    Point position;
+    Point wanted_position = {NAN, NAN};
+    float fleet_speed_per_turn = -1.0f;
+    bool empty_fleet = false;  // if true then fleet needs to be deleted
+    unsigned int owner_id;
+
+    void UpdateFleet()
+    {
+        int to_delete = -1;
+        do
+        {
+            to_delete = -1;
+            for (int i = 0; i < ships.size(); i++)
+            {
+                if (ships[i]->hp <= 0)
+                {
+                    to_delete = i;
+                    break;
+                }
+            }
+            if (to_delete >= 0)
+            {
+                ships.erase(ships.begin() + to_delete);
+            }
+        } while (to_delete >= 0);
+
+        if (ships.size() == 0)
+        {
+            empty_fleet = true;
+            return;
+        }
+
+        for (const auto& ship : ships)
+        {
+            ship->RegenShip();
+        }
+
+        MoveFleet();
+    }
+
+    void UpdateFleetSpeed()
+    {
+        if (ships.size() == 0)
+        {
+            empty_fleet = true;
+            return;
+        }
+
+        float minimum_speed = ships.front()->GetShipSpeed();
+        for (const auto& ship : ships)
+        {
+            float speed = ship->GetShipSpeed();
+            if (speed < minimum_speed)
+                minimum_speed = speed;
+        }
+
+        fleet_speed_per_turn = minimum_speed;
+    }
+
+    void MoveFleet()
+    {
+        if (std::isnan(wanted_position.x) || wanted_position == position)
+            return;
+        UpdateFleetSpeed();
+        if (fleet_speed_per_turn <= 0.0f)
+            return;
+        auto movement_vec = position - wanted_position;
+        float movement_length = std::sqrtf(movement_vec.squaredLength());
+        if (movement_length > fleet_speed_per_turn)
+        {
+            for (const auto& ship : ships)
+            {
+                ship->MoveShip(fleet_speed_per_turn);
+            }
+            movement_vec *= fleet_speed_per_turn / movement_length;
+            position += movement_vec;
+        }
+        else
+        {
+            for (const auto& ship : ships)
+            {
+                ship->MoveShip(movement_length);
+            }
+            position += movement_vec;
+        }
+    }
 };

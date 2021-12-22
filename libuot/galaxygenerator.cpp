@@ -184,7 +184,7 @@ Galaxy GenerateGalaxy(const GalaxyGeneratorParameters &parameters)
         while (pos.squaredLength() >= 1.0f || too_close(sector_positions, pos))
             pos = Point(dist(gen), dist(gen));
         const std::set<std::shared_ptr<SectorObject>> sector_objects = GenerateSectorObjects(parameters);
-        galaxy.sectors.insert(std::shared_ptr<Sector>(new Sector{i, pos, {}, sector_objects}));
+        galaxy.sectors.insert(std::shared_ptr<Sector>(new Sector{i, pos, {}, sector_objects, {}}));
         sector_positions.push_back(pos);
 
         // TODO: neighbour find - brute force or use kd-trees (nanoflann?)

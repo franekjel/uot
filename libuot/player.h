@@ -17,20 +17,23 @@ struct Player
     std::map<unsigned int, std::shared_ptr<Colony>> owned_colonies;
     std::map<unsigned int, std::shared_ptr<SpaceBase>> owned_space_bases;
     std::shared_ptr<Galaxy> known_galaxy;
-    std::map<unsigned int, std::shared_ptr<Ship>> owned_ships;
+    std::map<unsigned int, std::shared_ptr<Fleet>> owned_fleets;
     std::map<Resource, float> owned_resources;
-    std::map<Resource, bool> resources_changed;
 
     std::set<Technology::TechnologyType> known_technologies;
     std::set<Technology::TechnologyType> available_technologies;
     TechnologyProgress researched_technology;
 
-    Player(const long player_id_, const std::shared_ptr<Galaxy>& known_galaxy_,
+    Player(const unsigned int player_id_, const std::shared_ptr<Galaxy>& known_galaxy_,
            const std::map<Resource, float>& owned_resources_, const std::shared_ptr<Colony>& starting_colony);
 
     void HandleBuildRequest(Building::BuildingType type, Building::BuildingType upgrade_from, unsigned int colony_id);
+    void HandleMoveFleetRequest(int fleet_id, Point position);
     void HandleStartTechnologyResearch(Technology::TechnologyType technology);
     void DiscoverTechnology(Technology::TechnologyType technology);
+
+    // fields below are server-only
+    std::map<Resource, bool> resources_changed;
 };
 
 inline bool operator==(const Player& lhs, const Player& rhs) { return lhs.id == rhs.id; }

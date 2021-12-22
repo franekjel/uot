@@ -113,6 +113,25 @@ struct MsgBuildingsUpdates
                         int days_remaining_);
 };
 
+struct MsgFleet
+{
+    unsigned int id;
+    unsigned int player_id;  // owner
+    Point position;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleet, id, player_id, position)
+    MsgFleet();
+    MsgFleet(const std::shared_ptr<Fleet>& fleet, unsigned int player_id_);
+};
+
+struct MsgWatchedSectorUpdate
+{
+    int sector_id;
+    std::vector<MsgFleet> fleets;  // every fleet in sector, these which flew away, are just not shown
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgWatchedSectorUpdate, sector_id, fleets)
+    MsgWatchedSectorUpdate();
+    MsgWatchedSectorUpdate(int sector_id_);
+};
+
 struct MsgBuildRequest
 {
     int colony_id;
@@ -121,5 +140,14 @@ struct MsgBuildRequest
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgBuildRequest, colony_id, building_type, upgrade_from)
     MsgBuildRequest();
     MsgBuildRequest(int colony_id_, Building::BuildingType building_type_, Building::BuildingType upgrade_from_);
+};
+
+struct MsgMoveFleetRequest
+{
+    int fleet_id;
+    Point position;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgMoveFleetRequest, fleet_id, position)
+    MsgMoveFleetRequest();
+    MsgMoveFleetRequest(int fleet_id_, Point position_);
 };
 }  // namespace messageTypes

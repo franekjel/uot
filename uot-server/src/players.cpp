@@ -77,10 +77,10 @@ std::shared_ptr<Galaxy> PlayersList::GetStartingGalaxy(std::shared_ptr<Galaxy> w
 std::map<Resource, float> PlayersList::GetStartingResources()
 {
     // TODO: Prepare set of starting resources
-    return {};
+    return {{Resource::Food, 100.0f}, {Resource::Metals, 100.0f}};
 }
 
-std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shared_ptr<Galaxy> startingGalaxy,
+std::shared_ptr<Colony> PlayersList::GetStartingColony(unsigned int player_id, std::shared_ptr<Galaxy> startingGalaxy,
                                                        std::shared_ptr<Galaxy> wholeGalaxy)
 {
     std::shared_ptr<Planet> planet = nullptr;
@@ -114,6 +114,7 @@ std::shared_ptr<Colony> PlayersList::GetStartingColony(long player_id, std::shar
                 continue;
             const auto& plan = std::dynamic_pointer_cast<Planet>(pl);
             plan->colony = startingColony;
+            sector->watchers.insert(player_id);
         }
     }
     return startingColony;
@@ -148,6 +149,11 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
         player->HandleBuildRequest(build.building_type, build.upgrade_from, build.colony_id);
     }
 
+    for (const auto& move_request : payload->moveFleetRequests)
+    {
+        player->HandleMoveFleetRequest(move_request.fleet_id, move_request.position);
+    }
+
     if (payload->technologyRequest != Technology::TechnologyType::Empty)
         player->HandleStartTechnologyResearch(payload->technologyRequest);
 
@@ -165,11 +171,12 @@ void PlayersList::CountWeeklyNumbers()
         thread.join();
 }
 
-void PlayersList::SendNewTourMessage(int tour_number, net_server_uot& messaging_service)
+void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_service,
+                                     std::shared_ptr<Galaxy>& galaxy)
 {
     for (auto& player : players)
     {
-        messaging_service.send_new_tour_message(tour_number, player.second, players_net_names[player.first]);
+        messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first], galaxy);
     }
 }
 
@@ -188,7 +195,7 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     auto& player_colonies = player->owned_colonies;
     auto& player_space_bases = player->owned_space_bases;
     auto& player_galaxy = player->known_galaxy;
-    auto& player_ships = player->owned_ships;
+    auto& player_fleets = player->owned_fleets;
     auto& player_research = player->researched_technology;
 
     // calculate expenses and gains of player colonies
@@ -266,15 +273,21 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     player_resources[Resource::Technology] = 0.0f;
 }
 
-void PlayersList::CountEveryTourNumbersPlayer(std::shared_ptr<Player> player) {}
+void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
+{
+    for (const auto& fleet : player->owned_fleets)
+    {
+        fleet.second->UpdateFleet();
+    }
+}
 
-void PlayersList::CountEveryTourNumbers()
+void PlayersList::CountEveryTurnNumbers()
 {
     // Async Part like ships upkeep costs
     std::vector<std::thread> player_threads(players.size());
     int player_num = 0;
     for (auto& player : players)
-        player_threads[player_num++] = std::thread(CountEveryTourNumbersPlayer, player.second);
+        player_threads[player_num++] = std::thread(CountEveryTurnNumbersPlayer, player.second);
 
     for (auto& thread : player_threads)
         thread.join();

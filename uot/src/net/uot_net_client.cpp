@@ -238,11 +238,11 @@ void uot_net_client::handle_message(const std::string& data)
         }
         break;
 
-        case messageTypes::NewTour:
+        case messageTypes::NewTurn:
         {
-            auto payload_newtour = std::dynamic_pointer_cast<messageTypes::NewTourPayload>(des);
-            auto population_data = payload_newtour->updated_populations;
-            auto resource_data = payload_newtour->updated_resources;
+            auto payload_newturn = std::dynamic_pointer_cast<messageTypes::NewTurnPayload>(des);
+            auto population_data = payload_newturn->updated_populations;
+            auto resource_data = payload_newturn->updated_resources;
             auto state = context.getGameState();
             if (state.value->player != nullptr)
             {

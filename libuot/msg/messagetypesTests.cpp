@@ -98,6 +98,31 @@ bool operator==(messageTypes::MsgBuildRequest& b1, messageTypes::MsgBuildRequest
     return b1.colony_id == b2.colony_id && b1.building_type == b2.building_type && b1.upgrade_from == b2.upgrade_from;
 }
 
+bool operator==(messageTypes::MsgMoveFleetRequest& m1, messageTypes::MsgMoveFleetRequest& m2)
+{
+    return m1.fleet_id == m2.fleet_id && m1.position == m2.position;
+}
+
+bool operator==(messageTypes::MsgFleet& f1, messageTypes::MsgFleet& f2)
+{
+    return f1.id == f2.id && f1.player_id == f2.player_id && f1.position == f2.position;
+}
+
+bool operator==(messageTypes::MsgWatchedSectorUpdate& u1, messageTypes::MsgWatchedSectorUpdate& u2)
+{
+    if (u1.sector_id != u2.sector_id)
+        return false;
+
+    if (u1.fleets.size() != u2.fleets.size())
+        return false;
+
+    for (int i = 0; i < u1.fleets.size(); ++i)
+        if (!(u1.fleets[i] == u2.fleets[i]))
+            return false;
+
+    return true;
+}
+
 void StartGamePayloadTest()
 {
     messageTypes::StartGamePayload sgp;
@@ -149,6 +174,10 @@ void StartGamePayloadTest()
 
     sgp.player_id = player->id;
     sgp.galaxy = messageTypes::MsgGalaxy(galaxy);
+
+    sgp.starting_resources[Resource::Antimatter] = 11.0f;
+    sgp.starting_resources[Resource::Crystals] = 21.0f;
+
     auto ser = sgp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
     auto type = des->GetType();
@@ -193,11 +222,17 @@ void StartGamePayloadTest()
 
     if (player->id != cast->player_id)
         std::cout << "StartGame - Wrong player id\n";
+
+    auto antimatter = cast->starting_resources[Resource::Antimatter];
+    auto crystals = cast->starting_resources[Resource::Crystals];
+    if (antimatter != sgp.starting_resources[Resource::Antimatter] ||
+        crystals != sgp.starting_resources[Resource::Crystals])
+        std::cout << "StartGame - wrong resource values\n";
 }
 
-void NewTourPayloadTest()
+void NewTurnPayloadTest()
 {
-    messageTypes::NewTourPayload ntp;
+    messageTypes::NewTurnPayload ntp;
 
     float food_init = 100.0, metals_init = 10.0;
     float p1_init = 100.0, p10_init = 10.0;
@@ -216,39 +251,73 @@ void NewTourPayloadTest()
     ntp.buildings_updates.push_back(buildUpdate1);
     ntp.buildings_updates.push_back(buildUpdate2);
 
+    messageTypes::MsgWatchedSectorUpdate watchedSectorUpdate1{2};
+    messageTypes::MsgWatchedSectorUpdate watchedSectorUpdate2{4};
+
+    auto fl = std::make_shared<Fleet>();
+    fl->id = 3;
+    fl->position = {4.0f, 6.66f};
+    messageTypes::MsgFleet fleet1{fl, 7};
+
+    fl = std::make_shared<Fleet>();
+    fl->id = 4;
+    fl->position = {14.0f, 6.0f};
+    messageTypes::MsgFleet fleet2{fl, 8};
+
+    fl = std::make_shared<Fleet>();
+    fl->id = 5;
+    fl->position = {22.0f, 0.0f};
+    messageTypes::MsgFleet fleet3{fl, 9};
+
+    watchedSectorUpdate1.fleets.push_back(fleet1);
+    watchedSectorUpdate1.fleets.push_back(fleet2);
+
+    watchedSectorUpdate2.fleets.push_back(fleet3);
+
+    ntp.watched_sectors_updates.push_back(watchedSectorUpdate1);
+    ntp.watched_sectors_updates.push_back(watchedSectorUpdate2);
+
     auto ser = ntp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
     auto type = des->GetType();
-    if (type != messageTypes::MessageType::NewTour)
-        std::cout << "NewTour - wrong message type\n";
-    auto cast = std::dynamic_pointer_cast<messageTypes::NewTourPayload>(des);
+    if (type != messageTypes::MessageType::NewTurn)
+        std::cout << "NewTurn - wrong message type\n";
+    auto cast = std::dynamic_pointer_cast<messageTypes::NewTurnPayload>(des);
 
     if (cast->updated_resources.size() != 2)
-        std::cout << "NewTour - wrong resources size\n";
+        std::cout << "NewTurn - wrong resources size\n";
 
     if (cast->updated_populations.size() != 2)
-        std::cout << "NewTour - wrong populations size\n";
+        std::cout << "NewTurn - wrong populations size\n";
 
     if (cast->buildings_updates.size() != 2)
-        std::cout << "NewTour - wrong new buildings size\n";
+        std::cout << "NewTurn - wrong new buildings size\n";
+
+    if (cast->watched_sectors_updates.size() != 2)
+        std::cout << "NewTurn - wrong watched sectors size\n";
 
     auto food = cast->updated_resources[Resource::Food];
     auto metals = cast->updated_resources[Resource::Metals];
     if (food != food_init || metals != metals_init)
-        std::cout << "NewTour - wrong resource values\n";
+        std::cout << "NewTurn - wrong resource values\n";
 
     auto p1 = cast->updated_populations[1];
     auto p10 = cast->updated_populations[10];
     if (p1 != p1_init || p10 != p10_init)
-        std::cout << "NewTour - wrong people values\n";
+        std::cout << "NewTurn - wrong people values\n";
 
     if (!(ntp.technology_update == cast->technology_update))
-        std::cout << "NewTour - wrong technology update\n";
+        std::cout << "NewTurn - wrong technology update\n";
 
     auto b1 = cast->buildings_updates[0];
     auto b2 = cast->buildings_updates[1];
     if (!(b1 == buildUpdate1) || !(b2 == buildUpdate2))
-        std::cout << "NewTour - wrong new buildings\n";
+        std::cout << "NewTurn - wrong new buildings\n";
+
+    auto ws1 = cast->watched_sectors_updates[0];
+    auto ws2 = cast->watched_sectors_updates[1];
+    if (!(ws1 == watchedSectorUpdate1) || !(ws2 == watchedSectorUpdate2))
+        std::cout << "NewTurn - wrong watched sectors\n";
 }
 
 void ActionsPayloadTest()
@@ -258,10 +327,15 @@ void ActionsPayloadTest()
     messageTypes::MsgBuildRequest buildRequest1 = {2, Building::BuildingType::Farm, Building::BuildingType::None};
     messageTypes::MsgBuildRequest buildRequest2 = {3, Building::BuildingType::ImprovedMetalsMine,
                                                    Building::BuildingType::MetalsMine};
+
+    messageTypes::MsgMoveFleetRequest moveFleetRequest1 = {2, Point{44.0f, -41.0f}};
+
     ap.buildRequests.push_back(buildRequest1);
     ap.buildRequests.push_back(buildRequest2);
 
     ap.technologyRequest = Technology::TechnologyType::Engineering;
+
+    ap.moveFleetRequests.push_back(moveFleetRequest1);
 
     auto ser = ap.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
@@ -278,10 +352,16 @@ void ActionsPayloadTest()
     if (cast->buildRequests.size() != 2)
         std::cout << "Actions - wrong build actions size\n";
 
+    if (cast->moveFleetRequests.size() != 1)
+        std::cout << "Actions - wrong move fleet actions size\n";
+
     auto b1 = cast->buildRequests[0];
     auto b2 = cast->buildRequests[1];
     if (!(b1 == buildRequest1) || !(b2 == buildRequest2))
         std::cout << "Actions - wrong build requests\n";
+
+    if (!(cast->moveFleetRequests[0] == moveFleetRequest1))
+        std::cout << "Actions - wrong move fleet requests\n";
 }
 
 void InvalidMessageTest()
@@ -295,7 +375,7 @@ int main()
 {
     std::cout << "Tests started\n";
 
-    NewTourPayloadTest();
+    NewTurnPayloadTest();
     ActionsPayloadTest();
     StartGamePayloadTest();
     InvalidMessageTest();

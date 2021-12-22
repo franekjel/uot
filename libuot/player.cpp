@@ -1,6 +1,6 @@
 #include "player.h"
 
-Player::Player(const long id_, const std::shared_ptr<Galaxy> &known_galaxy_,
+Player::Player(const unsigned int id_, const std::shared_ptr<Galaxy> &known_galaxy_,
                const std::map<Resource, float> &owned_resources_, const std::shared_ptr<Colony> &starting_colony)
 {
     id = id_;
@@ -15,7 +15,7 @@ Player::Player(const long id_, const std::shared_ptr<Galaxy> &known_galaxy_,
     owned_colonies = {};
     owned_colonies[starting_colony->id] = starting_colony;
     owned_space_bases = {};
-    owned_ships = {};
+    owned_fleets = {};
     researched_technology = {};
     DiscoverTechnology(Technology::TechnologyType::Engineering);
 }
@@ -59,4 +59,9 @@ void Player::HandleBuildRequest(Building::BuildingType type, Building::BuildingT
     }
 
     colony->second->AddBuildingToQueue(type, upgrade_from);
+}
+
+void Player::HandleMoveFleetRequest(int fleet_id, Point position)
+{
+    owned_fleets[fleet_id]->wanted_position = position;
 }
