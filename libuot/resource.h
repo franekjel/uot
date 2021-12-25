@@ -5,9 +5,8 @@
 enum class Resource
 {
     // base
-    Metals,            // for all sorts of building, ships, modules
-    Antimatter,        // energy - to upkee building and modules
-    Cryptocurrencies,  // money
+    Metals,      // for all sorts of building, ships, modules
+    Antimatter,  // energy - to upkee building and modules
 
     // uncommon - used for better modules and building
     RareMetals,

@@ -93,10 +93,7 @@ const Engines SmallEngines(Module("Small engines", 2, 2.0f, {{Resource::Metals, 
 struct Quarters : Module
 {
     static constexpr float capacity = 10;
-    Quarters()
-        : Module("Cabins", 4, 1.0f, {{Resource::Metals, 25.0f}}, {{Resource::Cryptocurrencies, 2.0f}}, Module::All)
-    {
-    }
+    Quarters() : Module("Cabins", 4, 1.0f, {{Resource::Metals, 25.0f}}, {}, Module::All) {}
 } const Quarters;  // technology cannot make more people live on the same space so there is only one Quarters object
 
 struct ContructionModule : Module
@@ -183,8 +180,8 @@ struct ShipHull
     }
 };
 
-const ShipHull SmallShipHull(2, 4, 1, 4, {{Resource::Metals, 25.0f}}, {{Resource::Cryptocurrencies, 10.0f}});
-const ShipHull MediumShipHull(6, 12, 4, 10, {{Resource::Metals, 80.0f}}, {{Resource::Cryptocurrencies, 30.0f}});
+const ShipHull SmallShipHull(2, 4, 1, 4, {{Resource::Metals, 25.0f}}, {});
+const ShipHull MediumShipHull(6, 12, 4, 10, {{Resource::Metals, 80.0f}}, {});
 
 struct ShipDesign
 {
@@ -337,7 +334,7 @@ struct Fleet
         if (fleet_speed_per_turn <= 0.0f)
             return;
         auto movement_vec = position - wanted_position;
-        float movement_length = std::sqrtf(movement_vec.squaredLength());
+        float movement_length = std::sqrt(movement_vec.squaredLength());
         if (movement_length > fleet_speed_per_turn)
         {
             for (const auto& ship : ships)

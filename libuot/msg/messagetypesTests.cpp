@@ -246,7 +246,7 @@ void NewTurnPayloadTest()
 
     messageTypes::MsgBuildingsUpdates buildUpdate1{2, Building::BuildingType::Greenhouses, Building::BuildingType::None,
                                                    3};
-    messageTypes::MsgBuildingsUpdates buildUpdate2{3, Building::BuildingType::ImprovedMetalsMine,
+    messageTypes::MsgBuildingsUpdates buildUpdate2{3, Building::BuildingType::AdvancedMetalsMine,
                                                    Building::BuildingType::MetalsMine, 1};
     ntp.buildings_updates.push_back(buildUpdate1);
     ntp.buildings_updates.push_back(buildUpdate2);
@@ -324,8 +324,8 @@ void ActionsPayloadTest()
 {
     messageTypes::ActionsPayload ap;
 
-    messageTypes::MsgBuildRequest buildRequest1 = {2, Building::BuildingType::Farm, Building::BuildingType::None};
-    messageTypes::MsgBuildRequest buildRequest2 = {3, Building::BuildingType::ImprovedMetalsMine,
+    messageTypes::MsgBuildRequest buildRequest1 = {2, Building::BuildingType::Farms, Building::BuildingType::None};
+    messageTypes::MsgBuildRequest buildRequest2 = {3, Building::BuildingType::AdvancedMetalsMine,
                                                    Building::BuildingType::MetalsMine};
 
     messageTypes::MsgMoveFleetRequest moveFleetRequest1 = {2, Point{44.0f, -41.0f}};
