@@ -69,7 +69,7 @@ bool operator==(std::shared_ptr<Planet> p1, messageTypes::MsgPlanet& p2)
         return false;
 
     for (auto feature : p1->planetary_features)
-        if (p2.planetary_features.find(feature) == p2.planetary_features.end())
+        if (p2.planetary_features.find(feature.first) == p2.planetary_features.end())
             return false;
 
     if (p1->possible_buildings.size() != p2.possible_buildings.size())
@@ -128,9 +128,9 @@ void StartGamePayloadTest()
     messageTypes::StartGamePayload sgp;
 
     std::map<Resource, float> resources_t;
-    std::set<PlanetaryFeatures::PlanetaryFeatureType> features = {
-        PlanetaryFeatures::PlanetaryFeatureType::HotClimate,
-        PlanetaryFeatures::PlanetaryFeatureType::MediumMetalsDeposits};
+    std::map<PlanetaryFeatures::PlanetaryFeatureType, int> features = {
+        {PlanetaryFeatures::PlanetaryFeatureType::HotClimate, 1},
+        {PlanetaryFeatures::PlanetaryFeatureType::MetalsDeposit, 1}};
     auto planet =
         std::make_shared<Planet>(SectorObject(3, Point(5.0f, 6.0f), 3.0f), Planet::PlanetClimate::Hot, features);
     auto colony = std::make_shared<Colony>(33, planet);

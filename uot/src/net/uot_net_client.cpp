@@ -148,10 +148,10 @@ void uot_net_client::handle_message(const std::string& data)
                             messageTypes::MsgPlanet planet = planets[planet_idx];
                             SectorObject _sectorObject = SectorObject(planet.id, planet.position, planet.object_size);
 
-                            std::set<PlanetaryFeatures::PlanetaryFeatureType> planetary_features;
+                            std::map<PlanetaryFeatures::PlanetaryFeatureType, int> planetary_features;
                             for (int feat = 0; planet.planetary_features.size(); feat++)
                             {
-                                std::set<PlanetaryFeatures::PlanetaryFeatureType>::iterator planetaryFeature =
+                                std::map<PlanetaryFeatures::PlanetaryFeatureType, int>::iterator planetaryFeature =
                                     planet.planetary_features.begin();
                                 std::advance(planetaryFeature, feat);
                                 planetary_features.insert(*planetaryFeature);

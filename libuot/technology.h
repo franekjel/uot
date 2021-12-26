@@ -62,6 +62,8 @@ struct Technology
         Medicine4,
         Medicine5,
 
+        NanobotsActivation,  // Nanobots excavation facility
+
         // TODO: technologies for modules
 
         // always leave as the last one
@@ -237,6 +239,13 @@ const std::map<Technology::TechnologyType, Technology> Technologies{
                 {Technology::TechnologyType::Medicine5})},
     {Technology::TechnologyType::Medicine5,
      Technology(37, "Medicine 5", "Better medicine means higher birth rate and longer live", 7000, {})},
+
+    {Technology::TechnologyType::NanobotsActivation,
+     Technology(38, "Nanobots activation",
+                "During our exploration we encountered ancient nanobots. We can't build something this sophisticated "
+                "but with the right technology we should be able to activate and use them. Allows construction of "
+                "nanobots excavation facility on planets with ancient nanobots deposits",
+                5000, {})},
 
 };
 
