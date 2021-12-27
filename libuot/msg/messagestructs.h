@@ -61,7 +61,7 @@ struct MsgPlanet
     float object_size;
     Planet::PlanetClimate climate;
     int planet_size;
-    std::set<PlanetaryFeatures::PlanetaryFeatureType> planetary_features;
+    std::map<PlanetaryFeatures::PlanetaryFeatureType, int> planetary_features;
     std::map<Building::BuildingType, int> possible_buildings;
     bool colony_exists;
     MsgColony colony;

@@ -55,10 +55,10 @@ std::shared_ptr<Galaxy> PlayersList::GetStartingGalaxy(std::shared_ptr<Galaxy> w
                 }
                 else if (!!planet)
                 {
-                    auto new_planetary_features = std::set<PlanetaryFeatures::PlanetaryFeatureType>();
-                    for (auto feat : planet->planetary_features)
+                    auto new_planetary_features = std::map<PlanetaryFeatures::PlanetaryFeatureType, int>();
+                    for (auto feature : planet->planetary_features)
                     {
-                        new_planetary_features.insert(feat);
+                        new_planetary_features.insert(feature);
                     }
                     new_sector->objects.insert(
                         std::make_shared<Planet>(SectorObject(planet->id, planet->position, planet->size),

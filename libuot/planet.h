@@ -4,84 +4,10 @@
 #include <memory>
 #include <set>
 
+#include "buildings.h"
 #include "resource.h"
 #include "sectorobject.h"
 #include "structs.h"
-
-struct Building
-{
-    enum BuildingType
-    {
-        None,
-        PlanetaryAdministration,
-        ImprovedMetalsMine,
-        MetalsMine,
-        Farm,
-        Greenhouses
-    };
-
-    const std::map<Resource, float> cost;
-    const std::map<Resource, float> upkeep;
-    const float workers;
-    const std::map<Resource, float> production;
-    const float worker_weeks_cost;
-
-    const BuildingType upgrade;
-
-    bool operator<(const Building& b) const  // whatever, needed to make sets and maps
-    {
-        return this->workers < b.workers;
-    }
-};
-
-// all buildings
-const std::map<Building::BuildingType, Building> Buildings{
-
-    {Building::BuildingType::PlanetaryAdministration,
-     {{{Resource::Metals, 50.0f}},
-      {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
-      10.0f,
-      {},
-      300.0f,
-      Building::BuildingType::None}},
-
-    {Building::BuildingType::ImprovedMetalsMine,
-     {{{Resource::Metals, 50.0f}, {Resource::Crystals, 10.0f}},
-      {{Resource::Antimatter, 2.0f}, {Resource::Cryptocurrencies, 15.0f}},
-      15.0f,
-      {{Resource::Metals, 20.0f}},
-      300.0f,
-      Building::BuildingType::None}},
-
-    {Building::BuildingType::MetalsMine,
-     {{{Resource::Metals, 50.0f}},
-      {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
-      10.0f,
-      {{Resource::Metals, 10.0f}},
-      300.0f,
-      Building::BuildingType::ImprovedMetalsMine}},
-
-    {Building::BuildingType::Farm,
-     {{{Resource::Metals, 30.0f}},
-      {{Resource::Antimatter, 1.0f}, {Resource::Cryptocurrencies, 10.0f}},
-      10.0f,
-      {{Resource::Food, 10.0f}},
-      300.0f,
-      Building::BuildingType::ImprovedMetalsMine}},
-
-    {Building::BuildingType::Greenhouses,
-     {{{Resource::Metals, 50.0f}},
-      {{Resource::Antimatter, 3.0f}, {Resource::Cryptocurrencies, 12.0f}},
-      10.0f,
-      {{Resource::Food, 7.0f}},
-      300.0f,
-      Building::BuildingType::None}},
-};
-
-// buildable buildings here
-const std::set<Building::BuildingType> LimitedBuildings = {Building::BuildingType::Farm,
-                                                           Building::BuildingType::MetalsMine};
-const std::set<Building::BuildingType> UnlimitedBuildings = {Building::BuildingType::Greenhouses};
 
 struct PlanetaryFeatures
 {
@@ -90,21 +16,48 @@ struct PlanetaryFeatures
         TemperateClimate,
         HotClimate,
         ColdClimate,
-        SmallMetalsDeposits,
-        MediumMetalsDeposits,
-        BigMetalsDeposits
+        MetalsDeposit,
+        RareMetalsDeposit,
+        CrystalsDeposit,
+        FertileLands,
+        AncientRuins,
+        AncientNanobotsDeposit,
     };
+    const std::string name;
+    const std::string description;
     const std::map<Building::BuildingType, int> feature_buildings;
 };
 
 // all features
 const std::map<PlanetaryFeatures::PlanetaryFeatureType, PlanetaryFeatures> PlanetaryFeaturesTypes{
-    {PlanetaryFeatures::PlanetaryFeatureType::TemperateClimate, {{{Building::BuildingType::Farm, 6}}}},
-    {PlanetaryFeatures::PlanetaryFeatureType::HotClimate, {{{Building::BuildingType::Farm, 2}}}},
-    {PlanetaryFeatures::PlanetaryFeatureType::ColdClimate, {{{Building::BuildingType::Farm, 2}}}},
-    {PlanetaryFeatures::PlanetaryFeatureType::SmallMetalsDeposits, {{{Building::BuildingType::MetalsMine, 2}}}},
-    {PlanetaryFeatures::PlanetaryFeatureType::MediumMetalsDeposits, {{{Building::BuildingType::MetalsMine, 4}}}},
-    {PlanetaryFeatures::PlanetaryFeatureType::BigMetalsDeposits, {{{Building::BuildingType::MetalsMine, 8}}}}};
+    {PlanetaryFeatures::PlanetaryFeatureType::TemperateClimate,
+     {"Temperate climate", "This planet has Earth-like climate, good plants", {{Building::BuildingType::Farms, 6}}}},
+    {PlanetaryFeatures::PlanetaryFeatureType::HotClimate,
+     {"Hot climate",
+      "This planet is very hot. Plants can only be grown near the poles",
+      {{Building::BuildingType::Farms, 2}}}},
+    {PlanetaryFeatures::PlanetaryFeatureType::ColdClimate,
+     {"Cold climate",
+      "This planet is very cold. Plants can only be grown near the equator",
+      {{Building::BuildingType::Farms, 1}}}},
+    {PlanetaryFeatures::PlanetaryFeatureType::MetalsDeposit,
+     {"Metals deposit", "", {{Building::BuildingType::MetalsMine, 1}}}},
+    {PlanetaryFeatures::PlanetaryFeatureType::RareMetalsDeposit,
+     {"Rare metals deposit", "", {{Building::BuildingType::MetalsMine, 1}}}},
+    {PlanetaryFeatures::PlanetaryFeatureType::CrystalsDeposit,
+     {"Crystals deposit", "", {{Building::BuildingType::CrystalsMine, 1}}}},
+    {PlanetaryFeatures::PlanetaryFeatureType::FertileLands,
+     {"Fertile lands", "", {{Building::BuildingType::Farms, 1}}}},
+    {PlanetaryFeatures::PlanetaryFeatureType::AncientRuins,
+     {"Ancient ruins",
+      "Remains of ancient civilization can be found on this planet",
+      {{Building::BuildingType::ArchaeologicalSite, 1}}}},
+    {PlanetaryFeatures::PlanetaryFeatureType::AncientNanobotsDeposit,
+     {"Ancient nanobots deposits",
+      "On this planet can be found ancient nanbots. They are inactive, but with appropriate technology it will be "
+      "possible to use them",
+      {{Building::BuildingType::NanobotsExcavationFacility, 1}}}},
+};
 
 // habitable planet
 struct Planet : SectorObject
@@ -117,25 +70,26 @@ struct Planet : SectorObject
     };
     PlanetClimate climate;
     int size;
-    std::set<PlanetaryFeatures::PlanetaryFeatureType> planetary_features;
+    std::map<PlanetaryFeatures::PlanetaryFeatureType, int> planetary_features;
     std::map<Building::BuildingType, int> possible_buildings;
     std::shared_ptr<Colony> colony;
 
-    Planet(const SectorObject& o, const PlanetClimate c, const std::set<PlanetaryFeatures::PlanetaryFeatureType>& f)
+    Planet(const SectorObject& o, const PlanetClimate c,
+           const std::map<PlanetaryFeatures::PlanetaryFeatureType, int>& f)
         : SectorObject(o), climate(c), planetary_features(f)
     {
-        for (const auto& feature : planetary_features)
+        for (const auto& features : planetary_features)
         {
-            for (const auto& building : PlanetaryFeaturesTypes.at(feature).feature_buildings)
+            for (const auto& building : PlanetaryFeaturesTypes.at(features.first).feature_buildings)
             {
-                possible_buildings[building.first] += building.second;
+                possible_buildings[building.first] += building.second * features.second;
             }
         }
         size = int(20.0f * SectorObject::size);
     }
 };
 
-const float population_food_usage = 0.0f;  // TODO change to better value
+const float population_food_usage = 0.1f;
 
 struct BuildingBuildProgress
 {

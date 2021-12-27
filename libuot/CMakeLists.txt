@@ -19,6 +19,7 @@ set(SRCS
     structs.h
     spacebase.h
     planet.cpp
+    buildings.h
     msg/messagetypes.h
     msg/messagetypes.cpp
     msg/messagestructs.h

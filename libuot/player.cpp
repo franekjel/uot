@@ -18,6 +18,7 @@ Player::Player(const unsigned int id_, const std::shared_ptr<Galaxy> &known_gala
     owned_fleets = {};
     researched_technology = {};
     DiscoverTechnology(Technology::TechnologyType::Engineering);
+    DiscoverTechnology(Technology::TechnologyType::Spaceships);
 }
 
 void Player::DiscoverTechnology(Technology::TechnologyType technology)
