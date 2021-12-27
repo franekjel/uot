@@ -6,6 +6,9 @@
 #include "player.h"
 #include "utilities/input_utilities.h"
 
+void rendering::render_universe_view::_wheel_handler(client_context& context,
+        int x, int y, int xmov, int ymov) { }
+
 void rendering::render_selected_sector_info(const client_context& context)
 {
     auto& r = context.r;

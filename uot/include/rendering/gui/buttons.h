@@ -1,5 +1,6 @@
 #ifndef BUTTONS_H
 #define BUTTONS_H
+#include <functional>
 #include <memory>
 #include <string>
 #include <variant>
@@ -83,6 +84,15 @@ struct exit_button : button<exit_button>
 {
     exit_button() : button<exit_button>{1, std::string("EXIT"), bpos::exit_pos, bcol::basic} {}
     void _clicked(client_context& context);
+};
+
+struct generic_button : button<generic_button>
+{
+    typedef std::function<void(client_context& context)> handler_t;
+
+    handler_t handler;
+    generic_button(handler_t h, std::string t, button_position pos) : button<generic_button>{2, t, pos, bcol::basic} , handler(h){}
+    void _clicked(client_context& context) { handler(context); }
 };
 
 using popup_button = std::variant<std::unique_ptr<start_button>, std::unique_ptr<exit_button>>;

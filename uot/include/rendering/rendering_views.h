@@ -26,6 +26,9 @@ struct render_view
     {
         static_cast<T*>(this)->_mouse_handler(context, event_type, m, x, y);
     }
+    void wheel_handler(client_context& context, int x, int y, int xmov, int ymov) {
+        static_cast<T*>(this)->_wheel_handler(context, x, y, xmov, ymov);
+    }
     void key_handler(client_context& context, Uint16 k) { static_cast<T*>(this)->_key_handler(); }
 
    private:

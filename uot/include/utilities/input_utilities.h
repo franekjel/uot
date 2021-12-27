@@ -30,6 +30,10 @@ enum class uot_event_type
     planet_right_click_resource,
     planet_left_click_else,
     planet_right_click_else,
+    planet_scroll_context,
+    planet_scroll_play,
+    planet_scroll_other,
+    planet_scroll_resource,
     other
 };
 
@@ -59,6 +63,8 @@ inline bool check_collision(const int x, const int y, const int box_x, const int
 uot_event_type get_event_type(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
 
 uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
+
+uot_event_type get_planet_scroll_type(int x, int y);
 
 }  // namespace input_utilities
 

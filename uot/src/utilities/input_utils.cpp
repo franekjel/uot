@@ -105,4 +105,22 @@ uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, 
     }
     return uot_event_type::other;
 }
+
+uot_event_type get_planet_scroll_type(int x, int y) {
+    if (check_view_area_collision<size_settings::planet_play_area>(x, y))
+    {
+        return uot_event_type::planet_scroll_play;
+    }
+
+    if (check_view_area_collision<size_settings::resource_area>(x, y))
+    {
+        return uot_event_type::planet_scroll_resource;
+    }
+
+    if (check_view_area_collision<size_settings::planet_context_area>(x, y))
+    {
+        return uot_event_type::planet_scroll_context;
+    }
+    return uot_event_type::planet_scroll_other;
+}
 }  // namespace input_utilities

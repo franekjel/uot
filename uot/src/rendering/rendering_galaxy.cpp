@@ -5,6 +5,9 @@
 #include "game_state.h"
 #include "input_utilities.h"
 
+void rendering::render_sector_view::_wheel_handler(client_context& context,
+        int x, int y, int xmov, int ymov) { }
+
 void rendering::render_sector_view::_draw(client_context& context)
 {
     render_background(context);
@@ -112,7 +115,7 @@ void rendering::render_sector_galaxy_helper(const client_context& context, const
 
 rendering::view_t rendering::render_sector_view::_up() { return std::make_shared<render_universe_view>(); }
 
-rendering::view_t rendering::render_sector_view::_down() { return std::make_shared<render_planet_view>(); }
+rendering::view_t rendering::render_sector_view::_down() { auto ret = std::make_shared<render_planet_view>(); ret->init(); return ret; }
 
 void rendering::render_sector_view::_mouse_handler(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m,
                                                    int x, int y)

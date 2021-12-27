@@ -5,6 +5,9 @@
 #include "game_state.h"
 #include "input_utilities.h"
 
+void rendering::render_menu_view::_wheel_handler(client_context& context,
+        int x, int y, int xmov, int ymov) { }
+
 void rendering::render_current_popup_menu(client_context& context)
 {
     auto& gr = context.gr;
