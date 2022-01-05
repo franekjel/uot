@@ -242,7 +242,7 @@ void NewTurnPayloadTest()
     ntp.updated_populations[1] = p1_init;
     ntp.updated_populations[10] = p10_init;
 
-    ntp.technology_update = {Technology::TechnologyType::AdvancedSpaceship, 10};
+    ntp.technology_update = {Technology::TechnologyType::AdvancedSpaceships, 10};
 
     messageTypes::MsgBuildingsUpdates buildUpdate1{2, Building::BuildingType::Greenhouses, Building::BuildingType::None,
                                                    3};
