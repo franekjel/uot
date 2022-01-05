@@ -138,7 +138,7 @@ struct s_pos
 // Greenhouses
 static constexpr std::array<s_pos, num_buildings> sprite_positions{
     s_pos{247, 0, 89, 83}, s_pos{0, 100, 74, 78}, s_pos{73, 89, 74, 80}, s_pos{77, 170, 99, 80}, s_pos{344, 0, 96, 88}};
-static constexpr int screen_unit = size_settings::planet_play_area::width / 8;
+static constexpr int screen_unit = size_settings::planet_queue_area::width / 8;
 static constexpr int w = 1.2 * screen_unit;
 static constexpr int h = 1.2 * screen_unit;
 static constexpr std::array<std::string_view, num_buildings> names{"Planetary Administration", "Improved Metals Mine",

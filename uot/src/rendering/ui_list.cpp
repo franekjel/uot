@@ -12,6 +12,16 @@ void render_list(client_context& context, std::shared_ptr<ui_list_state> l_st) {
     auto& gr = context.gr;
     auto& gui = context.gui;
 
+    l_st->action_button.draw(context, false);
+
+    SDL_Rect curr_view;
+    SDL_RenderGetViewport(r.get(),
+                               &curr_view);
+    curr_view.y += l_st->action_button.pos.h / 2;
+    curr_view.h = l_st->action_button.pos.y - curr_view.y - l_st->action_button.pos.h / 2;
+
+    SDL_RenderSetViewport(r.get(), &curr_view);
+
     int curr = 0;
     for(const auto& e : l_st->elems) {
         bool focused = l_st->selected_elem.has_value() &&
@@ -22,7 +32,7 @@ void render_list(client_context& context, std::shared_ptr<ui_list_state> l_st) {
 
         // render rectangle
         SDL_SetRenderDrawColor(r.get(), b.r, b.g, b.b, b.a);
-        SDL_Rect dest { 10, 10 + 80 * curr - l_st->offset, 150, 70 };
+        SDL_Rect dest { l_st->w_off, l_st->h_off + (l_st->h + l_st->h_off) * curr - l_st->offset, l_st->w, l_st->h };
         SDL_RenderFillRect(r.get(), &dest);
         // render text
         sdl_utilities::render_text(r.get(), gr->main_font, e, dest.x + dest.w / 2, dest.y + dest.h / 2, dest.w * 0.7, t);
@@ -30,14 +40,13 @@ void render_list(client_context& context, std::shared_ptr<ui_list_state> l_st) {
         ++curr;
     }
     // render action button
-    l_st->action_button.draw(context, false);
 }
 
 
 void ui_list_state::handle_click(const int x, const int y) {
     int curr = 0;
     for(const auto& e : elems) {
-        SDL_Rect curr_elem{ 10, 10 + 80 * curr - offset, 150, 70 };
+        SDL_Rect curr_elem{ w_off, action_button.pos.h / 2 + h_off + (h_off + h) * curr - offset, w, h };
         if(iu::check_collision(x, y,
             curr_elem.x, curr_elem.y, curr_elem.w, curr_elem.h)){
             selected_elem = curr;

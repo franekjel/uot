@@ -59,9 +59,9 @@ uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, 
     {
         case SDL_MOUSEMOTION:
         {
-            if (check_view_area_collision<size_settings::planet_play_area>(x, y))
+            if (check_view_area_collision<size_settings::planet_queue_area>(x, y))
             {
-                return uot_event_type::planet_motion_play;
+                return uot_event_type::planet_motion_queue;
             }
 
             if (check_view_area_collision<size_settings::resource_area>(x, y))
@@ -69,9 +69,13 @@ uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, 
                 return uot_event_type::planet_motion_resource;
             }
 
-            if (check_view_area_collision<size_settings::planet_context_area>(x, y))
+            if (check_view_area_collision<size_settings::planet_built_area>(x, y))
             {
-                return uot_event_type::planet_motion_context;
+                return uot_event_type::planet_motion_built;
+            }
+            if (check_view_area_collision<size_settings::planet_build_area>(x, y))
+            {
+                return uot_event_type::planet_motion_build;
             }
             return uot_event_type::planet_motion_else;
         }
@@ -79,10 +83,10 @@ uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, 
 
         case SDL_MOUSEBUTTONDOWN:
         {
-            if (check_view_area_collision<size_settings::planet_play_area>(x, y))
+            if (check_view_area_collision<size_settings::planet_queue_area>(x, y))
             {
-                return m.button == SDL_BUTTON_LEFT ? uot_event_type::planet_left_click_play
-                                                   : uot_event_type::planet_right_click_play;
+                return m.button == SDL_BUTTON_LEFT ? uot_event_type::planet_left_click_queue
+                                                   : uot_event_type::planet_right_click_queue;
             }
 
             if (check_view_area_collision<size_settings::resource_area>(x, y))
@@ -91,10 +95,15 @@ uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, 
                                                    : uot_event_type::planet_right_click_resource;
             }
 
-            if (check_view_area_collision<size_settings::planet_context_area>(x, y))
+            if (check_view_area_collision<size_settings::planet_built_area>(x, y))
             {
-                return m.button == SDL_BUTTON_LEFT ? uot_event_type::planet_left_click_context
-                                                   : uot_event_type::planet_right_click_context;
+                return m.button == SDL_BUTTON_LEFT ? uot_event_type::planet_left_click_built
+                                                   : uot_event_type::planet_right_click_built;
+            }
+            if (check_view_area_collision<size_settings::planet_build_area>(x, y))
+            {
+                return m.button == SDL_BUTTON_LEFT ? uot_event_type::planet_left_click_build
+                                                   : uot_event_type::planet_right_click_build;
             }
             return m.button == SDL_BUTTON_LEFT ? uot_event_type::planet_left_click_else
                                                : uot_event_type::planet_right_click_else;
@@ -107,9 +116,9 @@ uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, 
 }
 
 uot_event_type get_planet_scroll_type(int x, int y) {
-    if (check_view_area_collision<size_settings::planet_play_area>(x, y))
+    if (check_view_area_collision<size_settings::planet_queue_area>(x, y))
     {
-        return uot_event_type::planet_scroll_play;
+        return uot_event_type::planet_scroll_queue;
     }
 
     if (check_view_area_collision<size_settings::resource_area>(x, y))
@@ -117,9 +126,13 @@ uot_event_type get_planet_scroll_type(int x, int y) {
         return uot_event_type::planet_scroll_resource;
     }
 
-    if (check_view_area_collision<size_settings::planet_context_area>(x, y))
+    if (check_view_area_collision<size_settings::planet_built_area>(x, y))
     {
-        return uot_event_type::planet_scroll_context;
+        return uot_event_type::planet_scroll_built;
+    }
+    if (check_view_area_collision<size_settings::planet_build_area>(x, y))
+    {
+        return uot_event_type::planet_scroll_build;
     }
     return uot_event_type::planet_scroll_other;
 }

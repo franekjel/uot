@@ -32,11 +32,16 @@ struct context_area : area_properties<350, 700, 1225, 50>
 {
 };
 
-struct planet_play_area : area_properties<750, 700, 25, 50>
+// PLANET VIEW
+struct planet_queue_area : area_properties<400, 700, 100, 50>
 {
 };
 
-struct planet_context_area : area_properties<700, 700, 850, 50>
+struct planet_built_area : area_properties<400, 700, 600, 50>
+{
+};
+
+struct planet_build_area : area_properties<400, 700, 1100, 50>
 {
 };
 

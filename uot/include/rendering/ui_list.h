@@ -13,10 +13,14 @@ struct ui_list_state {
     std::optional<int> selected_elem;
     std::vector<std::string>& elems;
     generic_button action_button;
+    int w;
+    int w_off;
+    int h;
+    int h_off;
 
     void handle_click(const int x, const int y);
-    ui_list_state(std::vector<std::string>& _e, generic_button ab) 
-        : elems(_e), action_button(ab) {}
+    ui_list_state(std::vector<std::string>& _e, generic_button ab, int _w, int _w_off,int _h, int _h_off)
+        : elems(_e), action_button(ab), w(_w), w_off(_w_off), h(_h), h_off(_h_off) {}
 };
 
 void render_list(client_context& context, std::shared_ptr<ui_list_state> l_st);

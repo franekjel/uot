@@ -16,7 +16,9 @@ struct render_planet_view : render_view<render_planet_view>
     void _draw(client_context& context);
     void init();
 
-    std::shared_ptr<ui_list_state> available;
+    std::shared_ptr<ui_list_state> queue;
+    std::shared_ptr<ui_list_state> built;
+    std::shared_ptr<ui_list_state> build;
 };
 
 }  // namespace rendering
