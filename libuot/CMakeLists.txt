@@ -4,6 +4,7 @@ set(LIB_NAME "libuot")
 set(SRCS
     ship.h
     ship.cpp
+    modules.h
     galaxy.h
     sectorobject.h
     sector.h
