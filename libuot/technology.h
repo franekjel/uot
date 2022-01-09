@@ -20,7 +20,7 @@ struct Technology
         AdvancedSpaceships,  // medium shipyards, medium hull
         SpaceCruisers,       // grand shipyards, cruiser hull
 
-        SoldiersTraingingProgram,  // military training centre
+        SoldiersTrainingProgram,  // military training centre
 
         AdvancedMining,              // advanced mines
         AutomatedProcessingCenters,  // grand mines
@@ -110,7 +110,7 @@ struct Technology
 const std::map<Technology::TechnologyType, Technology> Technologies{
     {Technology::TechnologyType::Engineering,
      Technology(0, "Engineering", "Starting technology. Allows constructing base buildngs", 0,
-                {Technology::TechnologyType::AdvancedMining, Technology::TechnologyType::SoldiersTraingingProgram,
+                {Technology::TechnologyType::AdvancedMining, Technology::TechnologyType::SoldiersTrainingProgram,
                  Technology::TechnologyType::PolymersProcessing, Technology::TechnologyType::AdvancedGenetics,
                  Technology::TechnologyType::ResearchOrganisation, Technology::TechnologyType::ColdFusion})},
 
@@ -129,7 +129,7 @@ const std::map<Technology::TechnologyType, Technology> Technologies{
     {Technology::TechnologyType::SpaceCruisers,
      Technology(3, "Space cruiser", "Greatest space ships requires much more advanced technology", 3000, {})},
 
-    {Technology::TechnologyType::SoldiersTraingingProgram,
+    {Technology::TechnologyType::SoldiersTrainingProgram,
      Technology(4, "Soldiers trainging program",
                 "By creating new soldiers trainging program we will be able to recruit elite troops", 300, {})},
 

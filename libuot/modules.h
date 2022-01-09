@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "resource.h"
+#include <optional>
 
 struct Weapon
 {

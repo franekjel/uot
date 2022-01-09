@@ -4,6 +4,7 @@
 #include <string>
 
 #include "resource.h"
+#include "technology.h"
 
 struct Building
 {
@@ -59,6 +60,7 @@ struct Building
     const std::map<Resource, float> production;
     const float worker_weeks_cost;
 
+    const std::vector<Technology::TechnologyType> required_technologies;
     const BuildingType upgrade;
 
     bool operator<(const Building& b) const  // whatever, needed to make sets and maps
@@ -78,6 +80,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       10.0f,
       {},
       300.0f,
+      {Technology::TechnologyType::Engineering},
       Building::BuildingType::None}},
 
     {Building::BuildingType::MilitaryTrainingCentre,
@@ -88,6 +91,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       10.0f,
       {},
       300.0f,
+      {Technology::TechnologyType::SoldiersTrainingProgram},
       Building::BuildingType::None}},
 
     // ships
@@ -99,6 +103,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       10.0f,
       {},
       300.0f,
+      {Technology::TechnologyType::Spaceships},
       Building::BuildingType::None}},
 
     {Building::BuildingType::MediumOrbitalShipyard,
@@ -109,6 +114,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       20.0f,
       {},
       400.0f,
+      {Technology::TechnologyType::AdvancedSpaceships},
       Building::BuildingType::GrandOrbitalShipyard}},
 
     {Building::BuildingType::GrandOrbitalShipyard,
@@ -122,6 +128,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       30.0f,
       {},
       600.0f,
+      {Technology::TechnologyType::SpaceCruisers},
       Building::BuildingType::None}},
 
     // metals
@@ -133,6 +140,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       10.0f,
       {{Resource::Metals, 5.0f}},
       300.0f,
+      {Technology::TechnologyType::Engineering},
       Building::BuildingType::AdvancedMetalsMine}},
 
     {Building::BuildingType::AdvancedMetalsMine,
@@ -143,6 +151,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       15.0f,
       {{Resource::Metals, 12.0f}},
       400.0f,
+      {Technology::TechnologyType::AdvancedMining},
       Building::BuildingType::GrandMetalsMine}},
 
     {Building::BuildingType::GrandMetalsMine,
@@ -153,6 +162,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       20.0f,
       {{Resource::Metals, 20.0f}, {Resource::RareMetals, 0.5f}},
       500.0f,
+      {Technology::TechnologyType::AutomatedProcessingCenters},
       Building::BuildingType::None}},
 
     // rare metals
@@ -164,6 +174,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       10.0f,
       {{Resource::RareMetals, 3.0f}},
       300.0f,
+      {Technology::TechnologyType::Engineering},
       Building::BuildingType::AdvancedRareMetalsMine}},
 
     {Building::BuildingType::AdvancedRareMetalsMine,
@@ -174,6 +185,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       15.0f,
       {{Resource::RareMetals, 8.0f}},
       400.0f,
+      {Technology::TechnologyType::AdvancedMining},
       Building::BuildingType::GrandRareMetalsMine}},
 
     {Building::BuildingType::GrandRareMetalsMine,
@@ -187,6 +199,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       20.0f,
       {{Resource::RareMetals, 12.0f}},
       500.0f,
+      {Technology::TechnologyType::AutomatedProcessingCenters},
       Building::BuildingType::None}},
 
     // crystals
@@ -198,6 +211,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       10.0f,
       {{Resource::Crystals, 3.0f}},
       300.0f,
+      {Technology::TechnologyType::Engineering},
       Building::BuildingType::AdvancedCrystalsMine}},
 
     {Building::BuildingType::AdvancedCrystalsMine,
@@ -208,6 +222,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       15.0f,
       {{Resource::Crystals, 8.0f}},
       400.0f,
+      {Technology::TechnologyType::AdvancedMining},
       Building::BuildingType::GrandCrystalsMine}},
 
     {Building::BuildingType::GrandCrystalsMine,
@@ -218,6 +233,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       20.0f,
       {{Resource::Crystals, 12.0f}},
       500.0f,
+      {Technology::TechnologyType::AutomatedProcessingCenters},
       Building::BuildingType::None}},
 
     // polymer
@@ -229,6 +245,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       25.0f,
       {{Resource::Polymers, 5.0f}},
       400.0f,
+      {Technology::TechnologyType::PolymersProcessing},
       Building::BuildingType::None}},
 
     // food
@@ -240,6 +257,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       10.0f,
       {{Resource::Food, 6.0f}},
       300.0f,
+      {Technology::TechnologyType::Engineering},
       Building::BuildingType::AdvancedFarms}},
 
     {Building::BuildingType::AdvancedFarms,
@@ -250,6 +268,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       15.0f,
       {{Resource::Metals, 15.0f}},
       400.0f,
+      {Technology::TechnologyType::AdvancedGenetics},
       Building::BuildingType::None}},
 
     {Building::BuildingType::Greenhouses,
@@ -260,6 +279,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       10.0f,
       {{Resource::Food, 6.0f}},
       300.0f,
+      {Technology::TechnologyType::Engineering},
       Building::BuildingType::FoodPruductionCentre}},
 
     {Building::BuildingType::FoodPruductionCentre,
@@ -270,6 +290,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       15.0f,
       {{Resource::Food, 15.0f}},
       400.0f,
+      {Technology::TechnologyType::AdvancedGenetics},
       Building::BuildingType::None}},
 
     {Building::BuildingType::PowerPlants,
@@ -280,6 +301,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       10.0f,
       {{Resource::Antimatter, 15.0f}},
       200.0f,
+      {Technology::TechnologyType::Engineering},
       Building::BuildingType::FusionPowerPlants}},
 
     {Building::BuildingType::FusionPowerPlants,
@@ -290,6 +312,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       15.0f,
       {{Resource::Antimatter, 30.0f}},
       400.0f,
+      {Technology::TechnologyType::ColdFusion},
       Building::BuildingType::FusionPowerPlants}},
 
     {Building::BuildingType::DarkMatterPowerPlants,
@@ -300,6 +323,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       15.0f,
       {{Resource::Antimatter, 60.0f}},
       500.0f,
+      {Technology::TechnologyType::DarkMatterEnergy},
       Building::BuildingType::None}},
 
     {Building::BuildingType::Laboratory,
@@ -310,6 +334,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       10.0f,
       {{Resource::Technology, 10.0f}},
       300.0f,
+      {Technology::TechnologyType::Engineering},
       Building::BuildingType::ResearchCentre}},
 
     {Building::BuildingType::ResearchCentre,
@@ -323,6 +348,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       15.0f,
       {{Resource::Technology, 25.0f}},
       400.0f,
+      {Technology::TechnologyType::ResearchOrganisation},
       Building::BuildingType::None}},
 
     {Building::BuildingType::Polytechnic,
@@ -339,6 +365,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       15.0f,
       {{Resource::Technology, 60.0f}},
       500.0f,
+      {Technology::TechnologyType::Polytechnic},
       Building::BuildingType::None}},
 
     {Building::BuildingType::ArchaeologicalSite,
@@ -349,6 +376,7 @@ const std::map<Building::BuildingType, Building> Buildings{
       10.0f,
       {{Resource::Technology, 20.0f}, {Resource::AncientRelics, 1.0f}},
       200.0f,
+      {Technology::TechnologyType::Engineering},
       Building::BuildingType::None}},
 
     {Building::BuildingType::NanobotsExcavationFacility,
@@ -359,10 +387,6 @@ const std::map<Building::BuildingType, Building> Buildings{
       15.0f,
       {{Resource::AncientNanobots, 1.0f}},
       300.0f,
+      {Technology::TechnologyType::NanobotsActivation},
       Building::BuildingType::None}},
 };
-
-// Building which can be always build
-const std::set<Building::BuildingType> UnlimitedBuildings = {
-    Building::BuildingType::Greenhouses, Building::BuildingType::Laboratory,
-    Building::BuildingType::MilitaryTrainingCentre, Building::BuildingType::PowerPlants};
