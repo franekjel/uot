@@ -11,11 +11,14 @@ struct Technology
     {
         Empty,
 
+        // Engineering and Spaceships are starting technologies
+
         Engineering,
 
-        Spaceships,         // small hull, small shipyards, basic modules
-        AdvancedSpaceship,  // medium shipyards, medium hull
-        SpaceCruisers,      // grand shipyards, cruiser hull
+        Spaceships,  // small hull, small shipyards, small reactor, metal armor plates, quarters, basic contruction
+                     // moudule, small laser, railgun
+        AdvancedSpaceships,  // medium shipyards, medium hull
+        SpaceCruisers,       // grand shipyards, cruiser hull
 
         SoldiersTraingingProgram,  // military training centre
 
@@ -64,7 +67,25 @@ struct Technology
 
         NanobotsActivation,  // Nanobots excavation facility
 
-        // TODO: technologies for modules
+        ImprovedReactor,  // improved small and big reactor
+        AdvancedReactor,  // advanced small and big reactor
+
+        EnergyShields,
+        ImprovedEnergyShields,
+        AdvancedEnergyShields,
+
+        ImprovedArmor,
+        AdvancedArmor,
+
+        AdvancedSpaceEngineering,  // advanced contruction module
+        NanobotsEngineering,       // nanobots contruction module and nanobots repair module
+
+        ImprovedLaserTechnology,  // improved small laser, big lase
+        AdvancedLaserTechnology,  // advanced big laser
+
+        AntimatterProcessing,  // Antimatter cannon
+
+        AdvancedRailgun,
 
         // always leave as the last one
         None,  // special type for aborting research :D
@@ -94,9 +115,13 @@ const std::map<Technology::TechnologyType, Technology> Technologies{
                  Technology::TechnologyType::ResearchOrganisation, Technology::TechnologyType::ColdFusion})},
 
     {Technology::TechnologyType::Spaceships,
-     Technology(1, "Spaceships", "Starting technology. Allows constructing base spaceships and base modules", 0,
-                {Technology::TechnologyType::AdvancedSpaceship})},
-    {Technology::TechnologyType::AdvancedSpaceship,
+     Technology(
+         1, "Spaceships", "Starting technology. Allows constructing base spaceships and base modules", 0,
+         {Technology::TechnologyType::AdvancedSpaceships, Technology::TechnologyType::ImprovedReactor,
+          Technology::TechnologyType::EnergyShields, Technology::TechnologyType::ImprovedArmor,
+          Technology::TechnologyType::AdvancedSpaceEngineering, Technology::TechnologyType::ImprovedLaserTechnology,
+          Technology::TechnologyType::AntimatterProcessing, Technology::TechnologyType::AdvancedRailgun})},
+    {Technology::TechnologyType::AdvancedSpaceships,
      Technology(2, "Advanced Spaceships",
                 "By utilizing better materials we can create biggers spaceships with more powerful modules. Allows "
                 "contructing medium ships in medium orbital shipyards",
@@ -246,6 +271,58 @@ const std::map<Technology::TechnologyType, Technology> Technologies{
                 "but with the right technology we should be able to activate and use them. Allows construction of "
                 "nanobots excavation facility on planets with ancient nanobots deposits",
                 5000, {})},
+
+    {Technology::TechnologyType::ImprovedReactor,
+     Technology(39, "Improved reactors", "Improved reactors to provide more power to our spaceships", 500,
+                {Technology::TechnologyType::AdvancedReactor})},
+    {Technology::TechnologyType::AdvancedReactor,
+     Technology(40, "Advanced reactors", "Advanced reactors are needed to power most powerful weapons", 2000, {})},
+
+    {Technology::TechnologyType::EnergyShields,
+     Technology(41, "Energy shields",
+                "Our scientist claims that antimatter energy can be used to protect our spaceships", 500,
+                {Technology::TechnologyType::ImprovedEnergyShields})},
+    {Technology::TechnologyType::ImprovedEnergyShields,
+     Technology(42, "Improved energy shields", "By improving energy transmission shield can endure more damage", 1000,
+                {Technology::TechnologyType::AdvancedEnergyShields})},
+    {Technology::TechnologyType::AdvancedEnergyShields,
+     Technology(43, "Advanced energy shields", "Using dark matter can further improve our shields", 2500, {})},
+
+    {Technology::TechnologyType::ImprovedArmor,
+     Technology(44, "Improved armor", "Reinforcing our ships armor with rare metals will make them more durable", 500,
+                {Technology::TechnologyType::AdvancedArmor})},
+    {Technology::TechnologyType::AdvancedArmor,
+     Technology(
+         45, "Advanced armor",
+         "Advanced armor utilizes complicated design of many layers and provide even more durability to our ships",
+         1200, {})},
+
+    {Technology::TechnologyType::AdvancedSpaceEngineering,
+     Technology(46, "Advanced space enginnering",
+                "Improved robots and tools will allow us to speed up space construction", 500,
+                {Technology::TechnologyType::NanobotsEngineering})},
+    {Technology::TechnologyType::NanobotsEngineering,
+     Technology(
+         47, "Nanobots enginnering",
+         "Nanobots can be used in place of traditionals tools to contruct structures in space and repair our ships",
+         3000, {})},
+
+    {Technology::TechnologyType::ImprovedLaserTechnology,
+     Technology(48, "Improved laser technology",
+                "By improving our laser technologi we will be able to contruct more powerful battle lasers", 1000,
+                {Technology::TechnologyType::AdvancedLaserTechnology})},
+    {Technology::TechnologyType::AdvancedLaserTechnology,
+     Technology(49, "Improved laser technology",
+                "With most powerful lasers we will be able to destroy our enemies before they even approach our ships",
+                3000, {})},
+
+    {Technology::TechnologyType::AntimatterProcessing,
+     Technology(50, "Antimatter provessing",
+                "Antimatter is by nature very dangerous and we can utilize this in weapon design", 1000, {})},
+
+    {Technology::TechnologyType::AdvancedRailgun,
+     Technology(51, "Advanced railgun",
+                "Improving energy transmission and bullet construction will our railgun to be more deadly", 1200, {})},
 
 };
 

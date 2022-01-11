@@ -50,6 +50,9 @@ struct InhabitableObject : SectorObject
 
 struct Sector
 {
+    /* Sector is circle with R=1.0 and star in centre
+     */
+
     int sector_id;
     Point position;  // position on galaxy map
     std::set<std::shared_ptr<Sector>> neighbors;
