@@ -11,7 +11,7 @@ struct client_context;
 struct ui_list_state {
     int offset { 0 };
     std::optional<int> selected_elem;
-    std::vector<std::string>& elems;
+    std::vector<std::string> elems;
     generic_button action_button;
     int w;
     int w_off;
@@ -19,6 +19,7 @@ struct ui_list_state {
     int h_off;
 
     void handle_click(const int x, const int y);
+    std::optional<int> handle_motion(const int x, const int y);
     ui_list_state(std::vector<std::string>& _e, generic_button ab, int _w, int _w_off,int _h, int _h_off)
         : elems(_e), action_button(ab), w(_w), w_off(_w_off), h(_h), h_off(_h_off) {}
 };

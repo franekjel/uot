@@ -8,7 +8,7 @@ namespace rendering
 struct render_universe_view : render_view<render_universe_view>
 {
     view_t _up();
-    view_t _down();
+    view_t _down(client_context& context);
     void _draw(client_context& context);
     void _mouse_handler(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
     void key_handler(client_context& context, Uint16 k);

@@ -35,7 +35,7 @@ void render_list(client_context& context, std::shared_ptr<ui_list_state> l_st) {
         SDL_Rect dest { l_st->w_off, l_st->h_off + (l_st->h + l_st->h_off) * curr - l_st->offset, l_st->w, l_st->h };
         SDL_RenderFillRect(r.get(), &dest);
         // render text
-        sdl_utilities::render_text(r.get(), gr->main_font, e, dest.x + dest.w / 2, dest.y + dest.h / 2, dest.w * 0.7, t);
+        sdl_utilities::render_text(r.get(), gr->action_button_font, e, dest.x + dest.w / 2, dest.y + dest.h / 2, dest.w * 0.7, t);
         // inc position
         ++curr;
     }
@@ -56,3 +56,20 @@ void ui_list_state::handle_click(const int x, const int y) {
     }
     selected_elem.reset();
 }
+
+std::optional<int> ui_list_state::handle_motion(const int x, const int y) {
+    std::optional<int> ret;
+    int curr = 0;
+    for(const auto& e : elems) {
+        SDL_Rect curr_elem{ w_off, action_button.pos.h / 2 + h_off + (h_off + h) * curr - offset, w, h };
+        if(iu::check_collision(x, y,
+            curr_elem.x, curr_elem.y, curr_elem.w, curr_elem.h)){
+            ret = curr;
+            return ret;
+        }
+        ++curr;
+    }
+
+    return ret;
+}
+

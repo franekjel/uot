@@ -105,6 +105,8 @@ constexpr std::string_view main_font = "assets/fonts/arcade.ttf";
 constexpr std::string_view secondary_font = "assets/fonts/secondary.ttf";
 constexpr int main_font_size = 50;
 constexpr int resource_font_size = 25;
+constexpr int action_button_font_size = 15;
+constexpr int infobox_font_size = 15;
 constexpr int secondary_font_size = 25;
 }  // namespace fonts
 namespace buttons_meta
@@ -148,5 +150,12 @@ static constexpr std::array<s_pos, num_buildings> render_positions{
     s_pos{1 * screen_unit, 4 * screen_unit, w, h}, s_pos{3 * screen_unit, 4 * screen_unit, w, h},
     s_pos{5 * screen_unit, 4 * screen_unit, w, h},
 };
+
+constexpr int frame_width = 300;
+
+constexpr int frame_height= 500;
+
 }  // namespace buildings_meta
+
+
 #endif

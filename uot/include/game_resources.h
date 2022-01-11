@@ -33,6 +33,8 @@ struct game_resources : public uncopiable
     std::shared_ptr<TTF_Font> main_font;
     std::shared_ptr<TTF_Font> secondary_font;
     std::shared_ptr<TTF_Font> resource_font;
+    std::shared_ptr<TTF_Font> action_button_font;
+    std::shared_ptr<TTF_Font> infobox_font;
 };
 
 #endif

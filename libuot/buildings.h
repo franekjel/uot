@@ -51,6 +51,7 @@ struct Building
         NanobotsExcavationFacility,
     };
 
+
     const std::string name;
     const std::string description;
     const std::map<Resource, float> cost;
@@ -365,4 +366,5 @@ const std::map<Building::BuildingType, Building> Buildings{
 // Building which can be always build
 const std::set<Building::BuildingType> UnlimitedBuildings = {
     Building::BuildingType::Greenhouses, Building::BuildingType::Laboratory,
-    Building::BuildingType::MilitaryTrainingCentre, Building::BuildingType::PowerPlants};
+    Building::BuildingType::MilitaryTrainingCentre, Building::BuildingType::PowerPlants
+};

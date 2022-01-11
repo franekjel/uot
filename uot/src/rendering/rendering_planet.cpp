@@ -8,31 +8,70 @@
 #include "game_state.h"
 #include "planet.h"
 #include "rendering_common.h"
+#include "uot_net_client.h"
 #include "utilities/input_utilities.h"
+#include <buildings.h>
 
+template <typename E>
+constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
+    return static_cast<typename std::underlying_type<E>::type>(e);
+}
 
-void rendering::render_planet_view::init() {
-    static std::vector<std::string> v_build = {"one", "two", "three", "four", "five", "one", "two", "three", "four", "five", "one", "two", "three", "four", "five" };
+void rendering::render_planet_view::init(client_context& context) {
+    std::vector<std::string> v_build;
+    std::vector<std::string> v_built;
+    std::vector<std::string> v_queue;
 
-    static std::vector<std::string> v_built = {"one", "two", "three", "four", "five", "one", "two"};
+    std::shared_ptr<Planet> pl = std::dynamic_pointer_cast<Planet>(context.gui->current_object.value());
+    std::shared_ptr<InhabitableObject> io = std::dynamic_pointer_cast<InhabitableObject>(context.gui->current_object.value());
+    std::shared_ptr<Star> st = std::dynamic_pointer_cast<Star>(context.gui->current_object.value());
 
-    static std::vector<std::string> v_queue = {"one", "two", "three"};
-
-    build = std::make_shared<ui_list_state>(v_build, generic_button{[&](client_context& context) {
-        std::cout << "Action button clicked " << std::endl;
-        if(build->selected_elem.has_value()) {
-            std::cout << "Action button clicked on " << build->elems[build->selected_elem.value()] << std::endl;
+    if(pl && pl->colony) {
+        for(const auto& b : UnlimitedBuildings) {
+            v_build.push_back(Buildings.at(b).name);
+            _build.push_back(b);
         }
+
+        for(const auto& b : pl->colony->buildings) {
+            for(int i = 0; i < b.second; ++i) {
+                v_built.push_back(Buildings.at(b.first).name);
+                _built.push_back(b.first);
+            }
+        }
+
+        for(const auto& b : pl->colony->building_queue) {
+            v_queue.push_back(Buildings.at(b.type).name);
+        }
+    }
+
+    build = std::make_shared<ui_list_state>(v_build,
+        generic_button{[&, pl, io, st](client_context& context) {
+            std::cout << "Action button clicked " << std::endl;
+            if(pl) {
+                if(build->selected_elem.has_value()) {
+                    std::cout << "Action button clicked on " << build->elems[build->selected_elem.value()] << std::endl;
+                    // build_building(_build[build->selected_elem.value()]);
+                    built->elems.push_back(build->elems[build->selected_elem.value()]);
+                    _built.push_back(_build[build->selected_elem.value()]);
+
+                    pl->colony->buildings[_build[build->selected_elem.value()]]++;
+                }
+            } else if(io) {
+
+
+            } else if(st) {
+
+            }
     }, "BUILD", {size_settings::planet_build_area::width / 2 - 125, 600, 250, 50}}, 300, 50, 50, 10);
 
-    built = std::make_shared<ui_list_state>(v_built, generic_button{[&](client_context& context) {
+    built = std::make_shared<ui_list_state>(v_built, generic_button{[&, pl, io, st](client_context& context) {
         std::cout << "Action button clicked " << std::endl;
         if(built->selected_elem.has_value()) {
             std::cout << "Action button clicked on " << built->elems[built->selected_elem.value()] << std::endl;
         }
     }, "UPGRADE", {size_settings::planet_build_area::width / 2 - 125, 600, 250, 50}}, 300, 50, 50, 10);
 
-    queue = std::make_shared<ui_list_state>(v_queue, generic_button{[&](client_context& context) {
+    queue = std::make_shared<ui_list_state>(v_queue, generic_button{[&, pl, io, st](client_context& context) {
         std::cout << "Action button clicked " << std::endl;
         if(queue->selected_elem.has_value()) {
             std::cout << "Action button clicked on " << queue->elems[queue->selected_elem.value()] << std::endl;
@@ -55,33 +94,48 @@ void rendering::render_planet_view::_draw(client_context& context)
     sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
     render_resource_bar(context);
 
-    // draw queue
-    sdl_utilities::set_render_viewport<size_settings::planet_queue_area>(r.get());
-    sdl_utilities::paint_frame_textured(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, gr->sky_square_texture);
-    sdl_utilities::set_custom_viewport<size_settings::planet_queue_area, size_settings::frame_size>(r.get());
-    rendering::render_planet_helper(context, 10.0f, size_settings::planet_queue_area::width / 6,
-                                    size_settings::planet_queue_area::height / 1.6,
-                                    gr->planetTextures[11 + context.gui->current_object.value()->id % 18]);
-    sdl_utilities::set_custom_viewport<size_settings::planet_queue_area, size_settings::frame_size>(r.get());
-    sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
-    render_list(context, queue);
+    std::shared_ptr<Planet> pl = std::dynamic_pointer_cast<Planet>(context.gui->current_object.value());
+    std::shared_ptr<InhabitableObject> io = std::dynamic_pointer_cast<InhabitableObject>(context.gui->current_object.value());
+    std::shared_ptr<Star> st = std::dynamic_pointer_cast<Star>(context.gui->current_object.value());
 
-    // =======================================================
-    // draw list with upgradeable (or not) buildings already present on the planet
-    sdl_utilities::set_render_viewport<size_settings::planet_built_area>(r.get());
-    sdl_utilities::paint_frame(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, SDL_Color{0x00, 0x00, 0x00, 0xFF});
-    render_list(context, built);
+    if(pl) {
+        // draw queue
+        sdl_utilities::set_render_viewport<size_settings::planet_queue_area>(r.get());
+        sdl_utilities::paint_frame_textured(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, gr->sky_square_texture);
+        sdl_utilities::set_custom_viewport<size_settings::planet_queue_area, size_settings::frame_size>(r.get());
+        rendering::render_planet_helper(context, 10.0f, size_settings::planet_queue_area::width / 6,
+                        size_settings::planet_queue_area::height / 1.6,
+                        gr->planetTextures[11 + context.gui->current_object.value()->id % 18]);
+        sdl_utilities::set_custom_viewport<size_settings::planet_queue_area, size_settings::frame_size>(r.get());
+        sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
+        render_list(context, queue);
 
-    // draw list with upgradeable (or not) buildings already present on the planet
-    sdl_utilities::set_render_viewport<size_settings::planet_build_area>(r.get());
-    sdl_utilities::paint_frame(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, SDL_Color{0x00, 0x00, 0x00, 0xFF});
-    render_list(context, build);
+        // =======================================================
+        // draw list with upgradeable (or not) buildings already present on the planet
+        sdl_utilities::set_render_viewport<size_settings::planet_built_area>(r.get());
+        sdl_utilities::paint_frame(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, SDL_Color{0x00, 0x00, 0x00, 0xFF});
+        render_list(context, built);
 
+        // draw list with upgradeable (or not) buildings already present on the planet
+        sdl_utilities::set_render_viewport<size_settings::planet_build_area>(r.get());
+        sdl_utilities::paint_frame(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, SDL_Color{0x00, 0x00, 0x00, 0xFF});
+        render_list(context, build);
+
+
+        if(box.has_value()) {
+            rendering::render_building_info_box(context, box.value().type, box.value().x, box.value().y);
+        }
+    }
+    else if (io) {
+
+    } else if (st) {
+
+    }
 }
 
 rendering::view_t rendering::render_planet_view::_up() { return std::make_shared<render_sector_view>(); }
 
-rendering::view_t rendering::render_planet_view::_down() { return std::make_shared<render_planet_view>(); }
+rendering::view_t rendering::render_planet_view::_down(client_context& context) { return std::make_shared<render_planet_view>(); }
 
 void rendering::render_planet_view::_mouse_handler(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m,
         
@@ -146,6 +200,52 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         }
 
     }
+
+    if (et == iu::uot_event_type::planet_motion_build)
+    {
+
+        using AreaType = size_settings::planet_build_area;
+        int _x = x - AreaType::x_offset;
+        int _y = y - AreaType::y_offset;
+
+        auto res = build->handle_motion(_x, _y);
+        if(res.has_value()) {
+           std::cout << "ustawiam box" << std::endl;
+           box = {x, y, _build[res.value()]};
+           return;
+        }
+        box.reset();
+    }
+
+    if (et == iu::uot_event_type::planet_motion_built)
+    {
+        using AreaType = size_settings::planet_built_area;
+        auto _x = x - AreaType::x_offset;
+        auto _y = y - AreaType::y_offset;
+
+        auto res = built->handle_motion(_x, _y);
+        if(res.has_value()) {
+           std::cout << "ustawiam box" << std::endl;
+           box = {x, y, _built[res.value()]};
+           return;
+        }
+        box.reset();
+    }
+
+    if (et == iu::uot_event_type::planet_motion_queue) {
+
+        using AreaType = size_settings::planet_queue_area;
+        x = x - AreaType::x_offset;
+        y = y - AreaType::y_offset;
+
+        auto res = queue->handle_motion(x, y);
+        if(res.has_value()) {
+           std::cout << "ustawiam box" << std::endl;
+           box = {x, y, _queue[res.value()]};
+           return;
+        }
+        box.reset();
+    }
 }
 
 void rendering::render_planet_view::_wheel_handler(client_context& context,
@@ -180,3 +280,66 @@ void rendering::render_planet_view::key_handler(client_context& context, Uint16 
         context.view = _up();
     }
 }
+
+void rendering::render_building_info_box(client_context& context, Building::BuildingType type, int x, int y) {
+    auto&r = context.r;
+    auto& gr = context.gr;
+
+    auto& b = Buildings.at(type);
+    sdl_utilities::set_viewport(r.get(), x, y,
+                      buildings_meta::frame_width, buildings_meta::frame_height);
+    sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
+
+    auto b_idx = type % buildings_meta::num_buildings;
+
+    SDL_Rect s{buildings_meta::sprite_positions[b_idx].x,
+               buildings_meta::sprite_positions[b_idx].y,
+               buildings_meta::sprite_positions[b_idx].w,
+               buildings_meta::sprite_positions[b_idx].h};
+
+    SDL_Rect d{buildings_meta::frame_width/ 2 - buildings_meta::sprite_positions[b_idx].w / 2,
+               0,
+               buildings_meta::sprite_positions[b_idx].w,
+               buildings_meta::sprite_positions[b_idx].h};
+
+    SDL_RenderCopyEx(context.r.get(), context.gr->buildings_sprite.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
+
+    std::string cost_string = "	 COST: \n ";
+    for(auto& e : Buildings.at(type).cost) {
+        cost_string += "  " + std::string(resourceNames[to_underlying(e.first)]) + ": " + std::to_string(int(e.second)) + "\n";
+    }
+
+    cost_string += "\n";
+
+    std::string production_string = "  PRODUCTION: \n ";
+    for(auto& e : Buildings.at(type).production) {
+        production_string += "  " + std::string(resourceNames[to_underlying(e.first)]) + ": " + std::to_string(int(e.second)) + "\n";
+    }
+
+    production_string += "\n";
+
+    std::string workers_string = std::string("  WORKERS: \n")
+            + std::string("  Weeks cost: ")
+            + std::to_string(int(Buildings.at(type).worker_weeks_cost)) + "\n"
+            + std::string("  Number: ")
+            + std::to_string((int)Buildings.at(type).workers) + "\n\n";
+
+    std::string upkeep_string = "  UPKEEP: \n";
+    for(auto& e : Buildings.at(type).upkeep) {
+        upkeep_string += "  " + std::string(resourceNames[to_underlying(e.first)]) + ": " + std::to_string(int(e.second)) + "\n";
+    }
+
+    upkeep_string += "\n";
+
+    sdl_utilities::render_text(r.get(), gr->infobox_font,
+                               std::string(Buildings.at(type).description) + "\n\n"
+                               + cost_string + "\n"
+                               + production_string
+                               + upkeep_string
+                               + workers_string,
+                               buildings_meta::frame_width / 2,
+                               buildings_meta::frame_height / 2,
+                               buildings_meta::frame_width, SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
+
+}
+
