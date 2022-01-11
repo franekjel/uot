@@ -22,6 +22,7 @@ struct game_gui
     std::optional<int> focused_button;
 
     std::vector<popup_button> popup_buttons;
+    std::vector<navigation_button> navigation_menu_buttons;
 
     game_gui() {}
 
