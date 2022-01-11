@@ -22,6 +22,7 @@ struct Player
 
     std::set<Technology::TechnologyType> known_technologies;
     std::set<Technology::TechnologyType> available_technologies;
+    std::set<Building::BuildingType> available_buildings;
     TechnologyProgress researched_technology;
 
     Player(const unsigned int player_id_, const std::shared_ptr<Galaxy>& known_galaxy_,

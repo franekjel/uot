@@ -87,6 +87,8 @@ struct Planet : SectorObject
         }
         size = int(20.0f * SectorObject::size);
     }
+
+    std::map<Building::BuildingType, int> GetAvailableBuildings(std::shared_ptr<Player> player);
 };
 
 const float population_food_usage = 0.1f;
