@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <string>
 
 enum class Resource
 {
@@ -22,6 +23,14 @@ enum class Resource
     Food,        // Food is special
     Technology,  // Technology is also special
 };
+
+constexpr std::array<std::string_view, 11> resourceNames{"Metals",     "Antimatter",
+
+                                                         "RareMetals", "Crystals",        "Polymers",
+
+                                                         "DarkMatter", "AncientNanobots", "AncientRelics", "Spatium",
+
+                                                         "Food",       "Technology"};
 
 std::map<Resource, float> operator+(std::map<Resource, float> a, const std::map<Resource, float>& b);
 std::map<Resource, float>& operator+=(std::map<Resource, float>& a, const std::map<Resource, float>& b);

@@ -6,6 +6,8 @@
 #include "player.h"
 #include "utilities/input_utilities.h"
 
+void rendering::render_universe_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov) {}
+
 void rendering::render_selected_sector_info(const client_context& context)
 {
     auto& r = context.r;
@@ -122,7 +124,10 @@ void rendering::render_sector_universe_helper(const client_context& context, con
 
 rendering::view_t rendering::render_universe_view::_up() { return std::make_shared<render_menu_view>(); }
 
-rendering::view_t rendering::render_universe_view::_down() { return std::make_shared<render_sector_view>(); }
+rendering::view_t rendering::render_universe_view::_down(client_context& context)
+{
+    return std::make_shared<render_sector_view>();
+}
 
 void rendering::render_universe_view::_mouse_handler(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m,
                                                      int x, int y)
@@ -152,7 +157,7 @@ void rendering::render_universe_view::_mouse_handler(client_context& context, Ui
             {
                 if (current_sector.has_value() && current_sector.value()->sector_id == s->sector_id)
                 {
-                    context.view = _down();
+                    context.view = _down(context);
                 }
                 current_sector = s;
                 return;

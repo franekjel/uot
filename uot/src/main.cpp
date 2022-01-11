@@ -68,6 +68,13 @@ int main(int argc, char* argv[])
                 SDL_GetMouseState(&x, &y);
                 std::visit([&](auto&& v) { v->mouse_handler(context, e.type, e.button, x, y); }, context.view);
             }
+            else if (e.type == SDL_MOUSEWHEEL)
+            {
+                int x, y;
+                int xmov{e.wheel.x}, ymov{e.wheel.y};
+                SDL_GetMouseState(&x, &y);
+                std::visit([&](auto&& v) { v->wheel_handler(context, x, y, xmov, ymov); }, context.view);
+            }
         }
 
         // static polymorphism via CRTP

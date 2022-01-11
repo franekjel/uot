@@ -87,5 +87,11 @@ void loadMedia(client_context& context)
 
     printf("Loading the resources font\n");
     gr->resource_font = sdl_utilities::load_font(std::string(fonts::secondary_font), fonts::resource_font_size);
+
+    printf("Loading the action button font font\n");
+    gr->infobox_font = sdl_utilities::load_font(std::string(fonts::secondary_font), fonts::action_button_font_size);
+
+    printf("Loading the infobox font\n");
+    gr->action_button_font = sdl_utilities::load_font(std::string(fonts::secondary_font), fonts::infobox_font_size);
 }
 }  // namespace setup_utils

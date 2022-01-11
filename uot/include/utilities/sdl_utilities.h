@@ -46,6 +46,9 @@ void set_render_viewport(SDL_Renderer* r)
     buttonViewport.h = H;
     SDL_RenderSetViewport(r, &buttonViewport);
 }
+
+void set_viewport(SDL_Renderer* r, int x, int y, int w, int h);
+
 }  // namespace sdl_utilities
 
 #endif

@@ -2,6 +2,7 @@
 #define UOT_NET_CLIENT_H
 #include <string>
 #include <thread>
+#include "buildings.h"
 #include "client_context.h"
 #include "net/client_txrx.h"
 
@@ -24,6 +25,10 @@ struct uot_net_client : net_client
     std::string get_name() override;
     void handle_status_change(net_status status) override;
     void handle_message(const std::string& data) override;
+
+    // TO BE IMPLEMENTED
+    void build_building(Building::BuildingType type);
+    void upgrade_building(Building::BuildingType type, Player& player);
 };
 
 #endif  // UOT_NET_CLIENT_H

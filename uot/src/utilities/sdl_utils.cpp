@@ -148,3 +148,13 @@ void sdl_utilities::render_text(SDL_Renderer* r, std::shared_ptr<TTF_Font> font,
     SDL_Rect s{0, 0, w, h}, d{x - w / 2, y - h / 2, w, h};
     SDL_RenderCopyEx(r, tmp_tex.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 }
+
+void sdl_utilities::set_viewport(SDL_Renderer* r, int x, int y, int w, int h)
+{
+    SDL_Rect buttonViewport;
+    buttonViewport.x = x;
+    buttonViewport.y = y;
+    buttonViewport.w = w;
+    buttonViewport.h = h;
+    SDL_RenderSetViewport(r, &buttonViewport);
+}
