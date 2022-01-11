@@ -6,8 +6,8 @@
 #include <string>
 #include <utility>
 
-#include "resource.h"
 #include <optional>
+#include "resource.h"
 
 struct Weapon
 {
