@@ -61,4 +61,13 @@ void generic_button::_clicked(client_context& context)
         throw std::runtime_error("couldnt plat the click sound");
     }
     handler(context);
+
+void technology_button::_clicked(client_context& context)
+{
+    if (Mix_PlayChannel(-1, context.gr->click.get(), 0) == -1)
+    {
+        throw std::runtime_error("couldnt plat the click sound");
+    }
+    printf("Technology button clicked\n");
+    //  TODO : call new view
 }
