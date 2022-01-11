@@ -5,8 +5,7 @@
 #include "game_state.h"
 #include "input_utilities.h"
 
-void rendering::render_menu_view::_wheel_handler(client_context& context,
-        int x, int y, int xmov, int ymov) { }
+void rendering::render_menu_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov) {}
 
 void rendering::render_current_popup_menu(client_context& context)
 {
@@ -41,7 +40,10 @@ void rendering::render_menu_view::_draw(client_context& context)
 
 rendering::view_t rendering::render_menu_view::_up() { return std::make_shared<render_menu_view>(); }
 
-rendering::view_t rendering::render_menu_view::_down(client_context& context) { return std::make_shared<render_universe_view>(); }
+rendering::view_t rendering::render_menu_view::_down(client_context& context)
+{
+    return std::make_shared<render_universe_view>();
+}
 
 void rendering::render_menu_view::_mouse_handler(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m,
                                                  int x, int y)

@@ -2,9 +2,9 @@
 #define UOT_NET_CLIENT_H
 #include <string>
 #include <thread>
+#include "buildings.h"
 #include "client_context.h"
 #include "net/client_txrx.h"
-#include "buildings.h"
 
 struct uot_net_client : net_client
 {
@@ -29,7 +29,6 @@ struct uot_net_client : net_client
     // TO BE IMPLEMENTED
     void build_building(Building::BuildingType type);
     void upgrade_building(Building::BuildingType type, Player& player);
-
 };
 
 #endif  // UOT_NET_CLIENT_H

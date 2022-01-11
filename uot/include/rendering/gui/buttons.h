@@ -91,7 +91,10 @@ struct generic_button : button<generic_button>
     typedef std::function<void(client_context& context)> handler_t;
 
     handler_t handler;
-    generic_button(handler_t h, std::string t, button_position pos) : button<generic_button>{2, t, pos, bcol::basic} , handler(h){}
+    generic_button(handler_t h, std::string t, button_position pos)
+        : button<generic_button>{2, t, pos, bcol::basic}, handler(h)
+    {
+    }
     void _clicked(client_context& context) { handler(context); }
 };
 

@@ -324,7 +324,7 @@ void uot_net_client::handle_message(const std::string& data)
     auto abc = 7;
 }
 
-
-void uot_net_client::build_building(Building::BuildingType type) {
+void uot_net_client::build_building(Building::BuildingType type)
+{
     std::cout << "building building of type " << type << std::endl;
 }

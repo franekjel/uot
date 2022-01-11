@@ -5,8 +5,7 @@
 #include "game_state.h"
 #include "input_utilities.h"
 
-void rendering::render_sector_view::_wheel_handler(client_context& context,
-        int x, int y, int xmov, int ymov) { }
+void rendering::render_sector_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov) {}
 
 void rendering::render_sector_view::_draw(client_context& context)
 {
@@ -96,15 +95,12 @@ void rendering::render_selected_object_info(const client_context& context)
     auto io = std::dynamic_pointer_cast<InhabitableObject>(gui->current_object.value());
     auto st = std::dynamic_pointer_cast<Star>(gui->current_object.value());
 
-    std::string type =
-            pl ? "Planet" :
-                 io ? "Inh Object" :
-                      "Star";
+    std::string type = pl ? "Planet" : io ? "Inh Object" : "Star";
 
     // render planet info
     sdl_utilities::render_text(r.get(), gr->secondary_font,
-                               " planet index: " + std::to_string(gui->current_object.value()->id) +
-                                   "\n type " + type + " \n planet info 2\n planet info 3",
+                               " planet index: " + std::to_string(gui->current_object.value()->id) + "\n type " + type +
+                                   " \n planet info 2\n planet info 3",
                                size_settings::context_area::width / 2, size_settings::context_area::height * 0.75,
                                size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 }
@@ -124,7 +120,12 @@ void rendering::render_sector_galaxy_helper(const client_context& context, const
 
 rendering::view_t rendering::render_sector_view::_up() { return std::make_shared<render_universe_view>(); }
 
-rendering::view_t rendering::render_sector_view::_down(client_context& context) { auto ret = std::make_shared<render_planet_view>(); ret->init(context); return ret; }
+rendering::view_t rendering::render_sector_view::_down(client_context& context)
+{
+    auto ret = std::make_shared<render_planet_view>();
+    ret->init(context);
+    return ret;
+}
 
 void rendering::render_sector_view::_mouse_handler(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m,
                                                    int x, int y)

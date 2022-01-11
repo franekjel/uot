@@ -32,8 +32,7 @@ struct client_context
     std::shared_ptr<SDL_Window> w;
     std::shared_ptr<game_gui> gui;
 
-    client_context(const std::shared_ptr<game_resources> gr, const std::shared_ptr<game_state> gs)
-        : gr(gr), gs(gs) { };
+    client_context(const std::shared_ptr<game_resources> gr, const std::shared_ptr<game_state> gs) : gr(gr), gs(gs){};
 
     LockGuardedValue<std::shared_ptr<game_state>> getGameState()
     {

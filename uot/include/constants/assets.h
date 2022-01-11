@@ -153,9 +153,8 @@ static constexpr std::array<s_pos, num_buildings> render_positions{
 
 constexpr int frame_width = 300;
 
-constexpr int frame_height= 500;
+constexpr int frame_height = 500;
 
 }  // namespace buildings_meta
-
 
 #endif

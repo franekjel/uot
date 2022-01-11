@@ -1,10 +1,10 @@
 #ifndef RENDERING_PLANET_H
 #define RENDERING_PLANET_H
+#include <vector>
+#include "buildings.h"
 #include "rendering_common.h"
 #include "rendering_views.h"
 #include "ui_list.h"
-#include "buildings.h"
-#include <vector>
 
 namespace rendering
 {
@@ -26,7 +26,8 @@ struct render_planet_view : render_view<render_planet_view>
     std::vector<Building::BuildingType> _built;
     std::vector<Building::BuildingType> _queue;
 
-    struct info_box {
+    struct info_box
+    {
         int x, y;
         Building::BuildingType type;
     };
@@ -34,8 +35,7 @@ struct render_planet_view : render_view<render_planet_view>
     std::optional<info_box> box;
 };
 
-void render_building_info_box(client_context& context,
-                             Building::BuildingType type, int x, int y);
+void render_building_info_box(client_context& context, Building::BuildingType type, int x, int y);
 
 }  // namespace rendering
 #endif  // PLANET_RENDERING_H

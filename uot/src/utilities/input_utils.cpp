@@ -115,7 +115,8 @@ uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, 
     return uot_event_type::other;
 }
 
-uot_event_type get_planet_scroll_type(int x, int y) {
+uot_event_type get_planet_scroll_type(int x, int y)
+{
     if (check_view_area_collision<size_settings::planet_queue_area>(x, y))
     {
         return uot_event_type::planet_scroll_queue;
