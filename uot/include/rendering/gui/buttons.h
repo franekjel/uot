@@ -63,7 +63,9 @@ struct button
 
     button_color color_scheme{bcol::basic};
 
-    void clicked(client_context& context) { static_cast<T*>(this)->_clicked(context); }
+    void clicked(client_context& context) {
+        static_cast<T*>(this)->_clicked(context);
+    }
     void draw(client_context& context, bool focused)
     {
         rendering::draw_button(context, text, pos, color_scheme, focused);
@@ -95,7 +97,7 @@ struct generic_button : button<generic_button>
         : button<generic_button>{2, t, pos, bcol::basic}, handler(h)
     {
     }
-    void _clicked(client_context& context) { handler(context); }
+    void _clicked(client_context& context);
 };
 
 using popup_button = std::variant<std::unique_ptr<start_button>, std::unique_ptr<exit_button>>;

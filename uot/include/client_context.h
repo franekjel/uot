@@ -39,6 +39,13 @@ struct client_context
         return LockGuardedValue<std::shared_ptr<game_state>>(gs, gs_mutex);
     }
 
+    ~client_context(){
+        Mix_CloseAudio();
+        TTF_Quit();
+        IMG_Quit();
+        SDL_Quit();
+    }
+
    private:
     std::recursive_mutex gs_mutex;
     std::shared_ptr<game_state> gs;

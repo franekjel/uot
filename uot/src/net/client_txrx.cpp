@@ -109,8 +109,8 @@ void sns_client_txrx::disconnect_local()
 {
     state = con_state::disconnected;
     client.handle_status_change(net_client::net_status::disconnect);
-    read_thread.join();
-    status_thread.join();
+    if(read_thread.joinable()) read_thread.join();
+    if(status_thread.joinable()) status_thread.join();
     SteamNetworkingSockets()->CloseConnection(con, 0, nullptr, false);
     GameNetworkingSockets_Kill();
 }

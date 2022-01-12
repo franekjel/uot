@@ -1,12 +1,28 @@
 #include <algorithm>
 #include "assets.h"
 #include "sdl_utilities.h"
+#include "SDL_mixer.h"
 
-void sdl_texture_deleter(SDL_Texture* t) { SDL_DestroyTexture(t); }
+void sdl_texture_deleter(SDL_Texture* t) { SDL_DestroyTexture(t);  t = NULL; }
 
-void sdl_font_deleter(TTF_Font* f) { TTF_CloseFont(f); }
+void sdl_font_deleter(TTF_Font* f) {
+    // szukałem długo rozwiązania tego
+    // problemu, zdaje się że jest to
+    // jakiś typ winy samego SDL_ttf,
+    // (a przynajmniej jest bug report
+    // sprzed kilku lat dotyczący dokładnie
+    // tego problemu i odpowiedź maintainera.
+    // jeśli ktoś znajdzie jakiś oczywisty błąd
+    // w zarządzaniu pamięcią to dajcie znać.
 
-void sdl_surface_deleter(SDL_Surface* s) { SDL_FreeSurface(s); }
+    // TTF_CloseFont(f); f = NULL;
+}
+
+void sdl_surface_deleter(SDL_Surface* s) { SDL_FreeSurface(s); s = NULL; }
+
+void sdl_music_deleter(Mix_Music* m) { Mix_FreeMusic(m); m = NULL; }
+
+void sdl_chunk_deleter(Mix_Chunk* c) { Mix_FreeChunk(c); c = NULL; }
 
 std::shared_ptr<TTF_Font> sdl_utilities::load_font(const std::string& font_name, int size)
 {
@@ -16,6 +32,24 @@ std::shared_ptr<TTF_Font> sdl_utilities::load_font(const std::string& font_name,
         throw std::runtime_error("Unable to load font " + font_name);
     }
     return ret;
+}
+
+std::shared_ptr<Mix_Music> sdl_utilities::load_music(const std::string& filename) {
+   auto ret = std::shared_ptr<Mix_Music>(Mix_LoadMUS(filename.c_str()), sdl_music_deleter);
+   if(ret == NULL)
+   {
+       throw std::runtime_error("Unable to load music track " + filename);
+   }
+   return ret;
+}
+
+std::shared_ptr<Mix_Chunk> sdl_utilities::load_chunk(const std::string& filename) {
+   auto ret = std::shared_ptr<Mix_Chunk>(Mix_LoadWAV(filename.c_str()), sdl_chunk_deleter);
+   if(ret == NULL)
+   {
+       throw std::runtime_error("Unable to load chunk file " + filename);
+   }
+   return ret;
 }
 
 std::shared_ptr<SDL_Texture> sdl_utilities::load_texture_from_file(const std::string& path,
@@ -124,7 +158,7 @@ std::shared_ptr<SDL_Renderer> sdl_utilities::sdl_create_renderer(const std::shar
     return ret;
 }
 
-void sdl_utilities::render_text(SDL_Renderer* r, std::shared_ptr<TTF_Font> font, const std::string& t, int x, int y,
+void sdl_utilities::render_text(SDL_Renderer* r, std::shared_ptr<TTF_Font>& font, const std::string& t, int x, int y,
                                 int _w, SDL_Color c)
 {
     auto textSurface =

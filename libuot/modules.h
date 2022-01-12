@@ -3,6 +3,8 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <optional>
+#include <utility>
 
 #include "resource.h"
 
