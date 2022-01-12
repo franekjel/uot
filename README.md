@@ -5,7 +5,7 @@ This repo contains Universe of Technology (UoT) source code. UoT is space 4X gam
 ## Building
 
 ### Linux
-Needed dependencies are SDL2, SDL2-image, SDL2-ttf, protobuf and libprotobuf (development files for all).
+Needed dependencies are SDL2, SDL2-image, SDL2-ttf, SDL2-mixer, protobuf and libprotobuf (development files for all).
 
 Compile like any other cmake project:
 ```
@@ -28,7 +28,7 @@ git clone https://github.com/microsoft/vcpkg
 2. Install bootstrap - in downloaded vcpkg folder run ```bootstrap-vcpkg.bat```
 3. Install required dependencies:
 ```
-vcpkg install sdl2 sdl2-image sdl2-ttf gamenetworkingsockets --triplet x64-windows
+vcpkg install sdl2 sdl2-image sdl2-ttf sdl2-mixer gamenetworkingsockets --triplet x64-windows
 ```
 4. Install visual integration (require admin):
 ```
