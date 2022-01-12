@@ -36,7 +36,7 @@ void Player::DiscoverTechnology(Technology::TechnologyType technology)
         const auto &required = b.second.required_technologies;
         if (find(required.begin(), required.end(), technology) != required.end())
         {
-            if (required.size() == 1)  // pewnie najczêstszy przypadek, dlatego wyró¿niam
+            if (required.size() == 1)  // pewnie najczÄ™stszy przypadek, dlatego wyrÃ³Å¼niam
                 available_buildings.insert(b.first);
             else
             {
