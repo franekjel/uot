@@ -359,14 +359,12 @@ void rendering::render_building_info_box(client_context& context, Building::Buil
 
     production_string += "\n";
 
-
     std::string upkeep_string = " UPKEEP: \n";
     for (const auto& e : Buildings.at(type).upkeep)
     {
         upkeep_string +=
             "  " + std::string(resourceNames[to_underlying(e.first)]) + ": " + std::to_string(int(e.second)) + "\n";
     }
-
 
     upkeep_string += "   Workers: " + std::to_string((int)Buildings.at(type).workers) + "\n\n";
 
