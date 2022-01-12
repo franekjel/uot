@@ -95,7 +95,7 @@ struct generic_button : button<generic_button>
         : button<generic_button>{2, t, pos, bcol::basic}, handler(h)
     {
     }
-    void _clicked(client_context& context) { handler(context); }
+    void _clicked(client_context& context);
 };
 
 using popup_button = std::variant<std::unique_ptr<start_button>, std::unique_ptr<exit_button>>;

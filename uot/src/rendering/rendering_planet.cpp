@@ -78,7 +78,7 @@ void rendering::render_planet_view::init(client_context& context)
                            }
                        },
                        "BUILD",
-                       {size_settings::planet_build_area::width / 2 - 125, 600, 250, 50}},
+                       {size_settings::planet_build_area::width / 2 - 140, 600, 280, 50}},
         300, 50, 50, 10);
 
     built = std::make_shared<ui_list_state>(
@@ -93,7 +93,7 @@ void rendering::render_planet_view::init(client_context& context)
                            }
                        },
                        "UPGRADE",
-                       {size_settings::planet_build_area::width / 2 - 125, 600, 250, 50}},
+                       {size_settings::planet_build_area::width / 2 - 140, 600, 280, 50}},
         300, 50, 50, 10);
 
     queue = std::make_shared<ui_list_state>(
@@ -108,7 +108,7 @@ void rendering::render_planet_view::init(client_context& context)
                            }
                        },
                        "CANCEL",
-                       {size_settings::planet_build_area::width / 2 - 125, 600, 250, 50}},
+                       {size_settings::planet_build_area::width / 2 - 140, 600, 280, 50}},
         300, 50, 50, 10);
 }
 

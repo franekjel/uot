@@ -112,7 +112,7 @@ constexpr int secondary_font_size = 25;
 namespace buttons_meta
 {
 constexpr int button_height = 75;
-constexpr int button_width = 200;
+constexpr int button_width = 225;
 constexpr int button_x_offset = 25;
 constexpr int button_y_offset = 110;
 
@@ -156,5 +156,16 @@ constexpr int frame_width = 300;
 constexpr int frame_height = 500;
 
 }  // namespace buildings_meta
+
+namespace audio_meta
+{
+constexpr std::string_view ambient_filename = "assets/audio/ambient.wav";
+
+constexpr std::string_view click_filename = "assets/audio/click.wav";
+constexpr std::string_view open_planet_filename = "assets/audio/open_planet.wav";
+constexpr std::string_view open_ship_filename = "assets/audio/open_ship.wav";
+constexpr std::string_view scanning_filename = "assets/audio/scanning.wav";
+
+}  // namespace audio_meta
 
 #endif

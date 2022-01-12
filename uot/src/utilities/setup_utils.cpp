@@ -1,6 +1,7 @@
 #include "setup_utils.h"
 #include "assets.h"
 // all necessary headers come through game_gui
+#include "SDL2/SDL_mixer.h"
 #include "game_gui.h"
 #include "game_resources.h"
 #include "game_state.h"
@@ -13,7 +14,7 @@ void init(client_context& context)
     auto state = context.getGameState();
     auto& gs = state.value;
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
         throw std::runtime_error("SDL coudl not initialize! SDL Error: %s\n" + std::string(SDL_GetError()));
     }
@@ -33,6 +34,12 @@ void init(client_context& context)
     if (TTF_Init() == -1)
     {
         throw std::runtime_error("Couldn't initialize SDL_ttf");
+    }
+
+    // Initialize SDL_mixer
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
+    {
+        throw std::runtime_error("Couldn't initialize SDL_mixer");
     }
 
     context.gui = std::make_unique<game_gui>();
@@ -93,5 +100,16 @@ void loadMedia(client_context& context)
 
     printf("Loading the infobox font\n");
     gr->action_button_font = sdl_utilities::load_font(std::string(fonts::secondary_font), fonts::infobox_font_size);
+
+    // AUDIO
+
+    // Load the music
+    gr->ambient = sdl_utilities::load_music(std::string(audio_meta::ambient_filename));
+
+    // Load chunks
+    gr->click = sdl_utilities::load_chunk(std::string(audio_meta::click_filename));
+    gr->open_planet = sdl_utilities::load_chunk(std::string(audio_meta::open_planet_filename));
+    gr->open_ship = sdl_utilities::load_chunk(std::string(audio_meta::open_ship_filename));
+    gr->scanning = sdl_utilities::load_chunk(std::string(audio_meta::scanning_filename));
 }
 }  // namespace setup_utils

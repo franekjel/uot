@@ -158,6 +158,10 @@ void rendering::render_universe_view::_mouse_handler(client_context& context, Ui
                 if (current_sector.has_value() && current_sector.value()->sector_id == s->sector_id)
                 {
                     context.view = _down(context);
+                    if (Mix_PlayChannel(-1, context.gr->open_planet.get(), 0) == -1)
+                    {
+                        throw std::runtime_error("couldnt plat the click sound");
+                    }
                 }
                 current_sector = s;
                 return;
