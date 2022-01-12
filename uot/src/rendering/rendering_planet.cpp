@@ -326,7 +326,7 @@ void rendering::render_building_info_box(client_context& context, Building::Buil
     auto& r = context.r;
     auto& gr = context.gr;
 
-    auto& b = Buildings.at(type);
+    const auto& b = Buildings.at(type);
     sdl_utilities::set_viewport(r.get(), x, y, buildings_meta::frame_width, buildings_meta::frame_height);
     sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
 
@@ -340,8 +340,9 @@ void rendering::render_building_info_box(client_context& context, Building::Buil
 
     SDL_RenderCopyEx(context.r.get(), context.gr->buildings_sprite.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 
-    std::string cost_string = "	 COST: \n ";
-    for (auto& e : Buildings.at(type).cost)
+    std::string cost_string = " COST: \n";
+    cost_string += "  Work: " + std::to_string(int(Buildings.at(type).worker_weeks_cost)) + "\n";
+    for (const auto& e : Buildings.at(type).cost)
     {
         cost_string +=
             "  " + std::string(resourceNames[to_underlying(e.first)]) + ": " + std::to_string(int(e.second)) + "\n";
@@ -349,8 +350,8 @@ void rendering::render_building_info_box(client_context& context, Building::Buil
 
     cost_string += "\n";
 
-    std::string production_string = "  PRODUCTION: \n ";
-    for (auto& e : Buildings.at(type).production)
+    std::string production_string = " PRODUCTION: \n";
+    for (const auto& e : Buildings.at(type).production)
     {
         production_string +=
             "  " + std::string(resourceNames[to_underlying(e.first)]) + ": " + std::to_string(int(e.second)) + "\n";
@@ -358,22 +359,20 @@ void rendering::render_building_info_box(client_context& context, Building::Buil
 
     production_string += "\n";
 
-    std::string workers_string = std::string("  WORKERS: \n") + std::string("  Weeks cost: ") +
-                                 std::to_string(int(Buildings.at(type).worker_weeks_cost)) + "\n" +
-                                 std::string("  Number: ") + std::to_string((int)Buildings.at(type).workers) + "\n\n";
 
-    std::string upkeep_string = "  UPKEEP: \n";
-    for (auto& e : Buildings.at(type).upkeep)
+    std::string upkeep_string = " UPKEEP: \n";
+    for (const auto& e : Buildings.at(type).upkeep)
     {
         upkeep_string +=
             "  " + std::string(resourceNames[to_underlying(e.first)]) + ": " + std::to_string(int(e.second)) + "\n";
     }
 
-    upkeep_string += "\n";
 
-    sdl_utilities::render_text(r.get(), gr->infobox_font,
-                               std::string(Buildings.at(type).description) + "\n\n" + cost_string + "\n" +
-                                   production_string + upkeep_string + workers_string,
-                               buildings_meta::frame_width / 2, buildings_meta::frame_height / 2,
-                               buildings_meta::frame_width, SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
+    upkeep_string += "   Workers: " + std::to_string((int)Buildings.at(type).workers) + "\n\n";
+
+    sdl_utilities::render_text(
+        r.get(), gr->infobox_font,
+        std::string(Buildings.at(type).description) + "\n\n" + cost_string + "\n" + production_string + upkeep_string,
+        buildings_meta::frame_width / 2, buildings_meta::frame_height / 2, buildings_meta::frame_width,
+        SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
 }
