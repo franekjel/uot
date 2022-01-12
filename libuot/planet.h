@@ -87,8 +87,6 @@ struct Planet : SectorObject
         }
         size = int(20.0f * SectorObject::size);
     }
-
-    std::map<Building::BuildingType, int> GetAvailableBuildings(std::shared_ptr<Player> player);
 };
 
 const float population_food_usage = 0.1f;
@@ -229,6 +227,8 @@ struct Colony
             building_queue.erase(building_queue.begin() + position);
         building_queue_changed = true;
     }
+
+    std::map<Building::BuildingType, int> GetAvailableBuildings();
 
     Colony(const unsigned int id, const std::shared_ptr<Planet> planet_) : id(id)
     {

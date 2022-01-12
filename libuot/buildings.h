@@ -390,3 +390,8 @@ const std::map<Building::BuildingType, Building> Buildings{
       {Technology::TechnologyType::NanobotsActivation},
       Building::BuildingType::None}},
 };
+
+// Building which can be always build
+const std::set<Building::BuildingType> UnlimitedBuildings = {
+    Building::BuildingType::Greenhouses, Building::BuildingType::Laboratory,
+    Building::BuildingType::MilitaryTrainingCentre, Building::BuildingType::PowerPlants};
