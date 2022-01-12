@@ -34,7 +34,6 @@ void close(client_context& context)
 
     // RAII (custom shared_ptr deleters) used everywhere so no need to close
     // textures and/or fonts manually
-
 }
 
 int main(int argc, char* argv[])
@@ -46,8 +45,8 @@ int main(int argc, char* argv[])
         su::init(context);
         su::loadMedia(context);
 
-        //Play the music
-        if( Mix_PlayMusic( context.gr->ambient.get(), -1 ) == -1 )
+        // Play the music
+        if (Mix_PlayMusic(context.gr->ambient.get(), -1) == -1)
         {
             throw std::runtime_error("failed to play the music track");
         }
@@ -58,43 +57,43 @@ int main(int argc, char* argv[])
         nc.connect_to_server();
         while (!quit)
         {
-        while (SDL_PollEvent(&e) != 0)
-        {
-            if (e.type == SDL_QUIT)
+            while (SDL_PollEvent(&e) != 0)
             {
-            quit = true;
+                if (e.type == SDL_QUIT)
+                {
+                    quit = true;
+                }
+                else if (e.type == SDL_KEYDOWN)
+                {
+                    std::visit([&](auto&& v) { v->key_handler(context, e.key.keysym.sym); }, context.view);
+                }
+                else if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP)
+                {
+                    int x, y;
+                    SDL_GetMouseState(&x, &y);
+                    std::visit([&](auto&& v) { v->mouse_handler(context, e.type, e.button, x, y); }, context.view);
+                }
+                else if (e.type == SDL_MOUSEWHEEL)
+                {
+                    int x, y;
+                    int xmov{e.wheel.x}, ymov{e.wheel.y};
+                    SDL_GetMouseState(&x, &y);
+                    std::visit([&](auto&& v) { v->wheel_handler(context, x, y, xmov, ymov); }, context.view);
+                }
             }
-            else if (e.type == SDL_KEYDOWN)
-            {
-            std::visit([&](auto&& v) { v->key_handler(context, e.key.keysym.sym); }, context.view);
-            }
-            else if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP)
-            {
-            int x, y;
-            SDL_GetMouseState(&x, &y);
-            std::visit([&](auto&& v) { v->mouse_handler(context, e.type, e.button, x, y); }, context.view);
-            }
-            else if (e.type == SDL_MOUSEWHEEL)
-            {
-            int x, y;
-            int xmov{e.wheel.x}, ymov{e.wheel.y};
-            SDL_GetMouseState(&x, &y);
-            std::visit([&](auto&& v) { v->wheel_handler(context, x, y, xmov, ymov); }, context.view);
-            }
-        }
 
-        // static polymorphism via CRTP
-        // and std::variant
-        std::visit([&](auto&& v) { v->draw(context); }, context.view);
+            // static polymorphism via CRTP
+            // and std::variant
+            std::visit([&](auto&& v) { v->draw(context); }, context.view);
 
-        // these shouldn't be here
-        // put into some EndFrame() in sdl_utilities
-        SDL_RenderPresent(context.r.get());
+            // these shouldn't be here
+            // put into some EndFrame() in sdl_utilities
+            SDL_RenderPresent(context.r.get());
 
-        context.gui->planet_frame =
-            (context.gui->planet_frame + 1 == (planets_meta::num_frames * planets_meta::frame_duration))
-            ? 0
-            : context.gui->planet_frame + 1;
+            context.gui->planet_frame =
+                (context.gui->planet_frame + 1 == (planets_meta::num_frames * planets_meta::frame_duration))
+                    ? 0
+                    : context.gui->planet_frame + 1;
         }
 
         nc.disconnect_from_server();

@@ -63,9 +63,7 @@ struct button
 
     button_color color_scheme{bcol::basic};
 
-    void clicked(client_context& context) {
-        static_cast<T*>(this)->_clicked(context);
-    }
+    void clicked(client_context& context) { static_cast<T*>(this)->_clicked(context); }
     void draw(client_context& context, bool focused)
     {
         rendering::draw_button(context, text, pos, color_scheme, focused);

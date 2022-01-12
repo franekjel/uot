@@ -36,7 +36,7 @@ void draw_button(client_context& context, const std::string& text, const button_
 
 void start_button::_clicked(client_context& context)
 {
-    if( Mix_PlayChannel( -1, context.gr->open_ship.get(), 0 ) == -1 )
+    if (Mix_PlayChannel(-1, context.gr->open_ship.get(), 0) == -1)
     {
         throw std::runtime_error("couldnt plat the click sound");
     }
@@ -45,7 +45,7 @@ void start_button::_clicked(client_context& context)
 
 void exit_button::_clicked(client_context& context)
 {
-    if( Mix_PlayChannel( -1, context.gr->click.get(), 0 ) == -1 )
+    if (Mix_PlayChannel(-1, context.gr->click.get(), 0) == -1)
     {
         throw std::runtime_error("couldnt plat the click sound");
     }
@@ -54,8 +54,9 @@ void exit_button::_clicked(client_context& context)
     SDL_PushEvent(&sdlevent);
 }
 
-void generic_button::_clicked(client_context& context) {
-    if( Mix_PlayChannel( -1, context.gr->click.get(), 0 ) == -1 )
+void generic_button::_clicked(client_context& context)
+{
+    if (Mix_PlayChannel(-1, context.gr->click.get(), 0) == -1)
     {
         throw std::runtime_error("couldnt plat the click sound");
     }

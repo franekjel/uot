@@ -157,14 +157,15 @@ constexpr int frame_height = 500;
 
 }  // namespace buildings_meta
 
-namespace audio_meta {
-    constexpr std::string_view ambient_filename = "assets/audio/ambient.wav";
+namespace audio_meta
+{
+constexpr std::string_view ambient_filename = "assets/audio/ambient.wav";
 
-    constexpr std::string_view click_filename = "assets/audio/click.wav";
-    constexpr std::string_view open_planet_filename = "assets/audio/open_planet.wav";
-    constexpr std::string_view open_ship_filename = "assets/audio/open_ship.wav";
-    constexpr std::string_view scanning_filename = "assets/audio/scanning.wav";
+constexpr std::string_view click_filename = "assets/audio/click.wav";
+constexpr std::string_view open_planet_filename = "assets/audio/open_planet.wav";
+constexpr std::string_view open_ship_filename = "assets/audio/open_ship.wav";
+constexpr std::string_view scanning_filename = "assets/audio/scanning.wav";
 
-}
+}  // namespace audio_meta
 
 #endif

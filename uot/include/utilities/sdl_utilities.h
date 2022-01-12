@@ -3,10 +3,10 @@
 
 #include <memory>
 #include <string>
+#include "SDL_mixer.h"
 #include "sdl_include.h"
 #include "size_settings.h"
 #include "stdexcept"
-#include "SDL_mixer.h"
 
 namespace sdl_utilities
 {
