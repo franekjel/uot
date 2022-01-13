@@ -69,5 +69,5 @@ void technology_button::_clicked(client_context& context)
         throw std::runtime_error("couldnt plat the click sound");
     }
     printf("Technology button clicked\n");
-    //  TODO : call new view
+    context.view = std::make_shared<rendering::render_tech_view>();
 }
