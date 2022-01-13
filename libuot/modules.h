@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 
+#include <optional>
 #include "resource.h"
 
 struct Weapon

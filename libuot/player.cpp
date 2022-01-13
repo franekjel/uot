@@ -17,6 +17,7 @@ Player::Player(const unsigned int id_, const std::shared_ptr<Galaxy> &known_gala
     owned_space_bases = {};
     owned_fleets = {};
     researched_technology = {};
+    available_buildings = {};
     DiscoverTechnology(Technology::TechnologyType::Engineering);
     DiscoverTechnology(Technology::TechnologyType::Spaceships);
 }
@@ -28,6 +29,27 @@ void Player::DiscoverTechnology(Technology::TechnologyType technology)
     for (const auto &t : tech.unlock)
     {
         available_technologies.insert(t);
+    }
+
+    for (const auto &b : Buildings)
+    {
+        const auto &required = b.second.required_technologies;
+        if (find(required.begin(), required.end(), technology) != required.end())
+        {
+            if (required.size() == 1)  // pewnie najczęstszy przypadek, dlatego wyróżniam
+                available_buildings.insert(b.first);
+            else
+            {
+                int intersection_count = 0;
+
+                for (const auto &r : required)
+                    if (find(known_technologies.begin(), known_technologies.end(), r) != known_technologies.end())
+                        intersection_count++;
+
+                if (intersection_count == required.size())  // sprawdzenie czy znamy wszystkie wymagane technologie
+                    available_buildings.insert(b.first);
+            }
+        }
     }
 }
 
