@@ -346,7 +346,7 @@ void rendering::render_building_info_box(client_context& context, Building::Buil
     for (const auto& e : Buildings.at(type).cost)
     {
         cost_string +=
-            "  " + std::string(resourceNames[to_underlying(e.first)]) + ": " + std::to_string(int(e.second)) + "\n";
+            "  ";// + std::string(resourceNames[to_underlying(e.first)]) + ": " + std::to_string(int(e.second)) + "\n";
     }
 
     cost_string += "\n";

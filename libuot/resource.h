@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <array>
 #include <string>
 
 enum class Resource
@@ -24,7 +25,7 @@ enum class Resource
     Technology,  // Technology is also special
 };
 
-constexpr std::array<std::string_view, 11> resourceNames{"Metals",     "Antimatter",
+const std::array<std::string, 11> resourceNames{"Metals",     "Antimatter",
 
                                                          "RareMetals", "Crystals",        "Polymers",
 
