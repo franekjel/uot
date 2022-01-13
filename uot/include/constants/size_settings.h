@@ -49,6 +49,14 @@ struct popup_menu_area : area_properties<400, 600, 600, 150>
 {
 };
 
+struct tech_node_size : area_properties<250, 60, 8, 3>
+{
+};
+
+struct tech_area : area_properties<1080, 680, 35, 60>
+{
+};
+
 }  // namespace size_settings
 
 #endif

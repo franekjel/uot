@@ -2,6 +2,7 @@
 #define GAME_GUI_H
 
 #include <sector.h>
+#include <technology.h>
 #include <sectorobject.h>
 #include <iostream>
 #include <optional>
@@ -20,6 +21,8 @@ struct game_gui
     std::optional<Building::BuildingType> current_building;
     std::optional<Building::BuildingType> focused_building;
     std::optional<int> focused_button;
+    std::optional<Technology::TechnologyType> hovered_tech;
+    std::optional<std::shared_ptr<Technology>> current_tech;
 
     std::vector<popup_button> popup_buttons;
     std::vector<navigation_button> navigation_menu_buttons;

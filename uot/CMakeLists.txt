@@ -16,6 +16,7 @@ set(SRCS
     include/rendering/rendering_menu.h
     include/rendering/rendering_planet.h
     include/rendering/rendering_universe.h
+    include/rendering/rendering_tech.h
     include/rendering/rendering_views.h
     include/rendering/ui_list.h
     include/utilities/sdl_utilities.h
@@ -36,6 +37,7 @@ set(SRCS
     src/rendering/rendering_menu.cpp
     src/rendering/rendering_planet.cpp
     src/rendering/rendering_universe.cpp
+    src/rendering/rendering_tech.cpp
     src/rendering/ui_list.cpp
     src/rendering/buttons.cpp
     src/utilities/sdl_utils.cpp
