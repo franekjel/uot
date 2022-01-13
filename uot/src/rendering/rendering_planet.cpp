@@ -31,7 +31,8 @@ void rendering::render_planet_view::init(client_context& context)
 
     if (pl && pl->colony)
     {
-        for (const auto& b : UnlimitedBuildings)
+        auto available_buildings = pl->colony->GetAvailableBuildings();
+        for (const auto& [b, count] : available_buildings)
         {
             v_build.push_back(Buildings.at(b).name);
             _build.push_back(b);
