@@ -2,6 +2,9 @@
 #include <player.h>
 #include <iostream>
 
+#define INF_TIME 999999
+#define EPS 0.0001f
+
 net_server_uot::net_server_uot() : txrx(*this, 40), running(false) { txrx.set_as_handler(); }
 
 bool net_server_uot::accept_player(const server_txrx::net_player& player)
@@ -94,10 +97,15 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
         if (colony.second->building_queue_changed)
         {
             float work_offset = 0.0f;
+            float divider = colony.second->population_building_modificator * colony.second->unemployed_population;
+
             for (const auto& building : colony.second->building_queue)
             {
-                work_offset += building.worker_week_units_left /
-                               (colony.second->population_building_modificator * colony.second->unemployed_population);
+                
+                if (divider > EPS)
+                    work_offset += building.worker_week_units_left / divider;
+                else
+                    work_offset = INF_TIME;
                 payload.buildings_updates.push_back(messageTypes::MsgBuildingsUpdates(
                     colony.second->id, building.type, building.upgrade_of, work_offset));
             }

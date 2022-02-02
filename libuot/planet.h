@@ -90,6 +90,7 @@ struct Planet : SectorObject
 };
 
 const float population_food_usage = 0.1f;
+const float base_population = 1.0f;
 
 struct BuildingBuildProgress
 {
