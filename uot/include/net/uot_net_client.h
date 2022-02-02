@@ -4,6 +4,7 @@
 #include <thread>
 #include "buildings.h"
 #include "client_context.h"
+#include "msg/messagetypes.h"
 #include "net/client_txrx.h"
 
 struct uot_net_client : net_client
@@ -15,7 +16,7 @@ struct uot_net_client : net_client
     bool getting_input;
     bool disconnected;
     // bool connected;
-    std::thread main_net_thread;
+    std::thread player_payload;
 
     void input_thread();
     void run();
@@ -26,9 +27,7 @@ struct uot_net_client : net_client
     void handle_status_change(net_status status) override;
     void handle_message(const std::string& data) override;
 
-    // TO BE IMPLEMENTED
-    void build_building(Building::BuildingType type);
-    void upgrade_building(Building::BuildingType type, Player& player);
+    void send_payload();
 };
 
 #endif  // UOT_NET_CLIENT_H

@@ -25,6 +25,7 @@ set(SRCS
     include/rendering/texture.h
     include/uncopiable.h
     include/net/uot_net_client.h
+    include/msg_queue.h
 
     src/game_state.cpp
     src/utilities/input_utils.cpp
@@ -40,7 +41,7 @@ set(SRCS
     src/utilities/sdl_utils.cpp
     src/utilities/setup_utils.cpp
     src/net/uot_net_client.cpp
-)
+    src/msg_queue.cpp)
 
 
 include_directories(include/)

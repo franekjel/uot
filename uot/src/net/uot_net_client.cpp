@@ -4,6 +4,7 @@
 
 #include "../libuot/msg/messagetypes.h"
 #include "game_state.h"
+#include "msg_queue.h"
 
 void uot_net_client::connect_to_server() { run(); }
 
@@ -314,6 +315,8 @@ void uot_net_client::handle_message(const std::string& data)
                     state.value->player->owned_resources.at(Resource::Technology) =
                         resource_data.at(Resource::Technology);
                 }
+
+                send_payload();
             }
         }
         break;
@@ -324,7 +327,12 @@ void uot_net_client::handle_message(const std::string& data)
     auto abc = 7;
 }
 
-void uot_net_client::build_building(Building::BuildingType type)
+void uot_net_client::send_payload()
 {
-    std::cout << "building building of type " << type << std::endl;
+    auto message_to_send = context.getActionQueue();
+    auto msg_str = message_to_send.value->actions.Serialize();
+    message_to_send.value->actions.buildRequests.clear();
+    message_to_send.value->actions.moveFleetRequests.clear();
+
+    txrx.send_reliable(msg_str);
 }

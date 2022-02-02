@@ -13,6 +13,7 @@ struct game_gui;
 struct game_resources;
 struct game_state;
 struct uot_net_client;
+struct msg_queue;
 
 template <typename T>
 struct LockGuardedValue
@@ -32,11 +33,18 @@ struct client_context
     std::shared_ptr<SDL_Window> w;
     std::shared_ptr<game_gui> gui;
 
-    client_context(const std::shared_ptr<game_resources> gr, const std::shared_ptr<game_state> gs) : gr(gr), gs(gs){};
+    client_context(const std::shared_ptr<game_resources> gr, const std::shared_ptr<game_state> gs,
+                   std::shared_ptr<msg_queue> mq)
+        : gr(gr), gs(gs), mq(mq){};
 
     LockGuardedValue<std::shared_ptr<game_state>> getGameState()
     {
         return LockGuardedValue<std::shared_ptr<game_state>>(gs, gs_mutex);
+    }
+
+    LockGuardedValue<std::shared_ptr<msg_queue>> getActionQueue()
+    {
+        return LockGuardedValue<std::shared_ptr<msg_queue>>(mq, mq_mutex);
     }
 
     ~client_context()
@@ -50,6 +58,9 @@ struct client_context
    private:
     std::recursive_mutex gs_mutex;
     std::shared_ptr<game_state> gs;
+
+    std::recursive_mutex mq_mutex;
+    std::shared_ptr<msg_queue> mq;
 };
 
 #endif

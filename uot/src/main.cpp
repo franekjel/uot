@@ -18,6 +18,7 @@
 #include "game_gui.h"
 #include "game_resources.h"
 #include "game_state.h"
+#include "msg_queue.h"
 #include "net/uot_net_client.h"
 #include "rendering.h"
 #include "rendering_all_views.h"
@@ -38,7 +39,7 @@ void close(client_context& context)
 
 int main(int argc, char* argv[])
 {
-    client_context context(singleton<game_resources>::ptr(), singleton<game_state>::ptr());
+    client_context context(singleton<game_resources>::ptr(), singleton<game_state>::ptr(), singleton<msg_queue>::ptr());
     {
         uot_net_client nc(context);
 
