@@ -101,7 +101,6 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
 
             for (const auto& building : colony.second->building_queue)
             {
-                
                 if (divider > EPS)
                     work_offset += building.worker_week_units_left / divider;
                 else
