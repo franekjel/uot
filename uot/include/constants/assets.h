@@ -53,10 +53,10 @@ namespace selection_meta
 constexpr int num_selection_textures = 2;
 constexpr int texture_width = 400;
 constexpr int texture_height = 400;
-constexpr std::string_view galaxy_boundary {"assets/neon_circle.png"};
+constexpr std::string_view galaxy_boundary{"assets/neon_circle.png"};
 constexpr int bd_w = 901;
 constexpr int bd_h = 930;
-constexpr std::string_view portal {"assets/portal.png"};
+constexpr std::string_view portal{"assets/portal.png"};
 constexpr int port_w = 360;
 constexpr int port_h = 600;
 }  // namespace selection_meta
@@ -68,7 +68,6 @@ constexpr int num_sectors = 64;
 constexpr int sqrt_num_sectors = 8;
 constexpr float multiplier = 100.f;
 }  // namespace generation_meta
-
 
 namespace planets_meta
 {

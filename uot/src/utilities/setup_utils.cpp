@@ -70,10 +70,9 @@ void loadMedia(client_context& context)
         sdl_utilities::load_texture_from_file(std::string(resources_meta::resources_path), context.r);
     printf("Loading neon circle");
     gr->galaxy_boundary =
-            sdl_utilities::load_texture_from_file(std::string(selection_meta::galaxy_boundary), context.r);
+        sdl_utilities::load_texture_from_file(std::string(selection_meta::galaxy_boundary), context.r);
     printf("Loading  portal texture");
-    gr->portal =
-            sdl_utilities::load_texture_from_file(std::string(selection_meta::portal), context.r);
+    gr->portal = sdl_utilities::load_texture_from_file(std::string(selection_meta::portal), context.r);
     // load only the waiting screen planet texture
     gr->planetTextures.resize(planets_meta::num_planets);
 
