@@ -72,7 +72,7 @@ void rendering::render_resource_bar(client_context& context)
 
         if (elem.first == Resource::RareMetals)
         {
-            SDL_Rect _s{9 * resources_meta::single_size, 20 * resources_meta::single_size, resources_meta::single_size,
+            SDL_Rect _s{13 * resources_meta::single_size, 21 * resources_meta::single_size, resources_meta::single_size,
                         resources_meta::single_size};
             SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
             s = _s;
@@ -81,7 +81,7 @@ void rendering::render_resource_bar(client_context& context)
 
         if (elem.first == Resource::Crystals)
         {
-            SDL_Rect _s{7 * resources_meta::single_size, 21 * resources_meta::single_size, resources_meta::single_size,
+            SDL_Rect _s{7 * resources_meta::single_size, 20 * resources_meta::single_size, resources_meta::single_size,
                         resources_meta::single_size};
             SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
             s = _s;
@@ -99,7 +99,7 @@ void rendering::render_resource_bar(client_context& context)
 
         if (elem.first == Resource::DarkMatter)
         {
-            SDL_Rect _s{15 * resources_meta::single_size, 22 * resources_meta::single_size, resources_meta::single_size,
+            SDL_Rect _s{12 * resources_meta::single_size, 6 * resources_meta::single_size, resources_meta::single_size,
                         resources_meta::single_size};
             SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
             s = _s;
@@ -108,7 +108,7 @@ void rendering::render_resource_bar(client_context& context)
 
         if (elem.first == Resource::AncientNanobots)
         {
-            SDL_Rect _s{15 * resources_meta::single_size, 15 * resources_meta::single_size, resources_meta::single_size,
+            SDL_Rect _s{15 * resources_meta::single_size, 18 * resources_meta::single_size, resources_meta::single_size,
                         resources_meta::single_size};
             SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
             s = _s;
@@ -117,11 +117,12 @@ void rendering::render_resource_bar(client_context& context)
 
         if (elem.first == Resource::AncientRelics)
         {
-            SDL_Rect _s{17 * resources_meta::single_size, 11 * resources_meta::single_size, resources_meta::single_size,
-                        resources_meta::single_size};
-            SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-            s = _s;
-            d = _d;
+          
+           SDL_Rect _s{17 * resources_meta::single_size, 13 * resources_meta::single_size, resources_meta::single_size,
+                       resources_meta::single_size};
+           SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
+           s = _s;
+           d = _d;
         }
 
         if (elem.first == Resource::Spatium)
@@ -135,7 +136,7 @@ void rendering::render_resource_bar(client_context& context)
 
         if (elem.first == Resource::Food)
         {
-            SDL_Rect _s{17 * resources_meta::single_size, 15 * resources_meta::single_size, resources_meta::single_size,
+            SDL_Rect _s{15 * resources_meta::single_size, 15 * resources_meta::single_size, resources_meta::single_size,
                         resources_meta::single_size};
             SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
             s = _s;
@@ -144,7 +145,7 @@ void rendering::render_resource_bar(client_context& context)
 
         if (elem.first == Resource::Technology)
         {
-            SDL_Rect _s{14 * resources_meta::single_size, 0 * resources_meta::single_size, resources_meta::single_size,
+            SDL_Rect _s{16 * resources_meta::single_size, 4 * resources_meta::single_size, resources_meta::single_size,
                         resources_meta::single_size};
             SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
             s = _s;
