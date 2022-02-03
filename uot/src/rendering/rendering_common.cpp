@@ -27,6 +27,28 @@ void rendering::render_planet_helper(const client_context& context, const float 
                static_cast<int>(tex.h * size_multiplier)};
 
     SDL_RenderCopyEx(r.get(), tex.t.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
+
+}
+
+void rendering::render_planet_owner(const client_context& context, const unsigned int owner_id, const float size_multiplier, const int x_off,
+                                    const int y_off, const texture_t& tex) {
+    // render ownership color
+    auto& r = context.r;
+    SDL_SetRenderDrawColor(r.get(),
+                           colors_meta::user_color[owner_id & colors_meta::num_mod].r,
+                           colors_meta::user_color[owner_id & colors_meta::num_mod].g,
+                           colors_meta::user_color[owner_id & colors_meta::num_mod].b,
+                           colors_meta::user_color[owner_id & colors_meta::num_mod].a
+            );
+
+    const int _w = size_multiplier * tex.w * 0.3;
+    const int _h = size_multiplier * tex.h * 0.1;
+
+    const SDL_Rect d = {static_cast<int>(x_off - 0.5 * _w),
+               static_cast<int>(y_off - 0.5 * _h),
+               _w,
+               _h};
+    SDL_RenderFillRect(r.get(), &d);
 }
 
 void rendering::render_resource_bar(client_context& context)
