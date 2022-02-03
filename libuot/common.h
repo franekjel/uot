@@ -65,7 +65,4 @@ inline Point operator*(Point lhs, const float rhs)
     return lhs;
 }
 
-inline Point Point::normalized() {
-        return (*this) * (1 / sqrt(squaredLength()));
-    }
-
+inline Point Point::normalized() { return (*this) * (1 / sqrt(squaredLength())); }
