@@ -6,6 +6,7 @@
 #include "game_gui.h"
 #include "game_resources.h"
 #include "game_state.h"
+#include "msg_queue.h"
 #include "planet.h"
 #include "rendering_common.h"
 #include "ui_list.h"
@@ -64,7 +65,9 @@ void rendering::render_planet_view::init(client_context& context)
                                {
                                    std::cout << "Action button clicked on "
                                              << build->elems[build->selected_elem.value()] << std::endl;
-                                   // build_building(_build[build->selected_elem.value()]);
+                                   auto mq = context.getActionQueue().value;
+                                   auto t = _build[build->selected_elem.value()];
+                                   mq->build_building(pl->colony->id, t);
                                    built->elems.push_back(build->elems[build->selected_elem.value()]);
                                    _built.push_back(_build[build->selected_elem.value()]);
 

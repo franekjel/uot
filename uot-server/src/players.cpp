@@ -233,6 +233,8 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
         else
         {
             colony.second->population -= colony.second->population * colony.second->base_population_starving_death;
+            if (colony.second->population < base_population)
+                colony.second->population = base_population;
             colony.second->population_changed = true;
         }
 
