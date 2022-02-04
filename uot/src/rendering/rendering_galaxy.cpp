@@ -82,7 +82,7 @@ void rendering::render_object_selection(const client_context& context)
     const auto& curr = gui->current_object.value();
 
     const auto x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * curr->position.x;
-    const auto y = size_settings::play_area::height / 2  + (size_settings::play_area::height / 2) * curr->position.y;
+    const auto y = size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * curr->position.y;
 
     const int tex_id = GAS_GIANT_1 + curr->id % (planets_meta::num_planets - GAS_GIANT_1);
     // render always the smallest possible selection
@@ -134,8 +134,10 @@ void rendering::render_sector_galaxy_helper(const client_context& context, const
     int i = 0;
     for (const auto& p : sector->objects)
     {
-        const auto planet_x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * p->position.x;
-        const auto planet_y = size_settings::play_area::height / 2  + (size_settings::play_area::height / 2) * p->position.y;
+        const auto planet_x =
+            size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * p->position.x;
+        const auto planet_y =
+            size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * p->position.y;
         render_planet_helper(context, 0.8, planet_x, planet_y, gr->planetTextures[11 + p->id % 18]);
 
         // always the same rec size
@@ -183,8 +185,10 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
         {
             const auto& pos = sec_obj->position;
             const auto tex_size = planets_meta::texture_size[GAS_GIANT_1];
-            const auto planet_x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * sec_obj->position.x;
-            const auto planet_y = size_settings::play_area::height / 2  + (size_settings::play_area::height / 2) * sec_obj->position.y;
+            const auto planet_x =
+                size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * sec_obj->position.x;
+            const auto planet_y =
+                size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * sec_obj->position.y;
 
             if (iu::check_collision(x, y, planet_x - 0.5 * tex_size, planet_y - 0.5 * tex_size, tex_size, tex_size))
             {
