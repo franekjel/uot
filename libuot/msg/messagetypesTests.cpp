@@ -25,9 +25,9 @@ bool operator==(std::shared_ptr<InhabitableObject> i1, messageTypes::MsgInhabita
         if (!(i1->base == i2.base))
             return false;
 
-    if (i1->resurce_deposit.size() != i2.resurce_deposit.size())
+    if (i1->resource_deposit.size() != i2.resurce_deposit.size())
         return false;
-    for (auto resource : i1->resurce_deposit)
+    for (auto resource : i1->resource_deposit)
         if (resource.second != i2.resurce_deposit[resource.first])
             return false;
 

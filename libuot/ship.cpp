@@ -2,7 +2,8 @@
 
 ShipHull::ShipHull(const int sides_size, const int inside_size, const std::map<Resource, float> &cost,
                    const std::map<Resource, float> &additional_upkeep, const float hp, const float engines_power,
-                   const float engines_energy_consumtion, const float crew, const float worker_weeks_cost)
+                   const float engines_energy_consumtion, const float crew, const float worker_weeks_cost,
+                   const float warp_drive_energy)
     : sides_size(sides_size),
       inside_size(inside_size),
       cost(cost),
@@ -11,7 +12,8 @@ ShipHull::ShipHull(const int sides_size, const int inside_size, const std::map<R
       speed(engines_power),
       engines_energy_consumtion(engines_energy_consumtion),
       crew(crew),
-      worker_weeks_cost(worker_weeks_cost)
+      worker_weeks_cost(worker_weeks_cost),
+      warp_drive_energy(warp_drive_energy)
 {
 }
 

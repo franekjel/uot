@@ -22,19 +22,21 @@ struct ShipHull
     float engines_energy_consumtion;
     float crew;  // people needed to crew
     float worker_weeks_cost;
+    float warp_drive_energy;  // energy need to warp
 
     ShipHull(const int sides_size, const int inside_size, const std::map<Resource, float>& cost,
              const std::map<Resource, float>& additional_upkeep, const float hp, const float engines_power,
-             const float engines_energy_consumtion, const float crew, const float worker_weeks_cost);
+             const float engines_energy_consumtion, const float crew, const float worker_weeks_cost,
+             const float warp_drive_energy);
 };
 
 const ShipHull SmallShipHull(4, 4, {{Resource::Metals, 50.0f}}, {{Resource::Antimatter, 0.5f}}, 80.0f, 0.1f, 1.0f, 0.1f,
-                             60.0f);
+                             60.0f, 15.0f);
 const ShipHull MediumShipHull(12, 12, {{Resource::Metals, 100.0f}, {Resource::RareMetals, 20.0f}},
-                              {{Resource::Antimatter, 1.2f}}, 250.0f, 0.08f, 2.5f, 0.25f, 120.0f);
+                              {{Resource::Antimatter, 1.2f}}, 250.0f, 0.08f, 2.5f, 0.25f, 120.0f, 40.0f);
 const ShipHull GrandShipHull(36, 36,
                              {{Resource::Metals, 200.0f}, {Resource::RareMetals, 40.0f}, {Resource::Polymers, 20.0f}},
-                             {{Resource::Antimatter, 2.5f}}, 700.0f, 0.07f, 4.0f, 0.5f, 250.0f);
+                             {{Resource::Antimatter, 2.5f}}, 700.0f, 0.07f, 4.0f, 0.5f, 250.0f, 80.0f);
 
 struct ShipDesign
 {
@@ -99,6 +101,18 @@ struct Fleet
     float fleet_speed_per_turn = -1.0f;
     bool empty_fleet = false;  // if true then fleet needs to be deleted
     unsigned int owner_id;
+
+    static constexpr float kNearValue = 0.01f;
+
+    enum Action
+    {
+        None,
+        WarpLoading,
+        BuildAsteroidMine,
+        Colonize,
+        Invade,
+        CancelAction
+    } current_action;
 
     void UpdateFleet();
 

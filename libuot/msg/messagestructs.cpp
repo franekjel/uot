@@ -24,7 +24,7 @@ messageTypes::MsgInhabitable::MsgInhabitable(const std::shared_ptr<InhabitableOb
       object_size(inhabitable->size),
       object_type(inhabitable->object_type)
 {
-    for (auto resource : inhabitable->resurce_deposit)
+    for (auto resource : inhabitable->resource_deposit)
         resurce_deposit[resource.first] = resource.second;
 
     if (!!inhabitable->base)
@@ -147,3 +147,17 @@ messageTypes::MsgFleet::MsgFleet(const std::shared_ptr<Fleet>& fleet, unsigned i
 messageTypes::MsgWatchedSectorUpdate::MsgWatchedSectorUpdate() {}
 
 messageTypes::MsgWatchedSectorUpdate::MsgWatchedSectorUpdate(int sector_id_) : sector_id(sector_id_) { fleets = {}; }
+
+messageTypes::MsgJoinFleetsRequest::MsgJoinFleetsRequest() {}
+
+messageTypes::MsgJoinFleetsRequest::MsgJoinFleetsRequest(int fleet1_id_, int fleet2_id_)
+    : fleet1_id(fleet1_id_), fleet2_id(fleet2_id_)
+{
+}
+
+messageTypes::MsgFleetActionRequest::MsgFleetActionRequest() {}
+
+messageTypes::MsgFleetActionRequest::MsgFleetActionRequest(int fleet_id_, Fleet::Action action_)
+    : fleet_id(fleet_id_), action(action_)
+{
+}

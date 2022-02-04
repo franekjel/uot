@@ -32,7 +32,7 @@ const std::map<Star::StarType, float> StarTypeToHabitablePlanetChance = {
 // asteroid, inhabitable planet, gas giants
 struct InhabitableObject : SectorObject
 {
-    std::map<Resource, float> resurce_deposit;
+    std::map<Resource, float> resource_deposit;
     std::shared_ptr<SpaceBase> base;
     enum class ObjectType
     {
@@ -43,8 +43,36 @@ struct InhabitableObject : SectorObject
     };
     ObjectType object_type;
     InhabitableObject(const SectorObject &o, const std::map<Resource, float> &r, ObjectType t)
-        : SectorObject(o), resurce_deposit(r), object_type(t)
+        : SectorObject(o), resource_deposit(r), object_type(t)
     {
+    }
+
+    std::pair<float, std::map<Resource, float>> CalcBaseCost()
+    {
+        if (resource_deposit.empty())
+            return {0, {}};
+        std::map<Resource, float> cost;
+        float work = 100.0f;
+        cost[Resource::Metals] = 100;
+        Resource deposit_type = resource_deposit.begin()->first;
+        switch (deposit_type)
+        {
+            case Resource::RareMetals:
+                cost[Resource::Metals] += 100;
+                work += 200.0f;
+                break;
+            case Resource::Crystals:
+                cost[Resource::Metals] += 100;
+                work += 200.0f;
+                break;
+            case Resource::Polymers:
+                cost[Resource::Crystals] = 40;
+                cost[Resource::RareMetals] = 40;
+                work += 300.0f;
+                break;
+        }
+
+        return {work, cost};
     }
 };
 
