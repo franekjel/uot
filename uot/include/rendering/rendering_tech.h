@@ -37,7 +37,7 @@ void render_tech_tree(const client_context& context, std::shared_ptr<game_state>
 
 void render_tech_node(const client_context& context, std::shared_ptr<game_state> gs, tech_pos pos, Technology::TechnologyType tech_type);
 
-void render_tech_info(const client_context& context);
+void render_tech_info(client_context& context, std::shared_ptr<game_state> gs);
 
 }  // namespace rendering
 #endif  // RENDERING_TECH
