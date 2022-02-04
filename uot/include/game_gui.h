@@ -3,6 +3,7 @@
 
 #include <sector.h>
 #include <sectorobject.h>
+#include <technology.h>
 #include <iostream>
 #include <optional>
 #include "assets.h"
@@ -22,6 +23,12 @@ struct game_gui
     std::optional<int> focused_button;
 
     std::vector<popup_button> popup_buttons;
+    std::vector<navigation_button> navigation_menu_buttons;
+
+    std::optional<Technology::TechnologyType> hovered_tech;
+    std::optional<Technology::TechnologyType> current_tech;
+    SDL_Point tech_offset = {0, 0};
+    SDL_Point tech_size = {0, 0};
 
     game_gui() {}
 

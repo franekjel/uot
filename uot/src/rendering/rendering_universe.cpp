@@ -70,6 +70,13 @@ void rendering::render_universe_view::_draw(client_context& context)
     {
         rendering::render_selected_sector_info(context);
     }
+    else
+    {
+        for (auto& elem : context.gui->navigation_menu_buttons)
+        {
+            std::visit([&](auto&& v) { v->draw(context, context.gui->focused_button == v->button_id); }, elem);
+        }
+    }
 }
 void rendering::render_sector_selection(const client_context& context)
 {
@@ -168,6 +175,37 @@ void rendering::render_universe_view::_mouse_handler(client_context& context, Ui
             }
         }
         current_sector.reset();
+    }
+    else if (et == iu::uot_event_type::left_click_context || et == iu::uot_event_type::motion_context)
+    {
+        x = x - size_settings::context_area::x_offset;
+        y = y - size_settings::context_area::y_offset;
+
+        bool hit = false;
+        for (const auto& b : context.gui->navigation_menu_buttons)
+        {
+            std::visit(
+                [&](auto&& v)
+                {
+                    const auto& pos = v->pos;
+                    if (iu::check_collision(x, y, pos.x, pos.y, pos.w, pos.h))
+                    {
+                        // calling a lambda, possibly losing a few instructions
+                        if (event_type == SDL_MOUSEBUTTONDOWN)
+                        {
+                            v->clicked(context);
+                            return;
+                        }
+
+                        context.gui->focused_button = v->button_id;
+                        hit = true;
+                    }
+                },
+                b);
+        }
+
+        if (!hit)
+            context.gui->focused_button.reset();
     }
 }
 

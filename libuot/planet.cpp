@@ -89,6 +89,7 @@ void Colony::UpdateBuildingQueue()
         if (building_queue.front().upgrade_of != Building::BuildingType::None)
             buildings[building_queue.front().upgrade_of]--;
         buildings[building_queue.front().type]++;
+        new_buildings.push_back(building_queue.front());
         building_queue.erase(building_queue.begin());
     }
 

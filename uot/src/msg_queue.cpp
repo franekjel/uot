@@ -14,3 +14,12 @@ void msg_queue::upgrade_building(int colony_id, Building::BuildingType type_from
     std::cout << "upgrading building of type " << type_from << " to " << type_to << std::endl;
     actions.buildRequests.push_back(request);
 }
+
+void msg_queue::request_research(Technology::TechnologyType tech) { actions.technologyRequest = tech; }
+
+void msg_queue::reset()
+{
+    actions.buildRequests.clear();
+    actions.moveFleetRequests.clear();
+    actions.technologyRequest = Technology::TechnologyType::Empty;
+}

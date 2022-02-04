@@ -1,6 +1,7 @@
 #include "gui/buttons.h"
 #include "client_context.h"
 #include "game_resources.h"
+#include "msg_queue.h"
 #include "sdl_utilities.h"
 
 namespace rendering
@@ -61,4 +62,28 @@ void generic_button::_clicked(client_context& context)
         throw std::runtime_error("couldnt plat the click sound");
     }
     handler(context);
+}
+
+void technology_button::_clicked(client_context& context)
+{
+    if (Mix_PlayChannel(-1, context.gr->click.get(), 0) == -1)
+    {
+        throw std::runtime_error("couldnt plat the click sound");
+    }
+    printf("Technology button clicked\n");
+    context.view = std::make_shared<rendering::render_tech_view>();
+}
+
+void research_button::_clicked(client_context& context)
+{
+    if (!context.gui->current_tech.has_value())
+        return;
+    context.getActionQueue().value->request_research(context.gui->current_tech.value());
+    context.gui->current_tech.reset();
+}
+
+void abort_research_button::_clicked(client_context& context)
+{
+    context.getActionQueue().value->request_research(Technology::TechnologyType::None);
+    context.gui->current_tech.reset();
 }

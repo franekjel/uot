@@ -142,4 +142,5 @@ struct Colony
     // fields below are server-only
     bool population_changed;
     bool building_queue_changed;
+    std::vector<BuildingBuildProgress> new_buildings;
 };

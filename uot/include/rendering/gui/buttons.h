@@ -44,6 +44,12 @@ inline constexpr button_position start_pos{(size_settings::popup_menu_area::widt
 inline constexpr button_position exit_pos{(size_settings::popup_menu_area::width - buttons_meta::button_width) / 2,
                                           planets_meta::frame_height / 2 + 60 + 2 * buttons_meta::button_y_offset,
                                           buttons_meta::button_width, buttons_meta::button_height};
+
+inline constexpr button_position tech_pos{40, 40, size_settings::context_area::width - 80,
+                                          buttons_meta::button_y_offset};
+
+inline constexpr button_position research_pos{40, size_settings::context_area::height * 3 / 4,
+                                              size_settings::context_area::width - 80, buttons_meta::button_y_offset};
 }  // namespace bpos
 
 namespace rendering
@@ -98,6 +104,26 @@ struct generic_button : button<generic_button>
     void _clicked(client_context& context);
 };
 
+struct technology_button : button<technology_button>
+{
+    technology_button() : button<technology_button>{2, std::string("TECH"), bpos::tech_pos, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
+struct research_button : button<research_button>
+{
+    research_button() : button<research_button>{3, std::string("START"), bpos::research_pos, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
+struct abort_research_button : button<abort_research_button>
+{
+    abort_research_button() : button<abort_research_button>{4, std::string("ABORT"), bpos::research_pos, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
 using popup_button = std::variant<std::unique_ptr<start_button>, std::unique_ptr<exit_button>>;
+using navigation_button = std::variant<std::unique_ptr<technology_button>>;
+using tech_menu_button = std::variant<std::unique_ptr<research_button>, std::unique_ptr<abort_research_button>>;
 
 #endif  // BUTTONS_H

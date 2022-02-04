@@ -198,6 +198,21 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     auto& player_fleets = player->owned_fleets;
     auto& player_research = player->researched_technology;
 
+    // technology points are special, as they disappear if not used
+    player_resources[Resource::Technology] = 0.0f;
+    player_resources_change[Resource::Technology] = true;
+    player_resources[Resource::Food] = 0.0f;
+    player_resources_change[Resource::Food] = true;
+
+    // This is a temporary debuggingsolution please remove ASAP
+    for (int i = (int)Resource::Metals; i <= (int)Resource::Last; i++)
+    {
+        if (player_resources.count((Resource)i) == 0)
+            player_resources[(Resource)i] = 0.0f;
+        player_resources[(Resource)i] += 1.0f;
+        player_resources_change[(Resource)i] = true;
+    }
+
     // calculate expenses and gains of player colonies
     for (auto& colony : player_colonies)
     {
@@ -278,9 +293,6 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
         else
             player_research.progress_left -= player_resources[Resource::Technology];
     }
-
-    // technology points are special, as they disappear if not used
-    player_resources[Resource::Technology] = 0.0f;
 }
 
 void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
