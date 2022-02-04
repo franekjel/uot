@@ -81,3 +81,9 @@ void research_button::_clicked(client_context& context)
     context.getActionQueue().value->request_research(context.gui->current_tech.value());
     context.gui->current_tech.reset();
 }
+
+void abort_research_button::_clicked(client_context& context)
+{
+    context.getActionQueue().value->request_research(Technology::TechnologyType::None);
+    context.gui->current_tech.reset();
+}

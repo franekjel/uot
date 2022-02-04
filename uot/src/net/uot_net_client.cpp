@@ -243,6 +243,7 @@ void uot_net_client::handle_message(const std::string& data)
             auto payload_newturn = std::dynamic_pointer_cast<messageTypes::NewTurnPayload>(des);
             auto population_data = payload_newturn->updated_populations;
             auto resource_data = payload_newturn->updated_resources;
+            auto tech_data = payload_newturn->technology_updates;
             auto state = context.getGameState();
             if (state.value->player != nullptr)
             {
@@ -314,6 +315,13 @@ void uot_net_client::handle_message(const std::string& data)
                 {
                     state.value->player->owned_resources.at(Resource::Technology) =
                         resource_data.at(Resource::Technology);
+                }
+
+                state.value->player->researched_technology.technology = Technology::TechnologyType::Empty;
+                for (auto& tech : tech_data)
+                {
+                    state.value->player->researched_technology.technology = tech.technology_type;
+                    state.value->player->researched_technology.progress_left = (float)tech.days_remaining;
                 }
 
                 send_payload();

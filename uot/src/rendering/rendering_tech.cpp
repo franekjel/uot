@@ -150,7 +150,7 @@ void rendering::render_tech_info(client_context& context, std::shared_ptr<game_s
     {
         tt = gui->current_tech.value();
     }
-    else if (gs->player->researched_technology.technology != Technology::TechnologyType::None)
+    else if (gs->player->researched_technology)
     {
         tt = gs->player->researched_technology.technology;
         researched = true;
@@ -165,12 +165,17 @@ void rendering::render_tech_info(client_context& context, std::shared_ptr<game_s
                                {0xFF, 0xFF, 0xFF, 0xFF});
 
     if (researched)
+    {
         sdl_utilities::render_text(
             r.get(), gr->secondary_font,
             tech.description +
-                "\nTime left: " + std::to_string(static_cast<int>(gs->player->researched_technology.progress_left)),
+                "\nDays left: " + std::to_string(static_cast<int>(gs->player->researched_technology.progress_left)),
             size_settings::context_area::width / 2, size_settings::context_area::height * 0.42,
             size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+
+        abort_research_button b;
+        b.draw(context, context.gui->focused_button == b.button_id);
+    }
     else
     {
         sdl_utilities::render_text(r.get(), gr->secondary_font,
@@ -235,19 +240,31 @@ void rendering::render_tech_view::_mouse_handler(client_context& context, Uint32
         y = y - size_settings::context_area::y_offset;
 
         bool hit = false;
-        research_button v;
-        const auto& pos = v.pos;
-        if (iu::check_collision(x, y, pos.x, pos.y, pos.w, pos.h))
-        {
-            if (event_type == SDL_MOUSEBUTTONDOWN)
-            {
-                v.clicked(context);
-                return;
-            }
+        tech_menu_button b;
 
-            context.gui->focused_button = v.button_id;
-            hit = true;
-        }
+        if (context.gui->current_tech.has_value())
+            b = std::make_unique<research_button>();
+        else
+            b = std::make_unique<abort_research_button>();
+
+        std::visit(
+            [&](auto&& v)
+            {
+                const auto& pos = v->pos;
+                if (iu::check_collision(x, y, pos.x, pos.y, pos.w, pos.h))
+                {
+                    if (event_type == SDL_MOUSEBUTTONDOWN)
+                    {
+                        v->clicked(context);
+                        return;
+                    }
+
+                    context.gui->focused_button = v->button_id;
+                    hit = true;
+                    return;
+                }
+            },
+            b);
 
         if (!hit)
             context.gui->focused_button.reset();

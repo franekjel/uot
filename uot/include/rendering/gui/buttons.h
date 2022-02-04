@@ -116,7 +116,14 @@ struct research_button : button<research_button>
     void _clicked(client_context& context);
 };
 
+struct abort_research_button : button<abort_research_button>
+{
+    abort_research_button() : button<abort_research_button>{4, std::string("ABORT"), bpos::research_pos, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
 using popup_button = std::variant<std::unique_ptr<start_button>, std::unique_ptr<exit_button>>;
 using navigation_button = std::variant<std::unique_ptr<technology_button>>;
+using tech_menu_button = std::variant<std::unique_ptr<research_button>, std::unique_ptr<abort_research_button>>;
 
 #endif  // BUTTONS_H
