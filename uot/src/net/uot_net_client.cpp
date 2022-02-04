@@ -320,6 +320,20 @@ void uot_net_client::handle_message(const std::string& data)
                 state.value->player->researched_technology.technology = Technology::TechnologyType::Empty;
                 for (auto& tech : tech_data)
                 {
+                    if (tech.days_remaining == 0 && tech.technology_type != Technology::TechnologyType::None &&
+                        tech.technology_type != Technology::TechnologyType::Empty)
+                    {
+                        std::cout << "Finished tech " << static_cast<int>(tech.technology_type) << "\n";
+                        auto t = Technologies.find(tech.technology_type);
+                        state.value->player->known_technologies.insert(tech.technology_type);
+                        if (state.value->player->available_technologies.count(tech.technology_type) > 0)
+                            state.value->player->available_technologies.erase(tech.technology_type);
+
+                        for (const auto& tt : t->second.unlock)
+                        {
+                            state.value->player->available_technologies.insert(tt);
+                        }
+                    }
                     state.value->player->researched_technology.technology = tech.technology_type;
                     state.value->player->researched_technology.progress_left = (float)tech.days_remaining;
                 }
