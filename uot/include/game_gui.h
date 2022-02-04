@@ -2,8 +2,8 @@
 #define GAME_GUI_H
 
 #include <sector.h>
-#include <technology.h>
 #include <sectorobject.h>
+#include <technology.h>
 #include <iostream>
 #include <optional>
 #include "assets.h"

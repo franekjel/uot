@@ -204,7 +204,8 @@ void rendering::render_universe_view::_mouse_handler(client_context& context, Ui
                 b);
         }
 
-        if (!hit) context.gui->focused_button.reset();
+        if (!hit)
+            context.gui->focused_button.reset();
     }
 }
 

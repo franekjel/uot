@@ -4,7 +4,7 @@
 #include "rendering_galaxy.h"
 #include "rendering_menu.h"
 #include "rendering_planet.h"
-#include "rendering_universe.h"
 #include "rendering_tech.h"
+#include "rendering_universe.h"
 
 #endif  // RENDERING_ALL_VIEWS_H

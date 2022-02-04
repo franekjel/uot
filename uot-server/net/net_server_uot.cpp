@@ -86,7 +86,7 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
         }
     }
 
-    for (const auto& colony : player->owned_colonies)
+    for (auto& colony : player->owned_colonies)
     {
         if (colony.second->population_changed)
         {
@@ -105,11 +105,24 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
                     work_offset += building.worker_week_units_left / divider;
                 else
                     work_offset = INF_TIME;
+
+                int days_remaining = work_offset;
+                if (days_remaining == 0)
+                    days_remaining++;
+
                 payload.buildings_updates.push_back(messageTypes::MsgBuildingsUpdates(
-                    colony.second->id, building.type, building.upgrade_of, work_offset));
+                    colony.second->id, building.type, building.upgrade_of, days_remaining));
             }
             colony.second->building_queue_changed = false;
         }
+
+        for (const auto& new_building : colony.second->new_buildings)
+        {
+            payload.buildings_updates.push_back(
+                messageTypes::MsgBuildingsUpdates(colony.second->id, new_building.type, new_building.upgrade_of, 0));
+        }
+
+        colony.second->new_buildings.clear();
     }
 
     for (const auto& sector : galaxy->sectors)
@@ -121,8 +134,35 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
             {
                 sector_update_msg.fleets.push_back(messageTypes::MsgFleet(fleet, fleet->owner_id));
             }
+            payload.watched_sectors_updates.push_back(sector_update_msg);
         }
     }
+
+    if (player->researched_technology.technology != Technology::TechnologyType::None)
+    {
+        float divider = player->owned_resources[Resource::Technology];
+        float tech_offset = 0.0f;
+
+        if (divider > EPS)
+            tech_offset += player->researched_technology.progress_left / divider;
+        else
+            tech_offset = INF_TIME;
+
+        int days_remaining = tech_offset;
+        if (days_remaining == 0)
+            days_remaining++;
+
+        auto technology_update_msg =
+            messageTypes::MsgTechnologyUpdate(player->researched_technology.technology, days_remaining);
+        payload.technology_updates.push_back(technology_update_msg);
+    }
+
+    for (const auto& new_technology : player->new_technologies)
+    {
+        auto technology_update_msg = messageTypes::MsgTechnologyUpdate(new_technology, 0);
+        payload.technology_updates.push_back(technology_update_msg);
+    }
+    player->new_technologies.clear();
 
     txrx.send_reliable(player_net_name, payload.Serialize());
 }

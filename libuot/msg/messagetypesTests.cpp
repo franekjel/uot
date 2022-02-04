@@ -242,7 +242,9 @@ void NewTurnPayloadTest()
     ntp.updated_populations[1] = p1_init;
     ntp.updated_populations[10] = p10_init;
 
-    ntp.technology_update = {Technology::TechnologyType::AdvancedSpaceships, 10};
+    messageTypes::MsgTechnologyUpdate technologyUpdate1 = {Technology::TechnologyType::AdvancedSpaceships, 10};
+    messageTypes::MsgTechnologyUpdate technologyUpdate2 = {Technology::TechnologyType::AdvancedGenetics, 0};
+    ntp.technology_updates = {technologyUpdate1, technologyUpdate2};
 
     messageTypes::MsgBuildingsUpdates buildUpdate1{2, Building::BuildingType::Greenhouses, Building::BuildingType::None,
                                                    3};
@@ -306,7 +308,9 @@ void NewTurnPayloadTest()
     if (p1 != p1_init || p10 != p10_init)
         std::cout << "NewTurn - wrong people values\n";
 
-    if (!(ntp.technology_update == cast->technology_update))
+    auto t1 = cast->technology_updates[0];
+    auto t2 = cast->technology_updates[1];
+    if (!(t1 == technologyUpdate1) || !(t2 == technologyUpdate2))
         std::cout << "NewTurn - wrong technology update\n";
 
     auto b1 = cast->buildings_updates[0];
