@@ -204,7 +204,7 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     player_resources[Resource::Food] = 0.0f;
     player_resources_change[Resource::Food] = true;
 
-                // This is a temporary debuggingsolution please remove ASAP
+    // This is a temporary debuggingsolution please remove ASAP
     for (int i = (int)Resource::Metals; i <= (int)Resource::Last; i++)
     {
         if (player_resources.count((Resource)i) == 0)
@@ -274,6 +274,7 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     }
 
     // use technology points to research technology if any is being researched
+    player->new_technologies.clear();
     if (player_research)
     {
         if (player_resources[Resource::Technology] >= player_research.progress_left)
@@ -285,7 +286,6 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
         else
             player_research.progress_left -= player_resources[Resource::Technology];
     }
-
 }
 
 void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)

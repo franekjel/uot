@@ -62,6 +62,7 @@ std::map<Resource, float> Colony::GetColonyExpenses()
 
 void Colony::UpdateBuildingQueue()
 {
+    new_buildings.clear();
     if (building_queue.size() == 0)
         return;
 
@@ -87,6 +88,7 @@ void Colony::UpdateBuildingQueue()
         if (building_queue.front().upgrade_of != Building::BuildingType::None)
             buildings[building_queue.front().upgrade_of]--;
         buildings[building_queue.front().type]++;
+        new_buildings.push_back(building_queue.front());
         building_queue.erase(building_queue.begin());
     }
 

@@ -25,6 +25,7 @@ Player::Player(const unsigned int id_, const std::shared_ptr<Galaxy> &known_gala
 void Player::DiscoverTechnology(Technology::TechnologyType technology)
 {
     known_technologies.insert(technology);
+    new_technologies.insert(technology);
     auto tech = Technologies.at(technology);
     for (const auto &t : tech.unlock)
     {

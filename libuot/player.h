@@ -35,6 +35,7 @@ struct Player
 
     // fields below are server-only
     std::map<Resource, bool> resources_changed;
+    std::set<Technology::TechnologyType> new_technologies;
 };
 
 inline bool operator==(const Player& lhs, const Player& rhs) { return lhs.id == rhs.id; }
