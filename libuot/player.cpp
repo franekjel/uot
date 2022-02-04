@@ -51,6 +51,32 @@ void Player::DiscoverTechnology(Technology::TechnologyType technology)
             }
         }
     }
+
+    for (const auto &bonus : tech.resources_modifiers_planet)
+    {
+        if (resources_modifiers_planet.count(bonus.first) > 0)
+        {
+            resources_modifiers_planet[bonus.first] += resources_modifiers_planet[bonus.first] * bonus.second;
+        }
+        else
+        {
+            resources_modifiers_planet[bonus.first] = 1.0f + bonus.second;
+        }
+    }
+
+    for (const auto &bonus : tech.resources_modifiers_inhabitable)
+    {
+        if (resources_modifiers_inhabitable.count(bonus.first) > 0)
+        {
+            resources_modifiers_inhabitable[bonus.first] += resources_modifiers_inhabitable[bonus.first] * bonus.second;
+        }
+        else
+        {
+            resources_modifiers_inhabitable[bonus.first] = 1.0f + bonus.second;
+        }
+    }
+
+    population_growth_modifier += tech.population_growth_modifier * population_growth_modifier;
 }
 
 void Player::HandleStartTechnologyResearch(Technology::TechnologyType technology)

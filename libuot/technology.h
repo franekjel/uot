@@ -97,9 +97,28 @@ struct Technology
     float cost;
     std::vector<TechnologyType> unlock;
 
+    std::map<Resource, float> resources_modifiers_planet = {};
+    std::map<Resource, float> resources_modifiers_inhabitable = {};
+    float population_growth_modifier = 0.0f;
+
     Technology(const int id, const std::string& name, const std::string& desc, const float cost,
                const std::vector<TechnologyType>& unlock)
         : id(id), name(name), description(desc), cost(cost), unlock(unlock)
+    {
+    }
+
+    Technology(const int id, const std::string& name, const std::string& desc, const float cost,
+               const std::vector<TechnologyType>& unlock,
+               const std::map<Resource, float>& resources_modifiers_inhabitable,
+               const std::map<Resource, float>& resources_modifiers_planet, const float population_growth_modifier)
+        : id(id),
+          name(name),
+          description(desc),
+          cost(cost),
+          unlock(unlock),
+          resources_modifiers_inhabitable(resources_modifiers_inhabitable),
+          resources_modifiers_planet(resources_modifiers_planet),
+          population_growth_modifier(population_growth_modifier)
     {
     }
 
@@ -108,11 +127,24 @@ struct Technology
 
 // all technologies
 const std::map<Technology::TechnologyType, Technology> Technologies{
+
+    // enables building special building types
     {Technology::TechnologyType::Engineering,
      Technology(0, "Engineering", "Starting technology. Allows constructing base buildngs", 0,
                 {Technology::TechnologyType::AdvancedMining, Technology::TechnologyType::SoldiersTrainingProgram,
                  Technology::TechnologyType::PolymersProcessing, Technology::TechnologyType::AdvancedGenetics,
-                 Technology::TechnologyType::ResearchOrganisation, Technology::TechnologyType::ColdFusion})},
+                 Technology::TechnologyType::ResearchOrganisation, Technology::TechnologyType::ColdFusion},
+                {},
+                {{Resource::Metals, 0.2f},
+                 {Resource::Antimatter, 0.2f},
+                 {Resource::RareMetals, 0.2f},
+                 {Resource::Crystals, 0.2f},
+                 {Resource::Polymers, 0.2f},
+                 {Resource::DarkMatter, 0.2f},
+                 {Resource::AncientNanobots, 0.2f},
+                 {Resource::AncientRelics, 0.2f},
+                 {Resource::Spatium, 0.2f},
+                 {Resource::Technology, 0.2f}}, 0.0f)},
 
     {Technology::TechnologyType::Spaceships,
      Technology(
@@ -168,30 +200,89 @@ const std::map<Technology::TechnologyType, Technology> Technologies{
                 "energy sources",
                 4000, {})},
 
+    // mines on inhabitable objects bonuses
     {Technology::TechnologyType::SpaceMining1,
      Technology(13, "Space mining 1",
                 "By optimizing our tools and algorithm we can increase efficinecy of our space mines", 3000,
-                {Technology::TechnologyType::SpaceMining2})},
+                {Technology::TechnologyType::SpaceMining2},
+                {{Resource::Metals, 0.2f},
+                 {Resource::Antimatter, 0.2f},
+                 {Resource::RareMetals, 0.2f},
+                 {Resource::Crystals, 0.2f},
+                 {Resource::Polymers, 0.2f},
+                 {Resource::DarkMatter, 0.2f},
+                 {Resource::AncientNanobots, 0.2f},
+                 {Resource::AncientRelics, 0.2f},
+                 {Resource::Spatium, 0.2f},
+                 {Resource::Technology, 0.2f}},
+                {}, 0.0f)},
     {Technology::TechnologyType::SpaceMining2,
      Technology(14, "Space mining 2",
                 "By optimizing our tools and algorithm we can increase efficinecy of our space mines", 4000,
-                {Technology::TechnologyType::SpaceMining3})},
+                {Technology::TechnologyType::SpaceMining3},
+                {{Resource::Metals, 0.2f},
+                 {Resource::Antimatter, 0.2f},
+                 {Resource::RareMetals, 0.2f},
+                 {Resource::Crystals, 0.2f},
+                 {Resource::Polymers, 0.2f},
+                 {Resource::DarkMatter, 0.2f},
+                 {Resource::AncientNanobots, 0.2f},
+                 {Resource::AncientRelics, 0.2f},
+                 {Resource::Spatium, 0.2f},
+                 {Resource::Technology, 0.2f}},
+                {}, 0.0f)},
     {Technology::TechnologyType::SpaceMining3,
      Technology(15, "Space mining 3",
                 "By optimizing our tools and algorithm we can increase efficinecy of our space mines", 5000,
-                {Technology::TechnologyType::SpaceMining4})},
+                {Technology::TechnologyType::SpaceMining4},
+                {{Resource::Metals, 0.2f},
+                 {Resource::Antimatter, 0.2f},
+                 {Resource::RareMetals, 0.2f},
+                 {Resource::Crystals, 0.2f},
+                 {Resource::Polymers, 0.2f},
+                 {Resource::DarkMatter, 0.2f},
+                 {Resource::AncientNanobots, 0.2f},
+                 {Resource::AncientRelics, 0.2f},
+                 {Resource::Spatium, 0.2f},
+                 {Resource::Technology, 0.2f}},
+                {}, 0.0f)},
     {Technology::TechnologyType::SpaceMining4,
      Technology(16, "Space mining 4",
                 "By optimizing our tools and algorithm we can increase efficinecy of our space mines", 6000,
-                {Technology::TechnologyType::SpaceMining5})},
+                {Technology::TechnologyType::SpaceMining5},
+                {{Resource::Metals, 0.2f},
+                 {Resource::Antimatter, 0.2f},
+                 {Resource::RareMetals, 0.2f},
+                 {Resource::Crystals, 0.2f},
+                 {Resource::Polymers, 0.2f},
+                 {Resource::DarkMatter, 0.2f},
+                 {Resource::AncientNanobots, 0.2f},
+                 {Resource::AncientRelics, 0.2f},
+                 {Resource::Spatium, 0.2f},
+                 {Resource::Technology, 0.2f}},
+                {}, 0.0f)},
     {Technology::TechnologyType::SpaceMining5,
      Technology(17, "Space mining 5",
-                "By optimizing our tools and algorithm we can increase efficinecy of our space mines", 7000, {})},
+                "By optimizing our tools and algorithm we can increase efficinecy of our space mines", 7000, {},
+                {{Resource::Metals, 0.2f},
+                 {Resource::Antimatter, 0.2f},
+                 {Resource::RareMetals, 0.2f},
+                 {Resource::Crystals, 0.2f},
+                 {Resource::Polymers, 0.2f},
+                 {Resource::DarkMatter, 0.2f},
+                 {Resource::AncientNanobots, 0.2f},
+                 {Resource::AncientRelics, 0.2f},
+                 {Resource::Spatium, 0.2f},
+                 {Resource::Technology, 0.2f}},
+                {}, 0.0f)},
 
-    {Technology::TechnologyType::PlanetaryMining1, Technology(18, "Planetary mining 1",
-                                                              "By optimizing our tools and algorithm we can increase "
-                                                              "efficinecy of our planetary mines and polymer factories",
-                                                              3000, {Technology::TechnologyType::PlanetaryMining2})},
+    // bonuses for buildings on planets
+    {Technology::TechnologyType::PlanetaryMining1,
+     Technology(18, "Planetary mining 1",
+                "By optimizing our tools and algorithm we can increase "
+                "efficinecy of our planetary mines and polymer factories",
+                3000, {Technology::TechnologyType::PlanetaryMining2}, {},
+                {{Resource::Metals, 0.2f}, {Resource::RareMetals, 0.2f}, {Resource::Crystals, 0.2f}}, 0.0f)},
     {Technology::TechnologyType::PlanetaryMining2, Technology(19, "Planetary mining 2",
                                                               "By optimizing our tools and algorithm we can increase "
                                                               "efficinecy of our planetary mines and polymer factories",
@@ -213,65 +304,67 @@ const std::map<Technology::TechnologyType, Technology> Technologies{
      Technology(23, "Food processing 1",
                 "By optimizing our food processing and genetics we can increase "
                 "efficinecy of our food sources",
-                3000, {Technology::TechnologyType::FoodProcessing2})},
+                3000, {Technology::TechnologyType::FoodProcessing2}, {}, {{Resource::Food, 0.2f}}, 0.0f)},
     {Technology::TechnologyType::FoodProcessing2,
      Technology(24, "Food processing 2",
                 "By optimizing our food processing and genetics we can increase "
                 "efficinecy of our food sources",
-                4000, {Technology::TechnologyType::FoodProcessing3})},
+                4000, {Technology::TechnologyType::FoodProcessing3}, {}, {{Resource::Food, 0.2f}}, 0.0f)},
     {Technology::TechnologyType::FoodProcessing3,
      Technology(25, "Food processing 3",
                 "By optimizing our food processing and genetics we can increase "
                 "efficinecy of our food sources",
-                5000, {Technology::TechnologyType::FoodProcessing4})},
+                5000, {Technology::TechnologyType::FoodProcessing4}, {}, {{Resource::Food, 0.2f}}, 0.0f)},
     {Technology::TechnologyType::FoodProcessing4,
      Technology(26, "Food processing 4",
                 "By optimizing our food processing and genetics we can increase "
                 "efficinecy of our food sources",
-                6000, {Technology::TechnologyType::FoodProcessing5})},
+                6000, {Technology::TechnologyType::FoodProcessing5}, {}, {{Resource::Food, 0.2f}}, 0.0f)},
     {Technology::TechnologyType::FoodProcessing5,
      Technology(27, "Food processing 5",
                 "By optimizing our food processing and genetics we can increase "
                 "efficinecy of our food sources",
-                7000, {})},
+                7000, {}, {}, {{Resource::Food, 0.2f}}, 0.0f)},
 
     {Technology::TechnologyType::EnergyProduction1,
      Technology(28, "Energy production 1", "Optimization of our energy generation and processing", 3000,
-                {Technology::TechnologyType::EnergyProduction2})},
+                {Technology::TechnologyType::EnergyProduction2}, {}, {{Resource::Antimatter, 0.2f}}, 0.0f)},
     {Technology::TechnologyType::EnergyProduction2,
      Technology(29, "Energy production 2", "Optimization of our energy generation and processing", 4000,
-                {Technology::TechnologyType::EnergyProduction3})},
+                {Technology::TechnologyType::EnergyProduction3}, {}, {{Resource::Antimatter, 0.2f}}, 0.0f)},
     {Technology::TechnologyType::EnergyProduction3,
      Technology(30, "Energy production 3", "Optimization of our energy generation and processing", 5000,
-                {Technology::TechnologyType::EnergyProduction4})},
+                {Technology::TechnologyType::EnergyProduction4}, {}, {{Resource::Antimatter, 0.2f}}, 0.0f)},
     {Technology::TechnologyType::EnergyProduction4,
      Technology(31, "Energy production 4", "Optimization of our energy generation and processing", 6000,
-                {Technology::TechnologyType::EnergyProduction5})},
+                {Technology::TechnologyType::EnergyProduction5}, {}, {{Resource::Antimatter, 0.2f}}, 0.0f)},
     {Technology::TechnologyType::EnergyProduction5,
-     Technology(32, "Energy production 5", "Optimization of our energy generation and processing", 7000, {})},
+     Technology(32, "Energy production 5", "Optimization of our energy generation and processing", 7000, {}, {},
+                {{Resource::Antimatter, 0.2f}}, 0.0f)},
 
+    // bonuses for population growth
     {Technology::TechnologyType::Medicine1,
      Technology(33, "Medicine 1", "Better medicine means higher birth rate and longer live", 3000,
-                {Technology::TechnologyType::Medicine2})},
+                {Technology::TechnologyType::Medicine2}, {}, {}, 0.2f)},
     {Technology::TechnologyType::Medicine2,
      Technology(34, "Medicine 2", "Better medicine means higher birth rate and longer live", 4000,
-                {Technology::TechnologyType::Medicine3})},
+                {Technology::TechnologyType::Medicine3}, {}, {}, 0.2f)},
     {Technology::TechnologyType::Medicine3,
      Technology(35, "Medicine 3", "Better medicine means higher birth rate and longer live", 5000,
-                {Technology::TechnologyType::Medicine4})},
+                {Technology::TechnologyType::Medicine4}, {}, {}, 0.2f)},
     {Technology::TechnologyType::Medicine4,
      Technology(36, "Medicine 4", "Better medicine means higher birth rate and longer live", 6000,
-                {Technology::TechnologyType::Medicine5})},
+                {Technology::TechnologyType::Medicine5}, {}, {}, 0.2f)},
     {Technology::TechnologyType::Medicine5,
-     Technology(37, "Medicine 5", "Better medicine means higher birth rate and longer live", 7000, {})},
+     Technology(37, "Medicine 5", "Better medicine means higher birth rate and longer live", 7000, {}, {}, {}, 0.2f)},
 
+    // bonuses for spaceships
     {Technology::TechnologyType::NanobotsActivation,
      Technology(38, "Nanobots activation",
                 "During our exploration we encountered ancient nanobots. We can't build something this sophisticated "
                 "but with the right technology we should be able to activate and use them. Allows construction of "
                 "nanobots excavation facility on planets with ancient nanobots deposits",
                 5000, {})},
-
     {Technology::TechnologyType::ImprovedReactor,
      Technology(39, "Improved reactors", "Improved reactors to provide more power to our spaceships", 500,
                 {Technology::TechnologyType::AdvancedReactor})},
