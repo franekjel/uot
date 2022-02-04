@@ -331,8 +331,7 @@ void uot_net_client::send_payload()
 {
     auto message_to_send = context.getActionQueue();
     auto msg_str = message_to_send.value->actions.Serialize();
-    message_to_send.value->actions.buildRequests.clear();
-    message_to_send.value->actions.moveFleetRequests.clear();
+    message_to_send.value->reset();
 
     txrx.send_reliable(msg_str);
 }
