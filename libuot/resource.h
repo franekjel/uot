@@ -7,22 +7,23 @@
 enum class Resource
 {
     // base
-    Metals,      // for all sorts of building, ships, modules
-    Antimatter,  // energy - to upkee building and modules
+    Metals = 0,      // for all sorts of building, ships, modules
+    Antimatter = 1,  // energy - to upkee building and modules
 
     // uncommon - used for better modules and building
-    RareMetals,
-    Crystals,
-    Polymers,
+    RareMetals = 2,
+    Crystals = 3,
+    Polymers = 4,
 
     // rare - for unique modules and building
-    DarkMatter,       // powerful weapons
-    AncientNanobots,  // hp regen modules, contruction
-    AncientRelics,    // for special projects
-    Spatium,          // for warp gates
+    DarkMatter = 5,       // powerful weapons
+    AncientNanobots = 6,  // hp regen modules, contruction
+    AncientRelics = 7,    // for special projects
+    Spatium = 8,          // for warp gates
 
-    Food,        // Food is special
-    Technology,  // Technology is also special
+    Food = 9,        // Food is special
+    Technology = 10,  // Technology is also special
+    Last = Technology,
 };
 
 constexpr std::array<std::string_view, 11> resourceNames = {"Metals",     "Antimatter",

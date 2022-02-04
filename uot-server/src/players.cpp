@@ -215,6 +215,14 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
             player_resources_change[gain.first] = true;
         }
 
+        // This is a temporary debuggingsolution please remove ASAP
+        for (int i = (int)Resource::Metals; i <= (int)Resource::Last; i++)
+        {
+            if (player_resources.count((Resource)i) == 0)
+                player_resources[(Resource)i] = 0.0f;
+            player_resources[(Resource)i] += 1.0f;
+        }
+
         for (auto& expense : colony_expenses)
         {
             if (expense.first == Resource::Food)
