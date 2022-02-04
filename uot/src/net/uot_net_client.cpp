@@ -169,6 +169,7 @@ void uot_net_client::handle_message(const std::string& data)
                                 _planet->colony->owner = player_ptr;
                                 _planet->colony->population = planet.colony.population;
                                 _planet->colony->buildings = planet.colony.buildings;
+                                player_ptr->owned_colonies[_planet->colony->id] = _planet->colony;
                                 colonies_map.insert(
                                     std::pair<int, std::shared_ptr<Colony>>(_planet->colony->id, _planet->colony));
                             }
@@ -252,6 +253,21 @@ void uot_net_client::handle_message(const std::string& data)
                         state.value->player->owned_colonies.end())
                     {
                         state.value->player->owned_colonies.at(pop_data.first)->population = pop_data.second;
+                    }
+                }
+
+                for(const auto& a : payload_newturn->buildings_updates) {
+                    state.value->player->owned_colonies[a.colony_id]->building_queue.clear();
+                }
+
+                for(const auto& a : payload_newturn->buildings_updates) {
+                    if(a.days_remaining == 1) {
+                        state.value->player->owned_colonies[a.colony_id]->buildings[a.building_type]++;
+                    } else {
+                        BuildingBuildProgress b{a.building_type, a.upgrade_of};
+                        b.worker_week_units_left = a.days_remaining;
+
+                        state.value->player->owned_colonies[a.colony_id]->building_queue.push_back(b);
                     }
                 }
 

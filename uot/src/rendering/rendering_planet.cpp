@@ -50,7 +50,9 @@ void rendering::render_planet_view::init(client_context& context)
 
         for (const auto& b : pl->colony->building_queue)
         {
-            v_queue.push_back(Buildings.at(b.type).name);
+            v_queue.push_back(Buildings.at(b.type).name + "  " +
+                             std::to_string(b.worker_week_units_left));
+            _queue.push_back(b.type);
         }
     }
 
@@ -68,10 +70,12 @@ void rendering::render_planet_view::init(client_context& context)
                                    auto mq = context.getActionQueue().value;
                                    auto t = _build[build->selected_elem.value()];
                                    mq->build_building(pl->colony->id, t);
-                                   built->elems.push_back(build->elems[build->selected_elem.value()]);
-                                   _built.push_back(_build[build->selected_elem.value()]);
 
-                                   pl->colony->buildings[_build[build->selected_elem.value()]]++;
+                                   // dodać sprawdzanie czy zasoby pozwalają na
+                                   // dodanie tego budynku
+                                   _queue.push_back(t);
+                                   queue->elems.push_back(Buildings.at(t).name + " " +
+                                            std::to_string(static_cast<int>(Buildings.at(t).worker_weeks_cost)));
                                }
                            }
                            else if (io)
