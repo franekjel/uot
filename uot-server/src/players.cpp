@@ -269,7 +269,7 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
 
     for (auto& space_base : player_space_bases)
     {
-        for (auto& resource : space_base.second->object->resurce_deposit)
+        for (auto& resource : space_base.second->object->resource_deposit)
         {
             if (player_resources.count(resource.first) == 0)
                 player_resources[resource.first] = 0.0f;

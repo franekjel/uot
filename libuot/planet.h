@@ -73,6 +73,8 @@ struct Planet : SectorObject
     std::map<PlanetaryFeatures::PlanetaryFeatureType, int> planetary_features;
     std::map<Building::BuildingType, int> possible_buildings;
     std::shared_ptr<Colony> colony;
+    static constexpr float colony_work_cost = 500.0f;
+    static constexpr float colony_metal_cost = 500.0f;
 
     Planet(const SectorObject& o, const PlanetClimate c,
            const std::map<PlanetaryFeatures::PlanetaryFeatureType, int>& f)

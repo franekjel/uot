@@ -150,4 +150,23 @@ struct MsgMoveFleetRequest
     MsgMoveFleetRequest();
     MsgMoveFleetRequest(int fleet_id_, Point position_);
 };
+
+struct MsgJoinFleetsRequest
+{
+    int fleet1_id;
+    int fleet2_id;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgJoinFleetsRequest, fleet1_id, fleet2_id)
+    MsgJoinFleetsRequest();
+    MsgJoinFleetsRequest(int fleet1_id_, int fleet2_id_);
+};
+
+struct MsgFleetActionRequest
+{
+    int fleet_id;
+    Fleet::Action action;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleetActionRequest, fleet_id, action)
+    MsgFleetActionRequest();
+    MsgFleetActionRequest(int fleet_id_, Fleet::Action action_);
+};
+
 }  // namespace messageTypes
