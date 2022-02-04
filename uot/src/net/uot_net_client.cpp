@@ -279,6 +279,22 @@ void uot_net_client::handle_message(const std::string& data)
                         state.value->player->owned_colonies[a.colony_id]->building_queue.push_back(b);
                     }
                 }
+
+                if (resource_data.find(Resource::Metals) != resource_data.end())
+                {
+                    state.value->player->owned_resources.at(Resource::Metals) = resource_data.at(Resource::Metals);
+                }
+
+                for(const auto& a : payload_newturn->buildings_updates) {
+                    if(a.days_remaining == 1) {
+                        state.value->player->owned_colonies[a.colony_id]->buildings[a.building_type]++;
+                    } else {
+                        BuildingBuildProgress b{a.building_type, a.upgrade_of};
+                        b.worker_week_units_left = a.days_remaining;
+
+                        state.value->player->owned_colonies[a.colony_id]->building_queue.push_back(b);
+                    }
+                }
                 for (const auto& r : resource_data) {
                     state.value->player->owned_resources[r.first] = r.second;
                 }
