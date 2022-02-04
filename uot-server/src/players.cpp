@@ -211,6 +211,8 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
         {
             if (gain.first == Resource::Food)
                 continue;
+            if (player_resources.count(gain.first) == 0)
+                player_resources[gain.first] = 0.0f;
             player_resources[gain.first] += gain.second;
             player_resources_change[gain.first] = true;
         }
@@ -219,6 +221,8 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
         {
             if (expense.first == Resource::Food)
                 continue;
+            if (player_resources.count(expense.first) == 0)
+                player_resources[expense.first] = 0.0f;
             player_resources[expense.first] -= expense.second;
             player_resources_change[expense.first] = true;
         }
@@ -227,7 +231,8 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
 
         if (food_bilans >= 0)
         {
-            colony.second->population += colony.second->population * colony.second->base_population_growth;
+            colony.second->population +=
+                colony.second->population * colony.second->base_population_growth * player->population_growth_modifier;
             colony.second->population_changed = true;
         }
         else
@@ -251,7 +256,10 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     {
         for (auto& resource : space_base.second->object->resurce_deposit)
         {
-            player_resources[resource.first] += resource.second;
+            if (player_resources.count(resource.first) == 0)
+                player_resources[resource.first] = 0.0f;
+            player_resources[resource.first] +=
+                resource.second * player->resources_modifiers_inhabitable[resource.first];
             player_resources_change[resource.first] = true;
         }
 
