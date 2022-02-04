@@ -274,7 +274,6 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     }
 
     // use technology points to research technology if any is being researched
-    player->new_technologies.clear();
     if (player_research)
     {
         if (player_resources[Resource::Technology] >= player_research.progress_left)

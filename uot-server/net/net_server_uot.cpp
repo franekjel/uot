@@ -86,7 +86,7 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
         }
     }
 
-    for (const auto& colony : player->owned_colonies)
+    for (auto& colony : player->owned_colonies)
     {
         if (colony.second->population_changed)
         {
@@ -121,6 +121,8 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
             payload.buildings_updates.push_back(
                 messageTypes::MsgBuildingsUpdates(colony.second->id, new_building.type, new_building.upgrade_of, 0));
         }
+
+        colony.second->new_buildings.clear();
     }
 
     for (const auto& sector : galaxy->sectors)
@@ -160,6 +162,7 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
         auto technology_update_msg = messageTypes::MsgTechnologyUpdate(new_technology, 0);
         payload.technology_updates.push_back(technology_update_msg);
     }
+    player->new_technologies.clear();
 
     txrx.send_reliable(player_net_name, payload.Serialize());
 }
