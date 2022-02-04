@@ -122,7 +122,7 @@ namespace resources_meta
 {
 constexpr std::string_view resources_path = "assets/resources.png";
 constexpr int total_size = 256;
-constexpr int single_size = 128/8;
+constexpr int single_size = 128 / 8;
 }  // namespace resources_meta
 
 namespace buildings_meta
