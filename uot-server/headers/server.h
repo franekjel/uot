@@ -35,6 +35,6 @@ class Server
 
     int turn_number = 0;
 
-    const int galaxy_size = 10;
+    const int galaxy_size = 64;
     const float galaxy_habitable_planet_chance_multipler = 10.5f;
 };
