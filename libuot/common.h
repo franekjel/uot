@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 
@@ -42,6 +43,7 @@ struct Point
         return *this;
     }
 
+    inline Point normalized();
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(Point, x, y)
 };
 
@@ -62,3 +64,5 @@ inline Point operator*(Point lhs, const float rhs)
     lhs *= rhs;
     return lhs;
 }
+
+inline Point Point::normalized() { return (*this) * (1 / sqrt(squaredLength())); }

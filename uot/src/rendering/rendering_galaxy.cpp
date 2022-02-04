@@ -4,6 +4,7 @@
 #include "game_resources.h"
 #include "game_state.h"
 #include "input_utilities.h"
+#include "player.h"
 
 void rendering::render_sector_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov) {}
 
@@ -24,10 +25,31 @@ void rendering::render_sector_view::_draw(client_context& context)
     sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
     sdl_utilities::paint_frame_textured(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, gr->sky_texture);
     sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
+
+    SDL_Rect s{0, 0, selection_meta::bd_w, selection_meta::bd_h};
+    const auto _w = static_cast<int>(size_settings::play_area::height * 1.1);
+    const auto _h = static_cast<int>(size_settings::play_area::height * 1.1);
+    SDL_Rect d{size_settings::play_area::width / 2 - _w / 2, size_settings::play_area::height / 2 - _h / 2, _w, _h};
+
+    SDL_RenderCopyEx(r.get(), gr->galaxy_boundary.get(), &s, &d, 0.0, NULL, SDL_FLIP_NONE);
+
     if (gui->current_sector.has_value())
     {
         // sector render here
         const auto& curr = gui->current_sector.value();
+        for (auto& neighbor : gui->current_sector.value()->neighbors)
+        {
+            const auto unit = (neighbor->position - gui->current_sector.value()->position).normalized();
+            const auto offset = unit * 0.5 * size_settings::play_area::height;
+
+            SDL_Rect s{0, 0, selection_meta::bd_w, selection_meta::bd_h};
+            const auto _w = selection_meta::bd_w / 12;
+            const auto _h = selection_meta::bd_h / 12;
+            SDL_Rect d{size_settings::play_area::width / 2 + static_cast<int>(offset.x) - _w / 2,
+                       size_settings::play_area::height / 2 + static_cast<int>(offset.y) - _h / 2, _w, _h};
+
+            SDL_RenderCopyEx(r.get(), gr->galaxy_boundary.get(), &s, &d, 0.0, NULL, SDL_FLIP_NONE);
+        }
         render_sector_galaxy_helper(context, curr);
     }
     render_object_selection(context);
@@ -59,8 +81,8 @@ void rendering::render_object_selection(const client_context& context)
 
     const auto& curr = gui->current_object.value();
 
-    const int x = size_settings::play_area::width * (curr->position.x + 1.0f) / 2;
-    const int y = size_settings::play_area::height * (curr->position.y + 1.0f) / 2;
+    const auto x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * curr->position.x;
+    const auto y = size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * curr->position.y;
 
     const int tex_id = GAS_GIANT_1 + curr->id % (planets_meta::num_planets - GAS_GIANT_1);
     // render always the smallest possible selection
@@ -112,9 +134,26 @@ void rendering::render_sector_galaxy_helper(const client_context& context, const
     int i = 0;
     for (const auto& p : sector->objects)
     {
-        const auto planet_x = size_settings::play_area::width * (1.0f + 1.0f * p->position.x) * 0.5f;
-        const auto planet_y = size_settings::play_area::height * (1.0f + 1.0f * p->position.y) * 0.5f;
+        const auto planet_x =
+            size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * p->position.x;
+        const auto planet_y =
+            size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * p->position.y;
         render_planet_helper(context, 0.8, planet_x, planet_y, gr->planetTextures[11 + p->id % 18]);
+
+        // always the same rec size
+        auto pl = std::dynamic_pointer_cast<Planet>(p);
+        auto io = std::dynamic_pointer_cast<InhabitableObject>(p);
+
+        if (pl)
+        {
+            const auto id = (pl->colony && pl->colony->owner) ? pl->colony->owner->id : 0;
+            render_planet_owner(context, id, 0.8, planet_x, planet_y, gr->planetTextures[12]);
+        }
+        if (io)
+        {
+            const auto id = (io->base && io->base->owner) ? io->base->owner->id : 0;
+            render_planet_owner(context, id, 0.8, planet_x, planet_y, gr->planetTextures[12]);
+        }
     }
 }
 
@@ -130,6 +169,7 @@ rendering::view_t rendering::render_sector_view::_down(client_context& context)
 void rendering::render_sector_view::_mouse_handler(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m,
                                                    int x, int y)
 {
+    auto& gui = context.gui;
     namespace iu = input_utilities;
     const auto et = input_utilities::get_event_type(event_type, m, x, y);
     if (et == iu::uot_event_type::left_click_play)
@@ -145,9 +185,12 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
         {
             const auto& pos = sec_obj->position;
             const auto tex_size = planets_meta::texture_size[GAS_GIANT_1];
-            if (iu::check_collision(x, y, size_settings::play_area::width * (1.0f + pos.x) * 0.5f - 0.5 * tex_size,
-                                    size_settings::play_area::height * (1.0f + pos.y) * 0.5f - 0.5 * tex_size, tex_size,
-                                    tex_size))
+            const auto planet_x =
+                size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * sec_obj->position.x;
+            const auto planet_y =
+                size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * sec_obj->position.y;
+
+            if (iu::check_collision(x, y, planet_x - 0.5 * tex_size, planet_y - 0.5 * tex_size, tex_size, tex_size))
             {
                 if (current_object.has_value() && current_object.value()->position == sec_obj->position)
                 {
@@ -159,6 +202,22 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
             }
         }
         current_object.reset();
+
+        for (auto& neighbor : gui->current_sector.value()->neighbors)
+        {
+            const auto unit = (neighbor->position - gui->current_sector.value()->position).normalized();
+            const auto offset = unit * 0.5 * size_settings::play_area::height;
+
+            const auto _w = selection_meta::bd_w / 12;
+            const auto _h = selection_meta::bd_h / 12;
+            const auto _x = size_settings::play_area::width / 2 + static_cast<int>(offset.x) - _w / 2;
+            const auto _y = size_settings::play_area::height / 2 + static_cast<int>(offset.y) - _h / 2;
+
+            if (iu::check_collision(x, y, _x, _y, _w, _h))
+            {
+                current_sector = neighbor;
+            }
+        }
     }
 }
 
