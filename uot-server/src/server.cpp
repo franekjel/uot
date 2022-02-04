@@ -9,7 +9,8 @@ Server::Server() : players(), messaging_service(), game_in_progress(false)
         { this->handle_player_actions(player_name, actions); });
     messaging_service.set_after_accept_player_callback([&]() { this->after_accept_player(); });
     messaging_thread = std::thread(&net_server_uot::run, &messaging_service);
-    galaxy = std::make_shared<Galaxy>(GenerateGalaxy({galaxy_size, galaxy_habitable_planet_chance_multipler}));
+    GalaxyGenerator generator(galaxy_size, galaxy_habitable_planet_chance_multipler);
+    galaxy = std::make_shared<Galaxy>(generator.Generate());
     messaging_thread.join();
 }
 

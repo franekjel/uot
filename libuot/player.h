@@ -19,6 +19,9 @@ struct Player
     std::shared_ptr<Galaxy> known_galaxy;
     std::map<unsigned int, std::shared_ptr<Fleet>> owned_fleets;
     std::map<Resource, float> owned_resources;
+    std::map<Resource, float> resources_modifiers_planet;
+    std::map<Resource, float> resources_modifiers_inhabitable;
+    float population_growth_modifier = 1.0f;
 
     std::set<Technology::TechnologyType> known_technologies;
     std::set<Technology::TechnologyType> available_technologies;
