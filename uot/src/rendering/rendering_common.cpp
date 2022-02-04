@@ -50,108 +50,73 @@ void rendering::render_resource_bar(client_context& context)
     int i = 0;
     for (auto elem : gs->player->owned_resources)
     {
-        SDL_Rect s{positions[(2 * i) & 7], positions[(2 * i + 1) & 7], resources_meta::single_size, resources_meta::single_size};
+        SDL_Rect s{positions[(2 * i) & 7], positions[(2 * i + 1) & 7], resources_meta::single_size,
+                   resources_meta::single_size};
         SDL_Rect d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-        if (elem.first == Resource::Metals)
+        int row, col;
+        switch (elem.first)
         {
-            SDL_Rect _s{9 * resources_meta::single_size, 21 * resources_meta::single_size, resources_meta::single_size,
-                        resources_meta::single_size};
-            SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-            s = _s;
-            d = _d;
+            case Resource::Metals:
+                row = 9;
+                col = 21;
+                break;
+
+            case Resource::Antimatter:
+                row = 6;
+                col = 5;
+                break;
+
+            case Resource::RareMetals:
+                row = 13;
+                col = 21;
+                break;
+
+            case Resource::Crystals:
+                row = 7;
+                col = 20;
+                break;
+
+            case Resource::Polymers:
+                row = 21;
+                col = 2;
+                break;
+
+            case Resource::DarkMatter:
+                row = 12;
+                col = 6;
+                break;
+
+            case Resource::AncientNanobots:
+                row = 15;
+                col = 18;
+                break;
+
+            case Resource::AncientRelics:
+                row = 17;
+                col = 13;
+                break;
+
+            case Resource::Spatium:
+                row = 21;
+                col = 4;
+                break;
+
+            case Resource::Food:
+                row = 15;
+                col = 15;
+                break;
+
+            case Resource::Technology:
+                row = 16;
+                col = 4;
+                break;
         }
 
-        if (elem.first == Resource::Antimatter)
-        {
-            SDL_Rect _s{6 * resources_meta::single_size, 5 * resources_meta::single_size, resources_meta::single_size,
-                        resources_meta::single_size};
-            SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-            s = _s;
-            d = _d;
-        }
-
-        if (elem.first == Resource::RareMetals)
-        {
-            SDL_Rect _s{13 * resources_meta::single_size, 21 * resources_meta::single_size, resources_meta::single_size,
-                        resources_meta::single_size};
-            SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-            s = _s;
-            d = _d;
-        }
-
-        if (elem.first == Resource::Crystals)
-        {
-            SDL_Rect _s{7 * resources_meta::single_size, 20 * resources_meta::single_size, resources_meta::single_size,
-                        resources_meta::single_size};
-            SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-            s = _s;
-            d = _d;
-        }
-
-        if (elem.first == Resource::Polymers)
-        {
-            SDL_Rect _s{21 * resources_meta::single_size, 2 * resources_meta::single_size, resources_meta::single_size,
-                        resources_meta::single_size};
-            SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-            s = _s;
-            d = _d;
-        }
-
-        if (elem.first == Resource::DarkMatter)
-        {
-            SDL_Rect _s{12 * resources_meta::single_size, 6 * resources_meta::single_size, resources_meta::single_size,
-                        resources_meta::single_size};
-            SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-            s = _s;
-            d = _d;
-        }
-
-        if (elem.first == Resource::AncientNanobots)
-        {
-            SDL_Rect _s{15 * resources_meta::single_size, 18 * resources_meta::single_size, resources_meta::single_size,
-                        resources_meta::single_size};
-            SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-            s = _s;
-            d = _d;
-        }
-
-        if (elem.first == Resource::AncientRelics)
-        {
-          
-           SDL_Rect _s{17 * resources_meta::single_size, 13 * resources_meta::single_size, resources_meta::single_size,
-                       resources_meta::single_size};
-           SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-           s = _s;
-           d = _d;
-        }
-
-        if (elem.first == Resource::Spatium)
-        {
-            SDL_Rect _s{21 * resources_meta::single_size, 4 * resources_meta::single_size, resources_meta::single_size,
-                        resources_meta::single_size};
-            SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-            s = _s;
-            d = _d;
-        }
-
-        if (elem.first == Resource::Food)
-        {
-            SDL_Rect _s{15 * resources_meta::single_size, 15 * resources_meta::single_size, resources_meta::single_size,
-                        resources_meta::single_size};
-            SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-            s = _s;
-            d = _d;
-        }
-
-        if (elem.first == Resource::Technology)
-        {
-            SDL_Rect _s{16 * resources_meta::single_size, 4 * resources_meta::single_size, resources_meta::single_size,
-                        resources_meta::single_size};
-            SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
-            s = _s;
-            d = _d;
-        }
-        
+        SDL_Rect _s{row * resources_meta::single_size, col * resources_meta::single_size, resources_meta::single_size,
+                    resources_meta::single_size};
+        SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
+        s = _s;
+        d = _d;
 
         SDL_RenderCopyEx(context.r.get(), context.gr->resource_texture.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 
@@ -160,6 +125,5 @@ void rendering::render_resource_bar(client_context& context)
                                    ":" + std::to_string(int(elem.second)) + " |", x_off + fonts::resource_font_size,
                                    y_off + fonts::resource_font_size / 2, 150, {0xFF, 0xFF, 0xFF, 0xFF});
         x_off += 90;
-       // i++;
     }
 }
