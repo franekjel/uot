@@ -16,7 +16,8 @@ std::map<Resource, float> Colony::GetColonyGains()
         for (auto& gains : building.production)
         {
             if (colony_gains.count(gains.first) == 0)
-                colony_gains[gains.first] = gains.second * number_of_buildings * owner->resources_modifiers_planet[gains.first];
+                colony_gains[gains.first] =
+                    gains.second * number_of_buildings * owner->resources_modifiers_planet[gains.first];
             else
                 colony_gains[gains.first] +=
                     gains.second * number_of_buildings * owner->resources_modifiers_planet[gains.first];
