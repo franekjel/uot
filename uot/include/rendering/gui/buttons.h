@@ -112,7 +112,7 @@ struct technology_button : button<technology_button>
 
 struct research_button : button<research_button>
 {
-    research_button() : button<research_button>{3, std::string("RESEARCH"), bpos::research_pos, bcol::basic} {}
+    research_button() : button<research_button>{3, std::string("START"), bpos::research_pos, bcol::basic} {}
     void _clicked(client_context& context);
 };
 

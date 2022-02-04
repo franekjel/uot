@@ -169,17 +169,20 @@ void rendering::render_tech_info(client_context& context, std::shared_ptr<game_s
             r.get(), gr->secondary_font,
             tech.description +
                 "\nTime left: " + std::to_string(static_cast<int>(gs->player->researched_technology.progress_left)),
-            size_settings::context_area::width / 2, size_settings::context_area::height * 0.6,
+            size_settings::context_area::width / 2, size_settings::context_area::height * 0.42,
             size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
     else
     {
         sdl_utilities::render_text(r.get(), gr->secondary_font,
                                    tech.description + "\nCost: " + std::to_string(static_cast<int>(tech.cost)),
-                                   size_settings::context_area::width / 2, size_settings::context_area::height * 0.6,
+                                   size_settings::context_area::width / 2, size_settings::context_area::height * 0.42,
                                    size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 
-        research_button b;
-        b.draw(context, context.gui->focused_button == b.button_id);
+        if (gs->player->researched_technology.technology != tt && gs->player->available_technologies.count(tt) > 0)
+        {
+            research_button b;
+            b.draw(context, context.gui->focused_button == b.button_id);
+        }
     }
 }
 
