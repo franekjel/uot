@@ -53,6 +53,71 @@ void rendering::render_resource_bar(client_context& context)
         SDL_Rect s{positions[(2 * i) & 7], positions[(2 * i + 1) & 7], resources_meta::single_size,
                    resources_meta::single_size};
         SDL_Rect d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
+        int row, col;
+        switch (elem.first)
+        {
+            case Resource::Metals:
+                row = 9;
+                col = 21;
+                break;
+
+            case Resource::Antimatter:
+                row = 6;
+                col = 5;
+                break;
+
+            case Resource::RareMetals:
+                row = 13;
+                col = 21;
+                break;
+
+            case Resource::Crystals:
+                row = 7;
+                col = 20;
+                break;
+
+            case Resource::Polymers:
+                row = 21;
+                col = 2;
+                break;
+
+            case Resource::DarkMatter:
+                row = 12;
+                col = 6;
+                break;
+
+            case Resource::AncientNanobots:
+                row = 15;
+                col = 18;
+                break;
+
+            case Resource::AncientRelics:
+                row = 17;
+                col = 13;
+                break;
+
+            case Resource::Spatium:
+                row = 21;
+                col = 4;
+                break;
+
+            case Resource::Food:
+                row = 15;
+                col = 15;
+                break;
+
+            case Resource::Technology:
+                row = 16;
+                col = 4;
+                break;
+        }
+
+        SDL_Rect _s{row * resources_meta::single_size, col * resources_meta::single_size, resources_meta::single_size,
+                    resources_meta::single_size};
+        SDL_Rect _d{x_off, y_off, fonts::resource_font_size, fonts::resource_font_size};
+        s = _s;
+        d = _d;
+
         SDL_RenderCopyEx(context.r.get(), context.gr->resource_texture.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 
         x_off += 20 + fonts::resource_font_size;
