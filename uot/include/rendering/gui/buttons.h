@@ -48,8 +48,8 @@ inline constexpr button_position exit_pos{(size_settings::popup_menu_area::width
 inline constexpr button_position tech_pos{40, 40, size_settings::context_area::width - 80,
                                           buttons_meta::button_y_offset};
 
-inline constexpr button_position research_pos{40, size_settings::context_area::height * 3 / 4, size_settings::context_area::width - 80,
-                                          buttons_meta::button_y_offset};
+inline constexpr button_position research_pos{40, size_settings::context_area::height * 3 / 4,
+                                              size_settings::context_area::width - 80, buttons_meta::button_y_offset};
 }  // namespace bpos
 
 namespace rendering

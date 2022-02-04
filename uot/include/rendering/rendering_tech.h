@@ -1,8 +1,8 @@
 #ifndef RENDERING_TECH
 #define RENDERING_TECH
+#include "game_state.h"
 #include "rendering_common.h"
 #include "rendering_views.h"
-#include "game_state.h"
 
 struct tech_pos
 {
@@ -19,7 +19,7 @@ inline constexpr SDL_Color c_dimmed_secondary{200, 200, 180, 0xFF};
 inline constexpr SDL_Color c_done_main{0, 102, 102, 0xFF};
 inline constexpr SDL_Color c_done_secondary{255, 255, 102, 0xFF};
 
-}  // namespace bcol
+}  // namespace tcol
 
 namespace rendering
 {
@@ -35,7 +35,8 @@ struct render_tech_view : render_view<render_tech_view>
 
 void render_tech_tree(const client_context& context, std::shared_ptr<game_state> gs);
 
-void render_tech_node(const client_context& context, std::shared_ptr<game_state> gs, tech_pos pos, Technology::TechnologyType tech_type);
+void render_tech_node(const client_context& context, std::shared_ptr<game_state> gs, tech_pos pos,
+                      Technology::TechnologyType tech_type);
 
 void render_tech_info(client_context& context, std::shared_ptr<game_state> gs);
 

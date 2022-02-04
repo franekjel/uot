@@ -21,7 +21,7 @@ enum class Resource
     AncientRelics = 7,    // for special projects
     Spatium = 8,          // for warp gates
 
-    Food = 9,        // Food is special
+    Food = 9,         // Food is special
     Technology = 10,  // Technology is also special
     Last = Technology,
 };

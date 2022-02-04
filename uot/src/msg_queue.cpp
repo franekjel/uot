@@ -15,10 +15,7 @@ void msg_queue::upgrade_building(int colony_id, Building::BuildingType type_from
     actions.buildRequests.push_back(request);
 }
 
-void msg_queue::request_research(Technology::TechnologyType tech)
-{
-    actions.technologyRequest = tech;
-}
+void msg_queue::request_research(Technology::TechnologyType tech) { actions.technologyRequest = tech; }
 
 void msg_queue::reset()
 {
