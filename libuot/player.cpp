@@ -161,7 +161,7 @@ void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int se
     owned_fleets[first_fleet_id]->location_sector->present_fleets.erase(
         owned_fleets[first_fleet_id]->location_sector->present_fleets.find(second_fleet_id));
 
-    owned_fleets[first_fleet_id]->location_sector->watchers[owned_fleets[first_fleet_id]->owner_id]--;
+    owned_fleets[first_fleet_id]->location_sector->DecrementWatcher(owned_fleets[first_fleet_id]->owner_id);
 
     owned_fleets.erase(owned_fleets.find(second_fleet_id));
 

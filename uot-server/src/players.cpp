@@ -102,7 +102,22 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
 
     for (const auto& fleet_action_request : payload->fleetActionRequests)
     {
-        // TODO
+        switch (fleet_action_request.action)
+        {
+            case Fleet::Action::BuildAsteroidMine:
+            case Fleet::Action::CancelAction:
+            case Fleet::Action::Colonize:
+            case Fleet::Action::Invade:
+            case Fleet::Action::None:
+                break;
+
+            case Fleet::Action::WarpLoading:
+                player->HandleWarpLoadingFleetRequest(fleet_action_request.fleet_id);
+                break;
+
+            default:
+                break;
+        }
     }
 
     return true;

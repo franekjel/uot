@@ -97,6 +97,8 @@ struct Sector
         Point res_fleet_pos;
     };
 
+    void DecrementWatcher(unsigned int player_id);
+    void IncrementWatcher(unsigned int player_id);
     void JumpFleet(unsigned int fleet_id);
     std::vector<JoinedFleets> joined_fleets;
 };
