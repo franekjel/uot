@@ -416,9 +416,6 @@ void ActionsPayloadTest()
         std::cout << "Actions - wrong message type\n";
     auto cast = std::dynamic_pointer_cast<messageTypes::ActionsPayload>(des);
 
-    if (!cast->createBaseActions.empty())
-        std::cout << "Actions - wrong resources size\n";
-
     if (cast->technologyRequest != ap.technologyRequest)
         std::cout << "Actions - wrong technology request\n";
     if (cast->buildRequests.size() != 2)
