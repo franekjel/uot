@@ -127,7 +127,7 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
 
     for (const auto& [sector_id, sector] : galaxy->sectors)
     {
-        if (sector->watchers.count(player->id) != 0)
+        if (sector->watchers.count(player->id) != 0 && sector->watchers[player->id] > 0)
         {
             auto sector_update_msg = messageTypes::MsgWatchedSectorUpdate(sector_id);
             for (const auto& [id, fleet] : sector->present_fleets)

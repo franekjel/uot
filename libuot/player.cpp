@@ -133,3 +133,15 @@ void Player::HandleJoinFleetRequest(int first_fleet_id, int second_fleet_id)
                                                owned_fleets[second_fleet_id]->ships.begin(),
                                                owned_fleets[second_fleet_id]->ships.end());
 }
+
+void Player::HandleWarpLoadingFleetRequest(int fleet_id)
+{
+    if (owned_fleets.count(fleet_id) < 1)
+        return;
+    if (owned_fleets[fleet_id]->current_action != Fleet::Action::None)
+        return;
+    if (std::abs(owned_fleets[fleet_id]->position.squaredLength() - 1.0f) > Fleet::kNearValue)
+        return;
+    owned_fleets[fleet_id]->current_action = Fleet::Action::WarpLoading;
+}
+

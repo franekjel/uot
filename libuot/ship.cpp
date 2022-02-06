@@ -80,6 +80,27 @@ std::shared_ptr<Ship> Ship::ShipFromDesign(const int id, const std::shared_ptr<S
     return ship;
 }
 
+void Ship::JumpShip() 
+{ 
+    warp_drive_charge = 0.0f;
+}
+
+bool Ship::ChargeWarpDrive() 
+{
+    float charge_left = full_warp_drive_charge - warp_drive_charge;
+    if (energy >= charge_left)
+    {
+        energy -= charge_left;
+        warp_drive_charge = full_warp_drive_charge;
+    }
+    else
+    {
+        warp_drive_charge += energy;
+        energy = 0.0f;
+    }
+    return full_warp_drive_charge <= warp_drive_charge;
+}
+
 float Ship::GetShipSpeed()
 {
     speed = (energy >= engines_energy_consumtion ? speed : speed * (energy / engines_energy_consumtion));
@@ -138,6 +159,19 @@ void Fleet::UpdateFleet()
     }
 
     MoveFleet();
+
+    if (current_action == Action::WarpLoading)
+    {
+        bool is_ready_to_jump = true;
+        for (const auto &ship : ships)
+        {
+            is_ready_to_jump &= ship->ChargeWarpDrive();
+        }
+        if (is_ready_to_jump)
+        {
+            location_sector->JumpFleet(id);
+        }
+    }
 }
 
 void Fleet::UpdateFleetSpeed()
@@ -185,4 +219,14 @@ void Fleet::MoveFleet()
         }
         position += movement_vec;
     }
+}
+
+void Fleet::JumpFleet()
+{
+    for (const auto &ship : ships)
+    {
+        ship->JumpShip();
+    }
+
+    current_action = Action::None;
 }

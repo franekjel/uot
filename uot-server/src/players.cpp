@@ -114,7 +114,7 @@ std::shared_ptr<Colony> PlayersList::GetStartingColony(unsigned int player_id, s
                 continue;
             const auto& plan = std::dynamic_pointer_cast<Planet>(pl);
             plan->colony = startingColony;
-            sector->watchers.insert(player_id);
+            sector->watchers.insert({player_id, 1});
         }
     }
     return startingColony;

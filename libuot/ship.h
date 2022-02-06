@@ -85,6 +85,8 @@ struct Ship
     float speed;
     float engines_energy_consumtion;
     float construction_points;
+    float warp_drive_charge = 0.0f;
+    float full_warp_drive_charge = 100.0f;
     std::vector<Weapon> weapons;
     std::shared_ptr<ShipDesign> design;
 
@@ -93,7 +95,9 @@ struct Ship
     float GetShipSpeed();
 
     void RegenShip();
+    bool ChargeWarpDrive();
 
+    void JumpShip();
     void MoveShip(float distance) { energy -= engines_energy_consumtion * (distance / speed); }
 };
 
@@ -129,4 +133,5 @@ struct Fleet
     void UpdateFleetSpeed();
 
     void MoveFleet();
+    void JumpFleet();
 };
