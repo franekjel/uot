@@ -115,3 +115,21 @@ void Player::HandleMoveFleetRequest(int fleet_id, Point position)
 {
     owned_fleets[fleet_id]->wanted_position = position;
 }
+
+void Player::HandleJoinFleetRequest(int first_fleet_id, int second_fleet_id)
+{
+    if (owned_fleets.count(first_fleet_id) < 1 || owned_fleets.count(second_fleet_id) < 1)
+        return;
+
+    if (owned_fleets[first_fleet_id]->location_sector->sector_id !=
+        owned_fleets[second_fleet_id]->location_sector->sector_id)
+        return;
+
+    if ((owned_fleets[first_fleet_id]->position - owned_fleets[second_fleet_id]->position).squaredLength() >
+        Fleet::kNearValue)
+        return;
+
+    owned_fleets[first_fleet_id]->ships.insert(owned_fleets[first_fleet_id]->ships.end(),
+                                               owned_fleets[second_fleet_id]->ships.begin(),
+                                               owned_fleets[second_fleet_id]->ships.end());
+}
