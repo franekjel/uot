@@ -163,6 +163,27 @@ void PlayersList::CountWeeklyNumbers()
                         fleet->base_building_object->base;
                     player->known_galaxy->sectors[fleet->base_building_object->sector_id]->IncrementWatcher(
                         fleet->base_building_object->base->owner->id);
+
+                    fleet->building_progress = 0.0f;
+                    fleet->full_building_progress = 0.0f;
+                    fleet->base_building_object = nullptr;
+                }
+            }
+            else if (fleet->current_action == Fleet::Action::Colonize)
+            {
+                if (fleet->building_progress >= fleet->full_building_progress)
+                {
+                    fleet->colony_building_object->colony =
+                        std::make_shared<Colony>(id_source++, fleet->colony_building_object);
+                    player->owned_colonies[fleet->colony_building_object->colony->id] =
+                        fleet->colony_building_object->colony;
+                    fleet->colony_building_object->colony->population = Fleet::kColonizationCost;
+                    player->known_galaxy->sectors[fleet->colony_building_object->sector_id]->IncrementWatcher(
+                        fleet->colony_building_object->colony->owner->id);
+                    fleet->current_action = Fleet::Action::None;
+                    fleet->building_progress = 0.0f;
+                    fleet->full_building_progress = 0.0f;
+                    fleet->colony_building_object = nullptr;
                 }
             }
         }
@@ -179,7 +200,7 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
 
     // cleanup
 
-    for (auto& [id,sector] : galaxy->sectors)
+    for (auto& [id, sector] : galaxy->sectors)
     {
         sector->joined_fleets.clear();
         sector->new_watchers.clear();
@@ -301,7 +322,8 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
 
     for (const auto& [fleet_id, fleet] : player_fleets)
     {
-        if (fleet->current_action == Fleet::Action::BuildAsteroidMine)
+        if (fleet->current_action == Fleet::Action::BuildAsteroidMine ||
+            fleet->current_action == Fleet::Action::Colonize)
         {
             fleet->building_progress += fleet->construction_points;
         }

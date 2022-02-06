@@ -203,7 +203,7 @@ void Player::HandleBuildAsteroidMineFleetRequest(int fleet_id)
 
     for (const auto &[obj_id, obj] : handled_fleet->location_sector->objects)
     {
-        if ((handled_fleet->position - obj->position).squaredLength() < Fleet::kNearValue)
+        if ((handled_fleet->position - obj->position).squaredLength() <= Fleet::kNearValue)
         {
             auto inhabitable = std::dynamic_pointer_cast<InhabitableObject>(obj);
             if (inhabitable && !inhabitable->base)
@@ -264,7 +264,7 @@ void Player::HandleCancelFleetRequest(int fleet_id)
             current_fleet->full_building_progress = 0.0f;
             break;
         case Fleet::Action::Colonize:
-            //TODO
+            // TODO
             break;
         case Fleet::Action::Invade:
             // TODO
@@ -273,4 +273,49 @@ void Player::HandleCancelFleetRequest(int fleet_id)
             break;
     }
     current_fleet->current_action = Fleet::Action::None;
+}
+
+void Player::HandleColonizeFleetRequest(int fleet_id)
+{
+    if (owned_fleets.count(fleet_id) < 1)
+        return;
+
+    auto handled_fleet = owned_fleets[fleet_id];
+
+    if (handled_fleet->current_action != Fleet::Action::None || handled_fleet->construction_points <= 0.0f ||
+        handled_fleet->civilians < Fleet::kColonizationCost)
+        return;
+
+    handled_fleet->colony_building_object = nullptr;
+
+    for (const auto &[obj_id, obj] : handled_fleet->location_sector->objects)
+    {
+        if ((handled_fleet->position - obj->position).squaredLength() <= Fleet::kNearValue)
+        {
+            auto planet = std::dynamic_pointer_cast<Planet>(obj);
+            if (planet && !planet->colony)
+            {
+                handled_fleet->colony_building_object = planet;
+                break;
+            }
+        }
+    }
+    if (!handled_fleet->colony_building_object)
+        return;
+
+    auto labour_cost = handled_fleet->colony_building_object->colony_work_cost;
+
+    if (owned_resources[Resource::Metals] < handled_fleet->colony_building_object->colony_metal_cost)
+    {
+        handled_fleet->colony_building_object = nullptr;
+        return;
+    }
+    else
+    {
+        owned_resources[Resource::Metals] -= handled_fleet->colony_building_object->colony_metal_cost;
+        handled_fleet->full_building_progress = labour_cost;
+        handled_fleet->building_progress = 0.0f;
+        handled_fleet->civilians -= handled_fleet->kColonizationCost;
+        handled_fleet->current_action = Fleet::Action::Colonize;
+    }
 }

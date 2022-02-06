@@ -117,6 +117,7 @@ struct Fleet
     unsigned int owner_id;
 
     std::shared_ptr<InhabitableObject> base_building_object;
+    std::shared_ptr<Planet> colony_building_object;
     float building_progress;
     float full_building_progress;
 
