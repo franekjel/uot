@@ -25,7 +25,7 @@ set(SRCS
     msg/messagetypes.cpp
     msg/messagestructs.h
     msg/messagestructs.cpp
-)
+ "sector.cpp")
 
 add_library(${LIB_NAME}
     ${SRCS}
