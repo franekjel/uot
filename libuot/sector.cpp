@@ -20,6 +20,7 @@ void Sector::JumpFleet(unsigned int fleet_id)
     }
 
     this_fleet->JumpFleet();
+    this_fleet->position = (position - dest->position).normalized();
 
     present_fleets.erase(present_fleets.find(fleet_id));
 
@@ -29,6 +30,9 @@ void Sector::JumpFleet(unsigned int fleet_id)
     dest->IncrementWatcher(this_fleet->owner_id);
 
     this_fleet->location_sector = dest;
+
+    dest->jumped_fleets.push_back(
+        Sector::JumpedFleet{fleet_id, sector_id, dest->sector_id, this_fleet->position, this_fleet->owner_id});
 }
 
 void Sector::DecrementWatcher(unsigned int player_id)

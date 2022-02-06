@@ -166,8 +166,9 @@ void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int se
     owned_fleets.erase(owned_fleets.find(second_fleet_id));
 
     auto &sector = owned_fleets[first_fleet_id]->location_sector;
-    sector->joined_fleets.push_back(
-        Sector::JoinedFleets{first_fleet_id, second_fleet_id, first_fleet_id, owned_fleets[first_fleet_id]->position});
+    sector->joined_fleets.push_back(Sector::JoinedFleets{first_fleet_id, second_fleet_id, first_fleet_id,
+                                                         owned_fleets[first_fleet_id]->position,
+                                                         owned_fleets[first_fleet_id]->owner_id});
 }
 
 void Player::HandleWarpLoadingFleetRequest(int fleet_id)

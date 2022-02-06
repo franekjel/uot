@@ -114,6 +114,12 @@ bool operator==(messageTypes::MsgFleetsJoin& f1, messageTypes::MsgFleetsJoin& f2
            f1.result_fleet_id == f2.result_fleet_id && f1.result_fleet_pos == f2.result_fleet_pos;
 }
 
+bool operator==(messageTypes::MsgFleetsJump& f1, messageTypes::MsgFleetsJump& f2)
+{
+    return f1.fleet_id == f2.fleet_id && f1.sector_id_from == f2.sector_id_from && f1.sector_id_to == f2.sector_id_to &&
+           f1.position == f2.position;
+}
+
 bool operator==(messageTypes::MsgWatchedSectorUpdate& u1, messageTypes::MsgWatchedSectorUpdate& u2)
 {
     if (u1.sector_id != u2.sector_id)
@@ -194,7 +200,7 @@ void StartGamePayloadTest()
 
     auto cast = std::dynamic_pointer_cast<messageTypes::StartGamePayload>(des);
 
-    if (cast->galaxy.sectors.size() != 3)
+    if (cast->galaxy.sectors.size() != 1)
         std::cout << "StartGame - wrong sectors count\n";
 
     auto s0 = cast->galaxy.sectors[0];
@@ -287,6 +293,12 @@ void NewTurnPayloadTest()
     watchedSectorUpdate1.fleets.push_back(fleet1);
     watchedSectorUpdate1.fleets.push_back(fleet2);
 
+    messageTypes::MsgFleetsJoin jf{{1, 2, 1, {3.0, 3.0}}};
+    ntp.joined_fleets.push_back(jf);
+
+    messageTypes::MsgFleetsJump juf{{1, 2, 1, {3.0, 3.0}}};
+    ntp.jumped_fleets.push_back(juf);
+
     watchedSectorUpdate2.fleets.push_back(fleet3);
 
     ntp.watched_sectors_updates.push_back(watchedSectorUpdate1);
@@ -310,6 +322,12 @@ void NewTurnPayloadTest()
 
     if (cast->watched_sectors_updates.size() != 2)
         std::cout << "NewTurn - wrong watched sectors size\n";
+
+    if (cast->joined_fleets.size() != 1)
+        std::cout << "NewTurn - wrong joined fleets size\n";
+
+    if (cast->jumped_fleets.size() != 1)
+        std::cout << "NewTurn - wrong jumped fleets size\n";
 
     auto food = cast->updated_resources[Resource::Food];
     auto metals = cast->updated_resources[Resource::Metals];
@@ -335,6 +353,14 @@ void NewTurnPayloadTest()
     auto ws2 = cast->watched_sectors_updates[1];
     if (!(ws1 == watchedSectorUpdate1) || !(ws2 == watchedSectorUpdate2))
         std::cout << "NewTurn - wrong watched sectors\n";
+
+    auto jf1 = cast->joined_fleets[0];
+    if (!(jf1 == jf))
+        std::cout << "NewTurn - wrong joined fleets\n";
+
+        auto juf1 = cast->jumped_fleets[0];
+    if (!(juf1 == juf))
+        std::cout << "NewTurn - wrong joined fleets\n";
 }
 
 void ActionsPayloadTest()
