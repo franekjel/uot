@@ -63,7 +63,7 @@ struct ActionsPayload : BasePayload  // Player's actions
 {
     std::vector<MsgBuildRequest> buildRequests;
     std::vector<MsgMoveFleetRequest> moveFleetRequests;
-    Technology::TechnologyType technologyRequest;  // if none requested, set to None
+    Technology::TechnologyType technologyRequest;  // if none requested, set to Empty
     std::vector<MsgJoinFleetsRequest> joinFleetsRequests;
     std::vector<MsgFleetActionRequest> fleetActionRequests;
     std::vector<MsgShipDesign> shipDesignRequests;
