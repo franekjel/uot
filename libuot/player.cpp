@@ -157,6 +157,13 @@ void Player::HandleJoinFleetRequest(int first_fleet_id, int second_fleet_id)
     owned_fleets[first_fleet_id]->ships.insert(owned_fleets[first_fleet_id]->ships.end(),
                                                owned_fleets[second_fleet_id]->ships.begin(),
                                                owned_fleets[second_fleet_id]->ships.end());
+
+    owned_fleets[first_fleet_id]->location_sector->present_fleets.erase(
+        owned_fleets[first_fleet_id]->location_sector->present_fleets.find(second_fleet_id));
+
+    owned_fleets[first_fleet_id]->location_sector->watchers[owned_fleets[first_fleet_id]->owner_id]--;
+
+    owned_fleets.erase(owned_fleets.find(second_fleet_id));
 }
 
 void Player::HandleWarpLoadingFleetRequest(int fleet_id)
