@@ -53,6 +53,24 @@ struct Player
            const unsigned int& starting_colony_obj_id);
     std::map<Resource, bool> resources_changed;
     std::set<Technology::TechnologyType> new_technologies;
+
+    struct ChangedDesign
+    {
+        unsigned int design_id;
+        std::shared_ptr<ShipDesign> design;
+        bool deleted;
+    };
+    std::vector<ChangedDesign> changed_designs;
+
+    struct NewShip
+    {
+        std::shared_ptr<Ship> ship;
+        unsigned int design_id;
+        unsigned int planet_id;
+        bool created;
+        bool new_fleet;
+    };
+    std::vector<NewShip> new_ships;
 };
 
 inline bool operator==(const Player& lhs, const Player& rhs) { return lhs.id == rhs.id; }
