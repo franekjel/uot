@@ -152,6 +152,16 @@ messageTypes::MsgFleet::MsgFleet(const std::shared_ptr<Fleet>& fleet, unsigned i
     position = fleet->position;
 }
 
+messageTypes::MsgFleetsJoin::MsgFleetsJoin() {}
+
+messageTypes::MsgFleetsJoin::MsgFleetsJoin(const Sector::JoinedFleets& joined_fleets)
+    : joined_fleet_id_1(joined_fleets.joined_fleet_1),
+      joined_fleet_id_2(joined_fleets.joined_fleet_2),
+      result_fleet_id(joined_fleets.res_fleet),
+      result_fleet_pos(joined_fleets.res_fleet_pos)
+{
+}
+
 messageTypes::MsgWatchedSectorUpdate::MsgWatchedSectorUpdate() {}
 
 messageTypes::MsgWatchedSectorUpdate::MsgWatchedSectorUpdate(int sector_id_) : sector_id(sector_id_) { fleets = {}; }

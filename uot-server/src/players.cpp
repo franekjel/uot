@@ -51,7 +51,7 @@ unsigned int PlayersList::GetStartingColonyObjId(unsigned int player_id, unsigne
         return UINT_MAX;
     std::shared_ptr<Colony> startingColony = std::make_shared<Colony>(player_id, planet);
     planet->colony = startingColony;
-    sector->watchers.insert({ player_id, 1});
+    sector->watchers.insert({player_id, 1});
     return planet->id;
 }
 
@@ -102,7 +102,7 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
 
     for (const auto& fleet_action_request : payload->fleetActionRequests)
     {
-        //TODO
+        // TODO
     }
 
     return true;
@@ -125,6 +125,13 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
     for (auto& player : players)
     {
         messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first], galaxy);
+    }
+
+    // cleanup
+
+    for (auto& sector : galaxy->sectors)
+    {
+        sector.second->joined_fleets.clear();
     }
 }
 

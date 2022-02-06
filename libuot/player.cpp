@@ -136,12 +136,12 @@ void Player::HandleBuildRequest(Building::BuildingType type, Building::BuildingT
     colony->second->AddBuildingToQueue(type, upgrade_from);
 }
 
-void Player::HandleMoveFleetRequest(int fleet_id, Point position)
+void Player::HandleMoveFleetRequest(unsigned int fleet_id, Point position)
 {
     owned_fleets[fleet_id]->wanted_position = position;
 }
 
-void Player::HandleJoinFleetRequest(int first_fleet_id, int second_fleet_id)
+void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int second_fleet_id)
 {
     if (owned_fleets.count(first_fleet_id) < 1 || owned_fleets.count(second_fleet_id) < 1)
         return;
@@ -164,6 +164,10 @@ void Player::HandleJoinFleetRequest(int first_fleet_id, int second_fleet_id)
     owned_fleets[first_fleet_id]->location_sector->watchers[owned_fleets[first_fleet_id]->owner_id]--;
 
     owned_fleets.erase(owned_fleets.find(second_fleet_id));
+
+    auto &sector = owned_fleets[first_fleet_id]->location_sector;
+    sector->joined_fleets.push_back(
+        Sector::JoinedFleets{first_fleet_id, second_fleet_id, first_fleet_id, owned_fleets[first_fleet_id]->position});
 }
 
 void Player::HandleWarpLoadingFleetRequest(int fleet_id)
@@ -176,4 +180,3 @@ void Player::HandleWarpLoadingFleetRequest(int fleet_id)
         return;
     owned_fleets[fleet_id]->current_action = Fleet::Action::WarpLoading;
 }
-

@@ -138,11 +138,25 @@ struct MsgFleet
     MsgFleet(const std::shared_ptr<Fleet>& fleet, unsigned int player_id_);
 };
 
+struct MsgFleetsJoin
+{
+    unsigned int joined_fleet_id_1;
+    unsigned int joined_fleet_id_2;
+    unsigned int result_fleet_id;
+    Point result_fleet_pos;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleetsJoin, joined_fleet_id_1, joined_fleet_id_2, result_fleet_id,
+                                   result_fleet_pos)
+    MsgFleetsJoin();
+    MsgFleetsJoin(const Sector::JoinedFleets& joined_fleets);
+};
+
 struct MsgWatchedSectorUpdate
 {
     int sector_id;
-    std::vector<MsgFleet> fleets;  // every fleet in sector, these which flew away, are just not shown
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgWatchedSectorUpdate, sector_id, fleets)
+    std::vector<MsgFleet> fleets;             // every fleet in sector, these which flew away, are just not shown
+    std::vector<MsgFleetsJoin> joinedFleets;  // both player and other players joins
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgWatchedSectorUpdate, sector_id, fleets, joinedFleets)
     MsgWatchedSectorUpdate();
     MsgWatchedSectorUpdate(int sector_id_);
 };

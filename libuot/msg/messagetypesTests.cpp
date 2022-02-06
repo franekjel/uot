@@ -108,6 +108,12 @@ bool operator==(messageTypes::MsgFleet& f1, messageTypes::MsgFleet& f2)
     return f1.id == f2.id && f1.player_id == f2.player_id && f1.position == f2.position;
 }
 
+bool operator==(messageTypes::MsgFleetsJoin& f1, messageTypes::MsgFleetsJoin& f2)
+{
+    return f1.joined_fleet_id_1 == f2.joined_fleet_id_1 && f1.joined_fleet_id_2 == f2.joined_fleet_id_2 &&
+           f1.result_fleet_id == f2.result_fleet_id && f1.result_fleet_pos == f2.result_fleet_pos;
+}
+
 bool operator==(messageTypes::MsgWatchedSectorUpdate& u1, messageTypes::MsgWatchedSectorUpdate& u2)
 {
     if (u1.sector_id != u2.sector_id)
@@ -118,6 +124,13 @@ bool operator==(messageTypes::MsgWatchedSectorUpdate& u1, messageTypes::MsgWatch
 
     for (int i = 0; i < u1.fleets.size(); ++i)
         if (!(u1.fleets[i] == u2.fleets[i]))
+            return false;
+
+    if (u1.joinedFleets.size() != u2.joinedFleets.size())
+        return false;
+
+    for (int i = 0; i < u1.joinedFleets.size(); ++i)
+        if (!(u1.joinedFleets[i] == u2.joinedFleets[i]))
             return false;
 
     return true;
@@ -276,6 +289,9 @@ void NewTurnPayloadTest()
 
     watchedSectorUpdate1.fleets.push_back(fleet1);
     watchedSectorUpdate1.fleets.push_back(fleet2);
+
+    messageTypes::MsgFleetsJoin jf{{1, 2, 1, {3.0, 3.0}}};
+    watchedSectorUpdate1.joinedFleets.push_back(jf);
 
     watchedSectorUpdate2.fleets.push_back(fleet3);
 
