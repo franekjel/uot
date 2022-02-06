@@ -132,6 +132,10 @@ void rendering::render_planet_view::_draw(client_context& context)
         build->elems.clear();
         built->elems.clear();
         queue->elems.clear();
+        _build.clear();
+        _built.clear();
+        _queue.clear();
+
         auto available_buildings = pl->colony->GetAvailableBuildings();
         for (const auto& [b, count] : available_buildings)
         {
@@ -151,7 +155,7 @@ void rendering::render_planet_view::_draw(client_context& context)
         for (const auto& b : pl->colony->building_queue)
         {
             queue->elems.push_back(Buildings.at(b.type).name + "  " +
-                             std::to_string(b.worker_week_units_left));
+                             std::to_string(static_cast<int>(b.worker_week_units_left)));
             _queue.push_back(b.type);
         }
     }
