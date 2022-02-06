@@ -21,6 +21,7 @@ struct Point
     }
 
     bool operator==(const Point& b) { return x == b.x && y == b.y; }
+    bool operator!=(const Point& b) { return !operator==(b); }
 
     Point& operator+=(const Point& p)
     {

@@ -71,15 +71,24 @@ struct MsgPlanet
     MsgPlanet(const std::shared_ptr<Planet>& planet);
 };
 
+struct MsgNeighbor
+{
+    int id;
+    Point position;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgNeighbor, id, position)
+    MsgNeighbor();
+    MsgNeighbor(const std::shared_ptr<Sector>& sector);
+};
+
 struct MsgSector
 {
     int id;
     Point position;
-    std::vector<int> neighbors_ids;
+    std::vector<MsgNeighbor> neighbors;
     std::vector<MsgStar> stars;
     std::vector<MsgInhabitable> inhabitables;
     std::vector<MsgPlanet> planets;
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgSector, id, position, neighbors_ids, stars, inhabitables, planets)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgSector, id, position, neighbors, stars, inhabitables, planets)
     MsgSector();
     MsgSector(const std::shared_ptr<Sector>& sector);
 };
@@ -89,7 +98,7 @@ struct MsgGalaxy
     std::vector<MsgSector> sectors;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgGalaxy, sectors)
     MsgGalaxy();
-    MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy);
+    MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy, const std::shared_ptr<Player>& player);
 };
 
 struct MsgShipDesign
@@ -138,11 +147,58 @@ struct MsgFleet
     MsgFleet(const std::shared_ptr<Fleet>& fleet, unsigned int player_id_);
 };
 
+struct MsgFleetsJoin
+{
+    unsigned int joined_fleet_id_1;
+    unsigned int joined_fleet_id_2;
+    unsigned int result_fleet_id;
+    Point result_fleet_pos;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleetsJoin, joined_fleet_id_1, joined_fleet_id_2, result_fleet_id,
+                                   result_fleet_pos)
+    MsgFleetsJoin();
+    MsgFleetsJoin(const Sector::JoinedFleets& joined_fleets);
+};
+
+struct MsgFleetsJump
+{
+    unsigned int fleet_id;
+    unsigned int sector_id_from;
+    unsigned int sector_id_to;
+    Point position;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleetsJump, fleet_id, sector_id_from, sector_id_to, position)
+    MsgFleetsJump();
+    MsgFleetsJump(const Sector::JumpedFleet& jumped_fleet);
+};
+
+struct MsgNewBase
+{
+    unsigned int base_id;
+    unsigned int object_id;
+    unsigned int owner;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgNewBase, base_id, object_id, owner)
+    MsgNewBase();
+    MsgNewBase(const Sector::NewBase& new_base);
+};
+
+struct MsgNewColony
+{
+    unsigned int colony_id;
+    unsigned int object_id;
+    unsigned int owner;
+    float population;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgNewColony, colony_id, object_id, owner, population)
+    MsgNewColony();
+    MsgNewColony(const Sector::NewColony& new_colony);
+};
+
 struct MsgWatchedSectorUpdate
 {
     int sector_id;
     std::vector<MsgFleet> fleets;  // every fleet in sector, these which flew away, are just not shown
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgWatchedSectorUpdate, sector_id, fleets)
+    std::vector<MsgNewColony> new_colonies;
+    std::vector<MsgNewBase> new_bases;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgWatchedSectorUpdate, sector_id, fleets, new_colonies, new_bases)
     MsgWatchedSectorUpdate();
     MsgWatchedSectorUpdate(int sector_id_);
 };

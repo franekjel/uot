@@ -127,13 +127,40 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
 
     for (const auto& [sector_id, sector] : galaxy->sectors)
     {
-        if (sector->watchers.count(player->id) != 0)
+        if (sector->new_watchers.count(player->id))
+        {
+            payload.new_sectors.push_back(messageTypes::MsgSector(sector));
+        }
+        if (sector->watchers.count(player->id) != 0 && sector->watchers[player->id] > 0)
         {
             auto sector_update_msg = messageTypes::MsgWatchedSectorUpdate(sector_id);
             for (const auto& [id, fleet] : sector->present_fleets)
             {
                 sector_update_msg.fleets.push_back(messageTypes::MsgFleet(fleet, fleet->owner_id));
             }
+
+            for (const auto& new_base : sector->new_bases)
+            {
+                sector_update_msg.new_bases.push_back(messageTypes::MsgNewBase(new_base));
+            }
+
+            for (const auto& new_colony : sector->new_colonies)
+            {
+                sector_update_msg.new_colonies.push_back(messageTypes::MsgNewColony(new_colony));
+            }
+
+            for (const auto& joined_fleet : sector->joined_fleets)
+            {
+                if (joined_fleet.owner == player->id)
+                    payload.joined_fleets.push_back(messageTypes::MsgFleetsJoin(joined_fleet));
+            }
+
+            for (const auto& jumped_fleet : sector->jumped_fleets)
+            {
+                if (jumped_fleet.owner == player->id)
+                    payload.jumped_fleets.push_back(messageTypes::MsgFleetsJump(jumped_fleet));
+            }
+
             payload.watched_sectors_updates.push_back(sector_update_msg);
         }
     }
@@ -167,12 +194,13 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
     txrx.send_reliable(player_net_name, payload.Serialize());
 }
 
-void net_server_uot::send_game_begin_message(std::shared_ptr<Player>& player, std::string player_net_name)
+void net_server_uot::send_game_begin_message(std::shared_ptr<Player>& player, std::string player_net_name,
+                                             std::shared_ptr<Galaxy>& galaxy)
 {
     messageTypes::StartGamePayload payload;
 
     payload.player_id = player->id;
-    payload.galaxy = messageTypes::MsgGalaxy(player->known_galaxy);
+    payload.galaxy = messageTypes::MsgGalaxy(galaxy, player);
     payload.starting_resources = {};
     for (const auto& resource : player->owned_resources)
     {

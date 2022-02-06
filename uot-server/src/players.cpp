@@ -1,9 +1,8 @@
 #include "../headers/players.h"
+#include <climits>
 
-std::shared_ptr<Galaxy> PlayersList::GetStartingGalaxy(std::shared_ptr<Galaxy> wholeGalaxy)
+unsigned int PlayersList::GetStartingSectorId(std::shared_ptr<Galaxy> wholeGalaxy)
 {
-    // TODO: Copy one empty (without another player) sector with at least one planet from wholeGalaxy
-    auto known_galaxy = std::make_shared<Galaxy>();
     for (const auto& [id, sector] : wholeGalaxy->sectors)
     {
         int num_of_planets = 0;
@@ -22,56 +21,11 @@ std::shared_ptr<Galaxy> PlayersList::GetStartingGalaxy(std::shared_ptr<Galaxy> w
         }
         if (num_of_planets > 0)
         {
-            std::shared_ptr<Sector> new_sector = std::make_shared<Sector>();
-
-            new_sector->sector_id = sector->sector_id;
-            new_sector->position = sector->position;
-
-            for (auto& neigh : sector->neighbors)
-            {
-                auto new_neigh = std::make_shared<Sector>();
-                new_neigh->sector_id = neigh->sector_id;
-                new_neigh->position = neigh->position;
-                new_sector->neighbors.insert(new_neigh);
-                known_galaxy->sectors.insert({new_neigh->sector_id, new_neigh});
-            }
-
-            for (auto& [id, obj] : sector->objects)
-            {
-                const auto& star = std::dynamic_pointer_cast<Star>(obj);
-                const auto& inhabitable = std::dynamic_pointer_cast<InhabitableObject>(obj);
-                const auto& planet = std::dynamic_pointer_cast<Planet>(obj);
-
-                if (!!star)
-                {
-                    new_sector->objects.insert(
-                        {id, std::make_shared<Star>(SectorObject(id, star->position, star->size), star->star_type)});
-                }
-                else if (!!inhabitable)
-                {
-                    new_sector->objects.insert({id, std::make_shared<InhabitableObject>(
-                                                        SectorObject(id, inhabitable->position, inhabitable->size),
-                                                        std::map<Resource, float>(), inhabitable->object_type)});
-                }
-                else if (!!planet)
-                {
-                    auto new_planetary_features = std::map<PlanetaryFeatures::PlanetaryFeatureType, int>();
-                    for (auto feature : planet->planetary_features)
-                    {
-                        new_planetary_features.insert(feature);
-                    }
-                    new_sector->objects.insert(
-                        {id, std::make_shared<Planet>(SectorObject(id, planet->position, planet->size), planet->climate,
-                                                      new_planetary_features)});
-                }
-            }
-
-            known_galaxy->sectors.insert({new_sector->sector_id, new_sector});
-            break;
+            return id;
         }
     }
 
-    return known_galaxy;
+    return UINT_MAX;
 }
 
 std::map<Resource, float> PlayersList::GetStartingResources()
@@ -80,60 +34,44 @@ std::map<Resource, float> PlayersList::GetStartingResources()
     return {{Resource::Food, 100.0f}, {Resource::Metals, 100.0f}};
 }
 
-std::shared_ptr<Colony> PlayersList::GetStartingColony(unsigned int player_id, std::shared_ptr<Galaxy> startingGalaxy,
-                                                       std::shared_ptr<Galaxy> wholeGalaxy)
+unsigned int PlayersList::GetStartingColonyObjId(unsigned int player_id, unsigned int startingSectorId,
+                                                 std::shared_ptr<Galaxy> wholeGalaxy)
 {
     std::shared_ptr<Planet> planet = nullptr;
-    int starting_sector_id = -1;
-    for (const auto& [id, sector] : startingGalaxy->sectors)
+    auto& sector = wholeGalaxy->sectors[startingSectorId];
+    for (const auto& [id, sector_object] : sector->objects)
     {
-        for (const auto& [id, sector_object] : sector->objects)
+        std::shared_ptr<Planet> is_planet = std::dynamic_pointer_cast<Planet>(sector_object);
+        if (!!is_planet && !(is_planet->colony))
         {
-            std::shared_ptr<Planet> is_planet = std::dynamic_pointer_cast<Planet>(sector_object);
-            if (!!is_planet && !(is_planet->colony))
-            {
-                planet = is_planet;
-                break;
-            }
-        }
-        if (!planet)
+            planet = is_planet;
             break;
-        starting_sector_id = sector->sector_id;
+        }
     }
     if (!planet)
-        return {};
-    std::shared_ptr<Colony> startingColony = std::make_shared<Colony>(player_id, planet);
+        return UINT_MAX;
+    std::shared_ptr<Colony> startingColony = std::make_shared<Colony>(id_source++, planet);
     planet->colony = startingColony;
-    for (auto& [id, sector] : wholeGalaxy->sectors)
-    {
-        if (sector->sector_id != starting_sector_id)
-            continue;
-        for (auto& [id, pl] : sector->objects)
-        {
-            if (pl->id != planet->id)
-                continue;
-            const auto& plan = std::dynamic_pointer_cast<Planet>(pl);
-            plan->colony = startingColony;
-            sector->watchers.insert(player_id);
-        }
-    }
-    return startingColony;
+    sector->watchers.insert({player_id, 1});
+    return planet->id;
 }
 
 bool PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy> wholeGalaxy)
 {
     unsigned int id = player_id++;
-    std::shared_ptr<Galaxy> startingGalaxy = GetStartingGalaxy(wholeGalaxy);
-    if (!startingGalaxy)
+    unsigned int startingSectorId = GetStartingSectorId(wholeGalaxy);
+    if (startingSectorId == UINT_MAX)
         return false;
-    std::shared_ptr<Colony> startingColony = GetStartingColony(id, startingGalaxy, wholeGalaxy);
-    if (!startingColony)
+    unsigned int startingColonyObjId = GetStartingColonyObjId(id, startingSectorId, wholeGalaxy);
+    if (startingColonyObjId == UINT_MAX)
         return false;
     std::shared_ptr<Player> new_player =
-        std::make_shared<Player>(id, startingGalaxy, GetStartingResources(), startingColony);
+        std::make_shared<Player>(id, wholeGalaxy, GetStartingResources(), startingSectorId, startingColonyObjId);
     if (!new_player)
         return false;
-    startingColony->owner = new_player;
+    auto& obj = wholeGalaxy->sectors[startingSectorId]->objects[startingColonyObjId];
+    std::shared_ptr<Planet> startingPlanet = std::dynamic_pointer_cast<Planet>(obj);
+    startingPlanet->colony->owner = new_player;
     players[id] = new_player;
     players_net_names[id] = player_net_name;
     players_net_names_rev[player_net_name] = id;
@@ -158,18 +96,108 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
     if (payload->technologyRequest != Technology::TechnologyType::Empty)
         player->HandleStartTechnologyResearch(payload->technologyRequest);
 
+    for (const auto& join_fleet_request : payload->joinFleetsRequests)
+    {
+        player->HandleJoinFleetRequest(join_fleet_request.fleet1_id, join_fleet_request.fleet2_id);
+    }
+
+    for (const auto& fleet_action_request : payload->fleetActionRequests)
+    {
+        switch (fleet_action_request.action)
+        {
+            case Fleet::Action::BuildAsteroidMine:
+                player->HandleBuildAsteroidMineFleetRequest(fleet_action_request.fleet_id);
+            case Fleet::Action::CancelAction:
+                player->HandleCancelFleetRequest(fleet_action_request.fleet_id);
+            case Fleet::Action::Colonize:
+                player->HandleColonizeFleetRequest(fleet_action_request.fleet_id);
+            case Fleet::Action::Invade:
+            case Fleet::Action::None:
+                break;
+
+            case Fleet::Action::WarpLoading:
+                player->HandleWarpLoadingFleetRequest(fleet_action_request.fleet_id);
+                break;
+
+            default:
+                break;
+        }
+    }
+
     return true;
 }
 
 void PlayersList::CountWeeklyNumbers()
 {
-    std::vector<std::thread> player_threads(players.size());
-    int player_num = 0;
-    for (auto& player : players)
-        player_threads[player_num++] = std::thread(CountWeeklyNumbersPlayer, player.second);
+    // std::vector<std::thread> player_threads(players.size());
+    // int player_num = 0;
+    // for (auto& player : players)
+    //    player_threads[player_num++] = std::thread(CountWeeklyNumbersPlayer, player.second);
 
-    for (auto& thread : player_threads)
-        thread.join();
+    // for (auto& thread : player_threads)
+    //    thread.join();
+
+    // Let it be synchornic for now - can be done async but too much work for now
+
+    for (auto& player : players)
+        CountWeeklyNumbersPlayer(player.second);
+
+    // here are weekly actions performed that could not have been done multithreadedly
+    for (auto& [player_id, player] : players)
+    {
+        auto& player_fleets = player->owned_fleets;
+        for (const auto& [fleet_id, fleet] : player_fleets)
+        {
+            if (fleet->current_action == Fleet::Action::BuildAsteroidMine)
+            {
+                if (fleet->building_progress >= fleet->full_building_progress)
+                {
+                    if (fleet->base_building_object->base)
+                    {
+                        fleet->base_building_object->base->owner->owned_space_bases.erase(
+                            fleet->base_building_object->base->owner->owned_space_bases.find(
+                                fleet->base_building_object->base->id));
+                        player->known_galaxy->sectors[fleet->base_building_object->sector_id]->DecrementWatcher(
+                            fleet->base_building_object->base->owner->id);
+                    }
+                    auto& bb_object = fleet->base_building_object;
+                    bb_object->base = std::make_shared<SpaceBase>(id_source++, bb_object, player);
+                    auto& base = bb_object->base;
+                    fleet->current_action = Fleet::Action::None;
+                    player->owned_space_bases[base->id] = base;
+                    player->known_galaxy->sectors[bb_object->sector_id]->IncrementWatcher(base->owner->id);
+
+                    fleet->building_progress = 0.0f;
+                    fleet->full_building_progress = 0.0f;
+                    fleet->base_building_object = nullptr;
+
+                    auto& sector = player->known_galaxy->sectors[fleet->base_building_object->sector_id];
+                    sector->new_bases.push_back({base->id, bb_object->id, player->id});
+                }
+            }
+            else if (fleet->current_action == Fleet::Action::Colonize)
+            {
+                if (fleet->building_progress >= fleet->full_building_progress)
+                {
+                    auto& cb_object = fleet->colony_building_object;
+                    cb_object->colony = std::make_shared<Colony>(id_source++, cb_object);
+                    auto& colony = cb_object->colony;
+                    player->owned_colonies[fleet->colony_building_object->colony->id] =
+                        fleet->colony_building_object->colony;
+                    fleet->colony_building_object->colony->population = Fleet::kColonizationCost;
+                    player->known_galaxy->sectors[fleet->colony_building_object->sector_id]->IncrementWatcher(
+                        fleet->colony_building_object->colony->owner->id);
+                    fleet->current_action = Fleet::Action::None;
+                    fleet->building_progress = 0.0f;
+                    fleet->full_building_progress = 0.0f;
+                    fleet->colony_building_object = nullptr;
+
+                    auto& sector = player->known_galaxy->sectors[fleet->base_building_object->sector_id];
+                    sector->new_colonies.push_back({colony->id, cb_object->id, player->id, colony->population});
+                }
+            }
+        }
+    }
 }
 
 void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_service,
@@ -179,13 +207,23 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
     {
         messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first], galaxy);
     }
+
+    // cleanup
+
+    for (auto& [id, sector] : galaxy->sectors)
+    {
+        sector->joined_fleets.clear();
+        sector->new_watchers.clear();
+        sector->new_bases.clear();
+        sector->new_colonies.clear();
+    }
 }
 
-void PlayersList::SendStartGameMessage(net_server_uot& messaging_service)
+void PlayersList::SendStartGameMessage(net_server_uot& messaging_service, std::shared_ptr<Galaxy>& galaxy)
 {
     for (auto& player : players)
     {
-        messaging_service.send_game_begin_message(player.second, players_net_names[player.first]);
+        messaging_service.send_game_begin_message(player.second, players_net_names[player.first], galaxy);
     }
 }
 
@@ -195,7 +233,6 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     auto& player_resources_change = player->resources_changed;
     auto& player_colonies = player->owned_colonies;
     auto& player_space_bases = player->owned_space_bases;
-    auto& player_galaxy = player->known_galaxy;
     auto& player_fleets = player->owned_fleets;
     auto& player_research = player->researched_technology;
 
@@ -294,6 +331,15 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
         else
             player_research.progress_left -= player_resources[Resource::Technology];
     }
+
+    for (const auto& [fleet_id, fleet] : player_fleets)
+    {
+        if (fleet->current_action == Fleet::Action::BuildAsteroidMine ||
+            fleet->current_action == Fleet::Action::Colonize)
+        {
+            fleet->building_progress += fleet->construction_points;
+        }
+    }
 }
 
 void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
@@ -306,12 +352,15 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
 
 void PlayersList::CountEveryTurnNumbers()
 {
-    // Async Part like ships upkeep costs
-    std::vector<std::thread> player_threads(players.size());
-    int player_num = 0;
-    for (auto& player : players)
-        player_threads[player_num++] = std::thread(CountEveryTurnNumbersPlayer, player.second);
+    //// Async Part like ships upkeep costs
+    // std::vector<std::thread> player_threads(players.size());
+    // int player_num = 0;
+    // for (auto& player : players)
+    //    player_threads[player_num++] = std::thread(CountEveryTurnNumbersPlayer, player.second);
 
-    for (auto& thread : player_threads)
-        thread.join();
+    // for (auto& thread : player_threads)
+    //    thread.join();
+
+    for (auto& player : players)
+        CountEveryTurnNumbersPlayer(player.second);
 }

@@ -81,12 +81,53 @@ struct Sector
     /* Sector is circle with R=1.0 and star in centre
      */
 
-    int sector_id;
+    unsigned int sector_id;
     Point position;  // position on galaxy map
     std::set<std::shared_ptr<Sector>> neighbors;
     std::map<unsigned int, std::shared_ptr<SectorObject>> objects;
     std::map<unsigned int, std::shared_ptr<Fleet>> present_fleets;
 
     // fields below are server-only
-    std::set<unsigned int> watchers;  // players who are watching the sector, only for server purpose
+    std::map<unsigned int, unsigned int> watchers;  // players who are watching the sector, only for server purpose
+    std::map<unsigned int, int> new_watchers;
+    struct JoinedFleets
+    {
+        unsigned int joined_fleet_1;
+        unsigned int joined_fleet_2;
+        unsigned int res_fleet;
+        Point res_fleet_pos;
+        unsigned int owner;
+    };
+
+    struct JumpedFleet
+    {
+        unsigned int fleet_id;
+        unsigned int sector_id_from;
+        unsigned int sector_id_to;
+        Point position;
+        unsigned int owner;
+    };
+
+    struct NewBase
+    {
+        unsigned int base_id;
+        unsigned int object_id;
+        unsigned int owner;
+    };
+
+    struct NewColony
+    {
+        unsigned int colony_id;
+        unsigned int object_id;
+        unsigned int owner;
+        float population;
+    };
+
+    void DecrementWatcher(unsigned int player_id);
+    void IncrementWatcher(unsigned int player_id);
+    void JumpFleet(unsigned int fleet_id);
+    std::vector<JoinedFleets> joined_fleets;
+    std::vector<JumpedFleet> jumped_fleets;
+    std::vector<NewBase> new_bases;
+    std::vector<NewColony> new_colonies;
 };

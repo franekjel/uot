@@ -73,9 +73,15 @@ messageTypes::MsgPlanet::MsgPlanet(const std::shared_ptr<Planet>& planet)
         possible_buildings[building.first] = building.second;
 }
 
+messageTypes::MsgNeighbor::MsgNeighbor() {}
+messageTypes::MsgNeighbor::MsgNeighbor(const std::shared_ptr<Sector>& sector)
+    : id(sector->sector_id), position(sector->position)
+{
+}
+
 messageTypes::MsgSector::MsgSector()
 {
-    neighbors_ids = {};
+    neighbors = {};
     stars = {};
     inhabitables = {};
     planets = {};
@@ -84,7 +90,7 @@ messageTypes::MsgSector::MsgSector(const std::shared_ptr<Sector>& sector)
     : id(sector->sector_id), position(sector->position)
 {
     for (auto neighbor : sector->neighbors)
-        neighbors_ids.push_back(neighbor->sector_id);
+        neighbors.push_back(MsgNeighbor(neighbor));
     for (auto& [id, sector_object] : sector->objects)
     {
         std::shared_ptr<Star> star = std::dynamic_pointer_cast<Star>(sector_object);
@@ -100,10 +106,10 @@ messageTypes::MsgSector::MsgSector(const std::shared_ptr<Sector>& sector)
 }
 
 messageTypes::MsgGalaxy::MsgGalaxy() { sectors = {}; }
-messageTypes::MsgGalaxy::MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy)
+messageTypes::MsgGalaxy::MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy, const std::shared_ptr<Player>& player)
 {
-    for (auto sector : galaxy->sectors)
-        sectors.push_back(MsgSector(sector.second));
+    auto sector = galaxy->sectors[player->owned_colonies.begin()->second->planet->sector_id];
+    sectors.push_back(MsgSector(sector));
 }
 
 messageTypes::MsgTechnologyUpdate::MsgTechnologyUpdate() {}
@@ -142,6 +148,43 @@ messageTypes::MsgFleet::MsgFleet(const std::shared_ptr<Fleet>& fleet, unsigned i
 {
     id = fleet->id;
     position = fleet->position;
+}
+
+messageTypes::MsgFleetsJoin::MsgFleetsJoin() {}
+
+messageTypes::MsgFleetsJoin::MsgFleetsJoin(const Sector::JoinedFleets& joined_fleets)
+    : joined_fleet_id_1(joined_fleets.joined_fleet_1),
+      joined_fleet_id_2(joined_fleets.joined_fleet_2),
+      result_fleet_id(joined_fleets.res_fleet),
+      result_fleet_pos(joined_fleets.res_fleet_pos)
+{
+}
+
+messageTypes::MsgFleetsJump::MsgFleetsJump() {}
+
+messageTypes::MsgFleetsJump::MsgFleetsJump(const Sector::JumpedFleet& jumped_fleets)
+    : fleet_id(jumped_fleets.fleet_id),
+      sector_id_from(jumped_fleets.sector_id_from),
+      sector_id_to(jumped_fleets.sector_id_to),
+      position(jumped_fleets.position)
+{
+}
+
+messageTypes::MsgNewBase::MsgNewBase() {}
+
+messageTypes::MsgNewBase::MsgNewBase(const Sector::NewBase& new_base)
+    : base_id(new_base.base_id), object_id(new_base.object_id), owner(new_base.owner)
+{
+}
+
+messageTypes::MsgNewColony::MsgNewColony() {}
+
+messageTypes::MsgNewColony::MsgNewColony(const Sector::NewColony& new_colony)
+    : colony_id(new_colony.colony_id),
+      object_id(new_colony.object_id),
+      owner(new_colony.owner),
+      population(new_colony.population)
+{
 }
 
 messageTypes::MsgWatchedSectorUpdate::MsgWatchedSectorUpdate() {}
