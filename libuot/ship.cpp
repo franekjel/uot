@@ -80,12 +80,9 @@ std::shared_ptr<Ship> Ship::ShipFromDesign(const int id, const std::shared_ptr<S
     return ship;
 }
 
-void Ship::JumpShip() 
-{ 
-    warp_drive_charge = 0.0f;
-}
+void Ship::JumpShip() { warp_drive_charge = 0.0f; }
 
-bool Ship::ChargeWarpDrive() 
+bool Ship::ChargeWarpDrive()
 {
     float charge_left = full_warp_drive_charge - warp_drive_charge;
     if (energy >= charge_left)
