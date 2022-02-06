@@ -125,12 +125,12 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
         colony.second->new_buildings.clear();
     }
 
-    for (const auto& sector : galaxy->sectors)
+    for (const auto& [sector_id, sector] : galaxy->sectors)
     {
         if (sector->watchers.count(player->id) != 0)
         {
-            auto sector_update_msg = messageTypes::MsgWatchedSectorUpdate(sector->sector_id);
-            for (const auto& fleet : sector->present_fleets)
+            auto sector_update_msg = messageTypes::MsgWatchedSectorUpdate(sector_id);
+            for (const auto& [id, fleet] : sector->present_fleets)
             {
                 sector_update_msg.fleets.push_back(messageTypes::MsgFleet(fleet, fleet->owner_id));
             }
@@ -177,6 +177,11 @@ void net_server_uot::send_game_begin_message(std::shared_ptr<Player>& player, st
     for (const auto& resource : player->owned_resources)
     {
         payload.starting_resources[resource.first] = resource.second;
+    }
+    payload.starting_ships_designs.reserve(player->ship_designs.size());
+    for (const auto& d : player->ship_designs)
+    {
+        payload.starting_ships_designs.emplace_back(messageTypes::MsgShipDesign(d.second));
     }
 
     txrx.send_reliable(player_net_name, payload.Serialize());

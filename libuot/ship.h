@@ -24,25 +24,35 @@ struct ShipHull
     float worker_weeks_cost;
     float warp_drive_energy;  // energy need to warp
 
+    enum Type
+    {
+        SmallShipHull,
+        MediumShipHull,
+        GrandShipHull
+    };
+
     ShipHull(const int sides_size, const int inside_size, const std::map<Resource, float>& cost,
              const std::map<Resource, float>& additional_upkeep, const float hp, const float engines_power,
              const float engines_energy_consumtion, const float crew, const float worker_weeks_cost,
              const float warp_drive_energy);
 };
 
-const ShipHull SmallShipHull(4, 4, {{Resource::Metals, 50.0f}}, {{Resource::Antimatter, 0.5f}}, 80.0f, 0.1f, 1.0f, 0.1f,
-                             60.0f, 15.0f);
-const ShipHull MediumShipHull(12, 12, {{Resource::Metals, 100.0f}, {Resource::RareMetals, 20.0f}},
-                              {{Resource::Antimatter, 1.2f}}, 250.0f, 0.08f, 2.5f, 0.25f, 120.0f, 40.0f);
-const ShipHull GrandShipHull(36, 36,
-                             {{Resource::Metals, 200.0f}, {Resource::RareMetals, 40.0f}, {Resource::Polymers, 20.0f}},
-                             {{Resource::Antimatter, 2.5f}}, 700.0f, 0.07f, 4.0f, 0.5f, 250.0f, 80.0f);
+const std::map<ShipHull::Type, ShipHull> ShipHulls{
+    {ShipHull::SmallShipHull, ShipHull(4, 4, {{Resource::Metals, 50.0f}}, {{Resource::Antimatter, 0.5f}}, 80.0f, 0.1f,
+                                       1.0f, 0.1f, 60.0f, 15.0f)},
+    {ShipHull::MediumShipHull, ShipHull(12, 12, {{Resource::Metals, 100.0f}, {Resource::RareMetals, 20.0f}},
+                                        {{Resource::Antimatter, 1.2f}}, 250.0f, 0.08f, 2.5f, 0.25f, 120.0f, 40.0f)},
+    {ShipHull::GrandShipHull,
+     ShipHull(36, 36, {{Resource::Metals, 200.0f}, {Resource::RareMetals, 40.0f}, {Resource::Polymers, 20.0f}},
+              {{Resource::Antimatter, 2.5f}}, 700.0f, 0.07f, 4.0f, 0.5f, 250.0f, 80.0f)}
+
+};
 
 struct ShipDesign
 {
     unsigned int id;
     std::string name;
-    const ShipHull* hull;
+    ShipHull::Type hull_type;
     std::map<ModuleType, int> sides;
     std::map<ModuleType, int> inside;
     std::map<Resource, float> cost;    // sum of costs of modules and hull
@@ -50,7 +60,7 @@ struct ShipDesign
     float worker_weeks_cost;
     static constexpr float percentage_cost_upkeep = 0.05f;  // which part of ship cost goes to weekly upkeep
 
-    ShipDesign(const unsigned int id, const std::string& name, const ShipHull* hull,
+    ShipDesign(const unsigned int id, const std::string& name, const ShipHull::Type hull_type,
                const std::map<ModuleType, int>& sides, const std::map<ModuleType, int>& inside);
 };
 
@@ -78,7 +88,7 @@ struct Ship
     std::vector<Weapon> weapons;
     std::shared_ptr<ShipDesign> design;
 
-    std::shared_ptr<Ship> ShipFromDesign(const int id, const std::shared_ptr<ShipDesign> design);
+    static std::shared_ptr<Ship> ShipFromDesign(const int id, const std::shared_ptr<ShipDesign> design);
 
     float GetShipSpeed();
 
