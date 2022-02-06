@@ -1,4 +1,5 @@
 #include "sector.h"
+#include <cfloat>
 #include "ship.h"
 
 void Sector::JumpFleet(unsigned int fleet_id)

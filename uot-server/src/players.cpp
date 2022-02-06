@@ -1,4 +1,5 @@
 #include "../headers/players.h"
+#include <climits>
 
 unsigned int PlayersList::GetStartingSectorId(std::shared_ptr<Galaxy> wholeGalaxy)
 {
