@@ -122,6 +122,41 @@ void rendering::render_planet_view::init(client_context& context)
 
 void rendering::render_planet_view::_draw(client_context& context)
 {
+    std::shared_ptr<Planet> pl = std::dynamic_pointer_cast<Planet>(context.gui->current_object.value());
+    std::shared_ptr<InhabitableObject> io =
+        std::dynamic_pointer_cast<InhabitableObject>(context.gui->current_object.value());
+    std::shared_ptr<Star> st = std::dynamic_pointer_cast<Star>(context.gui->current_object.value());
+
+    if (pl && pl->colony)
+    {
+        build->elems.clear();
+        built->elems.clear();
+        queue->elems.clear();
+        auto available_buildings = pl->colony->GetAvailableBuildings();
+        for (const auto& [b, count] : available_buildings)
+        {
+            build->elems.push_back(Buildings.at(b).name);
+            _build.push_back(b);
+        }
+
+        for (const auto& b : pl->colony->buildings)
+        {
+            for (int i = 0; i < b.second; ++i)
+            {
+                built->elems.push_back(Buildings.at(b.first).name);
+                _built.push_back(b.first);
+            }
+        }
+
+        for (const auto& b : pl->colony->building_queue)
+        {
+            queue->elems.push_back(Buildings.at(b.type).name + "  " +
+                             std::to_string(b.worker_week_units_left));
+            _queue.push_back(b.type);
+        }
+    }
+
+
     render_background(context);
     // draw the above astronaut buttons
     auto state = context.getGameState();
@@ -134,11 +169,6 @@ void rendering::render_planet_view::_draw(client_context& context)
     sdl_utilities::set_render_viewport<size_settings::resource_area>(r.get());
     sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
     render_resource_bar(context);
-
-    std::shared_ptr<Planet> pl = std::dynamic_pointer_cast<Planet>(context.gui->current_object.value());
-    std::shared_ptr<InhabitableObject> io =
-        std::dynamic_pointer_cast<InhabitableObject>(context.gui->current_object.value());
-    std::shared_ptr<Star> st = std::dynamic_pointer_cast<Star>(context.gui->current_object.value());
 
     if (pl)
     {
