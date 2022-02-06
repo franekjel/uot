@@ -160,6 +160,16 @@ messageTypes::MsgFleetsJoin::MsgFleetsJoin(const Sector::JoinedFleets& joined_fl
 {
 }
 
+messageTypes::MsgFleetsJump::MsgFleetsJump() {}
+
+messageTypes::MsgFleetsJump::MsgFleetsJump(const Sector::JumpedFleet& jumped_fleets)
+    : fleet_id(jumped_fleets.fleet_id),
+      sector_id_from(jumped_fleets.sector_id_from),
+      sector_id_to(jumped_fleets.sector_id_to),
+      position(jumped_fleets.position)
+{
+}
+
 messageTypes::MsgWatchedSectorUpdate::MsgWatchedSectorUpdate() {}
 
 messageTypes::MsgWatchedSectorUpdate::MsgWatchedSectorUpdate(int sector_id_) : sector_id(sector_id_) { fleets = {}; }

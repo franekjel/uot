@@ -214,7 +214,7 @@ Galaxy GalaxyGenerator::Generate()
 
     std::normal_distribution<> dist{0.0, 0.3};
 
-    for (int i = 0; i < size; i++)
+    for (unsigned int i = 0; i < size; i++)
     {
         Point pos(0, 0);
         while (pos.squaredLength() >= 1.0f || too_close(sector_positions, pos, 0.01))
