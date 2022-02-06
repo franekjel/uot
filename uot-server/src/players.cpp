@@ -153,16 +153,16 @@ void PlayersList::CountWeeklyNumbers()
                         fleet->base_building_object->base->owner->owned_space_bases.erase(
                             fleet->base_building_object->base->owner->owned_space_bases.find(
                                 fleet->base_building_object->base->id));
-                        player->known_galaxy->sectors[fleet->base_building_object->sector_id]
-                            ->watchers[fleet->base_building_object->base->owner->id]--;
+                        player->known_galaxy->sectors[fleet->base_building_object->sector_id]->DecrementWatcher(
+                            fleet->base_building_object->base->owner->id);
                     }
                     fleet->base_building_object->base =
                         std::make_shared<SpaceBase>(id_source++, fleet->base_building_object, player);
                     fleet->current_action = Fleet::Action::None;
                     player->owned_space_bases[fleet->base_building_object->base->id] =
                         fleet->base_building_object->base;
-                    player->known_galaxy->sectors[fleet->base_building_object->sector_id]
-                        ->watchers[fleet->base_building_object->base->owner->id]++;
+                    player->known_galaxy->sectors[fleet->base_building_object->sector_id]->IncrementWatcher(
+                        fleet->base_building_object->base->owner->id);
                 }
             }
         }
