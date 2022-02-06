@@ -201,7 +201,8 @@ void StartGamePayloadTest()
     if (s0.neighbors_ids.size() != 2)
         std::cout << "StartGame - wrong neighbors size\n";
 
-    if (s0.neighbors_ids[0] != sector2->sector_id || s0.neighbors_ids[1] != sector3->sector_id)
+    if ((s0.neighbors_ids[0] != sector2->sector_id || s0.neighbors_ids[1] != sector3->sector_id) &&
+        (s0.neighbors_ids[1] != sector2->sector_id || s0.neighbors_ids[0] != sector3->sector_id))
         std::cout << "StartGame - wrong neighbors ids\n";
 
     if (s0.stars.size() != 1)
