@@ -248,5 +248,29 @@ void Player::HandleCancelFleetRequest(int fleet_id)
 {
     if (owned_fleets.count(fleet_id) < 1)
         return;
-    owned_fleets[fleet_id]->current_action = Fleet::Action::None;
+    auto current_fleet = owned_fleets[fleet_id];
+
+    switch (current_fleet->current_action)
+    {
+        case Fleet::Action::WarpLoading:
+            for (auto &ship : current_fleet->ships)
+            {
+                ship->warp_drive_charge = 0.0f;
+            }
+            break;
+        case Fleet::Action::BuildAsteroidMine:
+            current_fleet->base_building_object = nullptr;
+            current_fleet->building_progress = 0.0f;
+            current_fleet->full_building_progress = 0.0f;
+            break;
+        case Fleet::Action::Colonize:
+            //TODO
+            break;
+        case Fleet::Action::Invade:
+            // TODO
+            break;
+        default:
+            break;
+    }
+    current_fleet->current_action = Fleet::Action::None;
 }
