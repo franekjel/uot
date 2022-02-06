@@ -33,6 +33,7 @@ struct Player
 
     void HandleBuildRequest(Building::BuildingType type, Building::BuildingType upgrade_from, unsigned int colony_id);
     void HandleMoveFleetRequest(int fleet_id, Point position);
+    void HandleJoinFleetRequest(int first_fleet_id, int second_fleet_id);
     void HandleStartTechnologyResearch(Technology::TechnologyType technology);
     void DiscoverTechnology(Technology::TechnologyType technology);
 
