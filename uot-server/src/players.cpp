@@ -95,6 +95,16 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
     if (payload->technologyRequest != Technology::TechnologyType::Empty)
         player->HandleStartTechnologyResearch(payload->technologyRequest);
 
+    for (const auto& join_fleet_request : payload->joinFleetsRequests)
+    {
+        player->HandleJoinFleetRequest(join_fleet_request.fleet1_id, join_fleet_request.fleet2_id);
+    }
+
+    for (const auto& fleet_action_request : payload->fleetActionRequests)
+    {
+        //TODO
+    }
+
     return true;
 }
 
