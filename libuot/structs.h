@@ -18,3 +18,5 @@ struct PlanetaryFeatures;
 struct Colony;
 struct Planet;
 struct SpaceBase;
+
+static unsigned int id_source = 0;

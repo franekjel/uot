@@ -51,7 +51,7 @@ unsigned int PlayersList::GetStartingColonyObjId(unsigned int player_id, unsigne
         return UINT_MAX;
     std::shared_ptr<Colony> startingColony = std::make_shared<Colony>(player_id, planet);
     planet->colony = startingColony;
-    sector->watchers.insert({ player_id, 1});
+    sector->watchers.insert({player_id, 1});
     return planet->id;
 }
 
@@ -102,7 +102,7 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
 
     for (const auto& fleet_action_request : payload->fleetActionRequests)
     {
-        //TODO
+        // TODO
     }
 
     return true;
@@ -110,13 +110,48 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
 
 void PlayersList::CountWeeklyNumbers()
 {
-    std::vector<std::thread> player_threads(players.size());
-    int player_num = 0;
-    for (auto& player : players)
-        player_threads[player_num++] = std::thread(CountWeeklyNumbersPlayer, player.second);
+    // std::vector<std::thread> player_threads(players.size());
+    // int player_num = 0;
+    // for (auto& player : players)
+    //    player_threads[player_num++] = std::thread(CountWeeklyNumbersPlayer, player.second);
 
-    for (auto& thread : player_threads)
-        thread.join();
+    // for (auto& thread : player_threads)
+    //    thread.join();
+
+    // Let it be synchornic for now - can be done async but too much work for now
+
+    for (auto& player : players)
+        CountWeeklyNumbersPlayer(player.second);
+
+    // here are weekly actions performed that could not have been done multithreadedly
+    for (auto& [player_id, player] : players)
+    {
+        auto& player_fleets = player->owned_fleets;
+        for (const auto& [fleet_id, fleet] : player_fleets)
+        {
+            if (fleet->current_action == Fleet::Action::BuildAsteroidMine)
+            {
+                if (fleet->building_progress >= fleet->full_building_progress)
+                {
+                    if (fleet->base_building_object->base)
+                    {
+                        fleet->base_building_object->base->owner->owned_space_bases.erase(
+                            fleet->base_building_object->base->owner->owned_space_bases.find(
+                                fleet->base_building_object->base->id));
+                        player->known_galaxy->sectors[fleet->base_building_object->sector_id]
+                            ->watchers[fleet->base_building_object->base->owner->id]--;
+                    }
+                    fleet->base_building_object->base =
+                        std::make_shared<SpaceBase>(id_source++, fleet->base_building_object, player);
+                    fleet->current_action = Fleet::Action::None;
+                    player->owned_space_bases[fleet->base_building_object->base->id] =
+                        fleet->base_building_object->base;
+                    player->known_galaxy->sectors[fleet->base_building_object->sector_id]
+                        ->watchers[fleet->base_building_object->base->owner->id]++;
+                }
+            }
+        }
+    }
 }
 
 void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_service,
@@ -240,6 +275,14 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
         else
             player_research.progress_left -= player_resources[Resource::Technology];
     }
+
+    for (const auto& [fleet_id, fleet] : player_fleets)
+    {
+        if (fleet->current_action == Fleet::Action::BuildAsteroidMine)
+        {
+            fleet->building_progress += fleet->construction_points;
+        }
+    }
 }
 
 void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
@@ -252,12 +295,15 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
 
 void PlayersList::CountEveryTurnNumbers()
 {
-    // Async Part like ships upkeep costs
-    std::vector<std::thread> player_threads(players.size());
-    int player_num = 0;
-    for (auto& player : players)
-        player_threads[player_num++] = std::thread(CountEveryTurnNumbersPlayer, player.second);
+    //// Async Part like ships upkeep costs
+    // std::vector<std::thread> player_threads(players.size());
+    // int player_num = 0;
+    // for (auto& player : players)
+    //    player_threads[player_num++] = std::thread(CountEveryTurnNumbersPlayer, player.second);
 
-    for (auto& thread : player_threads)
-        thread.join();
+    // for (auto& thread : player_threads)
+    //    thread.join();
+
+    for (auto& player : players)
+        CountEveryTurnNumbersPlayer(player.second);
 }
