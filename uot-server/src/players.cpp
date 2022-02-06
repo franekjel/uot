@@ -144,9 +144,10 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
 
     // cleanup
 
-    for (auto& sector : galaxy->sectors)
+    for (auto& [id,sector] : galaxy->sectors)
     {
-        sector.second->joined_fleets.clear();
+        sector->joined_fleets.clear();
+        sector->new_watchers.clear();
     }
 }
 

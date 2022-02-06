@@ -127,6 +127,10 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
 
     for (const auto& [sector_id, sector] : galaxy->sectors)
     {
+        if (sector->new_watchers.count(player->id))
+        {
+            payload.new_sectors.push_back(messageTypes::MsgSector(sector));
+        }
         if (sector->watchers.count(player->id) != 0 && sector->watchers[player->id] > 0)
         {
             auto sector_update_msg = messageTypes::MsgWatchedSectorUpdate(sector_id);
@@ -137,7 +141,7 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
 
             for (const auto& joined_fleet : sector->joined_fleets)
             {
-                sector_update_msg.joinedFleets.push_back(messageTypes::MsgFleetsJoin(joined_fleet));
+            //    sector_update_msg.joinedFleets.push_back(messageTypes::MsgFleetsJoin(joined_fleet));
             }
 
             payload.watched_sectors_updates.push_back(sector_update_msg);

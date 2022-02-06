@@ -23,7 +23,7 @@ void Sector::JumpFleet(unsigned int fleet_id)
 
     present_fleets.erase(present_fleets.find(fleet_id));
 
-    DecrementWatcher[this_fleet->owner_id];
+    DecrementWatcher(this_fleet->owner_id);
 
     dest->present_fleets[fleet_id] = this_fleet;
     dest->IncrementWatcher(this_fleet->owner_id);
@@ -31,7 +31,7 @@ void Sector::JumpFleet(unsigned int fleet_id)
     this_fleet->location_sector = dest;
 }
 
-void DecrementWatcher(unsigned int player_id)
+void Sector::DecrementWatcher(unsigned int player_id)
 {
     if (watchers[player_id] == 0)
         throw;
@@ -39,9 +39,12 @@ void DecrementWatcher(unsigned int player_id)
     watchers[player_id]--;
 }
 
-void IncrementWatcher(unsigned int player_id)
+void Sector::IncrementWatcher(unsigned int player_id)
 {
-    if (dest->watchers.count(player_id) < 1)
-        dest->watchers[player_id] = 0;
-    dest->watchers[player_id] += 1;
+    if (watchers.count(player_id) < 1)
+        watchers[player_id] = 0;
+    watchers[player_id] += 1;
+
+    if (watchers[player_id] == 1)
+        new_watchers[player_id] = 1;
 }

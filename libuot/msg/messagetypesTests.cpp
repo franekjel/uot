@@ -126,13 +126,6 @@ bool operator==(messageTypes::MsgWatchedSectorUpdate& u1, messageTypes::MsgWatch
         if (!(u1.fleets[i] == u2.fleets[i]))
             return false;
 
-    if (u1.joinedFleets.size() != u2.joinedFleets.size())
-        return false;
-
-    for (int i = 0; i < u1.joinedFleets.size(); ++i)
-        if (!(u1.joinedFleets[i] == u2.joinedFleets[i]))
-            return false;
-
     return true;
 }
 
@@ -211,12 +204,16 @@ void StartGamePayloadTest()
     if (!(s0.position == sector1->position))
         std::cout << "StartGame - wrong sector position\n";
 
-    if (s0.neighbors_ids.size() != 2)
+    if (s0.neighbors.size() != 2)
         std::cout << "StartGame - wrong neighbors size\n";
 
-    if ((s0.neighbors_ids[0] != sector2->sector_id || s0.neighbors_ids[1] != sector3->sector_id) &&
-        (s0.neighbors_ids[1] != sector2->sector_id || s0.neighbors_ids[0] != sector3->sector_id))
+    if ((s0.neighbors[0].id == sector2->sector_id || s0.neighbors[1].id != sector3->sector_id) &&
+        (s0.neighbors[1].id != sector2->sector_id || s0.neighbors[0].id != sector3->sector_id))
         std::cout << "StartGame - wrong neighbors ids\n";
+
+    if ((s0.neighbors[0].position != sector2->position || s0.neighbors[1].position != sector3->position) &&
+        (s0.neighbors[1].position != sector2->position || s0.neighbors[0].position != sector3->position))
+        std::cout << "StartGame - wrong neighbors pos\n";
 
     if (s0.stars.size() != 1)
         std::cout << "StartGame - wrong stars size\n";
@@ -289,9 +286,6 @@ void NewTurnPayloadTest()
 
     watchedSectorUpdate1.fleets.push_back(fleet1);
     watchedSectorUpdate1.fleets.push_back(fleet2);
-
-    messageTypes::MsgFleetsJoin jf{{1, 2, 1, {3.0, 3.0}}};
-    watchedSectorUpdate1.joinedFleets.push_back(jf);
 
     watchedSectorUpdate2.fleets.push_back(fleet3);
 
