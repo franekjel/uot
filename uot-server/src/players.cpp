@@ -49,7 +49,7 @@ unsigned int PlayersList::GetStartingColonyObjId(unsigned int player_id, unsigne
     }
     if (!planet)
         return UINT_MAX;
-    std::shared_ptr<Colony> startingColony = std::make_shared<Colony>(player_id, planet);
+    std::shared_ptr<Colony> startingColony = std::make_shared<Colony>(id_source++, planet);
     planet->colony = startingColony;
     sector->watchers.insert({player_id, 1});
     return planet->id;
@@ -105,8 +105,11 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
         switch (fleet_action_request.action)
         {
             case Fleet::Action::BuildAsteroidMine:
+                player->HandleBuildAsteroidMineFleetRequest(fleet_action_request.fleet_id);
             case Fleet::Action::CancelAction:
+                player->HandleCancelFleetRequest(fleet_action_request.fleet_id);
             case Fleet::Action::Colonize:
+                player->HandleColonizeFleetRequest(fleet_action_request.fleet_id);
             case Fleet::Action::Invade:
             case Fleet::Action::None:
                 break;

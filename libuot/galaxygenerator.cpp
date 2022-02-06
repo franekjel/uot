@@ -4,8 +4,6 @@
 
 #include "common.h"
 
-static unsigned int sector_object_id = 1;
-
 static constexpr float habitable_planet_base_chance = 0.01f;
 
 static std::normal_distribution<> size_distribution{1.0, 0.15};
@@ -55,7 +53,7 @@ void GalaxyGenerator::GenerateBlackHoleSector(std::map<unsigned int, std::shared
 
     for (const auto &pos : clouds_positions)
     {
-        unsigned int id = sector_object_id;
+        unsigned int id = id_source++;
         sector_objects.insert({id, std::shared_ptr<SectorObject>(new InhabitableObject(
                                        SectorObject(id, pos, float(size_distribution(gen)), sector_id), {},
                                        InhabitableObject::ObjectType::DarkMatterCloud))});
@@ -70,8 +68,8 @@ std::shared_ptr<SectorObject> GalaxyGenerator::GenerateInhabitable(const Point &
     int resource = resources_distribution(gen);
     if (resource == 0)
     {
-        return std::shared_ptr<SectorObject>(new InhabitableObject(
-            SectorObject(sector_object_id++, pos, float(size_distribution(gen)), sector_id), {}, type));
+        return std::shared_ptr<SectorObject>(
+            new InhabitableObject(SectorObject(id_source++, pos, float(size_distribution(gen)), sector_id), {}, type));
     }
     std::discrete_distribution<> dist({2.0, 1.0, 1.0, 0.2, 0.1, 0.1});
     int resource_count = dist(gen) + 1;
@@ -94,7 +92,7 @@ std::shared_ptr<SectorObject> GalaxyGenerator::GenerateInhabitable(const Point &
             break;
     }
     return std::shared_ptr<SectorObject>(new InhabitableObject(
-        SectorObject(sector_object_id++, pos, float(size_distribution(gen)), sector_id), {{r, resource_count}}, type));
+        SectorObject(id_source++, pos, float(size_distribution(gen)), sector_id), {{r, resource_count}}, type));
 }
 
 std::shared_ptr<SectorObject> GalaxyGenerator::GenerateHabitablePlanet(const Point &p, unsigned int sector_id)
@@ -132,8 +130,8 @@ std::shared_ptr<SectorObject> GalaxyGenerator::GenerateHabitablePlanet(const Poi
     add_features(PlanetaryFeatures::AncientRuins, {80, 5, 5, 5, 5});
     add_features(PlanetaryFeatures::AncientNanobotsDeposit, {80, 5, 5, 5, 5});
 
-    return std::make_shared<Planet>(SectorObject(sector_object_id++, p, float(size_distribution(gen)), sector_id),
-                                    climate, features);
+    return std::make_shared<Planet>(SectorObject(id_source++, p, float(size_distribution(gen)), sector_id), climate,
+                                    features);
 }
 
 std::map<unsigned int, std::shared_ptr<SectorObject>> GalaxyGenerator::GenerateSectorObjects(unsigned int sector_id)
@@ -142,7 +140,7 @@ std::map<unsigned int, std::shared_ptr<SectorObject>> GalaxyGenerator::GenerateS
 
     Star::StarType sector_star_type = {all_star_types[std::discrete_distribution<>({40, 30, 10, 5, 1, 1})(gen)]};
 
-    unsigned int id = sector_object_id++;
+    unsigned int id = id_source++;
     sector_objects.insert(
         {id, std::shared_ptr<SectorObject>(new Star(
                  SectorObject(id, Point(0.0f, 0.0f), float(size_distribution(gen)), sector_id), sector_star_type))});
@@ -174,7 +172,7 @@ std::map<unsigned int, std::shared_ptr<SectorObject>> GalaxyGenerator::GenerateS
                 if (std::bernoulli_distribution(habitable_chance)(gen))
                 {  // habitable
                     std::shared_ptr<SectorObject> o = std::shared_ptr<SectorObject>(
-                        new Planet(SectorObject(sector_object_id++, pos, float(size_distribution(gen)), sector_id),
+                        new Planet(SectorObject(id_source++, pos, float(size_distribution(gen)), sector_id),
                                    Planet::PlanetClimate::Temperate, {}));
                     sector_objects.insert({o->id, o});
                     // TODO: better planet generation via GenerateHabitablePlanet()
