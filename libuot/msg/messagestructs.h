@@ -104,16 +104,24 @@ struct MsgGalaxy
 struct MsgShipDesign
 {
     unsigned int id;
+    bool delete_design;  // mo¿liwoœæ usuniêcia designu, w oczywisty sposób podaj¹c istniej¹ce id mo¿na te¿ nadpisywaæ
+                         // designy
     std::string name;
     ShipHull::Type hull_type;
     std::map<ModuleType, int> sides;
     std::map<ModuleType, int> inside;
-    std::map<Resource, float> cost;    // sum of costs of modules and hull
-    std::map<Resource, float> upkeep;  // total upkeep
-    float worker_weeks_cost;
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgShipDesign, id, name, hull_type, sides, inside, cost, upkeep, worker_weeks_cost)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgShipDesign, id, delete_design, name, hull_type, sides, inside)
     MsgShipDesign();
-    MsgShipDesign(const std::shared_ptr<ShipDesign>& design);
+    MsgShipDesign(const std::shared_ptr<ShipDesign>& design, bool delete_design_);
+};
+
+struct MsgCreateShip
+{
+    unsigned int design_id;
+    unsigned int planet_id;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgCreateShip, design_id, planet_id)
+    MsgCreateShip();
+    MsgCreateShip(unsigned int design_id_, unsigned int planet_id_);
 };
 
 struct MsgTechnologyUpdate

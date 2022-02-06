@@ -36,6 +36,9 @@ struct Player
     void HandleCancelFleetRequest(int fleet_id);
     void HandleColonizeFleetRequest(int fleet_id);
     void HandleStartTechnologyResearch(Technology::TechnologyType technology);
+    void HandleShipDesignRequest(unsigned int id, bool delete_design, std::string name, ShipHull::Type hull_type,
+                                 std::map<ModuleType, int> sides, std::map<ModuleType, int> inside);
+    void HandleCreateShipRequest(unsigned int design_id, unsigned int planet_id);
     void DiscoverTechnology(Technology::TechnologyType technology);
 
     // client-only

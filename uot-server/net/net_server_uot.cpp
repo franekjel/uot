@@ -209,7 +209,7 @@ void net_server_uot::send_game_begin_message(std::shared_ptr<Player>& player, st
     payload.starting_ships_designs.reserve(player->ship_designs.size());
     for (const auto& d : player->ship_designs)
     {
-        payload.starting_ships_designs.emplace_back(messageTypes::MsgShipDesign(d.second));
+        //payload.starting_ships_designs.emplace_back(messageTypes::MsgShipDesignRe(d.second,)); TODO PO
     }
 
     txrx.send_reliable(player_net_name, payload.Serialize());

@@ -101,6 +101,16 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
         player->HandleJoinFleetRequest(join_fleet_request.fleet1_id, join_fleet_request.fleet2_id);
     }
 
+    for (const auto& sdr : payload->shipDesignRequests)
+    {
+        player->HandleShipDesignRequest(sdr.id, sdr.delete_design, sdr.name, sdr.hull_type, sdr.sides, sdr.inside);
+    }
+
+    for (const auto& csr : payload->createShipRequests)
+    {
+        player->HandleCreateShipRequest(csr.design_id, csr.planet_id);
+    }
+
     for (const auto& fleet_action_request : payload->fleetActionRequests)
     {
         switch (fleet_action_request.action)
