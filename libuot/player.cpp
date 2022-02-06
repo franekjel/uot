@@ -322,3 +322,18 @@ void Player::HandleColonizeFleetRequest(int fleet_id)
         handled_fleet->current_action = Fleet::Action::Colonize;
     }
 }
+
+void Player::HandleShipDesignRequest(unsigned int id, bool delete_design, std::string name, ShipHull::Type hull_type,
+                             std::map<ModuleType, int> sides, std::map<ModuleType, int> inside)
+{
+    // DO MM:
+    // delete_design mówi o tym czy chcemy usunąć design
+    // podanie istniejącego id, ale z delete = false powoduje nadpisanie
+    // tu musisz policzyć koszty zbudowania i utrzymania, będę chciał je później odesłać w odpowiedzi
+}
+void Player::HandleCreateShipRequest(unsigned int design_id, unsigned int planet_id)
+{
+    // DO MM:
+    // chyba wiadomo o co chodzi, trzeba sprawdzić czy mamy zasoby na budowę, zrobię wysyłanie odmowy jak nie ma
+    // surowców
+}
