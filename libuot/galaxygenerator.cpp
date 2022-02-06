@@ -46,7 +46,7 @@ std::vector<Point> GalaxyGenerator::GeneratePositionsInSector(const std::vector<
     return re;
 }
 
-void GalaxyGenerator::GenerateBlackHoleSector(std::set<std::shared_ptr<SectorObject>> &sector_objects,
+void GalaxyGenerator::GenerateBlackHoleSector(std::map<unsigned int, std::shared_ptr<SectorObject>> &sector_objects,
                                               std::mt19937 &gen)
 {
     int cloud_num = std::discrete_distribution<>({6, 4, 2, 2, 1})(gen);
@@ -55,9 +55,10 @@ void GalaxyGenerator::GenerateBlackHoleSector(std::set<std::shared_ptr<SectorObj
 
     for (const auto &pos : clouds_positions)
     {
-        sector_objects.insert(std::shared_ptr<SectorObject>(
-            new InhabitableObject(SectorObject(sector_object_id++, pos, float(size_distribution(gen))), {},
-                                  InhabitableObject::ObjectType::DarkMatterCloud)));
+        unsigned int id = sector_object_id;
+        sector_objects.insert({id, std::shared_ptr<SectorObject>(
+                                       new InhabitableObject(SectorObject(id, pos, float(size_distribution(gen))), {},
+                                                             InhabitableObject::ObjectType::DarkMatterCloud))});
     }
 }
 
@@ -134,14 +135,16 @@ std::shared_ptr<SectorObject> GalaxyGenerator::GenerateHabitablePlanet(const Poi
                                     features);
 }
 
-std::set<std::shared_ptr<SectorObject>> GalaxyGenerator::GenerateSectorObjects()
+std::map<unsigned int, std::shared_ptr<SectorObject>> GalaxyGenerator::GenerateSectorObjects()
 {
-    std::set<std::shared_ptr<SectorObject>> sector_objects;
+    std::map<unsigned int, std::shared_ptr<SectorObject>> sector_objects;
 
     Star::StarType sector_star_type = {all_star_types[std::discrete_distribution<>({40, 30, 10, 5, 1, 1})(gen)]};
 
-    sector_objects.insert(std::shared_ptr<SectorObject>(new Star(
-        SectorObject(sector_object_id++, Point(0.0f, 0.0f), float(size_distribution(gen))), sector_star_type)));
+    unsigned int id = sector_object_id++;
+    sector_objects.insert(
+        {id, std::shared_ptr<SectorObject>(
+                 new Star(SectorObject(id, Point(0.0f, 0.0f), float(size_distribution(gen))), sector_star_type))});
 
     if (sector_star_type == Star::StarType::BlackHole)
     {
@@ -160,31 +163,35 @@ std::set<std::shared_ptr<SectorObject>> GalaxyGenerator::GenerateSectorObjects()
         {
             case 0:
             {
-                sector_objects.insert(
-                    GenerateInhabitable(pos, InhabitableObject::ObjectType::Asteroid, {40, 20, 8, 1, 1, 1}));
+                std::shared_ptr<SectorObject> o =
+                    GenerateInhabitable(pos, InhabitableObject::ObjectType::Asteroid, {40, 20, 8, 1, 1, 1});
+                sector_objects.insert({o->id, o});
                 break;
             }
             case 1:
             {
                 if (std::bernoulli_distribution(habitable_chance)(gen))
                 {  // habitable
-                    sector_objects.insert(std::shared_ptr<SectorObject>(
+                    std::shared_ptr<SectorObject> o = std::shared_ptr<SectorObject>(
                         new Planet(SectorObject(sector_object_id++, pos, float(size_distribution(gen))),
-                                   Planet::PlanetClimate::Temperate, {})));
+                                   Planet::PlanetClimate::Temperate, {}));
+                    sector_objects.insert({o->id, o});
                     // TODO: better planet generation via GenerateHabitablePlanet()
                 }
                 else
                 {
-                    sector_objects.insert(GenerateInhabitable(pos, InhabitableObject::ObjectType::InhabitablePlanet,
-                                                              {40, 20, 8, 1, 1, 1}));
+                    std::shared_ptr<SectorObject> o = GenerateInhabitable(
+                        pos, InhabitableObject::ObjectType::InhabitablePlanet, {40, 20, 8, 1, 1, 1});
+                    sector_objects.insert({o->id, o});
                 }
 
                 break;
             }
             case 2:
             {
-                sector_objects.insert(
-                    GenerateInhabitable(pos, InhabitableObject::ObjectType::GasGiant, {20, 0, 4, 0, 0, 1}));
+                std::shared_ptr<SectorObject> o =
+                    GenerateInhabitable(pos, InhabitableObject::ObjectType::GasGiant, {20, 0, 4, 0, 0, 1});
+                sector_objects.insert({o->id, o});
                 break;
             }
         }
@@ -211,17 +218,17 @@ Galaxy GalaxyGenerator::Generate()
         Point pos(0, 0);
         while (pos.squaredLength() >= 1.0f || too_close(sector_positions, pos, 0.01))
             pos = Point(std::clamp(dist(gen), -1.0, 1.0), std::clamp(dist(gen), -1.0, 1.0));
-        const std::set<std::shared_ptr<SectorObject>> sector_objects = GenerateSectorObjects();
-        galaxy.sectors.insert(std::shared_ptr<Sector>(new Sector{i, pos, {}, sector_objects, {}, {}}));
+        const std::map<unsigned int, std::shared_ptr<SectorObject>> sector_objects = GenerateSectorObjects();
+        galaxy.sectors.insert({i, std::shared_ptr<Sector>(new Sector{i, pos, {}, sector_objects, {}, {}})});
         sector_positions.push_back(pos);
     }
-    for (auto &s1 : galaxy.sectors)
+    for (auto &[id1, s1] : galaxy.sectors)
     {
         std::vector<std::pair<float, std::shared_ptr<Sector>>> dists;
         dists.reserve(galaxy.sectors.size());
-        for (const auto &s2 : galaxy.sectors)
+        for (const auto &[id2, s2] : galaxy.sectors)
         {
-            if (s2 != s1)
+            if (id2 != id1)
                 dists.emplace_back(std::make_pair((s1->position - s2->position).squaredLength(), s2));
         }
         std::sort(dists.begin(), dists.end());

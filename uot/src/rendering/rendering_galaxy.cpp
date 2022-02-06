@@ -11,7 +11,6 @@ void rendering::render_sector_view::_wheel_handler(client_context& context, int 
 void rendering::render_sector_view::_draw(client_context& context)
 {
     render_background(context);
-    // draw the above astronaut buttons
     auto& r = context.r;
     auto& gr = context.gr;
     auto& gui = context.gui;
@@ -131,8 +130,7 @@ void rendering::render_sector_galaxy_helper(const client_context& context, const
 {
     auto& r = context.r;
     auto& gr = context.gr;
-    int i = 0;
-    for (const auto& p : sector->objects)
+    for (const auto& [id, p] : sector->objects)
     {
         const auto planet_x =
             size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * p->position.x;
@@ -154,6 +152,15 @@ void rendering::render_sector_galaxy_helper(const client_context& context, const
             const auto id = (io->base && io->base->owner) ? io->base->owner->id : 0;
             render_planet_owner(context, id, 0.8, planet_x, planet_y, gr->planetTextures[12]);
         }
+    }
+
+    for (const auto& [id, f] : sector->present_fleets)
+    {
+        const auto fleet_x =
+            size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * f->position.x;
+        const auto fleet_y =
+            size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * f->position.y;
+        render_planet_owner(context, 3, 0.8, fleet_x, fleet_y, gr->planetTextures[12]);
     }
 }
 
@@ -181,9 +188,8 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
         y = y - AreaType::y_offset;
 
         const auto& curr = current_sector.value();
-        for (const auto& sec_obj : curr->objects)
+        for (const auto& [id, sec_obj] : curr->objects)
         {
-            const auto& pos = sec_obj->position;
             const auto tex_size = planets_meta::texture_size[GAS_GIANT_1];
             const auto planet_x =
                 size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * sec_obj->position.x;

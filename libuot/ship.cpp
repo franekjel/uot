@@ -17,13 +17,14 @@ ShipHull::ShipHull(const int sides_size, const int inside_size, const std::map<R
 {
 }
 
-ShipDesign::ShipDesign(const unsigned int id, const std::string &name, const ShipHull *hull,
+ShipDesign::ShipDesign(const unsigned int id, const std::string &name, const ShipHull::Type hull_type,
                        const std::map<ModuleType, int> &sides, const std::map<ModuleType, int> &inside)
-    : id(id), name(name), hull(hull), sides(sides), inside(inside)
+    : id(id), name(name), hull_type(hull_type), sides(sides), inside(inside)
 {
-    worker_weeks_cost = hull->worker_weeks_cost;
-    cost = hull->cost;
-    upkeep = hull->additional_upkeep;
+    auto &hull = ShipHulls.at(hull_type);
+    worker_weeks_cost = hull.worker_weeks_cost;
+    cost = hull.cost;
+    upkeep = hull.additional_upkeep;
     for (const auto &module : {sides, inside})
     {
         for (const auto [type, count] : module)
@@ -65,9 +66,10 @@ std::shared_ptr<Ship> Ship::ShipFromDesign(const int id, const std::shared_ptr<S
             }
         }
     }
-    ship->max_hp += design->hull->hp;
-    ship->engines_energy_consumtion = design->hull->engines_energy_consumtion;
-    ship->speed = design->hull->speed;
+    const auto &hull = ShipHulls.at(design->hull_type);
+    ship->max_hp += hull.hp;
+    ship->engines_energy_consumtion = hull.engines_energy_consumtion;
+    ship->speed = hull.speed;
 
     ship->hp = ship->max_hp;
     ship->energy = ship->max_energy / 2.0f;

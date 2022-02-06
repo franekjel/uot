@@ -84,8 +84,8 @@ struct Sector
     int sector_id;
     Point position;  // position on galaxy map
     std::set<std::shared_ptr<Sector>> neighbors;
-    std::set<std::shared_ptr<SectorObject>> objects;  // stars, planets, asteroid
-    std::set<std::shared_ptr<Fleet>> present_fleets;
+    std::map<unsigned int, std::shared_ptr<SectorObject>> objects;
+    std::map<unsigned int, std::shared_ptr<Fleet>> present_fleets;
 
     // fields below are server-only
     std::set<unsigned int> watchers;  // players who are watching the sector, only for server purpose

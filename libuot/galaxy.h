@@ -7,5 +7,5 @@
 
 struct Galaxy
 {
-    std::set<std::shared_ptr<Sector>> sectors;
+    std::map<unsigned int, std::shared_ptr<Sector>> sectors;
 };

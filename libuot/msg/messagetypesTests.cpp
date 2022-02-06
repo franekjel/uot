@@ -155,7 +155,7 @@ void StartGamePayloadTest()
     sector3->neighbors.insert(sector1);
 
     auto star = std::make_shared<Star>(SectorObject(1, Point(1.0f, 1.0f), 1.0f), Star::StarType::Sunny);
-    sector1->objects.insert(star);
+    sector1->objects.insert({star->id, star});
 
     std::map<Resource, float> resources = {{Resource::AncientNanobots, 1.0f}, {Resource::DarkMatter, 10.0f}};
     auto inhabitable = std::make_shared<InhabitableObject>(SectorObject(2, Point(-1.0f, -1.0f), 2.0f), resources,
@@ -164,13 +164,13 @@ void StartGamePayloadTest()
     base->id = 10;
     base->owner = player;
     inhabitable->base = base;
-    sector1->objects.insert(inhabitable);
+    sector1->objects.insert({inhabitable->id, inhabitable});
 
-    sector1->objects.insert(planet);
+    sector1->objects.insert({planet->id, planet});
 
-    galaxy->sectors.insert(sector1);
-    galaxy->sectors.insert(sector2);
-    galaxy->sectors.insert(sector3);
+    galaxy->sectors.insert({sector1->sector_id, sector1});
+    galaxy->sectors.insert({sector2->sector_id, sector2});
+    galaxy->sectors.insert({sector3->sector_id, sector3});
 
     sgp.player_id = player->id;
     sgp.galaxy = messageTypes::MsgGalaxy(galaxy);

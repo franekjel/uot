@@ -85,7 +85,7 @@ messageTypes::MsgSector::MsgSector(const std::shared_ptr<Sector>& sector)
 {
     for (auto neighbor : sector->neighbors)
         neighbors_ids.push_back(neighbor->sector_id);
-    for (auto sector_object : sector->objects)
+    for (auto& [id, sector_object] : sector->objects)
     {
         std::shared_ptr<Star> star = std::dynamic_pointer_cast<Star>(sector_object);
         std::shared_ptr<InhabitableObject> inhabitable = std::dynamic_pointer_cast<InhabitableObject>(sector_object);
@@ -103,7 +103,7 @@ messageTypes::MsgGalaxy::MsgGalaxy() { sectors = {}; }
 messageTypes::MsgGalaxy::MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy)
 {
     for (auto sector : galaxy->sectors)
-        sectors.push_back(MsgSector(sector));
+        sectors.push_back(MsgSector(sector.second));
 }
 
 messageTypes::MsgTechnologyUpdate::MsgTechnologyUpdate() {}
@@ -160,4 +160,18 @@ messageTypes::MsgFleetActionRequest::MsgFleetActionRequest() {}
 messageTypes::MsgFleetActionRequest::MsgFleetActionRequest(int fleet_id_, Fleet::Action action_)
     : fleet_id(fleet_id_), action(action_)
 {
+}
+
+messageTypes::MsgShipDesign::MsgShipDesign() {}
+
+messageTypes::MsgShipDesign::MsgShipDesign(const std::shared_ptr<ShipDesign>& design)
+{
+    id = design->id;
+    name = design->name;
+    hull_type = design->hull_type;
+    sides = design->sides;
+    inside = design->inside;
+    cost = design->cost;
+    upkeep = design->upkeep;
+    worker_weeks_cost = design->worker_weeks_cost;
 }

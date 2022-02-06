@@ -92,6 +92,21 @@ struct MsgGalaxy
     MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy);
 };
 
+struct MsgShipDesign
+{
+    unsigned int id;
+    std::string name;
+    ShipHull::Type hull_type;
+    std::map<ModuleType, int> sides;
+    std::map<ModuleType, int> inside;
+    std::map<Resource, float> cost;    // sum of costs of modules and hull
+    std::map<Resource, float> upkeep;  // total upkeep
+    float worker_weeks_cost;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgShipDesign, id, name, hull_type, sides, inside, cost, upkeep, worker_weeks_cost)
+    MsgShipDesign();
+    MsgShipDesign(const std::shared_ptr<ShipDesign>& design);
+};
+
 struct MsgTechnologyUpdate
 {
     Technology::TechnologyType technology_type;  // if none in progress, set to None
