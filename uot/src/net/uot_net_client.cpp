@@ -85,19 +85,34 @@ void uot_net_client::handle_message(const std::string& data)
                 sectors_vec.push_back(s);
             }
 
+            // Add "empty" sectors;
+            for (int i = 0; i < msgGalaxy.sectors.size(); i++)
+            {
+                for (int j = 0; j < msgGalaxy.sectors[i].neighbors.size(); ++j)
+                {
+                    auto neigh = msgGalaxy.sectors[i].neighbors[j];
+
+                    if (sectors_map.count(neigh.id) < 1)
+                    {
+                        const auto s = std::make_shared<Sector>();
+                        s->sector_id = neigh.id;
+                        s->position = neigh.position;
+                        sectors_map.insert(std::pair<int, std::shared_ptr<Sector>>(s->sector_id, s));
+                        sectors_vec.push_back(s);
+                    }
+                }
+            }
+
             // Setting neighbors sectors references
             for (int i = 0; i < msgGalaxy.sectors.size(); i++)
             {
-                for (int j = 0; j < sectors_vec.size(); j++)
+                auto& sec = sectors_map[msgGalaxy.sectors[i].id];
+                for (int sec_idx = 0; sec_idx < msgGalaxy.sectors[i].neighbors.size(); sec_idx++)
                 {
-                    if (msgGalaxy.sectors[i].id == sectors_vec[j]->sector_id)
-                    {
-                        for (int sec_idx = 0; sec_idx < msgGalaxy.sectors[i].neighbors_ids.size(); sec_idx++)
-                        {
-                            auto neighb = msgGalaxy.sectors[i].neighbors_ids;
-                            sectors_vec[j]->neighbors.insert(sectors_map.at(neighb[sec_idx]));
-                        }
-                    }
+                    auto neighb_id = msgGalaxy.sectors[i].neighbors[sec_idx].id;
+                    auto& neighb = sectors_map[neighb_id];
+                    sec->neighbors.insert(neighb);
+                    neighb->neighbors.insert(sec);
                 }
             }
 

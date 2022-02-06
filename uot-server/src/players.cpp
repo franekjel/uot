@@ -102,7 +102,22 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
 
     for (const auto& fleet_action_request : payload->fleetActionRequests)
     {
-        // TODO
+        switch (fleet_action_request.action)
+        {
+            case Fleet::Action::BuildAsteroidMine:
+            case Fleet::Action::CancelAction:
+            case Fleet::Action::Colonize:
+            case Fleet::Action::Invade:
+            case Fleet::Action::None:
+                break;
+
+            case Fleet::Action::WarpLoading:
+                player->HandleWarpLoadingFleetRequest(fleet_action_request.fleet_id);
+                break;
+
+            default:
+                break;
+        }
     }
 
     return true;
@@ -160,6 +175,14 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
     for (auto& player : players)
     {
         messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first], galaxy);
+    }
+
+    // cleanup
+
+    for (auto& [id,sector] : galaxy->sectors)
+    {
+        sector->joined_fleets.clear();
+        sector->new_watchers.clear();
     }
 }
 

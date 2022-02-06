@@ -89,6 +89,17 @@ struct Sector
 
     // fields below are server-only
     std::map<unsigned int, unsigned int> watchers;  // players who are watching the sector, only for server purpose
+    std::map<unsigned int, int> new_watchers;
+    struct JoinedFleets
+    {
+        unsigned int joined_fleet_1;
+        unsigned int joined_fleet_2;
+        unsigned int res_fleet;
+        Point res_fleet_pos;
+    };
 
+    void DecrementWatcher(unsigned int player_id);
+    void IncrementWatcher(unsigned int player_id);
     void JumpFleet(unsigned int fleet_id);
+    std::vector<JoinedFleets> joined_fleets;
 };

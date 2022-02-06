@@ -73,33 +73,35 @@ messageTypes::MsgPlanet::MsgPlanet(const std::shared_ptr<Planet>& planet)
         possible_buildings[building.first] = building.second;
 }
 
+messageTypes::MsgNeighbor::MsgNeighbor() {}
+messageTypes::MsgNeighbor::MsgNeighbor(const std::shared_ptr<Sector>& sector)
+    : id(sector->sector_id), position(sector->position)
+{
+}
+
 messageTypes::MsgSector::MsgSector()
 {
-    neighbors_ids = {};
+    neighbors = {};
     stars = {};
     inhabitables = {};
     planets = {};
 }
-messageTypes::MsgSector::MsgSector(const std::shared_ptr<Sector>& sector, bool as_neighbor)
+messageTypes::MsgSector::MsgSector(const std::shared_ptr<Sector>& sector)
     : id(sector->sector_id), position(sector->position)
 {
-    if (!as_neighbor)
+    for (auto neighbor : sector->neighbors)
+        neighbors.push_back(MsgNeighbor(neighbor));
+    for (auto& [id, sector_object] : sector->objects)
     {
-        for (auto neighbor : sector->neighbors)
-            neighbors_ids.push_back(neighbor->sector_id);
-        for (auto& [id, sector_object] : sector->objects)
-        {
-            std::shared_ptr<Star> star = std::dynamic_pointer_cast<Star>(sector_object);
-            std::shared_ptr<InhabitableObject> inhabitable =
-                std::dynamic_pointer_cast<InhabitableObject>(sector_object);
-            std::shared_ptr<Planet> planet = std::dynamic_pointer_cast<Planet>(sector_object);
-            if (!!star)
-                stars.push_back(MsgStar(star));
-            if (!!inhabitable)
-                inhabitables.push_back(MsgInhabitable(inhabitable));
-            if (!!planet)
-                planets.push_back(MsgPlanet(planet));
-        }
+        std::shared_ptr<Star> star = std::dynamic_pointer_cast<Star>(sector_object);
+        std::shared_ptr<InhabitableObject> inhabitable = std::dynamic_pointer_cast<InhabitableObject>(sector_object);
+        std::shared_ptr<Planet> planet = std::dynamic_pointer_cast<Planet>(sector_object);
+        if (!!star)
+            stars.push_back(MsgStar(star));
+        if (!!inhabitable)
+            inhabitables.push_back(MsgInhabitable(inhabitable));
+        if (!!planet)
+            planets.push_back(MsgPlanet(planet));
     }
 }
 
@@ -107,11 +109,7 @@ messageTypes::MsgGalaxy::MsgGalaxy() { sectors = {}; }
 messageTypes::MsgGalaxy::MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy, const std::shared_ptr<Player>& player)
 {
     auto sector = galaxy->sectors[player->owned_colonies.begin()->second->planet->sector_id];
-    sectors.push_back(MsgSector(sector, false));
-    for (auto& neighbor : sector->neighbors)
-    {
-        sectors.push_back(MsgSector(neighbor, true));
-    }
+    sectors.push_back(MsgSector(sector));
 }
 
 messageTypes::MsgTechnologyUpdate::MsgTechnologyUpdate() {}
@@ -150,6 +148,16 @@ messageTypes::MsgFleet::MsgFleet(const std::shared_ptr<Fleet>& fleet, unsigned i
 {
     id = fleet->id;
     position = fleet->position;
+}
+
+messageTypes::MsgFleetsJoin::MsgFleetsJoin() {}
+
+messageTypes::MsgFleetsJoin::MsgFleetsJoin(const Sector::JoinedFleets& joined_fleets)
+    : joined_fleet_id_1(joined_fleets.joined_fleet_1),
+      joined_fleet_id_2(joined_fleets.joined_fleet_2),
+      result_fleet_id(joined_fleets.res_fleet),
+      result_fleet_pos(joined_fleets.res_fleet_pos)
+{
 }
 
 messageTypes::MsgWatchedSectorUpdate::MsgWatchedSectorUpdate() {}
