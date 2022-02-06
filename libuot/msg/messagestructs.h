@@ -124,6 +124,45 @@ struct MsgCreateShip
     MsgCreateShip(unsigned int design_id_, unsigned int planet_id_);
 };
 
+struct MsgShipDesignResponse
+{
+    unsigned int id;
+    bool deleted;
+    std::string name;
+    ShipHull::Type hull_type;
+    std::map<ModuleType, int> sides;
+    std::map<ModuleType, int> inside;
+    std::map<Resource, float> cost;
+    std::map<Resource, float> upkeep;
+    float worker_weeks_cost;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgShipDesignResponse, id, deleted, name, hull_type, sides, inside, cost, upkeep,
+                                   worker_weeks_cost)
+    MsgShipDesignResponse();
+    MsgShipDesignResponse(unsigned int design_id_, const std::shared_ptr<ShipDesign>& design, bool deleted_);
+};
+
+struct MsgFleetParameters
+{
+    unsigned int id;
+    bool new_fleet;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleetParameters, id, new_fleet)
+    MsgFleetParameters();
+    MsgFleetParameters(std::shared_ptr<Ship> ship_, bool new_fleet_);
+};
+
+struct MsgCreateShipResponse
+{
+    unsigned int id;
+    unsigned int design_id;
+    unsigned int planet_id;
+    bool created;
+    MsgFleetParameters fleet_parameters;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgCreateShipResponse, id, design_id, planet_id, created, fleet_parameters);
+    MsgCreateShipResponse();
+    MsgCreateShipResponse(unsigned int design_id_, unsigned int planet_id_, bool created_, bool new_fleet,
+                          std::shared_ptr<Ship> ship_);
+};
+
 struct MsgTechnologyUpdate
 {
     Technology::TechnologyType technology_type;  // if none in progress, set to None

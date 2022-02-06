@@ -223,3 +223,49 @@ messageTypes::MsgCreateShip::MsgCreateShip(unsigned int design_id_, unsigned int
     : design_id(design_id_), planet_id(planet_id_)
 {
 }
+
+messageTypes::MsgShipDesignResponse::MsgShipDesignResponse() {}
+
+messageTypes::MsgShipDesignResponse::MsgShipDesignResponse(unsigned int design_id_,
+                                                           const std::shared_ptr<ShipDesign>& design, bool deleted_)
+    : deleted(deleted_)
+{
+    id = design_id_;
+    if (!deleted)
+    {
+        name = design->name;
+        hull_type = design->hull_type;
+        sides = design->sides;
+        inside = design->inside;
+        cost = design->cost;
+        upkeep = design->upkeep;
+        worker_weeks_cost = design->worker_weeks_cost;
+    }
+}
+
+messageTypes::MsgCreateShipResponse::MsgCreateShipResponse() {}
+
+messageTypes::MsgCreateShipResponse::MsgCreateShipResponse(unsigned int design_id_, unsigned int planet_id_,
+                                                           bool created_, bool new_fleet, std::shared_ptr<Ship> ship)
+    : design_id(design_id_), planet_id(planet_id_), created(created_)
+{
+    if (created)
+    {
+        id = ship->id;
+        fleet_parameters = MsgFleetParameters(ship, new_fleet);
+    }
+    else
+    {
+        id = 0;
+    }
+}
+
+messageTypes::MsgFleetParameters::MsgFleetParameters() {}
+
+messageTypes::MsgFleetParameters::MsgFleetParameters(std::shared_ptr<Ship> ship, bool new_fleet_)
+    : new_fleet(new_fleet_)
+{
+    auto& fleet = ship->fleet;
+
+    id = fleet->id;
+}
