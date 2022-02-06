@@ -264,7 +264,9 @@ void Player::HandleCancelFleetRequest(int fleet_id)
             current_fleet->full_building_progress = 0.0f;
             break;
         case Fleet::Action::Colonize:
-            // TODO
+            current_fleet->colony_building_object = nullptr;
+            current_fleet->building_progress = 0.0f;
+            current_fleet->full_building_progress = 0.0f;
             break;
         case Fleet::Action::Invade:
             // TODO
