@@ -139,6 +139,16 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
                 sector_update_msg.fleets.push_back(messageTypes::MsgFleet(fleet, fleet->owner_id));
             }
 
+            for (const auto& new_base : sector->new_bases)
+            {
+                sector_update_msg.new_bases.push_back(messageTypes::MsgNewBase(new_base));
+            }
+
+            for (const auto& new_colony : sector->new_colonies)
+            {
+                sector_update_msg.new_colonies.push_back(messageTypes::MsgNewColony(new_colony));
+            }
+
             for (const auto& joined_fleet : sector->joined_fleets)
             {
                 if (joined_fleet.owner == player->id)

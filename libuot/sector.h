@@ -81,7 +81,7 @@ struct Sector
     /* Sector is circle with R=1.0 and star in centre
      */
 
-    unsigned  int sector_id;
+    unsigned int sector_id;
     Point position;  // position on galaxy map
     std::set<std::shared_ptr<Sector>> neighbors;
     std::map<unsigned int, std::shared_ptr<SectorObject>> objects;
@@ -108,9 +108,26 @@ struct Sector
         unsigned int owner;
     };
 
+    struct NewBase
+    {
+        unsigned int base_id;
+        unsigned int object_id;
+        unsigned int owner;
+    };
+
+    struct NewColony
+    {
+        unsigned int colony_id;
+        unsigned int object_id;
+        unsigned int owner;
+        float population;
+    };
+
     void DecrementWatcher(unsigned int player_id);
     void IncrementWatcher(unsigned int player_id);
     void JumpFleet(unsigned int fleet_id);
     std::vector<JoinedFleets> joined_fleets;
     std::vector<JumpedFleet> jumped_fleets;
+    std::vector<NewBase> new_bases;
+    std::vector<NewColony> new_colonies;
 };

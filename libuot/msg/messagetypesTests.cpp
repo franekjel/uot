@@ -108,6 +108,17 @@ bool operator==(messageTypes::MsgFleet& f1, messageTypes::MsgFleet& f2)
     return f1.id == f2.id && f1.player_id == f2.player_id && f1.position == f2.position;
 }
 
+bool operator==(messageTypes::MsgNewBase& f1, messageTypes::MsgNewBase& f2)
+{
+    return f1.base_id == f2.base_id && f1.object_id == f2.object_id && f1.owner == f2.owner;
+}
+
+bool operator==(messageTypes::MsgNewColony& f1, messageTypes::MsgNewColony& f2)
+{
+    return f1.colony_id == f2.colony_id && f1.object_id == f2.object_id && f1.owner == f2.owner &&
+           f1.population == f2.population;
+}
+
 bool operator==(messageTypes::MsgFleetsJoin& f1, messageTypes::MsgFleetsJoin& f2)
 {
     return f1.joined_fleet_id_1 == f2.joined_fleet_id_1 && f1.joined_fleet_id_2 == f2.joined_fleet_id_2 &&
@@ -130,6 +141,20 @@ bool operator==(messageTypes::MsgWatchedSectorUpdate& u1, messageTypes::MsgWatch
 
     for (int i = 0; i < u1.fleets.size(); ++i)
         if (!(u1.fleets[i] == u2.fleets[i]))
+            return false;
+
+    if (u1.new_bases.size() != u2.new_bases.size())
+        return false;
+
+    for (int i = 0; i < u1.new_bases.size(); ++i)
+        if (!(u1.new_bases[i] == u2.new_bases[i]))
+            return false;
+
+    if (u1.new_colonies.size() != u2.new_colonies.size())
+        return false;
+
+    for (int i = 0; i < u1.new_colonies.size(); ++i)
+        if (!(u1.new_colonies[i] == u2.new_colonies[i]))
             return false;
 
     return true;
@@ -174,9 +199,7 @@ void StartGamePayloadTest()
     auto inhabitable =
         std::make_shared<InhabitableObject>(SectorObject(2, Point(-1.0f, -1.0f), 2.0f, sector1->sector_id), resources,
                                             InhabitableObject::ObjectType::GasGiant);
-    auto base = std::make_shared<SpaceBase>();
-    base->id = 10;
-    base->owner = player;
+    auto base = std::make_shared<SpaceBase>(10, inhabitable, player);
     inhabitable->base = base;
     sector1->objects.insert({inhabitable->id, inhabitable});
 
@@ -213,7 +236,7 @@ void StartGamePayloadTest()
     if (s0.neighbors.size() != 2)
         std::cout << "StartGame - wrong neighbors size\n";
 
-    if ((s0.neighbors[0].id == sector2->sector_id || s0.neighbors[1].id != sector3->sector_id) &&
+    if ((s0.neighbors[0].id != sector2->sector_id || s0.neighbors[1].id != sector3->sector_id) &&
         (s0.neighbors[1].id != sector2->sector_id || s0.neighbors[0].id != sector3->sector_id))
         std::cout << "StartGame - wrong neighbors ids\n";
 
@@ -293,6 +316,12 @@ void NewTurnPayloadTest()
     watchedSectorUpdate1.fleets.push_back(fleet1);
     watchedSectorUpdate1.fleets.push_back(fleet2);
 
+    Sector::NewBase nb{1, 2, 3};
+    Sector::NewColony nc{4, 5, 6, 7.0f};
+
+    watchedSectorUpdate1.new_bases.push_back(nb);
+    watchedSectorUpdate1.new_colonies.push_back(nc);
+
     messageTypes::MsgFleetsJoin jf{{1, 2, 1, {3.0, 3.0}}};
     ntp.joined_fleets.push_back(jf);
 
@@ -358,7 +387,7 @@ void NewTurnPayloadTest()
     if (!(jf1 == jf))
         std::cout << "NewTurn - wrong joined fleets\n";
 
-        auto juf1 = cast->jumped_fleets[0];
+    auto juf1 = cast->jumped_fleets[0];
     if (!(juf1 == juf))
         std::cout << "NewTurn - wrong joined fleets\n";
 }

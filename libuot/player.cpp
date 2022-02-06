@@ -26,6 +26,7 @@ Player::Player(const unsigned int player_id_, const std::shared_ptr<Galaxy> &who
                const std::map<Resource, float> &owned_resources_, const unsigned int &starting_sector_id,
                const unsigned int &starting_colony_obj_id)
 {
+    known_galaxy = whole_galaxy_;
     id = player_id_;
     owned_resources = {};
     resources_changed = {};

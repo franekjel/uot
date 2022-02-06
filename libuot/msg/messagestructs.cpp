@@ -170,6 +170,23 @@ messageTypes::MsgFleetsJump::MsgFleetsJump(const Sector::JumpedFleet& jumped_fle
 {
 }
 
+messageTypes::MsgNewBase::MsgNewBase() {}
+
+messageTypes::MsgNewBase::MsgNewBase(const Sector::NewBase& new_base)
+    : base_id(new_base.base_id), object_id(new_base.object_id), owner(new_base.owner)
+{
+}
+
+messageTypes::MsgNewColony::MsgNewColony() {}
+
+messageTypes::MsgNewColony::MsgNewColony(const Sector::NewColony& new_colony)
+    : colony_id(new_colony.colony_id),
+      object_id(new_colony.object_id),
+      owner(new_colony.owner),
+      population(new_colony.population)
+{
+}
+
 messageTypes::MsgWatchedSectorUpdate::MsgWatchedSectorUpdate() {}
 
 messageTypes::MsgWatchedSectorUpdate::MsgWatchedSectorUpdate(int sector_id_) : sector_id(sector_id_) { fleets = {}; }

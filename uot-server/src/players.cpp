@@ -159,25 +159,28 @@ void PlayersList::CountWeeklyNumbers()
                         player->known_galaxy->sectors[fleet->base_building_object->sector_id]->DecrementWatcher(
                             fleet->base_building_object->base->owner->id);
                     }
-                    fleet->base_building_object->base =
-                        std::make_shared<SpaceBase>(id_source++, fleet->base_building_object, player);
+                    auto& bb_object = fleet->base_building_object;
+                    bb_object->base = std::make_shared<SpaceBase>(id_source++, bb_object, player);
+                    auto& base = bb_object->base;
                     fleet->current_action = Fleet::Action::None;
-                    player->owned_space_bases[fleet->base_building_object->base->id] =
-                        fleet->base_building_object->base;
-                    player->known_galaxy->sectors[fleet->base_building_object->sector_id]->IncrementWatcher(
-                        fleet->base_building_object->base->owner->id);
+                    player->owned_space_bases[base->id] = base;
+                    player->known_galaxy->sectors[bb_object->sector_id]->IncrementWatcher(base->owner->id);
 
                     fleet->building_progress = 0.0f;
                     fleet->full_building_progress = 0.0f;
                     fleet->base_building_object = nullptr;
+
+                    auto& sector = player->known_galaxy->sectors[fleet->base_building_object->sector_id];
+                    sector->new_bases.push_back({base->id, bb_object->id, player->id});
                 }
             }
             else if (fleet->current_action == Fleet::Action::Colonize)
             {
                 if (fleet->building_progress >= fleet->full_building_progress)
                 {
-                    fleet->colony_building_object->colony =
-                        std::make_shared<Colony>(id_source++, fleet->colony_building_object);
+                    auto& cb_object = fleet->colony_building_object;
+                    cb_object->colony = std::make_shared<Colony>(id_source++, cb_object);
+                    auto& colony = cb_object->colony;
                     player->owned_colonies[fleet->colony_building_object->colony->id] =
                         fleet->colony_building_object->colony;
                     fleet->colony_building_object->colony->population = Fleet::kColonizationCost;
@@ -187,6 +190,9 @@ void PlayersList::CountWeeklyNumbers()
                     fleet->building_progress = 0.0f;
                     fleet->full_building_progress = 0.0f;
                     fleet->colony_building_object = nullptr;
+
+                    auto& sector = player->known_galaxy->sectors[fleet->base_building_object->sector_id];
+                    sector->new_colonies.push_back({colony->id, cb_object->id, player->id, colony->population});
                 }
             }
         }
@@ -207,6 +213,8 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
     {
         sector->joined_fleets.clear();
         sector->new_watchers.clear();
+        sector->new_bases.clear();
+        sector->new_colonies.clear();
     }
 }
 

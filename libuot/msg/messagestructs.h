@@ -171,11 +171,34 @@ struct MsgFleetsJump
     MsgFleetsJump(const Sector::JumpedFleet& jumped_fleet);
 };
 
+struct MsgNewBase
+{
+    unsigned int base_id;
+    unsigned int object_id;
+    unsigned int owner;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgNewBase, base_id, object_id, owner)
+    MsgNewBase();
+    MsgNewBase(const Sector::NewBase& new_base);
+};
+
+struct MsgNewColony
+{
+    unsigned int colony_id;
+    unsigned int object_id;
+    unsigned int owner;
+    float population;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgNewColony, colony_id, object_id, owner, population)
+    MsgNewColony();
+    MsgNewColony(const Sector::NewColony& new_colony);
+};
+
 struct MsgWatchedSectorUpdate
 {
     int sector_id;
     std::vector<MsgFleet> fleets;  // every fleet in sector, these which flew away, are just not shown
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgWatchedSectorUpdate, sector_id, fleets)
+    std::vector<MsgNewColony> new_colonies;
+    std::vector<MsgNewBase> new_bases;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgWatchedSectorUpdate, sector_id, fleets, new_colonies, new_bases)
     MsgWatchedSectorUpdate();
     MsgWatchedSectorUpdate(int sector_id_);
 };
