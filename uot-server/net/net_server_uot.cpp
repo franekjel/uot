@@ -167,12 +167,13 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
     txrx.send_reliable(player_net_name, payload.Serialize());
 }
 
-void net_server_uot::send_game_begin_message(std::shared_ptr<Player>& player, std::string player_net_name)
+void net_server_uot::send_game_begin_message(std::shared_ptr<Player>& player, std::string player_net_name,
+                                             std::shared_ptr<Galaxy>& galaxy)
 {
     messageTypes::StartGamePayload payload;
 
     payload.player_id = player->id;
-    payload.galaxy = messageTypes::MsgGalaxy(player->known_galaxy);
+    payload.galaxy = messageTypes::MsgGalaxy(galaxy, player);
     payload.starting_resources = {};
     for (const auto& resource : player->owned_resources)
     {

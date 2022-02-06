@@ -131,8 +131,10 @@ void StartGamePayloadTest()
     std::map<PlanetaryFeatures::PlanetaryFeatureType, int> features = {
         {PlanetaryFeatures::PlanetaryFeatureType::HotClimate, 1},
         {PlanetaryFeatures::PlanetaryFeatureType::MetalsDeposit, 1}};
-    auto planet =
-        std::make_shared<Planet>(SectorObject(3, Point(5.0f, 6.0f), 3.0f), Planet::PlanetClimate::Hot, features);
+    auto sector1 = std::make_shared<Sector>();
+    sector1->sector_id = 1;
+    auto planet = std::make_shared<Planet>(SectorObject(3, Point(5.0f, 6.0f), 3.0f, sector1->sector_id),
+                                           Planet::PlanetClimate::Hot, features);
     auto colony = std::make_shared<Colony>(33, planet);
     planet->colony = colony;
 
@@ -140,8 +142,6 @@ void StartGamePayloadTest()
     colony->owner = player;
 
     auto galaxy = std::make_shared<Galaxy>();
-    auto sector1 = std::make_shared<Sector>();
-    sector1->sector_id = 1;
     sector1->position = Point(1.0f, 2.0f);
 
     auto sector2 = std::make_shared<Sector>();
@@ -154,12 +154,14 @@ void StartGamePayloadTest()
     sector1->neighbors.insert(sector3);
     sector3->neighbors.insert(sector1);
 
-    auto star = std::make_shared<Star>(SectorObject(1, Point(1.0f, 1.0f), 1.0f), Star::StarType::Sunny);
+    auto star =
+        std::make_shared<Star>(SectorObject(1, Point(1.0f, 1.0f), 1.0f, sector1->sector_id), Star::StarType::Sunny);
     sector1->objects.insert({star->id, star});
 
     std::map<Resource, float> resources = {{Resource::AncientNanobots, 1.0f}, {Resource::DarkMatter, 10.0f}};
-    auto inhabitable = std::make_shared<InhabitableObject>(SectorObject(2, Point(-1.0f, -1.0f), 2.0f), resources,
-                                                           InhabitableObject::ObjectType::GasGiant);
+    auto inhabitable =
+        std::make_shared<InhabitableObject>(SectorObject(2, Point(-1.0f, -1.0f), 2.0f, sector1->sector_id), resources,
+                                            InhabitableObject::ObjectType::GasGiant);
     auto base = std::make_shared<SpaceBase>();
     base->id = 10;
     base->owner = player;
@@ -173,7 +175,7 @@ void StartGamePayloadTest()
     galaxy->sectors.insert({sector3->sector_id, sector3});
 
     sgp.player_id = player->id;
-    sgp.galaxy = messageTypes::MsgGalaxy(galaxy);
+    sgp.galaxy = messageTypes::MsgGalaxy(galaxy, player);
 
     sgp.starting_resources[Resource::Antimatter] = 11.0f;
     sgp.starting_resources[Resource::Crystals] = 21.0f;

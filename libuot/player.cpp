@@ -22,6 +22,31 @@ Player::Player(const unsigned int id_, const std::shared_ptr<Galaxy> &known_gala
     DiscoverTechnology(Technology::TechnologyType::Spaceships);
 }
 
+Player::Player(const unsigned int player_id_, const std::shared_ptr<Galaxy> &whole_galaxy_,
+               const std::map<Resource, float> &owned_resources_, const unsigned int &starting_sector_id,
+               const unsigned int &starting_colony_obj_id)
+{
+    id = player_id_;
+    owned_resources = {};
+    resources_changed = {};
+    for (const auto &resource : owned_resources_)
+    {
+        owned_resources[resource.first] = resource.second;
+        resources_changed[resource.first] = true;
+    }
+    owned_colonies = {};
+    auto &starting_sector = whole_galaxy_->sectors[starting_sector_id];
+    auto &obj = starting_sector->objects[starting_colony_obj_id];
+    std::shared_ptr<Planet> starting_planet = std::dynamic_pointer_cast<Planet>(obj);
+    owned_colonies[starting_planet->colony->id] = starting_planet->colony;
+    owned_space_bases = {};
+    owned_fleets = {};
+    researched_technology = {};
+    available_buildings = {};
+    DiscoverTechnology(Technology::TechnologyType::Engineering);
+    DiscoverTechnology(Technology::TechnologyType::Spaceships);
+}
+
 void Player::DiscoverTechnology(Technology::TechnologyType technology)
 {
     known_technologies.insert(technology);

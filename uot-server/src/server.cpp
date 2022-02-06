@@ -18,7 +18,7 @@ void Server::StartGame()
 {
     game_in_progress = true;
     // TODO: Send players info about beginning of the game
-    players.SendStartGameMessage(messaging_service);
+    players.SendStartGameMessage(messaging_service, galaxy);
     run();
 }
 

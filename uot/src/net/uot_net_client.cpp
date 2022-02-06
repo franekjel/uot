@@ -113,7 +113,8 @@ void uot_net_client::handle_message(const std::string& data)
                         for (int star_idx = 0; star_idx < stars.size(); star_idx++)
                         {
                             messageTypes::MsgStar star = stars[star_idx];
-                            SectorObject _sectorObject = SectorObject(star.id, star.position, star.object_size);
+                            SectorObject _sectorObject =
+                                SectorObject(star.id, star.position, star.object_size, msgGalaxy.sectors[i].id);
                             std::shared_ptr<Star> s_star = std::make_shared<Star>(_sectorObject, star.starType);
                             stars_map.insert(std::pair<int, std::shared_ptr<Star>>(star.id, s_star));
                             sectors_vec[j]->objects.insert({s_star->id, s_star});
@@ -134,7 +135,8 @@ void uot_net_client::handle_message(const std::string& data)
                         for (int planet_idx = 0; planet_idx < planets.size(); planet_idx++)
                         {
                             messageTypes::MsgPlanet planet = planets[planet_idx];
-                            SectorObject _sectorObject = SectorObject(planet.id, planet.position, planet.object_size);
+                            SectorObject _sectorObject =
+                                SectorObject(planet.id, planet.position, planet.object_size, msgGalaxy.sectors[i].id);
 
                             std::map<PlanetaryFeatures::PlanetaryFeatureType, int> planetary_features;
                             for (int feat = 0; planet.planetary_features.size(); feat++)
@@ -180,8 +182,8 @@ void uot_net_client::handle_message(const std::string& data)
                         for (int inhabitable_idx = 0; inhabitable_idx < inhabitables.size(); inhabitable_idx++)
                         {
                             messageTypes::MsgInhabitable inhabitable = inhabitables[inhabitable_idx];
-                            SectorObject _sectorObject =
-                                SectorObject(inhabitable.id, inhabitable.position, inhabitable.object_size);
+                            SectorObject _sectorObject = SectorObject(inhabitable.id, inhabitable.position,
+                                                                      inhabitable.object_size, msgGalaxy.sectors[i].id);
                             std::shared_ptr<InhabitableObject> s_inhabitable = std::make_shared<InhabitableObject>(
                                 _sectorObject, inhabitable.resurce_deposit, inhabitable.object_type);
 
