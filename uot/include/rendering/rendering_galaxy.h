@@ -22,5 +22,7 @@ void render_sector_object();
 void render_object_selection(const client_context& context);
 
 void render_selected_object_info(const client_context& context);
+
+void render_fleet(const client_context& context, const std::shared_ptr<Fleet> f);
 }  // namespace rendering
 #endif  // GALAXY_RENDERING_H

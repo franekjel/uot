@@ -33,6 +33,8 @@ struct game_resources : public uncopiable
     std::shared_ptr<SDL_Texture> buildings_blur_sprite;
     std::shared_ptr<SDL_Texture> resource_texture;
 
+    std::array<texture_t, 16> fleet_textures;
+
     std::shared_ptr<TTF_Font> main_font;
     std::shared_ptr<TTF_Font> secondary_font;
     std::shared_ptr<TTF_Font> resource_font;

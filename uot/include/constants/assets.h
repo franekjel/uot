@@ -103,6 +103,7 @@ constexpr std::string_view sky_texture_path = "assets/sky.png";
 constexpr std::string_view sky_square_texture_path = "assets/sky_square.png";
 constexpr std::string_view building_sprite_path = "assets/buildings.png";
 constexpr std::string_view building_blur_sprite_path = "assets/buildings_blurred.png";
+constexpr std::string_view fleet_sprite_path = "assets/fleet.png";
 }  // namespace basic_textures
 
 namespace fonts

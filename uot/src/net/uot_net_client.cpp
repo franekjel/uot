@@ -323,7 +323,6 @@ void uot_net_client::handle_message(const std::string& data)
                         }
                     }
                 }
-
                 send_payload();
             }
         }
