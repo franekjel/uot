@@ -138,6 +138,10 @@ void Player::HandleBuildRequest(Building::BuildingType type, Building::BuildingT
 
 void Player::HandleMoveFleetRequest(unsigned int fleet_id, Point position)
 {
+    if (owned_fleets.count(fleet_id) < 1)
+        return;
+    if (owned_fleets[fleet_id]->current_action != Fleet::Action::None)
+        return;
     owned_fleets[fleet_id]->wanted_position = position;
 }
 
@@ -146,22 +150,25 @@ void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int se
     if (owned_fleets.count(first_fleet_id) < 1 || owned_fleets.count(second_fleet_id) < 1)
         return;
 
-    if (owned_fleets[first_fleet_id]->location_sector->sector_id !=
-        owned_fleets[second_fleet_id]->location_sector->sector_id)
+    auto first_fleet = owned_fleets[first_fleet_id];
+    auto second_fleet = owned_fleets[second_fleet_id];
+
+    if (first_fleet->location_sector->sector_id != second_fleet->location_sector->sector_id)
         return;
 
-    if ((owned_fleets[first_fleet_id]->position - owned_fleets[second_fleet_id]->position).squaredLength() >
-        Fleet::kNearValue)
+    if ((first_fleet->position - second_fleet->position).squaredLength() > Fleet::kNearValue)
         return;
 
-    owned_fleets[first_fleet_id]->ships.insert(owned_fleets[first_fleet_id]->ships.end(),
-                                               owned_fleets[second_fleet_id]->ships.begin(),
-                                               owned_fleets[second_fleet_id]->ships.end());
+    first_fleet->ships.insert(first_fleet->ships.end(), second_fleet->ships.begin(), second_fleet->ships.end());
 
-    owned_fleets[first_fleet_id]->location_sector->present_fleets.erase(
-        owned_fleets[first_fleet_id]->location_sector->present_fleets.find(second_fleet_id));
+    first_fleet->location_sector->present_fleets.erase(
+        first_fleet->location_sector->present_fleets.find(second_fleet_id));
 
     owned_fleets[first_fleet_id]->location_sector->DecrementWatcher(owned_fleets[first_fleet_id]->owner_id);
+    first_fleet->human_capacity += second_fleet->human_capacity;
+    first_fleet->soldiers += second_fleet->soldiers;
+    first_fleet->civilians += second_fleet->civilians;
+    first_fleet->construction_points += second_fleet->construction_points;
 
     owned_fleets.erase(owned_fleets.find(second_fleet_id));
 
@@ -180,4 +187,59 @@ void Player::HandleWarpLoadingFleetRequest(int fleet_id)
     if (std::abs(owned_fleets[fleet_id]->position.squaredLength() - 1.0f) > Fleet::kNearValue)
         return;
     owned_fleets[fleet_id]->current_action = Fleet::Action::WarpLoading;
+}
+
+void Player::HandleBuildAsteroidMineFleetRequest(int fleet_id)
+{
+    if (owned_fleets.count(fleet_id) < 1)
+        return;
+
+    auto handled_fleet = owned_fleets[fleet_id];
+
+    if (handled_fleet->current_action != Fleet::Action::None || handled_fleet->construction_points <= 0.0f)
+        return;
+
+    handled_fleet->base_building_object = nullptr;
+
+    for (const auto &[obj_id, obj] : handled_fleet->location_sector->objects)
+    {
+        if ((handled_fleet->position - obj->position).squaredLength() < Fleet::kNearValue)
+        {
+            auto inhabitable = std::dynamic_pointer_cast<InhabitableObject>(obj);
+            if (inhabitable && !inhabitable->base)
+            {
+                handled_fleet->base_building_object = inhabitable;
+                break;
+            }
+        }
+    }
+    if (!handled_fleet->base_building_object)
+        return;
+
+    auto [labour_cost, base_cost] = handled_fleet->base_building_object->CalcBaseCost();
+
+    bool enough_resources = true;
+    for (const auto &[res, count] : base_cost)
+    {
+        if (owned_resources[res] < count)
+        {
+            enough_resources = false;
+            break;
+        }
+    }
+
+    if (!enough_resources)
+    {
+        handled_fleet->base_building_object = nullptr;
+        return;
+    }
+
+    for (const auto &[res, count] : base_cost)
+    {
+        owned_resources[res] -= count;
+    }
+
+    handled_fleet->full_building_progress = labour_cost;
+    handled_fleet->building_progress = 0.0f;
+    handled_fleet->current_action = Fleet::Action::BuildAsteroidMine;
 }

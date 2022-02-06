@@ -116,7 +116,12 @@ struct Fleet
     bool empty_fleet = false;  // if true then fleet needs to be deleted
     unsigned int owner_id;
 
+    std::shared_ptr<InhabitableObject> base_building_object;
+    float building_progress;
+    float full_building_progress;
+
     static constexpr float kNearValue = 0.01f;
+    static constexpr float kColonizationCost = 10.0f;
 
     enum Action
     {
