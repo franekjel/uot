@@ -81,7 +81,7 @@ struct MsgSector
     std::vector<MsgPlanet> planets;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgSector, id, position, neighbors_ids, stars, inhabitables, planets)
     MsgSector();
-    MsgSector(const std::shared_ptr<Sector>& sector);
+    MsgSector(const std::shared_ptr<Sector>& sector, bool as_neighbor);
 };
 
 struct MsgGalaxy
@@ -89,7 +89,7 @@ struct MsgGalaxy
     std::vector<MsgSector> sectors;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgGalaxy, sectors)
     MsgGalaxy();
-    MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy);
+    MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy, const std::shared_ptr<Player>& player);
 };
 
 struct MsgShipDesign

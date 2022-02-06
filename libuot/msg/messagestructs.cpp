@@ -80,30 +80,38 @@ messageTypes::MsgSector::MsgSector()
     inhabitables = {};
     planets = {};
 }
-messageTypes::MsgSector::MsgSector(const std::shared_ptr<Sector>& sector)
+messageTypes::MsgSector::MsgSector(const std::shared_ptr<Sector>& sector, bool as_neighbor)
     : id(sector->sector_id), position(sector->position)
 {
-    for (auto neighbor : sector->neighbors)
-        neighbors_ids.push_back(neighbor->sector_id);
-    for (auto& [id, sector_object] : sector->objects)
+    if (!as_neighbor)
     {
-        std::shared_ptr<Star> star = std::dynamic_pointer_cast<Star>(sector_object);
-        std::shared_ptr<InhabitableObject> inhabitable = std::dynamic_pointer_cast<InhabitableObject>(sector_object);
-        std::shared_ptr<Planet> planet = std::dynamic_pointer_cast<Planet>(sector_object);
-        if (!!star)
-            stars.push_back(MsgStar(star));
-        if (!!inhabitable)
-            inhabitables.push_back(MsgInhabitable(inhabitable));
-        if (!!planet)
-            planets.push_back(MsgPlanet(planet));
+        for (auto neighbor : sector->neighbors)
+            neighbors_ids.push_back(neighbor->sector_id);
+        for (auto& [id, sector_object] : sector->objects)
+        {
+            std::shared_ptr<Star> star = std::dynamic_pointer_cast<Star>(sector_object);
+            std::shared_ptr<InhabitableObject> inhabitable =
+                std::dynamic_pointer_cast<InhabitableObject>(sector_object);
+            std::shared_ptr<Planet> planet = std::dynamic_pointer_cast<Planet>(sector_object);
+            if (!!star)
+                stars.push_back(MsgStar(star));
+            if (!!inhabitable)
+                inhabitables.push_back(MsgInhabitable(inhabitable));
+            if (!!planet)
+                planets.push_back(MsgPlanet(planet));
+        }
     }
 }
 
 messageTypes::MsgGalaxy::MsgGalaxy() { sectors = {}; }
-messageTypes::MsgGalaxy::MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy)
+messageTypes::MsgGalaxy::MsgGalaxy(const std::shared_ptr<Galaxy>& galaxy, const std::shared_ptr<Player>& player)
 {
-    for (auto sector : galaxy->sectors)
-        sectors.push_back(MsgSector(sector.second));
+    auto sector = galaxy->sectors[player->owned_colonies.begin()->second->planet->sector_id];
+    sectors.push_back(MsgSector(sector, false));
+    for (auto& neighbor : sector->neighbors)
+    {
+        sectors.push_back(MsgSector(neighbor, true));
+    }
 }
 
 messageTypes::MsgTechnologyUpdate::MsgTechnologyUpdate() {}
