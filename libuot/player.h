@@ -33,6 +33,7 @@ struct Player
     void HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int second_fleet_id);
     void HandleWarpLoadingFleetRequest(int fleet_id);
     void HandleBuildAsteroidMineFleetRequest(int fleet_id);
+    void HandleCancelFleetRequest(int fleet_id);
     void HandleStartTechnologyResearch(Technology::TechnologyType technology);
     void DiscoverTechnology(Technology::TechnologyType technology);
 

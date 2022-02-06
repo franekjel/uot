@@ -242,3 +242,10 @@ void Player::HandleBuildAsteroidMineFleetRequest(int fleet_id)
     handled_fleet->building_progress = 0.0f;
     handled_fleet->current_action = Fleet::Action::BuildAsteroidMine;
 }
+
+void Player::HandleCancelFleetRequest(int fleet_id)
+{
+    if (owned_fleets.count(fleet_id) < 1)
+        return;
+    owned_fleets[fleet_id]->current_action = Fleet::Action::None;
+}
