@@ -50,7 +50,7 @@ void rendering::render_planet_view::render_planet_info(const client_context& con
 
     if(pl) {
         std::string info;
-        info += "Population: " + std::to_string(pl->colony->population) + "\n\n";
+        info += "Population: " + std::to_string(static_cast<int>(pl->colony->population)) + "\n\n";
 
         info += "Gains: \n";
         for(auto& g : pl->colony->GetColonyGains()) {
