@@ -173,6 +173,7 @@ void uot_net_client::handle_message(const std::string& data)
                                 _planet->colony->owner = player_ptr;
                                 _planet->colony->population = planet.colony.population;
                                 _planet->colony->buildings = planet.colony.buildings;
+                                _planet->planetary_features = planet.planetary_features;
                                 player_ptr->owned_colonies[_planet->colony->id] = _planet->colony;
                                 colonies_map.insert(
                                     std::pair<int, std::shared_ptr<Colony>>(_planet->colony->id, _planet->colony));

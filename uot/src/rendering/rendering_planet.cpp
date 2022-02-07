@@ -19,6 +19,69 @@ constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept
     return static_cast<typename std::underlying_type<E>::type>(e);
 }
 
+std::array<std::string, 3> planet_names {
+        "Temperate Planet",  // Earth-like
+        "Cold Planet",       // a bit colder
+        "Hot Planet"        // a bit hotter
+};
+
+void rendering::render_planet_view::render_planet_info(const client_context& context)
+{
+    auto& r = context.r;
+    auto& gr = context.gr;
+    auto& gui = context.gui;
+
+    auto pl = std::dynamic_pointer_cast<Planet>(gui->current_object.value());
+    auto io = std::dynamic_pointer_cast<InhabitableObject>(gui->current_object.value());
+    auto st = std::dynamic_pointer_cast<Star>(gui->current_object.value());
+
+    auto object_id = GAS_GIANT_1 + gui->current_object.value()->id % (planets_meta::num_planets - GAS_GIANT_1);
+    std::string name = pl ? planet_names[static_cast<int>(pl->climate)] :
+            io ? (std::string(resourceNames[static_cast<int>(io->resource_deposit.begin()->first)]) + " Object") : "Star";
+
+    sdl_utilities::render_text(r.get(), gr->main_font, name.c_str(), size_settings::planet_info_area::width / 2,
+                               fonts::main_font_size / 2 + 30, size_settings::planet_info_area::width - 50,
+                               {0xFF, 0xFF, 0xFF, 0xFF});
+
+    // render planet here again
+    const bool biggie = planets_meta::texture_size[object_id] == 300;
+    rendering::render_planet_helper(context, biggie ? 1.0 : 3.0, size_settings::planet_info_area::width / 2,
+                         250, gr->planetTextures[object_id]);
+
+    if(pl) {
+        std::string info;
+        info += "Population: " + std::to_string(pl->colony->population) + "\n\n";
+
+        info += "Gains: \n";
+        for(auto& g : pl->colony->GetColonyGains()) {
+            info += std::string(resourceNames.at(static_cast<int>(g.first))) + " " + std::to_string(g.second) + "\n";
+        }
+
+        info += "\n";
+
+        info += "Expenses: \n";
+        for(auto& e : pl->colony->GetColonyExpenses()) {
+            info += std::string(resourceNames.at(static_cast<int>(e.first))) + " " + std::to_string(e.second) + "\n";
+        }
+
+        info += "\n";
+
+        info += "Features: \n";
+        for(auto& f : pl->planetary_features) {
+            auto& feat = PlanetaryFeaturesTypes.at(f.first);
+            info += feat.name + " \n";
+        }
+
+        sdl_utilities::set_render_viewport<size_settings::planet_info_text_area>(r.get());
+        if(info.length() > 0) {
+            sdl_utilities::render_text(r.get(), gr->secondary_font, info, size_settings::planet_info_area::width / 2,
+                           size_settings::planet_info_text_area::height / 2 + info_offset, size_settings::planet_info_area::width - 50,
+                           {0xFF, 0xFF, 0xFF, 0xFF});
+        }
+    }
+
+}
+
 void rendering::render_planet_view::init(client_context& context)
 {
     std::vector<std::string> v_build;
@@ -71,8 +134,6 @@ void rendering::render_planet_view::init(client_context& context)
                                    auto t = _build[build->selected_elem.value()];
                                    mq->build_building(pl->colony->id, t);
 
-                                   // dodać sprawdzanie czy zasoby pozwalają na
-                                   // dodanie tego budynku
                                    _queue.push_back(t);
                                    queue->elems.push_back(Buildings.at(t).name + " " +
                                             std::to_string(static_cast<int>(Buildings.at(t).worker_weeks_cost)));
@@ -86,7 +147,7 @@ void rendering::render_planet_view::init(client_context& context)
                            }
                        },
                        "BUILD",
-                       {size_settings::planet_build_area::width / 2 - 140, 600, 280, 50}},
+                       {size_settings::planet_build_area::width / 2 - 140, 670, 280, 50}},
         300, 50, 50, 10);
 
     built = std::make_shared<ui_list_state>(
@@ -98,10 +159,20 @@ void rendering::render_planet_view::init(client_context& context)
                            {
                                std::cout << "Action button clicked on " << built->elems[built->selected_elem.value()]
                                          << std::endl;
+                               auto mq = context.getActionQueue().value;
+                               auto t = _built[built->selected_elem.value()];
+                               auto up = Buildings.at(t).upgrade;
+                               mq->upgrade_building(pl->colony->id, t, up);
+                               pl->colony->buildings[t]--;
+
+
+                               _queue.push_back(Buildings.at(t).upgrade);
+                               queue->elems.push_back(Buildings.at(up).name + " " +
+                                    std::to_string(static_cast<int>(Buildings.at(up).worker_weeks_cost)));
                            }
                        },
                        "UPGRADE",
-                       {size_settings::planet_build_area::width / 2 - 140, 600, 280, 50}},
+                       {size_settings::planet_built_area::width / 2 - 140, 310, 280, 50}},
         300, 50, 50, 10);
 
     queue = std::make_shared<ui_list_state>(
@@ -116,7 +187,7 @@ void rendering::render_planet_view::init(client_context& context)
                            }
                        },
                        "CANCEL",
-                       {size_settings::planet_build_area::width / 2 - 140, 600, 280, 50}},
+                       {size_settings::planet_queue_area::width / 2 - 140, 310, 280, 50}},
         300, 50, 50, 10);
 }
 
@@ -178,13 +249,7 @@ void rendering::render_planet_view::_draw(client_context& context)
     {
         // draw queue
         sdl_utilities::set_render_viewport<size_settings::planet_queue_area>(r.get());
-        sdl_utilities::paint_frame_textured(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, gr->sky_square_texture);
-        sdl_utilities::set_custom_viewport<size_settings::planet_queue_area, size_settings::frame_size>(r.get());
-        rendering::render_planet_helper(context, 10.0f, size_settings::planet_queue_area::width / 6,
-                                        size_settings::planet_queue_area::height / 1.6,
-                                        gr->planetTextures[11 + context.gui->current_object.value()->id % 18]);
-        sdl_utilities::set_custom_viewport<size_settings::planet_queue_area, size_settings::frame_size>(r.get());
-        sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
+        sdl_utilities::paint_frame(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, SDL_Color{0x00, 0x00, 0x00, 0xFF});
         render_list(context, queue);
 
         // =======================================================
@@ -202,9 +267,18 @@ void rendering::render_planet_view::_draw(client_context& context)
         {
             rendering::render_building_info_box(context, box.value().type, box.value().x, box.value().y);
         }
+
+        sdl_utilities::set_render_viewport<size_settings::planet_info_area>(r.get());
+        sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
+
+        render_planet_info(context);
     }
     else if (io)
     {
+        sdl_utilities::set_render_viewport<size_settings::planet_info_area>(r.get());
+        sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
+
+        render_planet_info(context);
     }
     else if (st)
     {
@@ -329,6 +403,7 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         }
         box.reset();
     }
+
 }
 
 void rendering::render_planet_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov)
@@ -351,6 +426,11 @@ void rendering::render_planet_view::_wheel_handler(client_context& context, int 
     {
         queue->offset =
             std::clamp(0, static_cast<int>(queue->offset + 4 * ymov), static_cast<int>(queue->elems.size() * 80));
+    }
+
+    if (et == iu::uot_event_type::planet_scroll_info)
+    {
+        info_offset += 4 * ymov;
     }
 }
 

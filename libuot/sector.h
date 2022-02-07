@@ -70,6 +70,8 @@ struct InhabitableObject : SectorObject
                 cost[Resource::RareMetals] = 40;
                 work += 300.0f;
                 break;
+        default:
+            break;
         }
 
         return {work, cost};

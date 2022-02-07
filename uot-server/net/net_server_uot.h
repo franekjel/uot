@@ -22,7 +22,7 @@ class net_server_uot : public net_server
                                std::shared_ptr<Galaxy>& galaxy);
     void send_game_begin_message(std::shared_ptr<Player>& player, std::string player_net_name,
                                  std::shared_ptr<Galaxy>& galaxy);
-    void after_accept_player();
+    void after_accept_player() override;
 
    protected:
     bool running;
