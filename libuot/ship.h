@@ -89,6 +89,7 @@ struct Ship
     float full_warp_drive_charge = 100.0f;
     std::vector<Weapon> weapons;
     std::shared_ptr<ShipDesign> design;
+    std::shared_ptr<Fleet> fleet;
 
     static std::shared_ptr<Ship> ShipFromDesign(const int id, const std::shared_ptr<ShipDesign> design);
 

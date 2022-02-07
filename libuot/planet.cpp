@@ -7,14 +7,14 @@ float Colony::population_building_modificator = 1.0f;
 std::map<Resource, float> Colony::GetColonyGains()
 {
     std::map<Resource, float> colony_gains = {};
-    int neccessary_workers = 0;
+    float neccessary_workers = 0;
 
     for (auto& buildingType : buildings)
     {
-        auto& building = Colony::GetBuildingFromType(buildingType.first);
+        const auto& building = Colony::GetBuildingFromType(buildingType.first);
         int number_of_buildings = buildingType.second;
         neccessary_workers += number_of_buildings * building.workers;
-        for (auto& gains : building.production)
+        for (const auto& gains : building.production)
         {
             if (colony_gains.count(gains.first) == 0)
                 colony_gains[gains.first] =

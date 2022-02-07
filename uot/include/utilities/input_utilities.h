@@ -42,6 +42,7 @@ enum class uot_event_type
     planet_scroll_queue,
     planet_scroll_built,
     planet_scroll_build,
+    planet_scroll_info,
     planet_scroll_other,
     planet_scroll_resource,
 
@@ -69,6 +70,13 @@ inline bool check_collision(const int x, const int y, const int box_x, const int
     }
 
     return true;
+}
+
+inline bool check_collision_circle(const int x, const int y, const int circle_x, const int circle_y, const int r)
+{
+    const float dx = x - circle_x;
+    const float dy = y - circle_y;
+    return dx * dx + dy * dy <= r * r;
 }
 
 uot_event_type get_event_type(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);

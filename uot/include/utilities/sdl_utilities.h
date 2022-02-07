@@ -15,6 +15,9 @@ void render_text(SDL_Renderer* r, std::shared_ptr<TTF_Font>& font, const std::st
                  SDL_Color c);
 
 std::shared_ptr<SDL_Texture> load_texture_from_file(const std::string& path, const std::shared_ptr<SDL_Renderer>& r);
+std::shared_ptr<SDL_Texture> load_and_paint_texture_from_file(const std::string& path,
+                                                              const std::shared_ptr<SDL_Renderer>& r,
+                                                              const SDL_Color& c);
 
 void paint_background(SDL_Renderer* r, const SDL_Color& c);
 

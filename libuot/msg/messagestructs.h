@@ -124,6 +124,53 @@ struct MsgCreateShip
     MsgCreateShip(unsigned int design_id_, unsigned int planet_id_);
 };
 
+struct MsgShipDesignResponse
+{
+    unsigned int id;
+    bool deleted;
+    std::string name;
+    ShipHull::Type hull_type;
+    std::map<ModuleType, int> sides;
+    std::map<ModuleType, int> inside;
+    std::map<Resource, float> cost;
+    std::map<Resource, float> upkeep;
+    float worker_weeks_cost;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgShipDesignResponse, id, deleted, name, hull_type, sides, inside, cost, upkeep,
+                                   worker_weeks_cost)
+    MsgShipDesignResponse();
+    MsgShipDesignResponse(unsigned int design_id_, const std::shared_ptr<ShipDesign>& design, bool deleted_);
+};
+
+struct MsgFleetParameters
+{
+    bool new_fleet;
+    unsigned int id;
+    Point position;
+    float soldiers;
+    float civilians;
+    float human_capacity;
+    float construction_points;
+    float base_fleet_speed;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleetParameters, new_fleet, id, position, soldiers, civilians, human_capacity,
+                                   construction_points, base_fleet_speed)
+    MsgFleetParameters();
+    MsgFleetParameters(const Sector::FleetParameters& fleet_parameters, bool new_fleet_);
+};
+
+struct MsgCreateShipResponse
+{
+    unsigned int id;
+    unsigned int design_id;
+    unsigned int planet_id;
+    bool created;
+    MsgFleetParameters fleet_parameters;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgCreateShipResponse, id, design_id, planet_id, created, fleet_parameters);
+    MsgCreateShipResponse();
+    MsgCreateShipResponse(unsigned int design_id_, unsigned int planet_id_, bool created_, bool new_fleet,
+                          unsigned int ship_id_, const Sector::FleetParameters& fleet_parameters_);
+};
+
 struct MsgTechnologyUpdate
 {
     Technology::TechnologyType technology_type;  // if none in progress, set to None
@@ -159,11 +206,9 @@ struct MsgFleetsJoin
 {
     unsigned int joined_fleet_id_1;
     unsigned int joined_fleet_id_2;
-    unsigned int result_fleet_id;
-    Point result_fleet_pos;
+    MsgFleetParameters fleet_parameters;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleetsJoin, joined_fleet_id_1, joined_fleet_id_2, result_fleet_id,
-                                   result_fleet_pos)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleetsJoin, joined_fleet_id_1, joined_fleet_id_2, fleet_parameters)
     MsgFleetsJoin();
     MsgFleetsJoin(const Sector::JoinedFleets& joined_fleets);
 };

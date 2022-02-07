@@ -154,7 +154,7 @@ void uot_net_client::handle_message(const std::string& data)
                                 SectorObject(planet.id, planet.position, planet.object_size, msgGalaxy.sectors[i].id);
 
                             std::map<PlanetaryFeatures::PlanetaryFeatureType, int> planetary_features;
-                            for (int feat = 0; planet.planetary_features.size(); feat++)
+                            for (int feat = 0; feat < planet.planetary_features.size(); feat++)
                             {
                                 std::map<PlanetaryFeatures::PlanetaryFeatureType, int>::iterator planetaryFeature =
                                     planet.planetary_features.begin();
@@ -173,6 +173,8 @@ void uot_net_client::handle_message(const std::string& data)
                                 _planet->colony->owner = player_ptr;
                                 _planet->colony->population = planet.colony.population;
                                 _planet->colony->buildings = planet.colony.buildings;
+                                _planet->planetary_features = planet.planetary_features;
+                                player_ptr->owned_colonies[_planet->colony->id] = _planet->colony;
                                 colonies_map.insert(
                                     std::pair<int, std::shared_ptr<Colony>>(_planet->colony->id, _planet->colony));
                             }
@@ -241,7 +243,6 @@ void uot_net_client::handle_message(const std::string& data)
         case messageTypes::Actions:
         {
             auto payload_action = std::dynamic_pointer_cast<messageTypes::ActionsPayload>(des);
-            std::vector<int> action = payload_action->createBaseActions;
         }
         break;
 
@@ -264,6 +265,26 @@ void uot_net_client::handle_message(const std::string& data)
                     }
                 }
 
+                for (const auto& a : payload_newturn->buildings_updates)
+                {
+                    state.value->player->owned_colonies[a.colony_id]->building_queue.clear();
+                }
+
+                for (const auto& a : payload_newturn->buildings_updates)
+                {
+                    if (a.days_remaining == 0)
+                    {
+                        state.value->player->owned_colonies[a.colony_id]->buildings[a.building_type]++;
+                    }
+                    else
+                    {
+                        BuildingBuildProgress b{a.building_type, a.upgrade_of};
+                        b.worker_week_units_left = a.days_remaining;
+
+                        state.value->player->owned_colonies[a.colony_id]->building_queue.push_back(b);
+                    }
+                }
+
                 for (const auto& r : resource_data)
                 {
                     state.value->player->owned_resources[r.first] = r.second;
@@ -276,15 +297,9 @@ void uot_net_client::handle_message(const std::string& data)
                         tech.technology_type != Technology::TechnologyType::Empty)
                     {
                         std::cout << "Finished tech " << static_cast<int>(tech.technology_type) << "\n";
-                        auto t = Technologies.find(tech.technology_type);
-                        state.value->player->known_technologies.insert(tech.technology_type);
+                        state.value->player->DiscoverTechnology(tech.technology_type);
                         if (state.value->player->available_technologies.count(tech.technology_type) > 0)
                             state.value->player->available_technologies.erase(tech.technology_type);
-
-                        for (const auto& tt : t->second.unlock)
-                        {
-                            state.value->player->available_technologies.insert(tt);
-                        }
                     }
                     state.value->player->researched_technology.technology = tech.technology_type;
                     state.value->player->researched_technology.progress_left = (float)tech.days_remaining;
@@ -308,7 +323,6 @@ void uot_net_client::handle_message(const std::string& data)
                         }
                     }
                 }
-
                 send_payload();
             }
         }

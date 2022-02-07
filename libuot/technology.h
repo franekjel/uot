@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "resource.h"
+
 struct Technology
 {
     enum class TechnologyType
@@ -133,7 +135,30 @@ const std::map<Technology::TechnologyType, Technology> Technologies{
      Technology(0, "Engineering", "Starting technology. Allows constructing base buildngs", 0,
                 {Technology::TechnologyType::AdvancedMining, Technology::TechnologyType::SoldiersTrainingProgram,
                  Technology::TechnologyType::PolymersProcessing, Technology::TechnologyType::AdvancedGenetics,
-                 Technology::TechnologyType::ResearchOrganisation, Technology::TechnologyType::ColdFusion})},
+                 Technology::TechnologyType::ResearchOrganisation, Technology::TechnologyType::ColdFusion},
+                {{Resource::Metals, 0.0f},
+                 {Resource::Antimatter, 0.0f},
+                 {Resource::RareMetals, 0.0f},
+                 {Resource::Crystals, 0.0f},
+                 {Resource::Polymers, 0.0f},
+                 {Resource::DarkMatter, 0.0f},
+                 {Resource::AncientNanobots, 0.0f},
+                 {Resource::AncientRelics, 0.0f},
+                 {Resource::Spatium, 0.0f},
+                 {Resource::Food, 0.0f},
+                 {Resource::Technology, 0.0f}},
+                {{Resource::Metals, 0.0f},
+                 {Resource::Antimatter, 0.0f},
+                 {Resource::RareMetals, 0.0f},
+                 {Resource::Crystals, 0.0f},
+                 {Resource::Polymers, 0.0f},
+                 {Resource::DarkMatter, 0.0f},
+                 {Resource::AncientNanobots, 0.0f},
+                 {Resource::AncientRelics, 0.0f},
+                 {Resource::Spatium, 0.0f},
+                 {Resource::Food, 0.0f},
+                 {Resource::Technology, 0.0f}},
+                0.0f)},
 
     {Technology::TechnologyType::Spaceships,
      Technology(

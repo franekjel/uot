@@ -85,6 +85,15 @@ void loadMedia(client_context& context)
             sdl_utilities::load_texture_from_file(std::string{planets_meta::planet_texture_paths[i]}, context.r)};
     }
 
+    printf("Loading fleet texture\n");
+    for (int i = 0; i < gr->fleet_textures.size(); i++)
+    {
+        gr->fleet_textures[i] =
+            texture_t{32, 32,
+                      sdl_utilities::load_and_paint_texture_from_file(std::string(basic_textures::fleet_sprite_path),
+                                                                      context.r, colors_meta::user_color[i])};
+    }
+
     // load utility selection textures
     printf("Loading selection textures\n");
     gr->selectionTextures.resize(selection_meta::num_selection_textures);

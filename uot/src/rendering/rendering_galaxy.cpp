@@ -1,9 +1,13 @@
+#define _USE_MATH_DEFINES
 #include "rendering_galaxy.h"
+#include <cmath>
+
 #include "client_context.h"
 #include "game_gui.h"
 #include "game_resources.h"
 #include "game_state.h"
 #include "input_utilities.h"
+#include "msg_queue.h"
 #include "player.h"
 
 void rendering::render_sector_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov) {}
@@ -65,27 +69,25 @@ void rendering::render_sector_view::_draw(client_context& context)
 
 void rendering::render_object_selection(const client_context& context)
 {
-    auto& r = context.r;
-    auto& gr = context.gr;
-    auto& gui = context.gui;
+    const auto& r = context.r;
+    const auto& gr = context.gr;
+    const auto& gui = context.gui;
 
-    if (!gui->current_object.has_value())
+    if (!gui->current_object.has_value() && !gui->current_fleet.has_value())
     {
         return;
     }
+
+    const Point pos =
+        gui->current_object.has_value() ? gui->current_object.value()->position : gui->current_fleet.value()->position;
+    const int tex_size = gui->current_object.has_value() ? planets_meta::texture_size[GAS_GIANT_1] : 32;
 
     sdl_utilities::set_custom_viewport<size_settings::play_area, size_settings::frame_size>(r.get());
     sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
     sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
 
-    const auto& curr = gui->current_object.value();
-
-    const auto x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * curr->position.x;
-    const auto y = size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * curr->position.y;
-
-    const int tex_id = GAS_GIANT_1 + curr->id % (planets_meta::num_planets - GAS_GIANT_1);
-    // render always the smallest possible selection
-    const int tex_size = planets_meta::texture_size[GAS_GIANT_1];
+    const auto x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * pos.x;
+    const auto y = size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * pos.y;
 
     SDL_Rect s{0, 0, selection_meta::texture_width, selection_meta::texture_height};
 
@@ -94,14 +96,17 @@ void rendering::render_object_selection(const client_context& context)
     SDL_RenderCopyEx(r.get(), gr->selectionTextures[selection_types::SECTOR_SELECTION].get(), &s, &d,
                      SDL_GetTicks() / 100, NULL, SDL_FLIP_NONE);
 
-    render_planet_helper(context, 0.8, x, y, gr->planetTextures[11 + curr->id % 18]);
+    if (gui->current_object.has_value())
+        render_planet_helper(context, 0.8, x, y, gr->planetTextures[11 + gui->current_object.value()->id % 18]);
+    else
+        render_fleet(context, gui->current_fleet.value());
 }
 
 void rendering::render_selected_object_info(const client_context& context)
 {
-    auto& r = context.r;
-    auto& gr = context.gr;
-    auto& gui = context.gui;
+    const auto& r = context.r;
+    const auto& gr = context.gr;
+    const auto& gui = context.gui;
 
     auto object_id = GAS_GIANT_1 + gui->current_object.value()->id % (planets_meta::num_planets - GAS_GIANT_1);
     sdl_utilities::render_text(r.get(), gr->main_font, "PLANET NAME", size_settings::context_area::width / 2,
@@ -128,8 +133,7 @@ void rendering::render_selected_object_info(const client_context& context)
 
 void rendering::render_sector_galaxy_helper(const client_context& context, const std::shared_ptr<Sector>& sector)
 {
-    auto& r = context.r;
-    auto& gr = context.gr;
+    const auto& gr = context.gr;
     for (const auto& [id, p] : sector->objects)
     {
         const auto planet_x =
@@ -154,13 +158,10 @@ void rendering::render_sector_galaxy_helper(const client_context& context, const
         }
     }
 
-    for (const auto& [id, f] : sector->present_fleets)
+    for (auto& [id, f] : sector->present_fleets)
     {
-        const auto fleet_x =
-            size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * f->position.x;
-        const auto fleet_y =
-            size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * f->position.y;
-        render_planet_owner(context, 3, 0.8, fleet_x, fleet_y, gr->planetTextures[12]);
+        f->owner_id = 1;  // TODO: REMOVE IN FINAL VERSION (for now we don't have enough info about fleets)
+        render_fleet(context, f);
     }
 }
 
@@ -179,15 +180,35 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
     auto& gui = context.gui;
     namespace iu = input_utilities;
     const auto et = input_utilities::get_event_type(event_type, m, x, y);
+
+    using AreaType = size_settings::play_area;
+    auto& current_sector = context.gui->current_sector;
+    auto& current_object = context.gui->current_object;
+    auto& current_fleet = context.gui->current_fleet;
+    x = x - AreaType::x_offset;
+    y = y - AreaType::y_offset;
+
     if (et == iu::uot_event_type::left_click_play)
     {
-        using AreaType = size_settings::play_area;
-        auto& current_sector = context.gui->current_sector;
-        auto& current_object = context.gui->current_object;
-        x = x - AreaType::x_offset;
-        y = y - AreaType::y_offset;
-
         const auto& curr = current_sector.value();
+
+        const unsigned int player_id = context.getGameState().value->player->id;
+        for (const auto& [id, fleet] : gui->current_sector.value()->present_fleets)
+        {
+            if (fleet->owner_id != player_id)
+                continue;
+            const auto fleet_x =
+                size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * fleet->position.x;
+            const auto fleet_y =
+                size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * fleet->position.y;
+            if (iu::check_collision_circle(x, y, fleet_x, fleet_y, 16))  // 16 -magic number size of fleet sprite
+            {
+                current_fleet = fleet;
+                return;
+            }
+        }
+        current_fleet.reset();
+
         for (const auto& [id, sec_obj] : curr->objects)
         {
             const auto tex_size = planets_meta::texture_size[GAS_GIANT_1];
@@ -209,7 +230,7 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
         }
         current_object.reset();
 
-        for (auto& neighbor : gui->current_sector.value()->neighbors)
+        for (const auto& neighbor : gui->current_sector.value()->neighbors)
         {
             const auto unit = (neighbor->position - gui->current_sector.value()->position).normalized();
             const auto offset = unit * 0.5 * size_settings::play_area::height;
@@ -225,6 +246,22 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
             }
         }
     }
+    else if (et == iu::uot_event_type::right_click_play)
+    {
+        auto& current_fleet = context.gui->current_fleet;
+        if (current_fleet.has_value())
+        {
+            auto& fleet = current_fleet.value();
+
+            Point pos{(x - size_settings::play_area::width / 2.0f) / (size_settings::play_area::height / 2.0f),
+                      (y - size_settings::play_area::height / 2.0f) / (size_settings::play_area::height / 2.0f)};
+
+            if (pos.x * pos.x + pos.y * pos.y > 1.0f)
+                return;
+            context.getActionQueue().value->request_fleet_move(fleet->id, pos);
+            fleet->wanted_position = pos;
+        }
+    }
 }
 
 void rendering::render_sector_view::key_handler(client_context& context, Uint16 k)
@@ -232,6 +269,24 @@ void rendering::render_sector_view::key_handler(client_context& context, Uint16 
     if (k == SDLK_ESCAPE)
     {
         context.gui->current_object.reset();
+        context.gui->current_fleet.reset();
         context.view = _up();
     }
+}
+
+void rendering::render_fleet(const client_context& context, const std::shared_ptr<Fleet> f)
+{
+    const auto fleet_x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * f->position.x;
+    const auto fleet_y = size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * f->position.y;
+
+    const int w = context.gr->fleet_textures[f->owner_id].w;
+    const int h = context.gr->fleet_textures[f->owner_id].h;
+
+    const SDL_Rect d = {static_cast<int>(fleet_x - 0.5 * w), static_cast<int>(fleet_y - 0.5 * h), w, h};
+
+    const Point v = std::isnan(f->wanted_position.x) ? Point{0, -1} : f->wanted_position - f->position;
+    const float angle = std::atan2(v.y, v.x) + M_PI_2;
+
+    SDL_RenderCopyEx(context.r.get(), context.gr->fleet_textures[f->owner_id].t.get(), nullptr, &d,
+                     angle * 360.0f / (2.0f * M_PI), nullptr, SDL_FLIP_NONE);
 }

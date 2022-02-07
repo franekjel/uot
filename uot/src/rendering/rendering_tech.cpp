@@ -1,5 +1,7 @@
 #include "rendering/rendering_tech.h"
+
 #include <deque>
+
 #include "client_context.h"
 #include "game_gui.h"
 #include "game_resources.h"

@@ -79,15 +79,15 @@ void Player::DiscoverTechnology(Technology::TechnologyType technology)
         }
     }
 
-    for (const auto &bonus : tech.resources_modifiers_planet)
+    for (const auto &[res, bonus] : tech.resources_modifiers_planet)
     {
-        if (resources_modifiers_planet.count(bonus.first) > 0)
+        if (resources_modifiers_planet.count(res) > 0)
         {
-            resources_modifiers_planet[bonus.first] += resources_modifiers_planet[bonus.first] * bonus.second;
+            resources_modifiers_planet[res] += resources_modifiers_planet[res] * bonus;
         }
         else
         {
-            resources_modifiers_planet[bonus.first] = 1.0f + bonus.second;
+            resources_modifiers_planet[res] = 1.0f + bonus;
         }
     }
 
@@ -174,9 +174,9 @@ void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int se
     owned_fleets.erase(owned_fleets.find(second_fleet_id));
 
     auto &sector = owned_fleets[first_fleet_id]->location_sector;
-    sector->joined_fleets.push_back(Sector::JoinedFleets{first_fleet_id, second_fleet_id, first_fleet_id,
-                                                         owned_fleets[first_fleet_id]->position,
-                                                         owned_fleets[first_fleet_id]->owner_id});
+    sector->joined_fleets.push_back(Sector::JoinedFleets{
+        first_fleet_id, second_fleet_id, owned_fleets[first_fleet_id]->owner_id,
+        Sector::FleetParameters(owned_fleets[first_fleet_id])});
 }
 
 void Player::HandleWarpLoadingFleetRequest(int fleet_id)

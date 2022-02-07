@@ -18,6 +18,7 @@ struct game_gui
 
     std::optional<std::shared_ptr<Sector>> current_sector;
     std::optional<std::shared_ptr<SectorObject>> current_object;
+    std::optional<std::shared_ptr<Fleet>> current_fleet;
     std::optional<Building::BuildingType> current_building;
     std::optional<Building::BuildingType> focused_building;
     std::optional<int> focused_button;

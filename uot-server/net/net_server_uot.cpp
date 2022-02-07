@@ -189,7 +189,25 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
         auto technology_update_msg = messageTypes::MsgTechnologyUpdate(new_technology, 0);
         payload.technology_updates.push_back(technology_update_msg);
     }
+
+    for (const auto& changed_design : player->changed_designs)
+    {
+        auto ship_design = messageTypes::MsgShipDesignResponse(changed_design.design_id, changed_design.design,
+                                                               changed_design.deleted);
+        payload.ship_designs.push_back(ship_design);
+    }
+
+    for (const auto& new_ship : player->new_ships)
+    {
+        auto create_ship = messageTypes::MsgCreateShipResponse(new_ship.design_id, new_ship.planet_id, new_ship.created,
+                                                               new_ship.new_fleet, new_ship.ship->id, Sector::FleetParameters(new_ship.ship->fleet));
+
+        payload.ships.push_back(create_ship);
+    }
+
     player->new_technologies.clear();
+    player->changed_designs.clear();
+    player->new_ships.clear();
 
     txrx.send_reliable(player_net_name, payload.Serialize());
 }
@@ -209,7 +227,7 @@ void net_server_uot::send_game_begin_message(std::shared_ptr<Player>& player, st
     payload.starting_ships_designs.reserve(player->ship_designs.size());
     for (const auto& d : player->ship_designs)
     {
-        //payload.starting_ships_designs.emplace_back(messageTypes::MsgShipDesignRe(d.second,)); TODO PO
+        payload.starting_ships_designs.emplace_back(messageTypes::MsgShipDesignResponse(d.second->id, d.second, false));
     }
 
     txrx.send_reliable(player_net_name, payload.Serialize());

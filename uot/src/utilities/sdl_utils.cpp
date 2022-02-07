@@ -94,6 +94,46 @@ std::shared_ptr<SDL_Texture> sdl_utilities::load_texture_from_file(const std::st
     return ret;
 }
 
+// loads texture ans change all magenta (ff00ff) pixels to given color
+// we have only one fleet texture and we change details to match color of each player (from base magenta)
+std::shared_ptr<SDL_Texture> sdl_utilities::load_and_paint_texture_from_file(const std::string& path,
+                                                                             const std::shared_ptr<SDL_Renderer>& r,
+                                                                             const SDL_Color& c)
+{
+    SDL_Surface* s = IMG_Load(path.c_str());
+    if (s == nullptr)
+    {
+        throw std::runtime_error("Unable to load image %s! SDL_image Error: %s\n" + path + +" " +
+                                 std::string(IMG_GetError()));
+    }
+    const Uint32 color = SDL_MapRGB(s->format, c.r, c.g, c.b);
+    Uint32* pixels = static_cast<Uint32*>(s->pixels);
+    for (int i = 0; i < s->h; i++)
+    {
+        for (int j = 0; j < s->w; j++)
+        {
+            Uint32 pos = i * (s->pitch / sizeof(unsigned int)) + j;
+            Uint8 r, g, b;
+            SDL_GetRGB(pixels[pos], s->format, &r, &g, &b);
+            if (r == 0xFF && g == 0x00 && b == 0xFF)
+            {
+                pixels[pos] = color;
+            }
+        }
+    }
+
+    SDL_SetColorKey(s, SDL_TRUE, SDL_MapRGB(s->format, 0, 0xFF, 0xFF));
+    const auto ret = std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(r.get(), s), sdl_texture_deleter);
+    if (ret == nullptr)
+    {
+        throw std::runtime_error("Unable to create texture from %s! SDL Error: %s\n" + path + +" " +
+                                 std::string(SDL_GetError()));
+    }
+    SDL_FreeSurface(s);
+
+    return ret;
+}
+
 void sdl_utilities::paint_background(SDL_Renderer* r, const SDL_Color& c)
 {
     SDL_SetRenderDrawColor(r, c.r, c.g, c.b, c.a);
