@@ -160,6 +160,11 @@ void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int se
     if ((first_fleet->position - second_fleet->position).squaredLength() > Fleet::kNearValue)
         return;
 
+    for (const auto &ship : second_fleet->ships)
+    {
+        ship->fleet = first_fleet;
+    }
+
     first_fleet->ships.insert(first_fleet->ships.end(), second_fleet->ships.begin(), second_fleet->ships.end());
 
     first_fleet->location_sector->present_fleets.erase(
@@ -174,9 +179,9 @@ void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int se
     owned_fleets.erase(owned_fleets.find(second_fleet_id));
 
     auto &sector = owned_fleets[first_fleet_id]->location_sector;
-    sector->joined_fleets.push_back(Sector::JoinedFleets{
-        first_fleet_id, second_fleet_id, owned_fleets[first_fleet_id]->owner_id,
-        Sector::FleetParameters(owned_fleets[first_fleet_id])});
+    sector->joined_fleets.push_back(Sector::JoinedFleets{first_fleet_id, second_fleet_id,
+                                                         owned_fleets[first_fleet_id]->owner_id,
+                                                         Sector::FleetParameters(owned_fleets[first_fleet_id])});
 }
 
 void Player::HandleWarpLoadingFleetRequest(int fleet_id)
@@ -330,7 +335,48 @@ void Player::HandleShipDesignRequest(unsigned int id, bool delete_design, std::s
     // delete_design mówi o tym czy chcemy usunąć design
     // podanie istniejącego id, ale z delete = false powoduje nadpisanie
     // tu musisz policzyć koszty zbudowania i utrzymania, będę chciał je później odesłać w odpowiedzi
+    if (delete_design && ship_designs.count(id) > 0)
+    {
+        ship_designs.erase(id);
+        return;
+    }
+
+    auto sides_size = ShipHulls.at(hull_type).sides_size;
+    auto inside_size = ShipHulls.at(hull_type).inside_size;
+
+    for (const auto &[module_type, count] : sides)
+    {
+        if (Modules.at(module_type).destination != Module::ModuleDestination::Sides)
+        {
+            // PO error
+            return;
+        }
+
+        sides_size -= Modules.at(module_type).size * count;
+    }
+
+    for (const auto &[module_type, count] : inside)
+    {
+        if (Modules.at(module_type).destination != Module::ModuleDestination::Inside)
+        {
+            // PO error
+            return;
+        }
+
+        inside_size -= Modules.at(module_type).size * count;
+    }
+
+    if (sides_size < 0 || inside_size < 0)
+    {
+    // PO error
+        return;
+    }
+
+    auto current_design = std::make_shared<ShipDesign>(id, name, hull_type, sides, inside);
+
+    ship_designs[id] = current_design;
 }
+
 void Player::HandleCreateShipRequest(unsigned int design_id, unsigned int planet_id)
 {
     // DO MM:

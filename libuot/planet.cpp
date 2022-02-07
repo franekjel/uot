@@ -160,8 +160,9 @@ void Colony::UpdateShipBuildingQueue()
             owner->owned_fleets[current_fleet->id] = current_fleet;
             current_build.sector->IncrementWatcher(owner->id);
         }
-
-        current_fleet->AddShipToFleet(Ship::ShipFromDesign(id_source++, current_build.design));
+        auto new_ship = Ship::ShipFromDesign(id_source++, current_build.design);
+        new_ship->fleet = current_fleet;
+        current_fleet->AddShipToFleet(new_ship);
 
         ship_building_queue.erase(ship_building_queue.begin());
     }
