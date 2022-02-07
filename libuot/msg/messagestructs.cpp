@@ -155,8 +155,7 @@ messageTypes::MsgFleetsJoin::MsgFleetsJoin() {}
 messageTypes::MsgFleetsJoin::MsgFleetsJoin(const Sector::JoinedFleets& joined_fleets)
     : joined_fleet_id_1(joined_fleets.joined_fleet_1),
       joined_fleet_id_2(joined_fleets.joined_fleet_2),
-      result_fleet_id(joined_fleets.res_fleet),
-      result_fleet_pos(joined_fleets.res_fleet_pos)
+      fleet_parameters(joined_fleets.fleet_parameters, false)
 {
 }
 
@@ -246,13 +245,14 @@ messageTypes::MsgShipDesignResponse::MsgShipDesignResponse(unsigned int design_i
 messageTypes::MsgCreateShipResponse::MsgCreateShipResponse() {}
 
 messageTypes::MsgCreateShipResponse::MsgCreateShipResponse(unsigned int design_id_, unsigned int planet_id_,
-                                                           bool created_, bool new_fleet, std::shared_ptr<Ship> ship)
+                                                           bool created_, bool new_fleet, unsigned int ship_id_,
+                                                           const Sector::FleetParameters& fleet_parameters_)
     : design_id(design_id_), planet_id(planet_id_), created(created_)
 {
     if (created)
     {
-        id = ship->id;
-        fleet_parameters = MsgFleetParameters(ship, new_fleet);
+        id = ship_id_;
+        fleet_parameters = MsgFleetParameters(fleet_parameters_, new_fleet);
     }
     else
     {
@@ -262,10 +262,13 @@ messageTypes::MsgCreateShipResponse::MsgCreateShipResponse(unsigned int design_i
 
 messageTypes::MsgFleetParameters::MsgFleetParameters() {}
 
-messageTypes::MsgFleetParameters::MsgFleetParameters(std::shared_ptr<Ship> ship, bool new_fleet_)
+messageTypes::MsgFleetParameters::MsgFleetParameters(const Sector::FleetParameters& fleet_parameters, bool new_fleet_)
     : new_fleet(new_fleet_)
 {
-    auto& fleet = ship->fleet;
-
-    id = fleet->id;
+    id = fleet_parameters.fleet_id;
+    position = fleet_parameters.position;
+    soldiers = fleet_parameters.soldiers;
+    civilians = fleet_parameters.civilians;
+    human_capacity = fleet_parameters.human_capacity;
+    construction_points = fleet_parameters.construction_points;
 }

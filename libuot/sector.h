@@ -92,13 +92,26 @@ struct Sector
     // fields below are server-only
     std::map<unsigned int, unsigned int> watchers;  // players who are watching the sector, only for server purpose
     std::map<unsigned int, int> new_watchers;
+
+    struct FleetParameters
+    {
+        unsigned int fleet_id;
+        Point position;
+        float soldiers;
+        float civilians;
+        float human_capacity;
+        float construction_points;
+
+        FleetParameters() = default;
+        FleetParameters(std::shared_ptr<Fleet> fleet);
+    };
+
     struct JoinedFleets
     {
         unsigned int joined_fleet_1;
         unsigned int joined_fleet_2;
-        unsigned int res_fleet;
-        Point res_fleet_pos;
         unsigned int owner;
+        FleetParameters fleet_parameters;
     };
 
     struct JumpedFleet

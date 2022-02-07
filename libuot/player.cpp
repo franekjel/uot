@@ -174,9 +174,9 @@ void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int se
     owned_fleets.erase(owned_fleets.find(second_fleet_id));
 
     auto &sector = owned_fleets[first_fleet_id]->location_sector;
-    sector->joined_fleets.push_back(Sector::JoinedFleets{first_fleet_id, second_fleet_id, first_fleet_id,
-                                                         owned_fleets[first_fleet_id]->position,
-                                                         owned_fleets[first_fleet_id]->owner_id});
+    sector->joined_fleets.push_back(Sector::JoinedFleets{
+        first_fleet_id, second_fleet_id, owned_fleets[first_fleet_id]->owner_id,
+        Sector::FleetParameters(owned_fleets[first_fleet_id])});
 }
 
 void Player::HandleWarpLoadingFleetRequest(int fleet_id)
@@ -324,7 +324,7 @@ void Player::HandleColonizeFleetRequest(int fleet_id)
 }
 
 void Player::HandleShipDesignRequest(unsigned int id, bool delete_design, std::string name, ShipHull::Type hull_type,
-                             std::map<ModuleType, int> sides, std::map<ModuleType, int> inside)
+                                     std::map<ModuleType, int> sides, std::map<ModuleType, int> inside)
 {
     // DO MM:
     // delete_design mówi o tym czy chcemy usunąć design

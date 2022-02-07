@@ -200,7 +200,8 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
     for (const auto& new_ship : player->new_ships)
     {
         auto create_ship = messageTypes::MsgCreateShipResponse(new_ship.design_id, new_ship.planet_id, new_ship.created,
-                                                               new_ship.new_fleet, new_ship.ship);
+                                                               new_ship.new_fleet, new_ship.ship->id, Sector::FleetParameters(new_ship.ship->fleet));
+
         payload.ships.push_back(create_ship);
     }
 
