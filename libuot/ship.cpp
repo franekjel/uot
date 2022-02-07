@@ -197,7 +197,7 @@ void Fleet::MoveFleet()
     UpdateFleetSpeed();
     if (fleet_speed_per_turn <= 0.0f)
         return;
-    auto movement_vec = position - wanted_position;
+    auto movement_vec = wanted_position - position;
     float movement_length = std::sqrt(movement_vec.squaredLength());
     if (movement_length > fleet_speed_per_turn)
     {

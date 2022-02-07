@@ -54,7 +54,6 @@ void rendering::render_universe_view::_draw(client_context& context)
     if (gs->player)
     {
         // universe render here
-        int u = 1;
         for (const auto& sector : gs->player->known_galaxy->sectors)
         {
             render_sector_universe_helper(context, sector.second);
@@ -111,8 +110,7 @@ void rendering::render_sector_selection(const client_context& context)
 
 void rendering::render_sector_universe_helper(const client_context& context, const std::shared_ptr<Sector>& sector)
 {
-    auto& r = context.r;
-    auto& gr = context.gr;
+    const auto& gr = context.gr;
 
     const auto corrected_x = size_settings::play_area::width * (0.5f + 0.5f * sector->position.x);
     const auto corrected_y = size_settings::play_area::height * (0.5f + 0.5f * sector->position.y);
