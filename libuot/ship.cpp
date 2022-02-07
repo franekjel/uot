@@ -240,7 +240,7 @@ Fleet::Fleet(const unsigned int id, const std::shared_ptr<Sector> &location_sect
     construction_points = 0.0f;
 }
 
-void Fleet::AddShipToFleet(const std::shared_ptr<Ship>& ship)
+void Fleet::AddShipToFleet(const std::shared_ptr<Ship> &ship)
 {
     soldiers += ship->soldiers;
     civilians += ship->civilians;
