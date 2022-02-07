@@ -115,9 +115,15 @@ struct ShipBuildProgress
 {
     std::shared_ptr<ShipDesign> design;
     std::shared_ptr<Sector> sector;
+    std::shared_ptr<Ship> ship;
     float worker_week_units_left;
-
-    ShipBuildProgress() : design(nullptr), worker_week_units_left(0.0f){};
+    bool new_fleet;
+    ShipBuildProgress()
+        : design(nullptr),
+          worker_week_units_left(0.0f),
+          sector(nullptr),
+          ship(nullptr),
+          new_fleet(false){};
 
     ShipBuildProgress(const std::shared_ptr<ShipDesign>& design, const std::shared_ptr<Sector>& sector);
 };
@@ -149,8 +155,6 @@ struct Colony
     void AddBuildingToQueue(Building::BuildingType type,
                             Building::BuildingType upgrade_from = Building::BuildingType::None);
 
-    void RemoveBuildingFromQueueOnPosition(unsigned int position);
-
     std::map<Building::BuildingType, int> GetAvailableBuildings();
 
     Colony(const unsigned int id, const std::shared_ptr<Planet> planet_);
@@ -158,5 +162,7 @@ struct Colony
     // fields below are server-only
     bool population_changed;
     bool building_queue_changed;
+    bool ship_building_queue_changed;
     std::vector<BuildingBuildProgress> new_buildings;
+    std::vector<ShipBuildProgress> new_ships;
 };

@@ -41,6 +41,7 @@ ShipBuildProgress::ShipBuildProgress(const std::shared_ptr<ShipDesign>& design, 
     : design(design), sector(sector)
 {
     worker_week_units_left = design->worker_weeks_cost;
+    ship = nullptr;
 }
 
 std::map<Resource, float> Colony::GetColonyExpenses()
@@ -153,8 +154,10 @@ void Colony::UpdateShipBuildingQueue()
             }
         }
 
+        current_build.new_fleet = false;
         if (!current_fleet)
         {
+            current_build.new_fleet = true;
             current_fleet = std::make_shared<Fleet>(id_source++, current_build.sector, planet->position, owner->id);
             current_build.sector->present_fleets[current_fleet->id] = current_fleet;
             owner->owned_fleets[current_fleet->id] = current_fleet;
@@ -164,24 +167,18 @@ void Colony::UpdateShipBuildingQueue()
         new_ship->fleet = current_fleet;
         current_fleet->AddShipToFleet(new_ship);
 
+        current_build.ship = new_ship;
+        new_ships.push_back(current_build);
         ship_building_queue.erase(ship_building_queue.begin());
     }
 
-    // TODO PO tu trzeba zmienic
-    // building_queue_changed = true;
+    ship_building_queue_changed = true;
     return;
 }
 
 void Colony::AddBuildingToQueue(Building::BuildingType type, Building::BuildingType upgrade_from)
 {
     building_queue.push_back({type, upgrade_from});
-    building_queue_changed = true;
-}
-
-void Colony::RemoveBuildingFromQueueOnPosition(unsigned int position)
-{
-    if (position < building_queue.size())
-        building_queue.erase(building_queue.begin() + position);
     building_queue_changed = true;
 }
 

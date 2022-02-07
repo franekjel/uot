@@ -116,13 +116,54 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
             colony.second->building_queue_changed = false;
         }
 
+        if (colony.second->ship_building_queue_changed)
+        {
+            float people_weeks_to_distribute = 0.0f;
+            for (const auto& [buld_type, count] : colony.second->buildings)
+            {
+                if (buld_type == Building::BuildingType::SmallOrbitalShipyard ||
+                    buld_type == Building::BuildingType::MediumOrbitalShipyard ||
+                    buld_type == Building::BuildingType::GrandOrbitalShipyard)
+                {
+                    people_weeks_to_distribute += Colony::GetBuildingFromType(buld_type).workers *
+                                                  colony.second->buildings_working_modifier * count;
+                }
+            }
+
+            float work_offset = 0.0f;
+            float divider = people_weeks_to_distribute;
+
+            for (const auto& ship : colony.second->ship_building_queue)
+            {
+                if (divider > EPS)
+                    work_offset += ship.worker_week_units_left / divider;
+                else
+                    work_offset = INF_TIME;
+
+                int days_remaining = work_offset;
+                if (days_remaining == 0)
+                    days_remaining++;
+
+                payload.ships_updates.push_back(messageTypes::MsgShipsUpdates(
+                    ship.design->id, colony.second->planet->id, false, 0, days_remaining, Sector::FleetParameters()));
+            }
+            colony.second->ship_building_queue_changed = false;
+        }
+
         for (const auto& new_building : colony.second->new_buildings)
         {
             payload.buildings_updates.push_back(
                 messageTypes::MsgBuildingsUpdates(colony.second->id, new_building.type, new_building.upgrade_of, 0));
         }
+        for (const auto& new_ship : colony.second->new_ships)
+        {
+            payload.ships_updates.push_back(
+                messageTypes::MsgShipsUpdates(new_ship.design->id, colony.second->planet->id, new_ship.new_fleet,
+                                              new_ship.ship->id, 0, Sector::FleetParameters(new_ship.ship->fleet)));
+        }
 
         colony.second->new_buildings.clear();
+        colony.second->new_ships.clear();
     }
 
     for (const auto& [sector_id, sector] : galaxy->sectors)
@@ -197,17 +238,8 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
         payload.ship_designs.push_back(ship_design);
     }
 
-    for (const auto& new_ship : player->new_ships)
-    {
-        auto create_ship = messageTypes::MsgCreateShipResponse(new_ship.design_id, new_ship.planet_id, new_ship.created,
-                                                               new_ship.new_fleet, new_ship.ship->id, Sector::FleetParameters(new_ship.ship->fleet));
-
-        payload.ships.push_back(create_ship);
-    }
-
     player->new_technologies.clear();
     player->changed_designs.clear();
-    player->new_ships.clear();
 
     txrx.send_reliable(player_net_name, payload.Serialize());
 }

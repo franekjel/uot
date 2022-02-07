@@ -170,9 +170,10 @@ bool operator==(messageTypes::MsgWatchedSectorUpdate& u1, messageTypes::MsgWatch
     return true;
 }
 
-bool operator==(messageTypes::MsgCreateShipResponse& s1, messageTypes::MsgCreateShipResponse& s2)
+bool operator==(messageTypes::MsgShipsUpdates& s1, messageTypes::MsgShipsUpdates& s2)
 {
-    if (s1.id != s2.id || s1.design_id != s2.design_id || s1.planet_id != s2.planet_id || s1.created != s2.created)
+    if (s1.id != s2.id || s1.design_id != s2.design_id || s1.planet_id != s2.planet_id ||
+        s1.days_remaining != s2.days_remaining)
         return false;
 
     if (!(s1.fleet_parameters == s2.fleet_parameters))
@@ -433,7 +434,7 @@ void NewTurnPayloadTest()
     msdr.worker_weeks_cost = 6.4f;
     ntp.ship_designs.push_back(msdr);
 
-    messageTypes::MsgCreateShipResponse mcsr;
+    messageTypes::MsgShipsUpdates mcsr;
     Sector::FleetParameters flp2;
     flp2.fleet_id = 3;
     flp2.position = {0.2f, 2.0f};
@@ -446,9 +447,9 @@ void NewTurnPayloadTest()
     mcsr.id = 1;
     mcsr.design_id = 2;
     mcsr.planet_id = 3;
-    mcsr.created = true;
+    mcsr.days_remaining = 0;
     mcsr.fleet_parameters = messageTypes::MsgFleetParameters(flp2, false);
-    ntp.ships.push_back(mcsr);
+    ntp.ships_updates.push_back(mcsr);
 
     auto ser = ntp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
@@ -514,10 +515,10 @@ void NewTurnPayloadTest()
     if (!(msdr == cast->ship_designs[0]))
         std::cout << "NewTurn - wrong design\n";
 
-    if (cast->ships.size() != 1)
+    if (cast->ships_updates.size() != 1)
         std::cout << "NewTurn - wrong ships size\n";
 
-    if (!(mcsr == cast->ships[0]))
+    if (!(mcsr == cast->ships_updates[0]))
         std::cout << "NewTurn - wrong ship\n";
 }
 

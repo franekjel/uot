@@ -242,14 +242,14 @@ messageTypes::MsgShipDesignResponse::MsgShipDesignResponse(unsigned int design_i
     }
 }
 
-messageTypes::MsgCreateShipResponse::MsgCreateShipResponse() {}
+messageTypes::MsgShipsUpdates::MsgShipsUpdates() {}
 
-messageTypes::MsgCreateShipResponse::MsgCreateShipResponse(unsigned int design_id_, unsigned int planet_id_,
-                                                           bool created_, bool new_fleet, unsigned int ship_id_,
-                                                           const Sector::FleetParameters& fleet_parameters_)
-    : design_id(design_id_), planet_id(planet_id_), created(created_)
+messageTypes::MsgShipsUpdates::MsgShipsUpdates(unsigned int design_id_, unsigned int planet_id_, bool new_fleet,
+                                               unsigned int ship_id_, int days_remaining_,
+                                               const Sector::FleetParameters& fleet_parameters_)
+    : design_id(design_id_), planet_id(planet_id_), days_remaining(days_remaining_)
 {
-    if (created)
+    if (days_remaining_ == 0)
     {
         id = ship_id_;
         fleet_parameters = MsgFleetParameters(fleet_parameters_, new_fleet);

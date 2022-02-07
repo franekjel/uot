@@ -158,17 +158,18 @@ struct MsgFleetParameters
     MsgFleetParameters(const Sector::FleetParameters& fleet_parameters, bool new_fleet_);
 };
 
-struct MsgCreateShipResponse
+struct MsgShipsUpdates
 {
     unsigned int id;
     unsigned int design_id;
     unsigned int planet_id;
-    bool created;
     MsgFleetParameters fleet_parameters;
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgCreateShipResponse, id, design_id, planet_id, created, fleet_parameters);
-    MsgCreateShipResponse();
-    MsgCreateShipResponse(unsigned int design_id_, unsigned int planet_id_, bool created_, bool new_fleet,
-                          unsigned int ship_id_, const Sector::FleetParameters& fleet_parameters_);
+    int days_remaining;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgShipsUpdates, id, design_id, planet_id, fleet_parameters,
+                                   days_remaining);
+    MsgShipsUpdates();
+    MsgShipsUpdates(unsigned int design_id_, unsigned int planet_id_, bool new_fleet,
+                    unsigned int ship_id_, int days_remaining, const Sector::FleetParameters& fleet_parameters_);
 };
 
 struct MsgTechnologyUpdate

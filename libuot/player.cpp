@@ -390,8 +390,7 @@ void Player::HandleCreateShipRequest(unsigned int design_id, unsigned int planet
 
     if (!current_colony || ship_designs.count(design_id) < 1)
     {
-        // to PO:
-        // tu pojawia sie blad
+        return;
     }
 
     bool can_build = false;
@@ -411,14 +410,12 @@ void Player::HandleCreateShipRequest(unsigned int design_id, unsigned int planet
 
     if (!can_build)
     {
-        // to PO:
-        // tu pojawia sie blad
+        return;
     }
 
     if ((int)shipyard_type < (int)ship_designs[design_id]->hull_type)
     {
-        // to PO:
-        // tu pojawia sie blad
+        return;
     }
 
     auto &design = ship_designs[design_id];
@@ -434,12 +431,12 @@ void Player::HandleCreateShipRequest(unsigned int design_id, unsigned int planet
 
     if (!can_build)
     {
-        // to PO:
-        // tu pojawia sie blad
+        return;
     }
 
     for (const auto &[resource, count] : design->cost)
         owned_resources[resource] -= count;
 
     current_colony->ship_building_queue.push_back({design, current_sector});
+    current_colony->ship_building_queue_changed = true;
 }

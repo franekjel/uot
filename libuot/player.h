@@ -61,16 +61,6 @@ struct Player
         bool deleted;
     };
     std::vector<ChangedDesign> changed_designs;
-
-    struct NewShip
-    {
-        std::shared_ptr<Ship> ship;
-        unsigned int design_id;
-        unsigned int planet_id;
-        bool created;
-        bool new_fleet;
-    };
-    std::vector<NewShip> new_ships;
 };
 
 inline bool operator==(const Player& lhs, const Player& rhs) { return lhs.id == rhs.id; }
