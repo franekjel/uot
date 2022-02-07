@@ -119,10 +119,20 @@ bool operator==(messageTypes::MsgNewColony& f1, messageTypes::MsgNewColony& f2)
            f1.population == f2.population;
 }
 
+bool operator==(messageTypes::MsgFleetParameters& f1, messageTypes::MsgFleetParameters& f2)
+{
+    if (f1.id != f2.id || f1.new_fleet != f2.new_fleet || f1.position != f2.position || f1.soldiers != f2.soldiers ||
+        f1.civilians != f2.civilians || f1.human_capacity != f2.human_capacity ||
+        f1.construction_points != f2.construction_points)
+        return false;
+
+    return true;
+}
+
 bool operator==(messageTypes::MsgFleetsJoin& f1, messageTypes::MsgFleetsJoin& f2)
 {
     return f1.joined_fleet_id_1 == f2.joined_fleet_id_1 && f1.joined_fleet_id_2 == f2.joined_fleet_id_2 &&
-           f1.result_fleet_id == f2.result_fleet_id && f1.result_fleet_pos == f2.result_fleet_pos;
+           f1.fleet_parameters == f2.fleet_parameters;
 }
 
 bool operator==(messageTypes::MsgFleetsJump& f1, messageTypes::MsgFleetsJump& f2)
@@ -156,14 +166,6 @@ bool operator==(messageTypes::MsgWatchedSectorUpdate& u1, messageTypes::MsgWatch
     for (int i = 0; i < u1.new_colonies.size(); ++i)
         if (!(u1.new_colonies[i] == u2.new_colonies[i]))
             return false;
-
-    return true;
-}
-
-bool operator==(messageTypes::MsgFleetParameters& f1, messageTypes::MsgFleetParameters& f2)
-{
-    if (f1.id != f2.id || f1.new_fleet != f2.new_fleet)
-        return false;
 
     return true;
 }
@@ -399,7 +401,15 @@ void NewTurnPayloadTest()
     watchedSectorUpdate1.new_bases.push_back(nb);
     watchedSectorUpdate1.new_colonies.push_back(nc);
 
-    messageTypes::MsgFleetsJoin jf{{1, 2, 1, {3.0, 3.0}}};
+    Sector::FleetParameters flp;
+    flp.fleet_id = 1;
+    flp.position = {0.0f, 2.0f};
+    flp.soldiers = 4.0f;
+    flp.civilians = 5.0f;
+    flp.human_capacity = 6.0f;
+    flp.construction_points = 8.0f;
+
+    messageTypes::MsgFleetsJoin jf{{1, 2, 1, flp}};
     ntp.joined_fleets.push_back(jf);
 
     messageTypes::MsgFleetsJump juf{{1, 2, 1, {3.0, 3.0}}};
@@ -423,15 +433,19 @@ void NewTurnPayloadTest()
     ntp.ship_designs.push_back(msdr);
 
     messageTypes::MsgCreateShipResponse mcsr;
-    messageTypes::MsgFleetParameters mfp;
-    mfp.id = 1;
-    mfp.new_fleet = true;
+    Sector::FleetParameters flp2;
+    flp2.fleet_id = 3;
+    flp2.position = {0.2f, 2.0f};
+    flp2.soldiers = 4.1f;
+    flp2.civilians = 8.0f;
+    flp2.human_capacity = 3.9f;
+    flp2.construction_points = 4.0f;
 
     mcsr.id = 1;
     mcsr.design_id = 2;
     mcsr.planet_id = 3;
     mcsr.created = true;
-    mcsr.fleet_parameters = mfp;
+    mcsr.fleet_parameters = messageTypes::MsgFleetParameters(flp2, false);
     ntp.ships.push_back(mcsr);
 
     auto ser = ntp.Serialize();
