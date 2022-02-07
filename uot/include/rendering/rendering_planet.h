@@ -17,6 +17,7 @@ struct render_planet_view : render_view<render_planet_view>
     void key_handler(client_context& context, Uint16 k);
     void _draw(client_context& context);
     void init(client_context& context);
+    void render_planet_info(const client_context& context);
 
     std::shared_ptr<ui_list_state> queue;
     std::shared_ptr<ui_list_state> built;
@@ -33,6 +34,8 @@ struct render_planet_view : render_view<render_planet_view>
     };
 
     std::optional<info_box> box;
+
+    Uint32 info_offset{0u};
 };
 
 void render_building_info_box(client_context& context, Building::BuildingType type, int x, int y);

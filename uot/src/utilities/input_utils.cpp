@@ -77,6 +77,7 @@ uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, 
             {
                 return uot_event_type::planet_motion_build;
             }
+
             return uot_event_type::planet_motion_else;
         }
         break;
@@ -134,6 +135,11 @@ uot_event_type get_planet_scroll_type(int x, int y)
     if (check_view_area_collision<size_settings::planet_build_area>(x, y))
     {
         return uot_event_type::planet_scroll_build;
+    }
+
+    if (check_view_area_collision<size_settings::planet_info_text_area>(x, y))
+    {
+        return uot_event_type::planet_scroll_info;
     }
     return uot_event_type::planet_scroll_other;
 }

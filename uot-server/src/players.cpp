@@ -31,7 +31,7 @@ unsigned int PlayersList::GetStartingSectorId(std::shared_ptr<Galaxy> wholeGalax
 std::map<Resource, float> PlayersList::GetStartingResources()
 {
     // TODO: Prepare set of starting resources
-    return {{Resource::Food, 100.0f}, {Resource::Metals, 100.0f}};
+    return {{Resource::Metals, 500.0f}};
 }
 
 unsigned int PlayersList::GetStartingColonyObjId(unsigned int player_id, unsigned int startingSectorId,
@@ -51,6 +51,7 @@ unsigned int PlayersList::GetStartingColonyObjId(unsigned int player_id, unsigne
     if (!planet)
         return UINT_MAX;
     std::shared_ptr<Colony> startingColony = std::make_shared<Colony>(id_source++, planet);
+    startingColony->population = 20.0f;
     planet->colony = startingColony;
     sector->watchers.insert({player_id, 1});
     return planet->id;

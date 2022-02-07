@@ -42,6 +42,7 @@ enum class uot_event_type
     planet_scroll_queue,
     planet_scroll_built,
     planet_scroll_build,
+    planet_scroll_info,
     planet_scroll_other,
     planet_scroll_resource,
 
