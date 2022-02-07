@@ -243,7 +243,6 @@ void uot_net_client::handle_message(const std::string& data)
         case messageTypes::Actions:
         {
             auto payload_action = std::dynamic_pointer_cast<messageTypes::ActionsPayload>(des);
-            std::vector<int> action = payload_action->createBaseActions;
         }
         break;
 
