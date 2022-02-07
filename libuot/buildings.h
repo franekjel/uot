@@ -10,13 +10,13 @@ struct Building
 {
     enum BuildingType
     {
-        None,
+        None = 0,
         PlanetaryAdministration,
         MilitaryTrainingCentre,
         // ship contruction
-        SmallOrbitalShipyard,
-        MediumOrbitalShipyard,
-        GrandOrbitalShipyard,
+        SmallOrbitalShipyard = 4,
+        MediumOrbitalShipyard = 5,
+        GrandOrbitalShipyard = 6,
 
         // metals
         MetalsMine,

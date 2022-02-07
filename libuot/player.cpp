@@ -324,7 +324,7 @@ void Player::HandleColonizeFleetRequest(int fleet_id)
 }
 
 void Player::HandleShipDesignRequest(unsigned int id, bool delete_design, std::string name, ShipHull::Type hull_type,
-                             std::map<ModuleType, int> sides, std::map<ModuleType, int> inside)
+                                     std::map<ModuleType, int> sides, std::map<ModuleType, int> inside)
 {
     // DO MM:
     // delete_design mówi o tym czy chcemy usunąć design
@@ -336,4 +336,73 @@ void Player::HandleCreateShipRequest(unsigned int design_id, unsigned int planet
     // DO MM:
     // chyba wiadomo o co chodzi, trzeba sprawdzić czy mamy zasoby na budowę, zrobię wysyłanie odmowy jak nie ma
     // surowców
+    std::shared_ptr<Colony> current_colony;
+    std::shared_ptr<Planet> current_planet;
+    std::shared_ptr<Sector> current_sector;
+
+    for (const auto &[colony_id, colony] : owned_colonies)
+    {
+        if (colony->planet->id == planet_id)
+        {
+            current_colony = colony;
+            current_planet = colony->planet;
+            current_sector = known_galaxy->sectors[current_planet->sector_id];
+            break;
+        }
+    }
+
+    if (!current_colony || ship_designs.count(design_id) < 1)
+    {
+        // to PO:
+        // tu pojawia sie blad
+    }
+
+    bool can_build = false;
+    Building::BuildingType shipyard_type = Building::BuildingType::None;
+    for (const auto &[buld_type, buld] : current_colony->buildings)
+    {
+        if (buld_type == Building::BuildingType::SmallOrbitalShipyard ||
+            buld_type == Building::BuildingType::MediumOrbitalShipyard ||
+            buld_type == Building::BuildingType::GrandOrbitalShipyard)
+        {
+            if (shipyard_type < buld_type)
+                shipyard_type = buld_type;
+            can_build = true;
+            break;
+        }
+    }
+
+    if (!can_build)
+    {
+        // to PO:
+        // tu pojawia sie blad
+    }
+
+    if ((int)shipyard_type < (int)ship_designs[design_id]->hull_type)
+    {
+        // to PO:
+        // tu pojawia sie blad
+    }
+
+    auto &design = ship_designs[design_id];
+
+    for (const auto &[resource, count] : design->cost)
+    {
+        if (owned_resources[resource] < count)
+        {
+            can_build = false;
+            break;
+        }
+    }
+
+    if (!can_build)
+    {
+        // to PO:
+        // tu pojawia sie blad
+    }
+
+    for (const auto &[resource, count] : design->cost)
+        owned_resources[resource] -= count;
+
+    current_colony->ship_building_queue.push_back({design, current_sector});
 }

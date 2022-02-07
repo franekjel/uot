@@ -311,6 +311,7 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
 
         // update building queue
         colony.second->UpdateBuildingQueue();
+        colony.second->UpdateShipBuildingQueue();
     }
 
     // calculate bilans of inhabitable objects
