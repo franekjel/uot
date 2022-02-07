@@ -101,6 +101,7 @@ struct Sector
         float civilians;
         float human_capacity;
         float construction_points;
+        float base_fleet_speed;
 
         FleetParameters() = default;
         FleetParameters(std::shared_ptr<Fleet> fleet);

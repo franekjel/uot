@@ -123,7 +123,7 @@ bool operator==(messageTypes::MsgFleetParameters& f1, messageTypes::MsgFleetPara
 {
     if (f1.id != f2.id || f1.new_fleet != f2.new_fleet || f1.position != f2.position || f1.soldiers != f2.soldiers ||
         f1.civilians != f2.civilians || f1.human_capacity != f2.human_capacity ||
-        f1.construction_points != f2.construction_points)
+        f1.construction_points != f2.construction_points || f1.base_fleet_speed != f2.base_fleet_speed)
         return false;
 
     return true;
@@ -408,6 +408,7 @@ void NewTurnPayloadTest()
     flp.civilians = 5.0f;
     flp.human_capacity = 6.0f;
     flp.construction_points = 8.0f;
+    flp.base_fleet_speed = -1.0f;
 
     messageTypes::MsgFleetsJoin jf{{1, 2, 1, flp}};
     ntp.joined_fleets.push_back(jf);
@@ -440,6 +441,7 @@ void NewTurnPayloadTest()
     flp2.civilians = 8.0f;
     flp2.human_capacity = 3.9f;
     flp2.construction_points = 4.0f;
+    flp2.base_fleet_speed = 4.0f;
 
     mcsr.id = 1;
     mcsr.design_id = 2;

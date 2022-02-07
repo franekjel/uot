@@ -1,4 +1,6 @@
+#define _USE_MATH_DEFINES
 #include "rendering_galaxy.h"
+#include <cmath>
 
 #include "client_context.h"
 #include "game_gui.h"

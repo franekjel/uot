@@ -271,4 +271,5 @@ messageTypes::MsgFleetParameters::MsgFleetParameters(const Sector::FleetParamete
     civilians = fleet_parameters.civilians;
     human_capacity = fleet_parameters.human_capacity;
     construction_points = fleet_parameters.construction_points;
+    base_fleet_speed = fleet_parameters.base_fleet_speed;
 }

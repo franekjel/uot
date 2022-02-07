@@ -9,7 +9,7 @@ void Sector::JumpFleet(unsigned int fleet_id)
     float min_dist = FLT_MAX;
     std::shared_ptr<Sector> dest;
     auto this_fleet = present_fleets[fleet_id];
-    for (const auto &neighbor : neighbors)
+    for (const auto& neighbor : neighbors)
     {
         auto wersor_to_dest = (neighbor->position - position).normalized();
         auto dist = (this_fleet->position - wersor_to_dest).squaredLength();
@@ -62,4 +62,18 @@ Sector::FleetParameters::FleetParameters(std::shared_ptr<Fleet> fleet)
     civilians = fleet->civilians;
     human_capacity = fleet->human_capacity;
     construction_points = fleet->construction_points;
+
+    if (fleet->ships.size() == 0)
+    {
+        base_fleet_speed = -1.0f;
+    }
+    else
+    {
+        base_fleet_speed = fleet->ships[0]->speed;
+        for (const auto& ship : fleet->ships)
+        {
+            if (ship->speed < base_fleet_speed)
+                base_fleet_speed = ship->speed;
+        }
+    }
 }
