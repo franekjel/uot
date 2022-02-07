@@ -69,9 +69,8 @@ struct ActionsPayload : BasePayload  // Player's actions
     std::vector<MsgShipDesign> shipDesignRequests;
     std::vector<MsgCreateShip> createShipRequests;
     MessageType GetType() override { return MessageType::Actions; }
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ActionsPayload, technologyRequest, buildRequests,
-                                   moveFleetRequests, joinFleetsRequests, fleetActionRequests, shipDesignRequests,
-                                   createShipRequests)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ActionsPayload, technologyRequest, buildRequests, moveFleetRequests,
+                                   joinFleetsRequests, fleetActionRequests, shipDesignRequests, createShipRequests)
     std::string Serialize() override
     {
         nlohmann::json jsonPayload = (*this);

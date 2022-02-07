@@ -119,11 +119,7 @@ struct ShipBuildProgress
     float worker_week_units_left;
     bool new_fleet;
     ShipBuildProgress()
-        : design(nullptr),
-          worker_week_units_left(0.0f),
-          sector(nullptr),
-          ship(nullptr),
-          new_fleet(false){};
+        : design(nullptr), worker_week_units_left(0.0f), sector(nullptr), ship(nullptr), new_fleet(false){};
 
     ShipBuildProgress(const std::shared_ptr<ShipDesign>& design, const std::shared_ptr<Sector>& sector);
 };
