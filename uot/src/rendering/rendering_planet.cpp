@@ -134,6 +134,8 @@ void rendering::render_planet_view::init(client_context& context)
                                    auto t = _build[build->selected_elem.value()];
                                    mq->build_building(pl->colony->id, t);
 
+                                   // dodać sprawdzanie czy zasoby pozwalają na
+                                   // dodanie tego budynku
                                    _queue.push_back(t);
                                    queue->elems.push_back(Buildings.at(t).name + " " +
                                             std::to_string(static_cast<int>(Buildings.at(t).worker_weeks_cost)));
