@@ -331,12 +331,9 @@ void Player::HandleColonizeFleetRequest(int fleet_id)
 void Player::HandleShipDesignRequest(unsigned int id, bool delete_design, std::string name, ShipHull::Type hull_type,
                                      std::map<ModuleType, int> sides, std::map<ModuleType, int> inside)
 {
-    // DO MM:
-    // delete_design mówi o tym czy chcemy usunąć design
-    // podanie istniejącego id, ale z delete = false powoduje nadpisanie
-    // tu musisz policzyć koszty zbudowania i utrzymania, będę chciał je później odesłać w odpowiedzi
     if (delete_design && ship_designs.count(id) > 0)
     {
+        changed_designs.push_back({id, nullptr, true});
         ship_designs.erase(id);
         return;
     }
@@ -348,7 +345,6 @@ void Player::HandleShipDesignRequest(unsigned int id, bool delete_design, std::s
     {
         if (Modules.at(module_type).destination != Module::ModuleDestination::Sides)
         {
-            // PO error
             return;
         }
 
@@ -359,7 +355,6 @@ void Player::HandleShipDesignRequest(unsigned int id, bool delete_design, std::s
     {
         if (Modules.at(module_type).destination != Module::ModuleDestination::Inside)
         {
-            // PO error
             return;
         }
 
@@ -368,20 +363,16 @@ void Player::HandleShipDesignRequest(unsigned int id, bool delete_design, std::s
 
     if (sides_size < 0 || inside_size < 0)
     {
-    // PO error
         return;
     }
 
     auto current_design = std::make_shared<ShipDesign>(id, name, hull_type, sides, inside);
-
+    changed_designs.push_back({id, current_design, false});
     ship_designs[id] = current_design;
 }
 
 void Player::HandleCreateShipRequest(unsigned int design_id, unsigned int planet_id)
 {
-    // DO MM:
-    // chyba wiadomo o co chodzi, trzeba sprawdzić czy mamy zasoby na budowę, zrobię wysyłanie odmowy jak nie ma
-    // surowców
     std::shared_ptr<Colony> current_colony;
     std::shared_ptr<Planet> current_planet;
     std::shared_ptr<Sector> current_sector;
