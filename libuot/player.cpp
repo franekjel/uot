@@ -79,15 +79,15 @@ void Player::DiscoverTechnology(Technology::TechnologyType technology)
         }
     }
 
-    for (const auto &bonus : tech.resources_modifiers_planet)
+    for (const auto &[res, bonus] : tech.resources_modifiers_planet)
     {
-        if (resources_modifiers_planet.count(bonus.first) > 0)
+        if (resources_modifiers_planet.count(res) > 0)
         {
-            resources_modifiers_planet[bonus.first] += resources_modifiers_planet[bonus.first] * bonus.second;
+            resources_modifiers_planet[res] += resources_modifiers_planet[res] * bonus;
         }
         else
         {
-            resources_modifiers_planet[bonus.first] = 1.0f + bonus.second;
+            resources_modifiers_planet[res] = 1.0f + bonus;
         }
     }
 

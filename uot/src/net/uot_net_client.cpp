@@ -154,7 +154,7 @@ void uot_net_client::handle_message(const std::string& data)
                                 SectorObject(planet.id, planet.position, planet.object_size, msgGalaxy.sectors[i].id);
 
                             std::map<PlanetaryFeatures::PlanetaryFeatureType, int> planetary_features;
-                            for (int feat = 0; planet.planetary_features.size(); feat++)
+                            for (int feat = 0; feat < planet.planetary_features.size(); feat++)
                             {
                                 std::map<PlanetaryFeatures::PlanetaryFeatureType, int>::iterator planetaryFeature =
                                     planet.planetary_features.begin();
@@ -297,15 +297,9 @@ void uot_net_client::handle_message(const std::string& data)
                         tech.technology_type != Technology::TechnologyType::Empty)
                     {
                         std::cout << "Finished tech " << static_cast<int>(tech.technology_type) << "\n";
-                        auto t = Technologies.find(tech.technology_type);
-                        state.value->player->known_technologies.insert(tech.technology_type);
+                        state.value->player->DiscoverTechnology(tech.technology_type);
                         if (state.value->player->available_technologies.count(tech.technology_type) > 0)
                             state.value->player->available_technologies.erase(tech.technology_type);
-
-                        for (const auto& tt : t->second.unlock)
-                        {
-                            state.value->player->available_technologies.insert(tt);
-                        }
                     }
                     state.value->player->researched_technology.technology = tech.technology_type;
                     state.value->player->researched_technology.progress_left = (float)tech.days_remaining;

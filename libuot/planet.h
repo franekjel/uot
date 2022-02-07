@@ -118,8 +118,8 @@ struct Colony
     std::shared_ptr<Planet> planet;
     std::map<Building::BuildingType, int> buildings;
     float population;
-    float base_population_growth = 0.05f;
-    float base_population_starving_death = 0.025f;
+    float base_population_growth = 0.01f;
+    float base_population_starving_death = 0.005f;
     std::shared_ptr<Player> owner;
     float unemployed_population;
     std::vector<BuildingBuildProgress> building_queue = {};

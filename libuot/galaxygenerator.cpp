@@ -171,11 +171,8 @@ std::map<unsigned int, std::shared_ptr<SectorObject>> GalaxyGenerator::GenerateS
             {
                 if (std::bernoulli_distribution(habitable_chance)(gen))
                 {  // habitable
-                    std::shared_ptr<SectorObject> o = std::shared_ptr<SectorObject>(
-                        new Planet(SectorObject(id_source++, pos, float(size_distribution(gen)), sector_id),
-                                   Planet::PlanetClimate::Temperate, {}));
+                    std::shared_ptr<SectorObject> o = GenerateHabitablePlanet(pos, sector_id);
                     sector_objects.insert({o->id, o});
-                    // TODO: better planet generation via GenerateHabitablePlanet()
                 }
                 else
                 {
