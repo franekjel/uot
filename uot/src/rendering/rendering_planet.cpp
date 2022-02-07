@@ -19,10 +19,10 @@ constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept
     return static_cast<typename std::underlying_type<E>::type>(e);
 }
 
-std::array<std::string, 3> planet_names {
-        "Temperate Planet",  // Earth-like
-        "Cold Planet",       // a bit colder
-        "Hot Planet"        // a bit hotter
+std::array<std::string, 3> planet_names{
+    "Temperate Planet",  // Earth-like
+    "Cold Planet",       // a bit colder
+    "Hot Planet"         // a bit hotter
 };
 
 void rendering::render_planet_view::render_planet_info(const client_context& context)
@@ -36,8 +36,10 @@ void rendering::render_planet_view::render_planet_info(const client_context& con
     auto st = std::dynamic_pointer_cast<Star>(gui->current_object.value());
 
     auto object_id = GAS_GIANT_1 + gui->current_object.value()->id % (planets_meta::num_planets - GAS_GIANT_1);
-    std::string name = pl ? planet_names[static_cast<int>(pl->climate)] :
-            io ? (std::string(resourceNames[static_cast<int>(io->resource_deposit.begin()->first)]) + " Object") : "Star";
+    std::string name =
+        pl   ? planet_names[static_cast<int>(pl->climate)]
+        : io ? (std::string(resourceNames[static_cast<int>(io->resource_deposit.begin()->first)]) + " Object")
+             : "Star";
 
     sdl_utilities::render_text(r.get(), gr->main_font, name.c_str(), size_settings::planet_info_area::width / 2,
                                fonts::main_font_size / 2 + 30, size_settings::planet_info_area::width - 50,
@@ -45,41 +47,45 @@ void rendering::render_planet_view::render_planet_info(const client_context& con
 
     // render planet here again
     const bool biggie = planets_meta::texture_size[object_id] == 300;
-    rendering::render_planet_helper(context, biggie ? 1.0 : 3.0, size_settings::planet_info_area::width / 2,
-                         250, gr->planetTextures[object_id]);
+    rendering::render_planet_helper(context, biggie ? 1.0 : 3.0, size_settings::planet_info_area::width / 2, 250,
+                                    gr->planetTextures[object_id]);
 
-    if(pl) {
+    if (pl)
+    {
         std::string info;
         info += "Population: " + std::to_string(static_cast<int>(pl->colony->population)) + "\n\n";
 
         info += "Gains: \n";
-        for(auto& g : pl->colony->GetColonyGains()) {
+        for (auto& g : pl->colony->GetColonyGains())
+        {
             info += std::string(resourceNames.at(static_cast<int>(g.first))) + " " + std::to_string(g.second) + "\n";
         }
 
         info += "\n";
 
         info += "Expenses: \n";
-        for(auto& e : pl->colony->GetColonyExpenses()) {
+        for (auto& e : pl->colony->GetColonyExpenses())
+        {
             info += std::string(resourceNames.at(static_cast<int>(e.first))) + " " + std::to_string(e.second) + "\n";
         }
 
         info += "\n";
 
         info += "Features: \n";
-        for(auto& f : pl->planetary_features) {
+        for (auto& f : pl->planetary_features)
+        {
             auto& feat = PlanetaryFeaturesTypes.at(f.first);
             info += feat.name + " \n";
         }
 
         sdl_utilities::set_render_viewport<size_settings::planet_info_text_area>(r.get());
-        if(info.length() > 0) {
+        if (info.length() > 0)
+        {
             sdl_utilities::render_text(r.get(), gr->secondary_font, info, size_settings::planet_info_area::width / 2,
-                           size_settings::planet_info_text_area::height / 2 + info_offset, size_settings::planet_info_area::width - 50,
-                           {0xFF, 0xFF, 0xFF, 0xFF});
+                                       size_settings::planet_info_text_area::height / 2 + info_offset,
+                                       size_settings::planet_info_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
         }
     }
-
 }
 
 void rendering::render_planet_view::init(client_context& context)
@@ -113,8 +119,7 @@ void rendering::render_planet_view::init(client_context& context)
 
         for (const auto& b : pl->colony->building_queue)
         {
-            v_queue.push_back(Buildings.at(b.type).name + "  " +
-                             std::to_string(b.worker_week_units_left));
+            v_queue.push_back(Buildings.at(b.type).name + "  " + std::to_string(b.worker_week_units_left));
             _queue.push_back(b.type);
         }
     }
@@ -137,8 +142,9 @@ void rendering::render_planet_view::init(client_context& context)
                                    // dodać sprawdzanie czy zasoby pozwalają na
                                    // dodanie tego budynku
                                    _queue.push_back(t);
-                                   queue->elems.push_back(Buildings.at(t).name + " " +
-                                            std::to_string(static_cast<int>(Buildings.at(t).worker_weeks_cost)));
+                                   queue->elems.push_back(
+                                       Buildings.at(t).name + " " +
+                                       std::to_string(static_cast<int>(Buildings.at(t).worker_weeks_cost)));
                                }
                            }
                            else if (io)
@@ -154,27 +160,26 @@ void rendering::render_planet_view::init(client_context& context)
 
     built = std::make_shared<ui_list_state>(
         v_built,
-        generic_button{[&, pl, io, st](client_context& context)
-                       {
-                           std::cout << "Action button clicked " << std::endl;
-                           if (built->selected_elem.has_value())
-                           {
-                               std::cout << "Action button clicked on " << built->elems[built->selected_elem.value()]
-                                         << std::endl;
-                               auto mq = context.getActionQueue().value;
-                               auto t = _built[built->selected_elem.value()];
-                               auto up = Buildings.at(t).upgrade;
-                               mq->upgrade_building(pl->colony->id, t, up);
-                               pl->colony->buildings[t]--;
+        generic_button{
+            [&, pl, io, st](client_context& context)
+            {
+                std::cout << "Action button clicked " << std::endl;
+                if (built->selected_elem.has_value())
+                {
+                    std::cout << "Action button clicked on " << built->elems[built->selected_elem.value()] << std::endl;
+                    auto mq = context.getActionQueue().value;
+                    auto t = _built[built->selected_elem.value()];
+                    auto up = Buildings.at(t).upgrade;
+                    mq->upgrade_building(pl->colony->id, t, up);
+                    pl->colony->buildings[t]--;
 
-
-                               _queue.push_back(Buildings.at(t).upgrade);
-                               queue->elems.push_back(Buildings.at(up).name + " " +
-                                    std::to_string(static_cast<int>(Buildings.at(up).worker_weeks_cost)));
-                           }
-                       },
-                       "UPGRADE",
-                       {size_settings::planet_built_area::width / 2 - 140, 310, 280, 50}},
+                    _queue.push_back(Buildings.at(t).upgrade);
+                    queue->elems.push_back(Buildings.at(up).name + " " +
+                                           std::to_string(static_cast<int>(Buildings.at(up).worker_weeks_cost)));
+                }
+            },
+            "UPGRADE",
+            {size_settings::planet_built_area::width / 2 - 140, 310, 280, 50}},
         300, 50, 50, 10);
 
     queue = std::make_shared<ui_list_state>(
@@ -228,11 +233,10 @@ void rendering::render_planet_view::_draw(client_context& context)
         for (const auto& b : pl->colony->building_queue)
         {
             queue->elems.push_back(Buildings.at(b.type).name + "  " +
-                             std::to_string(static_cast<int>(b.worker_week_units_left)));
+                                   std::to_string(static_cast<int>(b.worker_week_units_left)));
             _queue.push_back(b.type);
         }
     }
-
 
     render_background(context);
     // draw the above astronaut buttons
@@ -405,7 +409,6 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         }
         box.reset();
     }
-
 }
 
 void rendering::render_planet_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov)
