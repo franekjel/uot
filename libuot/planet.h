@@ -111,6 +111,19 @@ struct BuildingBuildProgress
     }
 };
 
+struct ShipBuildProgress
+{
+    std::shared_ptr<ShipDesign> design;
+    std::shared_ptr<Sector> sector;
+    std::shared_ptr<Ship> ship;
+    float worker_week_units_left;
+    bool new_fleet;
+    ShipBuildProgress()
+        : design(nullptr), worker_week_units_left(0.0f), sector(nullptr), ship(nullptr), new_fleet(false){};
+
+    ShipBuildProgress(const std::shared_ptr<ShipDesign>& design, const std::shared_ptr<Sector>& sector);
+};
+
 struct Colony
 {
     static float population_building_modificator;
@@ -122,7 +135,9 @@ struct Colony
     float base_population_starving_death = 0.005f;
     std::shared_ptr<Player> owner;
     float unemployed_population;
+    float buildings_working_modifier;
     std::vector<BuildingBuildProgress> building_queue = {};
+    std::vector<ShipBuildProgress> ship_building_queue = {};
 
     static const Building& GetBuildingFromType(Building::BuildingType type) { return Buildings.at(type); }
 
@@ -131,11 +146,10 @@ struct Colony
     std::map<Resource, float> GetColonyExpenses();
 
     void UpdateBuildingQueue();
+    void UpdateShipBuildingQueue();
 
     void AddBuildingToQueue(Building::BuildingType type,
                             Building::BuildingType upgrade_from = Building::BuildingType::None);
-
-    void RemoveBuildingFromQueueOnPosition(unsigned int position);
 
     std::map<Building::BuildingType, int> GetAvailableBuildings();
 
@@ -144,5 +158,7 @@ struct Colony
     // fields below are server-only
     bool population_changed;
     bool building_queue_changed;
+    bool ship_building_queue_changed;
     std::vector<BuildingBuildProgress> new_buildings;
+    std::vector<ShipBuildProgress> new_ships;
 };

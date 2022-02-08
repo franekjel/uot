@@ -1,5 +1,6 @@
 #include "planet.h"
 #include "player.h"
+#include "ship.h"
 
 float Colony::population_building_modificator = 1.0f;
 
@@ -24,13 +25,23 @@ std::map<Resource, float> Colony::GetColonyGains()
         }
     }
 
-    const float colony_efficency = neccessary_workers > population ? population / neccessary_workers : 1.0f;
-    unemployed_population = population - neccessary_workers;
+    float colony_efficency = neccessary_workers > population ? population / neccessary_workers : 1.0f;
+
+    buildings_working_modifier = colony_efficency;
+
+    unemployed_population = std::max(population - neccessary_workers, 0.0f);
 
     if (colony_efficency < 1.0f)
         colony_gains = colony_gains * colony_efficency;
 
     return colony_gains;
+}
+
+ShipBuildProgress::ShipBuildProgress(const std::shared_ptr<ShipDesign>& design, const std::shared_ptr<Sector>& sector)
+    : design(design), sector(sector)
+{
+    worker_week_units_left = design->worker_weeks_cost;
+    ship = nullptr;
 }
 
 std::map<Resource, float> Colony::GetColonyExpenses()
@@ -97,16 +108,77 @@ void Colony::UpdateBuildingQueue()
     return;
 }
 
+void Colony::UpdateShipBuildingQueue()
+{
+    if (ship_building_queue.size() == 0)
+        return;
+
+    float people_weeks_to_distribute = 0.0f;
+    for (const auto& [buld_type, count] : buildings)
+    {
+        if (buld_type == Building::BuildingType::SmallOrbitalShipyard ||
+            buld_type == Building::BuildingType::MediumOrbitalShipyard ||
+            buld_type == Building::BuildingType::GrandOrbitalShipyard)
+        {
+            people_weeks_to_distribute += GetBuildingFromType(buld_type).workers * buildings_working_modifier * count;
+        }
+    }
+
+    auto itr = ship_building_queue.begin();
+    while (people_weeks_to_distribute > 0.0f && itr != ship_building_queue.end())
+    {
+        if (itr->worker_week_units_left < people_weeks_to_distribute)
+        {
+            people_weeks_to_distribute -= itr->worker_week_units_left;
+            itr->worker_week_units_left = 0.0f;
+        }
+        else
+        {
+            itr->worker_week_units_left -= people_weeks_to_distribute;
+            people_weeks_to_distribute = 0.0f;
+        }
+        itr++;
+    }
+
+    while (ship_building_queue.size() != 0 && ship_building_queue.front().worker_week_units_left == 0.0f)
+    {
+        auto& current_build = ship_building_queue.front();
+        std::shared_ptr<Fleet> current_fleet = nullptr;
+        for (const auto& [fleet_id, fleet] : current_build.sector->present_fleets)
+        {
+            if ((fleet->position - planet->position).squaredLength() < Fleet::kNearValue &&
+                fleet->owner_id == owner->id)
+            {
+                current_fleet = fleet;
+                break;
+            }
+        }
+
+        current_build.new_fleet = false;
+        if (!current_fleet)
+        {
+            current_build.new_fleet = true;
+            current_fleet = std::make_shared<Fleet>(id_source++, current_build.sector, planet->position, owner->id);
+            current_build.sector->present_fleets[current_fleet->id] = current_fleet;
+            owner->owned_fleets[current_fleet->id] = current_fleet;
+            current_build.sector->IncrementWatcher(owner->id);
+        }
+        auto new_ship = Ship::ShipFromDesign(id_source++, current_build.design);
+        new_ship->fleet = current_fleet;
+        current_fleet->AddShipToFleet(new_ship);
+
+        current_build.ship = new_ship;
+        new_ships.push_back(current_build);
+        ship_building_queue.erase(ship_building_queue.begin());
+    }
+
+    ship_building_queue_changed = true;
+    return;
+}
+
 void Colony::AddBuildingToQueue(Building::BuildingType type, Building::BuildingType upgrade_from)
 {
     building_queue.push_back({type, upgrade_from});
-    building_queue_changed = true;
-}
-
-void Colony::RemoveBuildingFromQueueOnPosition(unsigned int position)
-{
-    if (position < building_queue.size())
-        building_queue.erase(building_queue.begin() + position);
     building_queue_changed = true;
 }
 

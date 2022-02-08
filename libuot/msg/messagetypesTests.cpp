@@ -119,10 +119,22 @@ bool operator==(messageTypes::MsgNewColony& f1, messageTypes::MsgNewColony& f2)
            f1.population == f2.population;
 }
 
+bool operator==(messageTypes::MsgFleetParameters& f1, messageTypes::MsgFleetParameters& f2)
+{
+    if (f1.id != f2.id || f1.new_fleet != f2.new_fleet || f1.position != f2.position || f1.soldiers != f2.soldiers ||
+        f1.civilians != f2.civilians || f1.human_capacity != f2.human_capacity ||
+        f1.construction_points != f2.construction_points || f1.base_fleet_speed != f2.base_fleet_speed ||
+        f1.current_hp != f2.current_hp || f1.max_hp != f2.max_hp || f1.current_shields != f2.current_shields ||
+        f1.max_shields != f2.max_shields || f1.average_energy != f2.average_energy)
+        return false;
+
+    return true;
+}
+
 bool operator==(messageTypes::MsgFleetsJoin& f1, messageTypes::MsgFleetsJoin& f2)
 {
     return f1.joined_fleet_id_1 == f2.joined_fleet_id_1 && f1.joined_fleet_id_2 == f2.joined_fleet_id_2 &&
-           f1.result_fleet_id == f2.result_fleet_id && f1.result_fleet_pos == f2.result_fleet_pos;
+           f1.fleet_parameters == f2.fleet_parameters;
 }
 
 bool operator==(messageTypes::MsgFleetsJump& f1, messageTypes::MsgFleetsJump& f2)
@@ -160,6 +172,65 @@ bool operator==(messageTypes::MsgWatchedSectorUpdate& u1, messageTypes::MsgWatch
     return true;
 }
 
+bool operator==(messageTypes::MsgShipUpdate& s1, messageTypes::MsgShipUpdate& s2)
+{
+    if (s1.design_id != s2.design_id || s1.planet_id != s2.planet_id || s1.days_remaining != s2.days_remaining)
+        return false;
+
+    return true;
+}
+
+bool operator==(messageTypes::MsgNewShip& s1, messageTypes::MsgNewShip& s2)
+{
+    if (s1.id != s2.id || s1.design_id != s2.design_id || s1.planet_id != s2.planet_id)
+        return false;
+
+    if (!(s1.fleet_parameters == s2.fleet_parameters))
+        return false;
+
+    return true;
+}
+
+bool operator==(messageTypes::MsgShipDesignResponse& r1, messageTypes::MsgShipDesignResponse& r2)
+{
+    if (r1.id != r2.id || r1.deleted != r2.deleted || r1.name != r2.name || r1.hull_type != r2.hull_type ||
+        r1.worker_weeks_cost != r2.worker_weeks_cost)
+        return false;
+
+    if (r1.sides.size() != r2.sides.size())
+        return false;
+    if (r1.inside.size() != r2.inside.size())
+        return false;
+    if (r1.cost.size() != r2.cost.size())
+        return false;
+    if (r1.upkeep.size() != r2.upkeep.size())
+        return false;
+
+    for (auto& [module_, count] : r1.sides)
+    {
+        if (r2.sides[module_] != count)
+            return false;
+    }
+
+    for (auto& [module_, count] : r1.inside)
+    {
+        if (r2.inside[module_] != count)
+            return false;
+    }
+
+    for (auto& [res, count] : r1.cost)
+    {
+        if (r2.cost[res] != count)
+            return false;
+    }
+
+    for (auto& [res, count] : r1.upkeep)
+    {
+        if (r2.upkeep[res] != count)
+            return false;
+    }
+    return true;
+}
 void StartGamePayloadTest()
 {
     messageTypes::StartGamePayload sgp;
@@ -215,6 +286,18 @@ void StartGamePayloadTest()
     sgp.starting_resources[Resource::Antimatter] = 11.0f;
     sgp.starting_resources[Resource::Crystals] = 21.0f;
 
+    messageTypes::MsgShipDesignResponse msdr;
+    msdr.id = 1;
+    msdr.deleted = false;
+    msdr.name = "lul";
+    msdr.hull_type = ShipHull::Type::MediumShipHull;
+    msdr.sides[ModuleType::AdvancedBigLaser] = 3.0f;
+    msdr.inside[ModuleType::AdvancedBigLaser] = 3.0f;
+    msdr.cost[Resource::Antimatter] = 4.0f;
+    msdr.upkeep[Resource::AncientRelics] = 5.0f;
+    msdr.worker_weeks_cost = 6.4f;
+    sgp.starting_ships_designs.push_back(msdr);
+
     auto ser = sgp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
     auto type = des->GetType();
@@ -264,6 +347,12 @@ void StartGamePayloadTest()
 
     if (player->id != cast->player_id)
         std::cout << "StartGame - Wrong player id\n";
+
+    if (cast->starting_ships_designs.size() != 1)
+        std::cout << "StartGame - wrong designs size\n";
+
+    if (!(msdr == cast->starting_ships_designs[0]))
+        std::cout << "StartGame - wrong design\n";
 
     auto antimatter = cast->starting_resources[Resource::Antimatter];
     auto crystals = cast->starting_resources[Resource::Crystals];
@@ -322,7 +411,21 @@ void NewTurnPayloadTest()
     watchedSectorUpdate1.new_bases.push_back(nb);
     watchedSectorUpdate1.new_colonies.push_back(nc);
 
-    messageTypes::MsgFleetsJoin jf{{1, 2, 1, {3.0, 3.0}}};
+    Sector::FleetParameters flp;
+    flp.fleet_id = 1;
+    flp.position = {0.0f, 2.0f};
+    flp.soldiers = 4.0f;
+    flp.civilians = 5.0f;
+    flp.human_capacity = 6.0f;
+    flp.construction_points = 8.0f;
+    flp.base_fleet_speed = -1.0f;
+    flp.current_hp = 11.0f;
+    flp.max_hp = 33.0f;
+    flp.current_shields = 1.0f;
+    flp.max_shields = 24.0f;
+    flp.average_energy = 0.542f;
+
+    messageTypes::MsgFleetsJoin jf{{1, 2, 1, flp}};
     ntp.joined_fleets.push_back(jf);
 
     messageTypes::MsgFleetsJump juf{{1, 2, 1, {3.0, 3.0}}};
@@ -332,6 +435,45 @@ void NewTurnPayloadTest()
 
     ntp.watched_sectors_updates.push_back(watchedSectorUpdate1);
     ntp.watched_sectors_updates.push_back(watchedSectorUpdate2);
+
+    messageTypes::MsgShipDesignResponse msdr;
+    msdr.id = 1;
+    msdr.deleted = false;
+    msdr.name = "lul";
+    msdr.hull_type = ShipHull::Type::MediumShipHull;
+    msdr.sides[ModuleType::AdvancedBigLaser] = 3.0f;
+    msdr.inside[ModuleType::AdvancedBigLaser] = 3.0f;
+    msdr.cost[Resource::Antimatter] = 4.0f;
+    msdr.upkeep[Resource::AncientRelics] = 5.0f;
+    msdr.worker_weeks_cost = 6.4f;
+    ntp.ship_designs.push_back(msdr);
+
+    messageTypes::MsgShipUpdate msu;
+    messageTypes::MsgNewShip mns;
+    Sector::FleetParameters flp2;
+    flp2.fleet_id = 3;
+    flp2.position = {0.2f, 2.0f};
+    flp2.soldiers = 4.1f;
+    flp2.civilians = 8.0f;
+    flp2.human_capacity = 3.9f;
+    flp2.construction_points = 4.0f;
+    flp2.base_fleet_speed = 4.0f;
+    flp2.current_hp = 1.0f;
+    flp2.max_hp = 24.0f;
+    flp2.current_shields = 51.0f;
+    flp2.max_shields = 240.0f;
+    flp2.average_energy = 0.9542f;
+
+    msu.design_id = 2;
+    msu.planet_id = 3;
+    msu.days_remaining = 0;
+    ntp.ships_updates.push_back(msu);
+
+    mns.id = 1;
+    mns.design_id = 2;
+    mns.planet_id = 3;
+    mns.fleet_parameters = messageTypes::MsgFleetParameters(flp2, false);
+    ntp.new_ships.push_back(mns);
 
     auto ser = ntp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
@@ -390,6 +532,24 @@ void NewTurnPayloadTest()
     auto juf1 = cast->jumped_fleets[0];
     if (!(juf1 == juf))
         std::cout << "NewTurn - wrong joined fleets\n";
+
+    if (cast->ship_designs.size() != 1)
+        std::cout << "NewTurn - wrong designs size\n";
+
+    if (!(msdr == cast->ship_designs[0]))
+        std::cout << "NewTurn - wrong design\n";
+
+    if (cast->ships_updates.size() != 1)
+        std::cout << "NewTurn - wrong ships size\n";
+
+    if (!(msu == cast->ships_updates[0]))
+        std::cout << "NewTurn - wrong ship\n";
+
+    if (cast->new_ships.size() != 1)
+        std::cout << "NewTurn - wrong new ships size\n";
+
+    if (!(mns == cast->new_ships[0]))
+        std::cout << "NewTurn - wrong mew ship\n";
 }
 
 void ActionsPayloadTest()
@@ -431,6 +591,8 @@ void ActionsPayloadTest()
 
     if (!(cast->moveFleetRequests[0] == moveFleetRequest1))
         std::cout << "Actions - wrong move fleet requests\n";
+
+    // TODO join, fleetAction, shipDesign, createShip
 }
 
 void InvalidMessageTest()

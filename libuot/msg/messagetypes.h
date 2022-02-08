@@ -45,7 +45,7 @@ struct StartGamePayload : BasePayload
     unsigned int player_id;
     MsgGalaxy galaxy;
     std::map<Resource, float> starting_resources; /*resource, amount*/
-    std::vector<MsgShipDesign> starting_ships_designs;
+    std::vector<MsgShipDesignResponse> starting_ships_designs;
     MessageType GetType() override { return MessageType::StartGame; }
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(StartGamePayload, player_id, galaxy, starting_resources, starting_ships_designs)
     std::string Serialize() override
@@ -61,17 +61,16 @@ struct StartGamePayload : BasePayload
 
 struct ActionsPayload : BasePayload  // Player's actions
 {
-    /*TBD*/
-    // std::vector<int> createColonyActions; /*objectId*/
-    // std::vector<int> createBaseActions; /*objectId*/
     std::vector<MsgBuildRequest> buildRequests;
     std::vector<MsgMoveFleetRequest> moveFleetRequests;
-    Technology::TechnologyType technologyRequest;  // if none requested, set to None
+    Technology::TechnologyType technologyRequest;  // if none requested, set to Empty
     std::vector<MsgJoinFleetsRequest> joinFleetsRequests;
     std::vector<MsgFleetActionRequest> fleetActionRequests;
+    std::vector<MsgShipDesign> shipDesignRequests;
+    std::vector<MsgCreateShip> createShipRequests;
     MessageType GetType() override { return MessageType::Actions; }
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ActionsPayload, technologyRequest, buildRequests, moveFleetRequests,
-                                   joinFleetsRequests, fleetActionRequests)
+                                   joinFleetsRequests, fleetActionRequests, shipDesignRequests, createShipRequests)
     std::string Serialize() override
     {
         nlohmann::json jsonPayload = (*this);
@@ -93,10 +92,13 @@ struct NewTurnPayload : BasePayload  // New turn
     std::vector<MsgSector> new_sectors;
     std::vector<MsgFleetsJoin> joined_fleets;
     std::vector<MsgFleetsJump> jumped_fleets;
+    std::vector<MsgShipDesignResponse> ship_designs;
+    std::vector<MsgShipUpdate> ships_updates;
+    std::vector<MsgNewShip> new_ships;
     MessageType GetType() override { return MessageType::NewTurn; }
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(NewTurnPayload, updated_resources, updated_populations, buildings_updates,
                                    technology_updates, watched_sectors_updates, new_sectors, joined_fleets,
-                                   jumped_fleets)
+                                   jumped_fleets, ship_designs, ships_updates, new_ships)
     std::string Serialize() override
     {
         nlohmann::json jsonPayload = (*this);

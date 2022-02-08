@@ -227,3 +227,24 @@ void Fleet::JumpFleet()
 
     current_action = Action::None;
 }
+
+Fleet::Fleet(const unsigned int id, const std::shared_ptr<Sector> &location_sector, const Point &position,
+             const unsigned int owner_id)
+    : id(id), location_sector(location_sector), position(position), owner_id(owner_id)
+{
+    current_action = None;
+    ships = {};
+    soldiers = 0.0f;
+    civilians = 0.0f;
+    human_capacity = 0.0f;
+    construction_points = 0.0f;
+}
+
+void Fleet::AddShipToFleet(const std::shared_ptr<Ship> &ship)
+{
+    soldiers += ship->soldiers;
+    civilians += ship->civilians;
+    human_capacity += ship->human_capacity;
+    construction_points += ship->construction_points;
+    ships.push_back(ship);
+}

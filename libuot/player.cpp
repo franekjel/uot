@@ -160,6 +160,11 @@ void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int se
     if ((first_fleet->position - second_fleet->position).squaredLength() > Fleet::kNearValue)
         return;
 
+    for (const auto &ship : second_fleet->ships)
+    {
+        ship->fleet = first_fleet;
+    }
+
     first_fleet->ships.insert(first_fleet->ships.end(), second_fleet->ships.begin(), second_fleet->ships.end());
 
     first_fleet->location_sector->present_fleets.erase(
@@ -174,9 +179,9 @@ void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int se
     owned_fleets.erase(owned_fleets.find(second_fleet_id));
 
     auto &sector = owned_fleets[first_fleet_id]->location_sector;
-    sector->joined_fleets.push_back(Sector::JoinedFleets{first_fleet_id, second_fleet_id, first_fleet_id,
-                                                         owned_fleets[first_fleet_id]->position,
-                                                         owned_fleets[first_fleet_id]->owner_id});
+    sector->joined_fleets.push_back(Sector::JoinedFleets{first_fleet_id, second_fleet_id,
+                                                         owned_fleets[first_fleet_id]->owner_id,
+                                                         Sector::FleetParameters(owned_fleets[first_fleet_id])});
 }
 
 void Player::HandleWarpLoadingFleetRequest(int fleet_id)
@@ -321,4 +326,117 @@ void Player::HandleColonizeFleetRequest(int fleet_id)
         handled_fleet->civilians -= handled_fleet->kColonizationCost;
         handled_fleet->current_action = Fleet::Action::Colonize;
     }
+}
+
+void Player::HandleShipDesignRequest(unsigned int id, bool delete_design, std::string name, ShipHull::Type hull_type,
+                                     std::map<ModuleType, int> sides, std::map<ModuleType, int> inside)
+{
+    if (delete_design && ship_designs.count(id) > 0)
+    {
+        changed_designs.push_back({id, nullptr, true});
+        ship_designs.erase(id);
+        return;
+    }
+
+    auto sides_size = ShipHulls.at(hull_type).sides_size;
+    auto inside_size = ShipHulls.at(hull_type).inside_size;
+
+    for (const auto &[module_type, count] : sides)
+    {
+        if (Modules.at(module_type).destination != Module::ModuleDestination::Sides)
+        {
+            return;
+        }
+
+        sides_size -= Modules.at(module_type).size * count;
+    }
+
+    for (const auto &[module_type, count] : inside)
+    {
+        if (Modules.at(module_type).destination != Module::ModuleDestination::Inside)
+        {
+            return;
+        }
+
+        inside_size -= Modules.at(module_type).size * count;
+    }
+
+    if (sides_size < 0 || inside_size < 0)
+    {
+        return;
+    }
+
+    auto current_design = std::make_shared<ShipDesign>(id, name, hull_type, sides, inside);
+    changed_designs.push_back({id, current_design, false});
+    ship_designs[id] = current_design;
+}
+
+void Player::HandleCreateShipRequest(unsigned int design_id, unsigned int planet_id)
+{
+    std::shared_ptr<Colony> current_colony;
+    std::shared_ptr<Planet> current_planet;
+    std::shared_ptr<Sector> current_sector;
+
+    for (const auto &[colony_id, colony] : owned_colonies)
+    {
+        if (colony->planet->id == planet_id)
+        {
+            current_colony = colony;
+            current_planet = colony->planet;
+            current_sector = known_galaxy->sectors[current_planet->sector_id];
+            break;
+        }
+    }
+
+    if (!current_colony || ship_designs.count(design_id) < 1)
+    {
+        return;
+    }
+
+    bool can_build = false;
+    Building::BuildingType shipyard_type = Building::BuildingType::None;
+    for (const auto &[buld_type, buld] : current_colony->buildings)
+    {
+        if (buld_type == Building::BuildingType::SmallOrbitalShipyard ||
+            buld_type == Building::BuildingType::MediumOrbitalShipyard ||
+            buld_type == Building::BuildingType::GrandOrbitalShipyard)
+        {
+            if (shipyard_type < buld_type)
+                shipyard_type = buld_type;
+            can_build = true;
+            break;
+        }
+    }
+
+    if (!can_build)
+    {
+        return;
+    }
+
+    if ((int)shipyard_type < (int)ship_designs[design_id]->hull_type)
+    {
+        return;
+    }
+
+    auto &design = ship_designs[design_id];
+
+    for (const auto &[resource, count] : design->cost)
+    {
+        if (owned_resources[resource] < count)
+        {
+            can_build = false;
+            break;
+        }
+    }
+
+    if (!can_build)
+    {
+        return;
+    }
+
+    for (const auto &[resource, count] : design->cost)
+        owned_resources[resource] -= count;
+
+    current_colony->ship_building_queue.push_back({design, current_sector});
+    current_colony->ship_building_queue_changed = true;
 }

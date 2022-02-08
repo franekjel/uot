@@ -36,6 +36,9 @@ struct Player
     void HandleCancelFleetRequest(int fleet_id);
     void HandleColonizeFleetRequest(int fleet_id);
     void HandleStartTechnologyResearch(Technology::TechnologyType technology);
+    void HandleShipDesignRequest(unsigned int id, bool delete_design, std::string name, ShipHull::Type hull_type,
+                                 std::map<ModuleType, int> sides, std::map<ModuleType, int> inside);
+    void HandleCreateShipRequest(unsigned int design_id, unsigned int planet_id);
     void DiscoverTechnology(Technology::TechnologyType technology);
 
     // client-only
@@ -50,6 +53,14 @@ struct Player
            const unsigned int& starting_colony_obj_id);
     std::map<Resource, bool> resources_changed;
     std::set<Technology::TechnologyType> new_technologies;
+
+    struct ChangedDesign
+    {
+        unsigned int design_id;
+        std::shared_ptr<ShipDesign> design;
+        bool deleted;
+    };
+    std::vector<ChangedDesign> changed_designs;
 };
 
 inline bool operator==(const Player& lhs, const Player& rhs) { return lhs.id == rhs.id; }

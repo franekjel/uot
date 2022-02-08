@@ -155,8 +155,7 @@ messageTypes::MsgFleetsJoin::MsgFleetsJoin() {}
 messageTypes::MsgFleetsJoin::MsgFleetsJoin(const Sector::JoinedFleets& joined_fleets)
     : joined_fleet_id_1(joined_fleets.joined_fleet_1),
       joined_fleet_id_2(joined_fleets.joined_fleet_2),
-      result_fleet_id(joined_fleets.res_fleet),
-      result_fleet_pos(joined_fleets.res_fleet_pos)
+      fleet_parameters(joined_fleets.fleet_parameters, false)
 {
 }
 
@@ -207,14 +206,72 @@ messageTypes::MsgFleetActionRequest::MsgFleetActionRequest(int fleet_id_, Fleet:
 
 messageTypes::MsgShipDesign::MsgShipDesign() {}
 
-messageTypes::MsgShipDesign::MsgShipDesign(const std::shared_ptr<ShipDesign>& design)
+messageTypes::MsgShipDesign::MsgShipDesign(const std::shared_ptr<ShipDesign>& design, bool delete_design_)
+    : delete_design(delete_design_)
 {
     id = design->id;
     name = design->name;
     hull_type = design->hull_type;
     sides = design->sides;
     inside = design->inside;
-    cost = design->cost;
-    upkeep = design->upkeep;
-    worker_weeks_cost = design->worker_weeks_cost;
+}
+
+messageTypes::MsgCreateShip::MsgCreateShip() {}
+
+messageTypes::MsgCreateShip::MsgCreateShip(unsigned int design_id_, unsigned int planet_id_)
+    : design_id(design_id_), planet_id(planet_id_)
+{
+}
+
+messageTypes::MsgShipDesignResponse::MsgShipDesignResponse() {}
+
+messageTypes::MsgShipDesignResponse::MsgShipDesignResponse(unsigned int design_id_,
+                                                           const std::shared_ptr<ShipDesign>& design, bool deleted_)
+    : deleted(deleted_)
+{
+    id = design_id_;
+    if (!deleted)
+    {
+        name = design->name;
+        hull_type = design->hull_type;
+        sides = design->sides;
+        inside = design->inside;
+        cost = design->cost;
+        upkeep = design->upkeep;
+        worker_weeks_cost = design->worker_weeks_cost;
+    }
+}
+
+messageTypes::MsgShipUpdate::MsgShipUpdate() {}
+
+messageTypes::MsgShipUpdate::MsgShipUpdate(unsigned int design_id_, unsigned int planet_id_, int days_remaining_)
+    : design_id(design_id_), planet_id(planet_id_), days_remaining(days_remaining_)
+{
+}
+
+messageTypes::MsgNewShip::MsgNewShip() {}
+
+messageTypes::MsgNewShip::MsgNewShip(unsigned int design_id_, unsigned int planet_id_, bool new_fleet,
+                                     unsigned int ship_id_, const Sector::FleetParameters& fleet_parameters_)
+    : design_id(design_id_), planet_id(planet_id_), id(ship_id_), fleet_parameters(fleet_parameters_, new_fleet)
+{
+}
+
+messageTypes::MsgFleetParameters::MsgFleetParameters() {}
+
+messageTypes::MsgFleetParameters::MsgFleetParameters(const Sector::FleetParameters& fleet_parameters, bool new_fleet_)
+    : new_fleet(new_fleet_)
+{
+    id = fleet_parameters.fleet_id;
+    position = fleet_parameters.position;
+    soldiers = fleet_parameters.soldiers;
+    civilians = fleet_parameters.civilians;
+    human_capacity = fleet_parameters.human_capacity;
+    construction_points = fleet_parameters.construction_points;
+    base_fleet_speed = fleet_parameters.base_fleet_speed;
+    current_hp = fleet_parameters.current_hp;
+    max_hp = fleet_parameters.max_hp;
+    current_shields = fleet_parameters.current_shields;
+    max_shields = fleet_parameters.max_shields;
+    average_energy = fleet_parameters.average_energy;
 }

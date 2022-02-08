@@ -26,9 +26,9 @@ struct ShipHull
 
     enum Type
     {
-        SmallShipHull,
-        MediumShipHull,
-        GrandShipHull
+        SmallShipHull = 4,
+        MediumShipHull = 5,
+        GrandShipHull = 6
     };
 
     ShipHull(const int sides_size, const int inside_size, const std::map<Resource, float>& cost,
@@ -89,6 +89,7 @@ struct Ship
     float full_warp_drive_charge = 100.0f;
     std::vector<Weapon> weapons;
     std::shared_ptr<ShipDesign> design;
+    std::shared_ptr<Fleet> fleet;
 
     static std::shared_ptr<Ship> ShipFromDesign(const int id, const std::shared_ptr<ShipDesign> design);
 
@@ -134,9 +135,16 @@ struct Fleet
         CancelAction
     } current_action;
 
+    Fleet() = default;
+
+    Fleet(const unsigned int id, const std::shared_ptr<Sector>& location_sector, const Point& position,
+          const unsigned int owner_id);
+
     void UpdateFleet();
 
     void UpdateFleetSpeed();
+
+    void AddShipToFleet(const std::shared_ptr<Ship>& ship);
 
     void MoveFleet();
     void JumpFleet();

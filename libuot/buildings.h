@@ -10,13 +10,13 @@ struct Building
 {
     enum BuildingType
     {
-        None,
+        None = 0,
         PlanetaryAdministration,
         MilitaryTrainingCentre,
         // ship contruction
-        SmallOrbitalShipyard,
-        MediumOrbitalShipyard,
-        GrandOrbitalShipyard,
+        SmallOrbitalShipyard = 4,
+        MediumOrbitalShipyard = 5,
+        GrandOrbitalShipyard = 6,
 
         // metals
         MetalsMine,
@@ -394,4 +394,5 @@ const std::map<Building::BuildingType, Building> Buildings{
 // Building which can be always build
 const std::set<Building::BuildingType> UnlimitedBuildings = {
     Building::BuildingType::Greenhouses, Building::BuildingType::Laboratory,
-    Building::BuildingType::MilitaryTrainingCentre, Building::BuildingType::PowerPlants};
+    Building::BuildingType::MilitaryTrainingCentre, Building::BuildingType::PowerPlants,
+    Building::BuildingType::SmallOrbitalShipyard};
