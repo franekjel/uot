@@ -399,13 +399,11 @@ void PlayersList::CountEveryTurnNumbers()
                 fleets_to_remove.push_back(fleet_id);
         }
 
-        
         for (const auto& id : fleets_to_remove)
         {
             player->owned_fleets[id]->location_sector->present_fleets.erase(id);
             player->owned_fleets[id]->location_sector->DecrementWatcher(player_id);
             player->owned_fleets.erase(id);
         }
-        
     }
 }

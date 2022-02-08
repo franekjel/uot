@@ -122,7 +122,6 @@ struct Fleet
     float building_progress;
     float full_building_progress;
 
-
     std::map<Weapon::SpecialFeatures, float> gained_damage = {
         {Weapon::SpecialFeatures::BypassShield, 0.0f},
         {Weapon::SpecialFeatures::HPDamageBonus, 0.0f},
