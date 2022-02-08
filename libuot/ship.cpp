@@ -1,7 +1,7 @@
 #include "ship.h"
 
 ShipHull::ShipHull(const int sides_size, const int inside_size, const std::map<Resource, float> &cost,
-                   const std::map<Resource, float> &additional_upkeep, const float hp, const float engines_power,
+                   const std::map<Resource, float> &additional_upkeep, const float hp, const float speed,
                    const float engines_energy_consumtion, const float crew, const float worker_weeks_cost,
                    const float warp_drive_energy)
     : sides_size(sides_size),
@@ -9,7 +9,7 @@ ShipHull::ShipHull(const int sides_size, const int inside_size, const std::map<R
       cost(cost),
       additional_upkeep(additional_upkeep),
       hp(hp),
-      speed(engines_power),
+      speed(speed),
       engines_energy_consumtion(engines_energy_consumtion),
       crew(crew),
       worker_weeks_cost(worker_weeks_cost),

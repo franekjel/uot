@@ -10,7 +10,15 @@
 #include "msg_queue.h"
 #include "player.h"
 
-void rendering::render_sector_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov) {}
+void rendering::render_sector_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov)
+{
+    auto& gui = context.gui;
+    if (gui->current_fleet.has_value() &&
+        input_utilities::check_view_area_collision<size_settings::fleet_info_area>(x, y))
+    {
+        gui->current_fleet_info_offset += 4 * ymov;
+    }
+}
 
 void rendering::render_sector_view::_draw(client_context& context)
 {
@@ -65,6 +73,10 @@ void rendering::render_sector_view::_draw(client_context& context)
     {
         render_selected_object_info(context);
     }
+    else if (gui->current_fleet.has_value())
+    {
+        render_selected_fleet_info(context);
+    }
 }
 
 void rendering::render_object_selection(const client_context& context)
@@ -73,33 +85,18 @@ void rendering::render_object_selection(const client_context& context)
     const auto& gr = context.gr;
     const auto& gui = context.gui;
 
-    if (!gui->current_object.has_value() && !gui->current_fleet.has_value())
+    if (!gui->current_object.has_value())
     {
         return;
     }
 
-    const Point pos =
-        gui->current_object.has_value() ? gui->current_object.value()->position : gui->current_fleet.value()->position;
-    const int tex_size = gui->current_object.has_value() ? planets_meta::texture_size[GAS_GIANT_1] : 32;
+    const Point pos = gui->current_object.value()->position;
+    const int tex_size = planets_meta::texture_size[GAS_GIANT_1];
 
-    sdl_utilities::set_custom_viewport<size_settings::play_area, size_settings::frame_size>(r.get());
-    sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
-    sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
-
+    render_selection_graphics(context, pos, tex_size);
     const auto x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * pos.x;
     const auto y = size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * pos.y;
-
-    SDL_Rect s{0, 0, selection_meta::texture_width, selection_meta::texture_height};
-
-    SDL_Rect d{static_cast<int>(x - 0.5 * tex_size), static_cast<int>(y - 0.5 * tex_size), tex_size, tex_size};
-
-    SDL_RenderCopyEx(r.get(), gr->selectionTextures[selection_types::SECTOR_SELECTION].get(), &s, &d,
-                     SDL_GetTicks() / 100, NULL, SDL_FLIP_NONE);
-
-    if (gui->current_object.has_value())
-        render_planet_helper(context, 0.8, x, y, gr->planetTextures[11 + gui->current_object.value()->id % 18]);
-    else
-        render_fleet(context, gui->current_fleet.value());
+    render_planet_helper(context, 0.8, x, y, gr->planetTextures[11 + gui->current_object.value()->id % 18]);
 }
 
 void rendering::render_selected_object_info(const client_context& context)
@@ -191,6 +188,7 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
     if (et == iu::uot_event_type::left_click_play)
     {
         const auto& curr = current_sector.value();
+        gui->current_fleet_info_offset = 0;
 
         const unsigned int player_id = context.getGameState().value->player->id;
         for (const auto& [id, fleet] : gui->current_sector.value()->present_fleets)
@@ -204,6 +202,7 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
             if (iu::check_collision_circle(x, y, fleet_x, fleet_y, 16))  // 16 -magic number size of fleet sprite
             {
                 current_fleet = fleet;
+                current_object.reset();
                 return;
             }
         }
@@ -251,15 +250,15 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
         auto& current_fleet = context.gui->current_fleet;
         if (current_fleet.has_value())
         {
-            auto& fleet = current_fleet.value();
+            auto& f = current_fleet.value();
 
             Point pos{(x - size_settings::play_area::width / 2.0f) / (size_settings::play_area::height / 2.0f),
                       (y - size_settings::play_area::height / 2.0f) / (size_settings::play_area::height / 2.0f)};
 
             if (pos.x * pos.x + pos.y * pos.y > 1.0f)
                 return;
-            context.getActionQueue().value->request_fleet_move(fleet->id, pos);
-            fleet->wanted_position = pos;
+            context.getActionQueue().value->request_fleet_move(f->id, pos);
+            f->wanted_position = pos;
         }
     }
 }
@@ -276,17 +275,78 @@ void rendering::render_sector_view::key_handler(client_context& context, Uint16 
 
 void rendering::render_fleet(const client_context& context, const std::shared_ptr<Fleet> f)
 {
-    const auto fleet_x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * f->position.x;
-    const auto fleet_y = size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * f->position.y;
+    const long dt = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() -
+                                                                          context.gui->last_turn_time)
+                        .count();
+
+    const Point vec = std::isnan(f->wanted_position.x) ? Point{0, 0} : f->wanted_position - f->position;
+    Point v = f->position + f->movement_vec * (float(dt) / float(turn_time_ms));
+
+    if (context.gui->current_fleet.has_value() && f == context.gui->current_fleet.value())
+    {
+        render_selection_graphics(context, v, 32);
+    }
+
+    const auto fleet_x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * v.x;
+    const auto fleet_y = size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * v.y;
 
     const int w = context.gr->fleet_textures[f->owner_id].w;
     const int h = context.gr->fleet_textures[f->owner_id].h;
 
     const SDL_Rect d = {static_cast<int>(fleet_x - 0.5 * w), static_cast<int>(fleet_y - 0.5 * h), w, h};
 
-    const Point v = std::isnan(f->wanted_position.x) ? Point{0, -1} : f->wanted_position - f->position;
-    const float angle = std::atan2(v.y, v.x) + M_PI_2;
+    const float angle = std::atan2(vec.y, vec.x) + M_PI_2;
 
     SDL_RenderCopyEx(context.r.get(), context.gr->fleet_textures[f->owner_id].t.get(), nullptr, &d,
                      angle * 360.0f / (2.0f * M_PI), nullptr, SDL_FLIP_NONE);
+}
+
+void rendering::render_selection_graphics(const client_context& context, const Point pos, const int tex_size)
+{
+    const auto& r = context.r;
+    const auto& gr = context.gr;
+
+    sdl_utilities::set_custom_viewport<size_settings::play_area, size_settings::frame_size>(r.get());
+    sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 150});
+    sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
+
+    const auto x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * pos.x;
+    const auto y = size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * pos.y;
+
+    SDL_Rect s{0, 0, selection_meta::texture_width, selection_meta::texture_height};
+
+    SDL_Rect d{static_cast<int>(x - 0.5 * tex_size), static_cast<int>(y - 0.5 * tex_size), tex_size, tex_size};
+
+    SDL_RenderCopyEx(r.get(), gr->selectionTextures[selection_types::SECTOR_SELECTION].get(), &s, &d,
+                     SDL_GetTicks() / 100, NULL, SDL_FLIP_NONE);
+}
+
+void rendering::render_selected_fleet_info(const client_context& context)
+{
+    const auto& r = context.r;
+    const auto& gr = context.gr;
+    const auto& gui = context.gui;
+
+    const auto& f = gui->current_fleet.value();
+
+    sdl_utilities::render_text(r.get(), gr->main_font, "fleet " + std::to_string(f->id),
+                               size_settings::context_area::width / 2, fonts::main_font_size / 2 + 30,
+                               size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+
+    std::string fleet_info = "";
+
+    fleet_info += "HP: " + std::to_string(int(f->current_hp)) + "/" + std::to_string(int(f->max_hp)) + "\n";
+    fleet_info +=
+        "shields: " + std::to_string(int(f->current_shields)) + "/" + std::to_string(int(f->max_shields)) + "\n";
+    fleet_info += "avg energy: " + std::to_string(int(f->average_energy * 100.0f)) + "%\n";
+    fleet_info += "ships:\n";
+    for (const auto& s : f->ships)
+    {
+        fleet_info += " id" + std::to_string(s->id) + ": " + s->design->name + "\n";
+    }
+
+    sdl_utilities::set_render_viewport<size_settings::fleet_info_area>(r.get());
+    sdl_utilities::render_text(r.get(), gr->secondary_font, fleet_info, size_settings::context_area::width / 2,
+                               fonts::main_font_size / 2 + 30 + gui->current_fleet_info_offset,
+                               size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 }

@@ -24,5 +24,9 @@ void render_object_selection(const client_context& context);
 void render_selected_object_info(const client_context& context);
 
 void render_fleet(const client_context& context, const std::shared_ptr<Fleet> f);
+
+void render_selected_fleet_info(const client_context& context);
+
+void render_selection_graphics(const client_context& context, const Point pos, const int tex_size);
 }  // namespace rendering
 #endif  // GALAXY_RENDERING_H

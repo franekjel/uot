@@ -26,6 +26,7 @@ struct game_state : public uncopiable
    public:
     void reset_galaxy();
     std::shared_ptr<Player> player;
+    std::map<unsigned int, std::shared_ptr<Planet>> planets;
 };
 
 #endif
