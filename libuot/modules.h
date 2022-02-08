@@ -14,6 +14,9 @@ struct Weapon
     int attack_count;
     float damage;
     float range;
+    int atacks_left;
+
+    static constexpr float bonus_damage = 1.5f;
 
     enum SpecialFeatures
     {
@@ -26,7 +29,11 @@ struct Weapon
     Weapon() = default;
 
     Weapon(const int attack_count, const float damage, const float range, const SpecialFeatures special_features)
-        : attack_count(attack_count), damage(damage), range(range), special_features(special_features)
+        : attack_count(attack_count),
+          damage(damage),
+          range(range),
+          special_features(special_features),
+          atacks_left(attack_count)
     {
     }
 };

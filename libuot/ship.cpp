@@ -122,6 +122,10 @@ void Ship::RegenShip()
         shield += energy * shield_regen_energy_cost_reverse;
         energy = 0.0f;
     }
+    for (auto &weapon : weapons)
+    {
+        weapon.atacks_left = weapon.attack_count;
+    }
 }
 
 void Fleet::UpdateFleet()
@@ -190,6 +194,28 @@ void Fleet::UpdateFleetSpeed()
     fleet_speed_per_turn = minimum_speed;
 }
 
+std::map<Weapon::SpecialFeatures, float> Fleet::GetDamageDeal(float distance)
+{
+    std::map<Weapon::SpecialFeatures, float> damage = {
+        {Weapon::SpecialFeatures::BypassShield, 0.0f},
+        {Weapon::SpecialFeatures::HPDamageBonus, 0.0f},
+        {Weapon::SpecialFeatures::None, 0.0f},
+        {Weapon::SpecialFeatures::ShieldDamageBonus, 0.0f},
+    };
+    for (const auto &ship : ships)
+    {
+        for (auto &weapon : ship->weapons)
+        {
+            if (weapon.range >= distance)
+            {
+                damage[weapon.special_features] += weapon.atacks_left * weapon.damage;
+                weapon.atacks_left = 0.0f;
+            }
+        }
+    }
+    return damage;
+}
+
 void Fleet::MoveFleet()
 {
     if (std::isnan(wanted_position.x) || wanted_position == position)
@@ -247,4 +273,172 @@ void Fleet::AddShipToFleet(const std::shared_ptr<Ship> &ship)
     human_capacity += ship->human_capacity;
     construction_points += ship->construction_points;
     ships.push_back(ship);
+}
+
+void Fleet::CountDamage()
+{
+    int size = ships.size();
+
+    float damage_to_deal;
+    float damage_left_to_deal;
+
+    bool ship_was_destroyed = false;
+
+    float damage_sum = 0.0f;
+
+    for (const auto &[dmg_type, dmg] : gained_damage)
+    {
+        damage_sum += dmg;
+    }
+
+    while (damage_sum > 0.0f && !empty_fleet)
+    {
+        for (const auto &ship : ships)
+        {
+            // damage with bonus to shields
+            if (gained_damage[Weapon::SpecialFeatures::ShieldDamageBonus] > 0.0f)
+            {
+                damage_to_deal = gained_damage[Weapon::SpecialFeatures::ShieldDamageBonus] / size;
+                damage_left_to_deal = damage_to_deal;
+
+                ship->shield -= damage_left_to_deal * Weapon::bonus_damage;
+                damage_left_to_deal = 0.0f;
+                if (ship->shield < 0.0f)
+                {
+                    damage_left_to_deal = -(ship->shield / Weapon::bonus_damage);
+                    ship->shield = 0.0f;
+                }
+
+                if (damage_left_to_deal > 0.0f)
+                {
+                    ship->hp -= damage_left_to_deal;
+                    damage_left_to_deal = 0.0f;
+                    if (ship->hp <= 0.0f)
+                    {
+                        damage_left_to_deal = -ship->hp;
+                        ship->hp = 0.0f;
+                        ship_was_destroyed = true;
+                    }
+                }
+                gained_damage[Weapon::SpecialFeatures::ShieldDamageBonus] -= damage_to_deal - damage_left_to_deal;
+            }
+
+            // damage without bonuses
+            if (gained_damage[Weapon::SpecialFeatures::None] > 0.0f)
+            {
+                damage_to_deal = gained_damage[Weapon::SpecialFeatures::None] / size;
+                damage_left_to_deal = damage_to_deal;
+
+                ship->shield -= damage_left_to_deal;
+                damage_left_to_deal = 0.0f;
+                if (ship->shield < 0.0f)
+                {
+                    damage_left_to_deal = -ship->shield;
+                    ship->shield = 0.0f;
+                }
+
+                if (damage_left_to_deal > 0.0f)
+                {
+                    ship->hp -= damage_left_to_deal;
+                    damage_left_to_deal = 0.0f;
+                    if (ship->hp <= 0.0f)
+                    {
+                        damage_left_to_deal = -ship->hp;
+                        ship->hp = 0.0f;
+                        ship_was_destroyed = true;
+                    }
+                }
+                gained_damage[Weapon::SpecialFeatures::None] -= damage_to_deal - damage_left_to_deal;
+            }
+            // damage with hp bonuses
+            if (gained_damage[Weapon::SpecialFeatures::HPDamageBonus] > 0.0f)
+            {
+                damage_to_deal = gained_damage[Weapon::SpecialFeatures::HPDamageBonus] / size;
+                damage_left_to_deal = damage_to_deal;
+
+                ship->shield -= damage_left_to_deal;
+                damage_left_to_deal = 0.0f;
+                if (ship->shield < 0.0f)
+                {
+                    damage_left_to_deal = -ship->shield;
+                    ship->shield = 0.0f;
+                }
+
+                if (damage_left_to_deal > 0.0f)
+                {
+                    ship->hp -= damage_left_to_deal * Weapon::bonus_damage;
+                    damage_left_to_deal = 0.0f;
+                    if (ship->hp <= 0.0f)
+                    {
+                        damage_left_to_deal = -(ship->hp / Weapon::bonus_damage);
+                        ship->hp = 0.0f;
+                        ship_was_destroyed = true;
+                    }
+                }
+                gained_damage[Weapon::SpecialFeatures::HPDamageBonus] -= damage_to_deal - damage_left_to_deal;
+            }
+            // damage with hp bonuses
+            if (gained_damage[Weapon::SpecialFeatures::BypassShield] > 0.0f)
+            {
+                damage_to_deal = gained_damage[Weapon::SpecialFeatures::BypassShield] / size;
+                damage_left_to_deal = damage_to_deal;
+
+                ship->hp -= damage_left_to_deal;
+                damage_left_to_deal = 0.0f;
+                if (ship->hp <= 0.0f)
+                {
+                    damage_left_to_deal = -ship->hp;
+                    ship->hp = 0.0f;
+                    ship_was_destroyed = true;
+                }
+
+                gained_damage[Weapon::SpecialFeatures::BypassShield] -= damage_to_deal - damage_left_to_deal;
+            }
+            size--;
+        }
+
+        while (ship_was_destroyed)
+        {
+            ship_was_destroyed = false;
+            auto itr = ships.begin();
+            while (itr != ships.end())
+            {
+                if ((*itr)->hp <= 0.0f)
+                {
+                    auto &sh = *itr;
+                    civilians -= sh->civilians;
+                    soldiers -= sh->soldiers;
+                    human_capacity -= sh->human_capacity;
+                    construction_points -= sh->construction_points;
+
+                    ships.erase(itr);
+                    ship_was_destroyed = true;
+                    break;
+
+                    // PO tu sie niszczy stateczki
+                }
+                itr++;
+            }
+        }
+
+        if (ships.begin() == ships.end())
+            empty_fleet = true;
+
+        damage_sum = 0.0f;
+
+        for (const auto &[dmg_type, dmg] : gained_damage)
+        {
+            damage_sum += dmg;
+        }
+    }
+}
+
+std::map<Resource, float> Fleet::GetUpkeepCost()
+{
+    std::map<Resource, float> cost;
+    for (const auto &ship : ships)
+    {
+        cost += ship->design->upkeep;
+    }
+    return cost;
 }

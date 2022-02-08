@@ -122,6 +122,14 @@ struct Fleet
     float building_progress;
     float full_building_progress;
 
+
+    std::map<Weapon::SpecialFeatures, float> gained_damage = {
+        {Weapon::SpecialFeatures::BypassShield, 0.0f},
+        {Weapon::SpecialFeatures::HPDamageBonus, 0.0f},
+        {Weapon::SpecialFeatures::None, 0.0f},
+        {Weapon::SpecialFeatures::ShieldDamageBonus, 0.0f},
+    };
+
     static constexpr float kNearValue = 0.01f;
     static constexpr float kColonizationCost = 10.0f;
 
@@ -145,6 +153,12 @@ struct Fleet
     void UpdateFleetSpeed();
 
     void AddShipToFleet(const std::shared_ptr<Ship>& ship);
+
+    std::map<Weapon::SpecialFeatures, float> GetDamageDeal(float distance);
+
+    std::map<Resource, float> GetUpkeepCost();
+
+    void CountDamage();
 
     void MoveFleet();
     void JumpFleet();

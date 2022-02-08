@@ -346,6 +346,9 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
 
     for (const auto& [fleet_id, fleet] : player_fleets)
     {
+        for (const auto& [resource, count] : fleet->GetUpkeepCost())
+            player->owned_resources[resource] -= count;
+
         if (fleet->current_action == Fleet::Action::BuildAsteroidMine ||
             fleet->current_action == Fleet::Action::Colonize)
         {
@@ -356,9 +359,19 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
 
 void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
 {
-    for (const auto& fleet : player->owned_fleets)
+    for (const auto& [fleet_id, fleet] : player->owned_fleets)
     {
-        fleet.second->UpdateFleet();
+        fleet->UpdateFleet();
+
+        for (const auto& [other_fleet_id, other_fleet] : fleet->location_sector->present_fleets)
+        {
+            if (other_fleet_id != fleet_id && other_fleet->owner_id != fleet->owner_id)
+            {
+                for (const auto& [type, count] :
+                     fleet->GetDamageDeal(((other_fleet->position - fleet->position).squaredLength())))
+                    other_fleet->gained_damage[type] += count;
+            }
+        }
     }
 }
 
@@ -375,4 +388,24 @@ void PlayersList::CountEveryTurnNumbers()
 
     for (auto& player : players)
         CountEveryTurnNumbersPlayer(player.second);
+
+    for (auto& [player_id, player] : players)
+    {
+        std::vector<unsigned int> fleets_to_remove = {};
+        for (const auto& [fleet_id, fleet] : player->owned_fleets)
+        {
+            fleet->CountDamage();
+            if (fleet->empty_fleet)
+                fleets_to_remove.push_back(fleet_id);
+        }
+
+        
+        for (const auto& id : fleets_to_remove)
+        {
+            player->owned_fleets[id]->location_sector->present_fleets.erase(id);
+            player->owned_fleets[id]->location_sector->DecrementWatcher(player_id);
+            player->owned_fleets.erase(id);
+        }
+        
+    }
 }
