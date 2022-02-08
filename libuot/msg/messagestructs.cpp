@@ -242,22 +242,19 @@ messageTypes::MsgShipDesignResponse::MsgShipDesignResponse(unsigned int design_i
     }
 }
 
-messageTypes::MsgShipsUpdates::MsgShipsUpdates() {}
+messageTypes::MsgShipUpdate::MsgShipUpdate() {}
 
-messageTypes::MsgShipsUpdates::MsgShipsUpdates(unsigned int design_id_, unsigned int planet_id_, bool new_fleet,
-                                               unsigned int ship_id_, int days_remaining_,
-                                               const Sector::FleetParameters& fleet_parameters_)
+messageTypes::MsgShipUpdate::MsgShipUpdate(unsigned int design_id_, unsigned int planet_id_, int days_remaining_)
     : design_id(design_id_), planet_id(planet_id_), days_remaining(days_remaining_)
 {
-    if (days_remaining_ == 0)
-    {
-        id = ship_id_;
-        fleet_parameters = MsgFleetParameters(fleet_parameters_, new_fleet);
-    }
-    else
-    {
-        id = 0;
-    }
+}
+
+messageTypes::MsgNewShip::MsgNewShip() {}
+
+messageTypes::MsgNewShip::MsgNewShip(unsigned int design_id_, unsigned int planet_id_, bool new_fleet,
+                                     unsigned int ship_id_, const Sector::FleetParameters& fleet_parameters_)
+    : design_id(design_id_), planet_id(planet_id_), id(ship_id_), fleet_parameters(fleet_parameters_, new_fleet)
+{
 }
 
 messageTypes::MsgFleetParameters::MsgFleetParameters() {}

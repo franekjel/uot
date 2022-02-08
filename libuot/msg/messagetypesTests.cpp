@@ -170,10 +170,17 @@ bool operator==(messageTypes::MsgWatchedSectorUpdate& u1, messageTypes::MsgWatch
     return true;
 }
 
-bool operator==(messageTypes::MsgShipsUpdates& s1, messageTypes::MsgShipsUpdates& s2)
+bool operator==(messageTypes::MsgShipUpdate& s1, messageTypes::MsgShipUpdate& s2)
 {
-    if (s1.id != s2.id || s1.design_id != s2.design_id || s1.planet_id != s2.planet_id ||
-        s1.days_remaining != s2.days_remaining)
+    if (s1.design_id != s2.design_id || s1.planet_id != s2.planet_id || s1.days_remaining != s2.days_remaining)
+        return false;
+
+    return true;
+}
+
+bool operator==(messageTypes::MsgNewShip& s1, messageTypes::MsgNewShip& s2)
+{
+    if (s1.id != s2.id || s1.design_id != s2.design_id || s1.planet_id != s2.planet_id)
         return false;
 
     if (!(s1.fleet_parameters == s2.fleet_parameters))
@@ -434,7 +441,8 @@ void NewTurnPayloadTest()
     msdr.worker_weeks_cost = 6.4f;
     ntp.ship_designs.push_back(msdr);
 
-    messageTypes::MsgShipsUpdates mcsr;
+    messageTypes::MsgShipUpdate msu;
+    messageTypes::MsgNewShip mns;
     Sector::FleetParameters flp2;
     flp2.fleet_id = 3;
     flp2.position = {0.2f, 2.0f};
@@ -444,12 +452,16 @@ void NewTurnPayloadTest()
     flp2.construction_points = 4.0f;
     flp2.base_fleet_speed = 4.0f;
 
-    mcsr.id = 1;
-    mcsr.design_id = 2;
-    mcsr.planet_id = 3;
-    mcsr.days_remaining = 0;
-    mcsr.fleet_parameters = messageTypes::MsgFleetParameters(flp2, false);
-    ntp.ships_updates.push_back(mcsr);
+    msu.design_id = 2;
+    msu.planet_id = 3;
+    msu.days_remaining = 0;
+    ntp.ships_updates.push_back(msu);
+
+    mns.id = 1;
+    mns.design_id = 2;
+    mns.planet_id = 3;
+    mns.fleet_parameters = messageTypes::MsgFleetParameters(flp2, false);
+    ntp.new_ships.push_back(mns);
 
     auto ser = ntp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
@@ -518,8 +530,14 @@ void NewTurnPayloadTest()
     if (cast->ships_updates.size() != 1)
         std::cout << "NewTurn - wrong ships size\n";
 
-    if (!(mcsr == cast->ships_updates[0]))
+    if (!(msu == cast->ships_updates[0]))
         std::cout << "NewTurn - wrong ship\n";
+
+    if (cast->new_ships.size() != 1)
+        std::cout << "NewTurn - wrong new ships size\n";
+
+    if (!(mns == cast->new_ships[0]))
+        std::cout << "NewTurn - wrong mew ship\n";
 }
 
 void ActionsPayloadTest()

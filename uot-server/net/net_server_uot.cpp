@@ -144,8 +144,8 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
                 if (days_remaining == 0)
                     days_remaining++;
 
-                payload.ships_updates.push_back(messageTypes::MsgShipsUpdates(
-                    ship.design->id, colony.second->planet->id, false, 0, days_remaining, Sector::FleetParameters()));
+                payload.ships_updates.push_back(
+                    messageTypes::MsgShipUpdate(ship.design->id, colony.second->planet->id, days_remaining));
             }
             colony.second->ship_building_queue_changed = false;
         }
@@ -157,9 +157,9 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
         }
         for (const auto& new_ship : colony.second->new_ships)
         {
-            payload.ships_updates.push_back(
-                messageTypes::MsgShipsUpdates(new_ship.design->id, colony.second->planet->id, new_ship.new_fleet,
-                                              new_ship.ship->id, 0, Sector::FleetParameters(new_ship.ship->fleet)));
+            payload.new_ships.push_back(messageTypes::MsgNewShip(new_ship.design->id, colony.second->planet->id,
+                                                                 new_ship.new_fleet, new_ship.ship->id,
+                                                                 Sector::FleetParameters(new_ship.ship->fleet)));
         }
 
         colony.second->new_buildings.clear();
