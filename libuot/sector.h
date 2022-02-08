@@ -104,6 +104,9 @@ struct Sector
         float base_fleet_speed;
         float current_hp;
         float max_hp;
+        float current_shields;
+        float max_shields;
+        float average_energy;
 
         FleetParameters() = default;
         FleetParameters(std::shared_ptr<Fleet> fleet);

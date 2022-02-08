@@ -64,6 +64,11 @@ Sector::FleetParameters::FleetParameters(std::shared_ptr<Fleet> fleet)
     construction_points = fleet->construction_points;
     current_hp = 0.0f;
     max_hp = 0.0f;
+    current_shields = 0.0f;
+    max_shields = 0.0f;
+    average_energy = 0.0f;
+
+    float tot_energy = 0.0f;
 
     if (fleet->ships.size() == 0)
     {
@@ -77,9 +82,13 @@ Sector::FleetParameters::FleetParameters(std::shared_ptr<Fleet> fleet)
             if (ship->speed < base_fleet_speed)
             {
                 base_fleet_speed = ship->speed;
-                current_hp += ship->hp;
-                max_hp += ship->max_hp;
             }
+            current_hp += ship->hp;
+            max_hp += ship->max_hp;
+            current_shields += ship->shield;
+            max_shields += ship->max_shield;
+            tot_energy += ship->energy / ship->max_energy;
         }
+        average_energy = tot_energy / fleet->ships.size();
     }
 }

@@ -124,7 +124,8 @@ bool operator==(messageTypes::MsgFleetParameters& f1, messageTypes::MsgFleetPara
     if (f1.id != f2.id || f1.new_fleet != f2.new_fleet || f1.position != f2.position || f1.soldiers != f2.soldiers ||
         f1.civilians != f2.civilians || f1.human_capacity != f2.human_capacity ||
         f1.construction_points != f2.construction_points || f1.base_fleet_speed != f2.base_fleet_speed ||
-        f1.current_hp != f2.current_hp || f1.max_hp != f2.max_hp)
+        f1.current_hp != f2.current_hp || f1.max_hp != f2.max_hp || f1.current_shields != f2.current_shields ||
+        f1.max_shields != f2.max_shields || f1.average_energy != f2.average_energy)
         return false;
 
     return true;
@@ -420,6 +421,9 @@ void NewTurnPayloadTest()
     flp.base_fleet_speed = -1.0f;
     flp.current_hp = 11.0f;
     flp.max_hp = 33.0f;
+    flp.current_shields = 1.0f;
+    flp.max_shields = 24.0f;
+    flp.average_energy = 0.542f;
 
     messageTypes::MsgFleetsJoin jf{{1, 2, 1, flp}};
     ntp.joined_fleets.push_back(jf);
@@ -456,6 +460,9 @@ void NewTurnPayloadTest()
     flp2.base_fleet_speed = 4.0f;
     flp2.current_hp = 1.0f;
     flp2.max_hp = 24.0f;
+    flp2.current_shields = 51.0f;
+    flp2.max_shields = 240.0f;
+    flp2.average_energy = 0.9542f;
 
     msu.design_id = 2;
     msu.planet_id = 3;

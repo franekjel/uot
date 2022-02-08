@@ -271,4 +271,7 @@ messageTypes::MsgFleetParameters::MsgFleetParameters(const Sector::FleetParamete
     base_fleet_speed = fleet_parameters.base_fleet_speed;
     current_hp = fleet_parameters.current_hp;
     max_hp = fleet_parameters.max_hp;
+    current_shields = fleet_parameters.current_shields;
+    max_shields = fleet_parameters.max_shields;
+    average_energy = fleet_parameters.average_energy;
 }

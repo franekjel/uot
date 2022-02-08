@@ -153,9 +153,13 @@ struct MsgFleetParameters
     float base_fleet_speed;
     float current_hp;
     float max_hp;
+    float current_shields;
+    float max_shields;
+    float average_energy;
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleetParameters, new_fleet, id, position, soldiers, civilians, human_capacity,
-                                   construction_points, base_fleet_speed, current_hp, max_hp)
+                                   construction_points, base_fleet_speed, current_hp, max_hp, current_shields,
+                                   max_shields, average_energy)
     MsgFleetParameters();
     MsgFleetParameters(const Sector::FleetParameters& fleet_parameters, bool new_fleet_);
 };
