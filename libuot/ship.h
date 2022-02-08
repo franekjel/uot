@@ -32,19 +32,19 @@ struct ShipHull
     };
 
     ShipHull(const int sides_size, const int inside_size, const std::map<Resource, float>& cost,
-             const std::map<Resource, float>& additional_upkeep, const float hp, const float engines_power,
+             const std::map<Resource, float>& additional_upkeep, const float hp, const float speed,
              const float engines_energy_consumtion, const float crew, const float worker_weeks_cost,
              const float warp_drive_energy);
 };
 
 const std::map<ShipHull::Type, ShipHull> ShipHulls{
-    {ShipHull::SmallShipHull, ShipHull(4, 4, {{Resource::Metals, 50.0f}}, {{Resource::Antimatter, 0.5f}}, 80.0f, 0.1f,
+    {ShipHull::SmallShipHull, ShipHull(4, 4, {{Resource::Metals, 50.0f}}, {{Resource::Antimatter, 0.5f}}, 80.0f, 0.04f,
                                        1.0f, 0.1f, 60.0f, 15.0f)},
     {ShipHull::MediumShipHull, ShipHull(12, 12, {{Resource::Metals, 100.0f}, {Resource::RareMetals, 20.0f}},
-                                        {{Resource::Antimatter, 1.2f}}, 250.0f, 0.08f, 2.5f, 0.25f, 120.0f, 40.0f)},
+                                        {{Resource::Antimatter, 1.2f}}, 250.0f, 0.03f, 2.5f, 0.25f, 120.0f, 40.0f)},
     {ShipHull::GrandShipHull,
      ShipHull(36, 36, {{Resource::Metals, 200.0f}, {Resource::RareMetals, 40.0f}, {Resource::Polymers, 20.0f}},
-              {{Resource::Antimatter, 2.5f}}, 700.0f, 0.07f, 4.0f, 0.5f, 250.0f, 80.0f)}
+              {{Resource::Antimatter, 2.5f}}, 700.0f, 0.02f, 4.0f, 0.5f, 250.0f, 80.0f)}
 
 };
 
@@ -148,4 +148,12 @@ struct Fleet
 
     void MoveFleet();
     void JumpFleet();
+
+    // client only fields
+    float current_hp;
+    float max_hp;
+    float current_shields;
+    float max_shields;
+    float average_energy;
+    Point movement_vec;
 };

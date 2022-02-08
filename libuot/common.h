@@ -44,7 +44,7 @@ struct Point
         return *this;
     }
 
-    inline Point normalized();
+    inline Point normalized() const;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(Point, x, y)
 };
 
@@ -66,4 +66,7 @@ inline Point operator*(Point lhs, const float rhs)
     return lhs;
 }
 
-inline Point Point::normalized() { return (*this) * (1 / sqrt(squaredLength())); }
+inline Point Point::normalized() const { return (*this) * (1 / sqrt(squaredLength())); }
+
+static constexpr int WEEK_LENGTH = 2;
+static constexpr int turn_time_ms = 300;

@@ -2,8 +2,8 @@
 #include <array>
 #include <iostream>
 
-#include "../libuot/msg/messagetypes.h"
 #include "game_state.h"
+#include "msg/messagetypes.h"
 #include "msg_queue.h"
 
 void uot_net_client::connect_to_server() { run(); }
@@ -180,7 +180,7 @@ void uot_net_client::handle_message(const std::string& data)
                             }
 
                             _planet->possible_buildings = planet.possible_buildings;
-                            planets_map.insert(std::pair<int, std::shared_ptr<Planet>>(planet.id, _planet));
+                            planets_map.insert(std::pair<int, std::shared_ptr<Planet>>(_planet->id, _planet));
                             sectors_vec[j]->objects.insert({_planet->id, _planet});
                         }
                     }
@@ -237,6 +237,7 @@ void uot_net_client::handle_message(const std::string& data)
 
             auto state = context.getGameState();
             state.value->player = player_ptr;
+            state.value->planets = planets_map;
         }
         break;
 
@@ -253,6 +254,7 @@ void uot_net_client::handle_message(const std::string& data)
             const auto& resource_data = payload_newturn->updated_resources;
             const auto& sector_updates = payload_newturn->watched_sectors_updates;
             const auto& tech_data = payload_newturn->technology_updates;
+            const auto& new_ships = payload_newturn->new_ships;
             auto state = context.getGameState();
             if (state.value->player != nullptr)
             {
@@ -305,24 +307,49 @@ void uot_net_client::handle_message(const std::string& data)
                     state.value->player->researched_technology.progress_left = (float)tech.days_remaining;
                 }
 
+                for (const auto& s : new_ships)
+                {
+                    std::shared_ptr<Ship> ship =
+                        Ship::ShipFromDesign(s.id, state.value->player->ship_designs.at(s.design_id));
+
+                    std::shared_ptr<Fleet> fleet;
+                    if (s.fleet_parameters.new_fleet)
+                    {
+                        auto sector = state.value->player->known_galaxy->sectors.at(
+                            state.value->planets.at(s.planet_id)->sector_id);
+                        const auto& p = s.fleet_parameters;
+                        fleet = std::make_shared<Fleet>(p.id, sector, p.position, state.value->player->id);
+                        state.value->player->owned_fleets.insert({fleet->id, fleet});
+                        sector->present_fleets.insert({fleet->id, fleet});
+                    }
+                    else
+                    {
+                        fleet = state.value->player->owned_fleets.at(s.fleet_parameters.id);
+                    }
+                    fleet->ships.emplace_back(ship);
+
+                    updateFleet(fleet, s.fleet_parameters);
+                }
+
                 for (const auto& u : sector_updates)
                 {
                     auto s = state.value->player->known_galaxy->sectors[u.sector_id];
                     for (const auto& fu : u.fleets)
                     {
-                        auto f = s->present_fleets.find(fu.id);
-                        if (f != s->present_fleets.end())
-                        {
-                            f->second->position = fu.position;
-                        }
+                        auto& f = s->present_fleets.at(fu.id);
+                        f->position = fu.position;
+
+                        const Point vec =
+                            std::isnan(f->wanted_position.x) ? Point{0, 0} : f->wanted_position - f->position;
+                        Point v;
+                        if (vec.squaredLength() > (f->fleet_speed_per_turn * f->fleet_speed_per_turn))
+                            v = vec.normalized() * f->fleet_speed_per_turn;
                         else
-                        {
-                            Fleet* fleet = new Fleet;
-                            fleet->id = fu.id;
-                            s->present_fleets.insert({fu.id, std::shared_ptr<Fleet>(fleet)});
-                        }
+                            v = vec * f->fleet_speed_per_turn;
+                        f->movement_vec = v;
                     }
                 }
+                context.gui->last_turn_time = std::chrono::steady_clock::now();
                 send_payload();
             }
         }
@@ -339,4 +366,19 @@ void uot_net_client::send_payload()
     message_to_send.value->reset();
 
     txrx.send_reliable(msg_str);
+}
+
+void uot_net_client::updateFleet(const std::shared_ptr<Fleet> f, const messageTypes::MsgFleetParameters p)
+{
+    f->position = p.position;
+    f->soldiers = p.soldiers;
+    f->civilians = p.civilians;
+    f->human_capacity = p.human_capacity;
+    f->construction_points = p.construction_points;
+    f->fleet_speed_per_turn = p.base_fleet_speed;
+    f->current_hp = p.current_hp;
+    f->max_hp = p.max_hp;
+    f->current_shields = p.current_shields;
+    f->max_shields = p.max_shields;
+    f->average_energy = p.average_energy;
 }

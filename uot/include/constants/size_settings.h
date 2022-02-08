@@ -65,6 +65,10 @@ struct tech_area : area_properties<1080, 680, 35, 60>
 {
 };
 
+struct fleet_info_area : area_properties<350, 250, 1225, 150>
+{
+};
+
 }  // namespace size_settings
 
 #endif

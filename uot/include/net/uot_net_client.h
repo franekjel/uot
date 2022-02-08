@@ -1,10 +1,9 @@
-#ifndef UOT_NET_CLIENT_H
-#define UOT_NET_CLIENT_H
+#pragma once
 #include <string>
 #include <thread>
 #include "buildings.h"
 #include "client_context.h"
-#include "msg/messagetypes.h"
+#include "msg/messagestructs.h"
 #include "net/client_txrx.h"
 
 struct uot_net_client : net_client
@@ -28,6 +27,5 @@ struct uot_net_client : net_client
     void handle_message(const std::string& data) override;
 
     void send_payload();
+    void updateFleet(const std::shared_ptr<Fleet> f, const messageTypes::MsgFleetParameters p);
 };
-
-#endif  // UOT_NET_CLIENT_H
