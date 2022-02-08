@@ -62,6 +62,8 @@ Sector::FleetParameters::FleetParameters(std::shared_ptr<Fleet> fleet)
     civilians = fleet->civilians;
     human_capacity = fleet->human_capacity;
     construction_points = fleet->construction_points;
+    current_hp = 0.0f;
+    max_hp = 0.0f;
 
     if (fleet->ships.size() == 0)
     {
@@ -73,7 +75,11 @@ Sector::FleetParameters::FleetParameters(std::shared_ptr<Fleet> fleet)
         for (const auto& ship : fleet->ships)
         {
             if (ship->speed < base_fleet_speed)
+            {
                 base_fleet_speed = ship->speed;
+                current_hp += ship->hp;
+                max_hp += ship->max_hp;
+            }
         }
     }
 }

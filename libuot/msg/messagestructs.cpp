@@ -269,4 +269,6 @@ messageTypes::MsgFleetParameters::MsgFleetParameters(const Sector::FleetParamete
     human_capacity = fleet_parameters.human_capacity;
     construction_points = fleet_parameters.construction_points;
     base_fleet_speed = fleet_parameters.base_fleet_speed;
+    current_hp = fleet_parameters.current_hp;
+    max_hp = fleet_parameters.max_hp;
 }

@@ -151,9 +151,11 @@ struct MsgFleetParameters
     float human_capacity;
     float construction_points;
     float base_fleet_speed;
+    float current_hp;
+    float max_hp;
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleetParameters, new_fleet, id, position, soldiers, civilians, human_capacity,
-                                   construction_points, base_fleet_speed)
+                                   construction_points, base_fleet_speed, current_hp, max_hp)
     MsgFleetParameters();
     MsgFleetParameters(const Sector::FleetParameters& fleet_parameters, bool new_fleet_);
 };
@@ -177,7 +179,7 @@ struct MsgNewShip
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgNewShip, id, design_id, planet_id, fleet_parameters);
     MsgNewShip();
     MsgNewShip(unsigned int design_id_, unsigned int planet_id_, bool new_fleet, unsigned int ship_id_,
-                   const Sector::FleetParameters& fleet_parameters_);
+               const Sector::FleetParameters& fleet_parameters_);
 };
 
 struct MsgTechnologyUpdate
