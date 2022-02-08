@@ -104,7 +104,7 @@ struct MsgGalaxy
 struct MsgShipDesign
 {
     unsigned int id;
-    bool delete_design;  // mo¿liwoœæ usuniêcia designu, w oczywisty sposób podaj¹c istniej¹ce id mo¿na te¿ nadpisywaæ
+    bool delete_design;  // moÅ¼liwoÅ›Ä‡ usuniÄ™cia designu, w oczywisty sposÃ³b podajÄ…c istniejÄ…ce id moÅ¼na teÅ¼ nadpisywaÄ‡
                          // designy
     std::string name;
     ShipHull::Type hull_type;
