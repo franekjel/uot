@@ -365,14 +365,42 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
     for (const auto& [fleet_id, fleet] : player->owned_fleets)
     {
         fleet->UpdateFleet();
+        auto fleet_position = fleet->position;
 
-        for (const auto& [other_fleet_id, other_fleet] : fleet->location_sector->present_fleets)
+        for (auto& [weapon_type, atacks] : fleet->fleet_weapons)
         {
-            if (other_fleet_id != fleet_id && other_fleet->owner_id != fleet->owner_id)
+            std::vector<std::shared_ptr<Fleet>> in_distance = {};
+            int fleet_values_sum = 0;
+            if (!Modules.at(weapon_type).weapon.has_value())
+                continue;
+            auto weapon = Modules.at(weapon_type).weapon.value();
+            for (const auto& [other_fleet_id, other_fleet] : fleet->location_sector->present_fleets)
             {
-                for (const auto& [type, count] :
-                     fleet->GetDamageDeal(((other_fleet->position - fleet->position).squaredLength())))
-                    other_fleet->gained_damage[type] += count;
+                if (other_fleet_id != fleet_id && other_fleet->owner_id != fleet->owner_id &&
+                    (other_fleet->position - fleet_position).squaredLength() <= weapon.range)
+                {
+                    in_distance.push_back(other_fleet);
+                    fleet_values_sum += other_fleet->fleet_value;
+                }
+            }
+
+            for (const auto& other_fleet : in_distance)
+            {
+                int number_of_shots = std::min(
+                    static_cast<int>(std::roundf(other_fleet->fleet_value / static_cast<float>(fleet_values_sum))),
+                    atacks.second);
+
+                other_fleet->gained_damage[weapon.special_features] += number_of_shots * weapon.damage;
+
+                atacks.second -= number_of_shots;
+            }
+
+            if (atacks.second > 0 && in_distance.size() > 0)
+            {
+                const auto& other_fleet = in_distance[in_distance.size() - 1];
+                int number_of_shots = atacks.second;
+                other_fleet->gained_damage[weapon.special_features] += number_of_shots * weapon.damage;
+                atacks.second -= number_of_shots;
             }
         }
     }

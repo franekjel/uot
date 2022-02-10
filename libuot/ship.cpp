@@ -3,7 +3,7 @@
 ShipHull::ShipHull(const int sides_size, const int inside_size, const std::map<Resource, float> &cost,
                    const std::map<Resource, float> &additional_upkeep, const float hp, const float speed,
                    const float engines_energy_consumtion, const float crew, const float worker_weeks_cost,
-                   const float warp_drive_energy)
+                   const float warp_drive_energy, const int value)
     : sides_size(sides_size),
       inside_size(inside_size),
       cost(cost),
@@ -13,7 +13,8 @@ ShipHull::ShipHull(const int sides_size, const int inside_size, const std::map<R
       engines_energy_consumtion(engines_energy_consumtion),
       crew(crew),
       worker_weeks_cost(worker_weeks_cost),
-      warp_drive_energy(warp_drive_energy)
+      warp_drive_energy(warp_drive_energy),
+      value(value)
 {
 }
 
@@ -59,6 +60,7 @@ std::shared_ptr<Ship> Ship::ShipFromDesign(const int id, const std::shared_ptr<S
                 Weapon w = m.weapon.value();
                 w.attack_count = w.attack_count * count;
                 ship->weapons.push_back(w);
+                ship->ship_weapons[type] += w.attack_count * count;
             }
             if (type == ModuleType::NanobotsSelfRepairModule)
             {
@@ -70,6 +72,8 @@ std::shared_ptr<Ship> Ship::ShipFromDesign(const int id, const std::shared_ptr<S
     ship->max_hp += hull.hp;
     ship->engines_energy_consumtion = hull.engines_energy_consumtion;
     ship->speed = hull.speed;
+
+    ship->value = hull.value;
 
     ship->hp = ship->max_hp;
     ship->energy = ship->max_energy / 2.0f;
@@ -122,10 +126,6 @@ void Ship::RegenShip()
         shield += energy * shield_regen_energy_cost_reverse;
         energy = 0.0f;
     }
-    for (auto &weapon : weapons)
-    {
-        weapon.atacks_left = weapon.attack_count;
-    }
 }
 
 void Fleet::UpdateFleet()
@@ -154,9 +154,16 @@ void Fleet::UpdateFleet()
         return;
     }
 
+    fleet_value = 0;
     for (const auto &ship : ships)
     {
         ship->RegenShip();
+        fleet_value += ship->value;
+    }
+
+    for (auto &[type, amount] : fleet_weapons)
+    {
+        amount.second = amount.first;
     }
 
     MoveFleet();
@@ -192,28 +199,6 @@ void Fleet::UpdateFleetSpeed()
     }
 
     fleet_speed_per_turn = minimum_speed;
-}
-
-std::map<Weapon::SpecialFeatures, float> Fleet::GetDamageDeal(float distance)
-{
-    std::map<Weapon::SpecialFeatures, float> damage = {
-        {Weapon::SpecialFeatures::BypassShield, 0.0f},
-        {Weapon::SpecialFeatures::HPDamageBonus, 0.0f},
-        {Weapon::SpecialFeatures::None, 0.0f},
-        {Weapon::SpecialFeatures::ShieldDamageBonus, 0.0f},
-    };
-    for (const auto &ship : ships)
-    {
-        for (auto &weapon : ship->weapons)
-        {
-            if (weapon.range >= distance)
-            {
-                damage[weapon.special_features] += weapon.atacks_left * weapon.damage;
-                weapon.atacks_left = 0.0f;
-            }
-        }
-    }
-    return damage;
 }
 
 void Fleet::MoveFleet()
@@ -260,6 +245,7 @@ Fleet::Fleet(const unsigned int id, const std::shared_ptr<Sector> &location_sect
 {
     current_action = None;
     ships = {};
+    fleet_weapons = {};
     soldiers = 0.0f;
     civilians = 0.0f;
     human_capacity = 0.0f;
@@ -272,7 +258,13 @@ void Fleet::AddShipToFleet(const std::shared_ptr<Ship> &ship)
     civilians += ship->civilians;
     human_capacity += ship->human_capacity;
     construction_points += ship->construction_points;
+    fleet_value += ship->value;
     ships.push_back(ship);
+    for (const auto &[type, amount] : ship->ship_weapons)
+    {
+        fleet_weapons[type].first += amount;
+        fleet_weapons[type].second += amount;
+    }
 }
 
 void Fleet::CountDamage()
@@ -415,6 +407,13 @@ void Fleet::CountDamage()
                     soldiers -= sh->soldiers;
                     human_capacity -= sh->human_capacity;
                     construction_points -= sh->construction_points;
+
+                    fleet_value -= sh->value;
+
+                    for (const auto &[type, amount] : sh->ship_weapons)
+                    {
+                        fleet_weapons[type].first -= amount;
+                    }
 
                     location_sector->destroyed_ships.push_back({owner_id, sh->id});
 
