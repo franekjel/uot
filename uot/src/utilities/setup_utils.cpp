@@ -94,6 +94,22 @@ void loadMedia(client_context& context)
                                                                       context.r, colors_meta::user_color[i])};
     }
 
+    for (const auto& [t, m] : Modules)
+    {
+        if (!m.weapon.has_value())
+            continue;
+        const int r = m.weapon.value().range * (size_settings::play_area::height / 2);
+        const std::string svg = "<svg height='" + std::to_string(r * 2) + "' width='" + std::to_string(r * 2) +
+                                "'><circle cx='" + std::to_string(r) + "' cy='" + std::to_string(r) + "' r='" +
+                                std::to_string(r) +
+                                "' stroke='white' stroke-width='1' "
+                                "fill='none' /></svg>";
+        SDL_RWops* rw = SDL_RWFromConstMem(svg.c_str(), svg.size());
+        SDL_Surface* surface = IMG_Load_RW(rw, 1);
+        gr->circle_textures[t] = texture_t{r * 2, r * 2, sdl_utilities::load_texture_from_svg(svg, context.r)};
+        SDL_FreeSurface(surface);
+    }
+
     // load utility selection textures
     printf("Loading selection textures\n");
     gr->selectionTextures.resize(selection_meta::num_selection_textures);

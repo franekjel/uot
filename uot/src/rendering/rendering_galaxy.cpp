@@ -284,6 +284,7 @@ void rendering::render_fleet(const client_context& context, const std::shared_pt
 
     if (context.gui->current_fleet.has_value() && f == context.gui->current_fleet.value())
     {
+        render_fleet_weapon_ranges(context, v, f);
         render_selection_graphics(context, v, 32);
     }
 
@@ -349,4 +350,21 @@ void rendering::render_selected_fleet_info(const client_context& context)
     sdl_utilities::render_text(r.get(), gr->secondary_font, fleet_info, size_settings::context_area::width / 2,
                                fonts::main_font_size / 2 + 30 + gui->current_fleet_info_offset,
                                size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+}
+
+void rendering::render_fleet_weapon_ranges(const client_context& context, const Point pos,
+                                           const std::shared_ptr<Fleet> f)
+{
+    const auto& r = context.r;
+    const auto& gr = context.gr;
+    const auto x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * pos.x;
+    const auto y = size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * pos.y;
+
+    for (const auto& [t, c] : f->fleet_weapons)
+    {
+        const auto& tex = gr->circle_textures.at(t);
+        const SDL_Rect s{0, 0, tex.w, tex.h};
+        const SDL_Rect d{static_cast<int>(x - 0.5 * tex.w), static_cast<int>(y - 0.5 * tex.h), tex.w, tex.h};
+        SDL_RenderCopyEx(r.get(), tex.t.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
+    }
 }

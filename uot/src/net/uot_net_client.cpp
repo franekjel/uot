@@ -309,8 +309,8 @@ void uot_net_client::handle_message(const std::string& data)
 
                 for (const auto& s : new_ships)
                 {
-                    std::shared_ptr<Ship> ship =
-                        Ship::ShipFromDesign(s.id, state.value->player->ship_designs.at(s.design_id));
+                    const auto& design = state.value->player->ship_designs.at(s.design_id);
+                    std::shared_ptr<Ship> ship = Ship::ShipFromDesign(s.id, design);
 
                     std::shared_ptr<Fleet> fleet;
                     if (s.fleet_parameters.new_fleet)
@@ -327,6 +327,14 @@ void uot_net_client::handle_message(const std::string& data)
                         fleet = state.value->player->owned_fleets.at(s.fleet_parameters.id);
                     }
                     fleet->ships.emplace_back(ship);
+                    for (const auto& [t, c] : design->sides)
+                    {
+                        const auto& m = Modules.at(t);
+                        if (m.weapon.has_value())
+                        {
+                            fleet->fleet_weapons[t].first += c;
+                        }
+                    }
 
                     updateFleet(fleet, s.fleet_parameters);
                 }

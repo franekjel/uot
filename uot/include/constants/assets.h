@@ -59,6 +59,10 @@ constexpr int bd_h = 930;
 constexpr std::string_view portal{"assets/portal.png"};
 constexpr int port_w = 360;
 constexpr int port_h = 600;
+constexpr std::string_view weapon_range_circle{"assets/circle.png"};
+constexpr int circle_w = 128;
+constexpr int circle_h = 128;
+
 }  // namespace selection_meta
 
 namespace generation_meta
