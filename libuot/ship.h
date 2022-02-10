@@ -23,7 +23,7 @@ struct ShipHull
     float crew;  // people needed to crew
     float worker_weeks_cost;
     float warp_drive_energy;  // energy need to warp
-    int value;
+    int ship_aggro;
 
     enum Type
     {
@@ -35,7 +35,7 @@ struct ShipHull
     ShipHull(const int sides_size, const int inside_size, const std::map<Resource, float>& cost,
              const std::map<Resource, float>& additional_upkeep, const float hp, const float speed,
              const float engines_energy_consumtion, const float crew, const float worker_weeks_cost,
-             const float warp_drive_energy, const int value);
+             const float warp_drive_energy, const int ship_aggro);
 };
 
 const std::map<ShipHull::Type, ShipHull> ShipHulls{
@@ -88,8 +88,7 @@ struct Ship
     float construction_points;
     float warp_drive_charge = 0.0f;
     float full_warp_drive_charge = 100.0f;
-    int value = 0;
-    std::vector<Weapon> weapons;
+    int ship_aggro = 0;
     std::shared_ptr<ShipDesign> design;
     std::shared_ptr<Fleet> fleet;
 
@@ -121,7 +120,7 @@ struct Fleet
     bool empty_fleet = false;  // if true then fleet needs to be deleted
     unsigned int owner_id;
 
-    int fleet_value;
+    int fleet_aggro;
     std::map<ModuleType, std::pair<int, int>> fleet_weapons;
 
     std::shared_ptr<InhabitableObject> base_building_object;

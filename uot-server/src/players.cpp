@@ -380,14 +380,14 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
                     (other_fleet->position - fleet_position).squaredLength() <= weapon.range)
                 {
                     in_distance.push_back(other_fleet);
-                    fleet_values_sum += other_fleet->fleet_value;
+                    fleet_values_sum += other_fleet->fleet_aggro;
                 }
             }
 
             for (const auto& other_fleet : in_distance)
             {
                 int number_of_shots = std::min(
-                    static_cast<int>(std::roundf(other_fleet->fleet_value / static_cast<float>(fleet_values_sum))),
+                    static_cast<int>(std::roundf(other_fleet->fleet_aggro / static_cast<float>(fleet_values_sum))),
                     atacks.second);
 
                 other_fleet->gained_damage[weapon.special_features] += number_of_shots * weapon.damage;
