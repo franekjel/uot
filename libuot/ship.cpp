@@ -267,8 +267,6 @@ void Fleet::AddShipToFleet(const std::shared_ptr<Ship> &ship)
 
 void Fleet::CountDamage()
 {
-    int size = ships.size();
-
     float damage_to_deal;
     float damage_left_to_deal;
 
@@ -337,7 +335,6 @@ void Fleet::CountDamage()
             counting_damage(ship, Weapon::SpecialFeatures::None);
             counting_damage(ship, Weapon::SpecialFeatures::HPDamageBonus);
             counting_damage(ship, Weapon::SpecialFeatures::BypassShield);
-            size--;
         }
 
         while (ship_was_destroyed)
