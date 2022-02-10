@@ -212,7 +212,8 @@ struct MsgFleet
     unsigned int id;
     unsigned int player_id;  // owner
     Point position;
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleet, id, player_id, position)
+    Point predicted_position;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleet, id, player_id, position, predicted_position)
     MsgFleet();
     MsgFleet(const std::shared_ptr<Fleet>& fleet, unsigned int player_id_);
 };

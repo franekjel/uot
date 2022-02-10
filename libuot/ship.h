@@ -23,6 +23,7 @@ struct ShipHull
     float crew;  // people needed to crew
     float worker_weeks_cost;
     float warp_drive_energy;  // energy need to warp
+    int ship_aggro;
 
     enum Type
     {
@@ -34,17 +35,17 @@ struct ShipHull
     ShipHull(const int sides_size, const int inside_size, const std::map<Resource, float>& cost,
              const std::map<Resource, float>& additional_upkeep, const float hp, const float speed,
              const float engines_energy_consumtion, const float crew, const float worker_weeks_cost,
-             const float warp_drive_energy);
+             const float warp_drive_energy, const int ship_aggro);
 };
 
 const std::map<ShipHull::Type, ShipHull> ShipHulls{
     {ShipHull::SmallShipHull, ShipHull(4, 4, {{Resource::Metals, 50.0f}}, {{Resource::Antimatter, 0.5f}}, 80.0f, 0.04f,
-                                       1.0f, 0.1f, 60.0f, 15.0f)},
+                                       1.0f, 0.1f, 60.0f, 15.0f, 1)},
     {ShipHull::MediumShipHull, ShipHull(12, 12, {{Resource::Metals, 100.0f}, {Resource::RareMetals, 20.0f}},
-                                        {{Resource::Antimatter, 1.2f}}, 250.0f, 0.03f, 2.5f, 0.25f, 120.0f, 40.0f)},
+                                        {{Resource::Antimatter, 1.2f}}, 250.0f, 0.03f, 2.5f, 0.25f, 120.0f, 40.0f, 2)},
     {ShipHull::GrandShipHull,
      ShipHull(36, 36, {{Resource::Metals, 200.0f}, {Resource::RareMetals, 40.0f}, {Resource::Polymers, 20.0f}},
-              {{Resource::Antimatter, 2.5f}}, 700.0f, 0.02f, 4.0f, 0.5f, 250.0f, 80.0f)}
+              {{Resource::Antimatter, 2.5f}}, 700.0f, 0.02f, 4.0f, 0.5f, 250.0f, 80.0f, 4)}
 
 };
 
@@ -87,9 +88,11 @@ struct Ship
     float construction_points;
     float warp_drive_charge = 0.0f;
     float full_warp_drive_charge = 100.0f;
-    std::vector<Weapon> weapons;
+    int ship_aggro = 0;
     std::shared_ptr<ShipDesign> design;
     std::shared_ptr<Fleet> fleet;
+
+    std::map<ModuleType, int> ship_weapons;
 
     static std::shared_ptr<Ship> ShipFromDesign(const int id, const std::shared_ptr<ShipDesign> design);
 
@@ -117,10 +120,20 @@ struct Fleet
     bool empty_fleet = false;  // if true then fleet needs to be deleted
     unsigned int owner_id;
 
+    int fleet_aggro;
+    std::map<ModuleType, std::pair<int, int>> fleet_weapons;
+
     std::shared_ptr<InhabitableObject> base_building_object;
     std::shared_ptr<Planet> colony_building_object;
     float building_progress;
     float full_building_progress;
+
+    std::map<Weapon::SpecialFeatures, float> gained_damage = {
+        {Weapon::SpecialFeatures::BypassShield, 0.0f},
+        {Weapon::SpecialFeatures::HPDamageBonus, 0.0f},
+        {Weapon::SpecialFeatures::None, 0.0f},
+        {Weapon::SpecialFeatures::ShieldDamageBonus, 0.0f},
+    };
 
     static constexpr float kNearValue = 0.01f;
     static constexpr float kColonizationCost = 10.0f;
@@ -145,6 +158,10 @@ struct Fleet
     void UpdateFleetSpeed();
 
     void AddShipToFleet(const std::shared_ptr<Ship>& ship);
+
+    std::map<Resource, float> GetUpkeepCost();
+
+    void CountDamage();
 
     void MoveFleet();
     void JumpFleet();

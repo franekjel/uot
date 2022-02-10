@@ -148,6 +148,20 @@ messageTypes::MsgFleet::MsgFleet(const std::shared_ptr<Fleet>& fleet, unsigned i
 {
     id = fleet->id;
     position = fleet->position;
+    if (std::isnan(fleet->wanted_position.x) || fleet->fleet_speed_per_turn <= 0.0f)
+    {
+        predicted_position = fleet->position;
+    }
+    else
+    {
+        auto movement_vec = fleet->wanted_position - fleet->position;
+        float movement_length = std::sqrt(movement_vec.squaredLength());
+        if (movement_length > fleet->fleet_speed_per_turn)
+        {
+            movement_vec *= fleet->fleet_speed_per_turn / movement_length;
+        }
+        predicted_position = position + movement_vec;
+    }
 }
 
 messageTypes::MsgFleetsJoin::MsgFleetsJoin() {}

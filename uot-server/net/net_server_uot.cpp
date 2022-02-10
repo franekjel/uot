@@ -202,6 +202,19 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
                     payload.jumped_fleets.push_back(messageTypes::MsgFleetsJump(jumped_fleet));
             }
 
+            for (const auto& fleet_in_fight : sector->fleets_in_fight)
+            {
+                if (fleet_in_fight->owner_id == player->id)
+                    payload.fleets_in_fight.push_back(
+                        messageTypes::MsgFleetParameters(Sector::FleetParameters(fleet_in_fight), false));
+            }
+
+            for (const auto& destroyed_ship : sector->destroyed_ships)
+            {
+                if (destroyed_ship.owner == player->id)
+                    payload.destroyed_ships.push_back(destroyed_ship.ship_id);
+            }
+
             payload.watched_sectors_updates.push_back(sector_update_msg);
         }
     }

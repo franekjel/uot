@@ -224,9 +224,12 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
     for (auto& [id, sector] : galaxy->sectors)
     {
         sector->joined_fleets.clear();
+        sector->jumped_fleets.clear();
         sector->new_watchers.clear();
         sector->new_bases.clear();
         sector->new_colonies.clear();
+        sector->fleets_in_fight.clear();
+        sector->destroyed_ships.clear();
     }
 }
 
@@ -346,6 +349,9 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
 
     for (const auto& [fleet_id, fleet] : player_fleets)
     {
+        for (const auto& [resource, count] : fleet->GetUpkeepCost())
+            player->owned_resources[resource] -= count;
+
         if (fleet->current_action == Fleet::Action::BuildAsteroidMine ||
             fleet->current_action == Fleet::Action::Colonize)
         {
@@ -356,9 +362,47 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
 
 void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
 {
-    for (const auto& fleet : player->owned_fleets)
+    for (const auto& [fleet_id, fleet] : player->owned_fleets)
     {
-        fleet.second->UpdateFleet();
+        fleet->UpdateFleet();
+        auto fleet_position = fleet->position;
+
+        for (auto& [weapon_type, atacks] : fleet->fleet_weapons)
+        {
+            std::vector<std::shared_ptr<Fleet>> in_distance = {};
+            int fleet_values_sum = 0;
+            if (!Modules.at(weapon_type).weapon.has_value())
+                continue;
+            auto weapon = Modules.at(weapon_type).weapon.value();
+            for (const auto& [other_fleet_id, other_fleet] : fleet->location_sector->present_fleets)
+            {
+                if (other_fleet_id != fleet_id && other_fleet->owner_id != fleet->owner_id &&
+                    (other_fleet->position - fleet_position).squaredLength() <= weapon.range)
+                {
+                    in_distance.push_back(other_fleet);
+                    fleet_values_sum += other_fleet->fleet_aggro;
+                }
+            }
+
+            for (const auto& other_fleet : in_distance)
+            {
+                int number_of_shots = std::min(
+                    static_cast<int>(std::roundf(other_fleet->fleet_aggro / static_cast<float>(fleet_values_sum))),
+                    atacks.second);
+
+                other_fleet->gained_damage[weapon.special_features] += number_of_shots * weapon.damage;
+
+                atacks.second -= number_of_shots;
+            }
+
+            if (atacks.second > 0 && in_distance.size() > 0)
+            {
+                const auto& other_fleet = in_distance[in_distance.size() - 1];
+                int number_of_shots = atacks.second;
+                other_fleet->gained_damage[weapon.special_features] += number_of_shots * weapon.damage;
+                atacks.second -= number_of_shots;
+            }
+        }
     }
 }
 
@@ -375,4 +419,22 @@ void PlayersList::CountEveryTurnNumbers()
 
     for (auto& player : players)
         CountEveryTurnNumbersPlayer(player.second);
+
+    for (auto& [player_id, player] : players)
+    {
+        std::vector<unsigned int> fleets_to_remove = {};
+        for (const auto& [fleet_id, fleet] : player->owned_fleets)
+        {
+            fleet->CountDamage();
+            if (fleet->empty_fleet)
+                fleets_to_remove.push_back(fleet_id);
+        }
+
+        for (const auto& id : fleets_to_remove)
+        {
+            player->owned_fleets[id]->location_sector->present_fleets.erase(id);
+            player->owned_fleets[id]->location_sector->DecrementWatcher(player_id);
+            player->owned_fleets.erase(id);
+        }
+    }
 }

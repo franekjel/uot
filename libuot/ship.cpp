@@ -3,7 +3,7 @@
 ShipHull::ShipHull(const int sides_size, const int inside_size, const std::map<Resource, float> &cost,
                    const std::map<Resource, float> &additional_upkeep, const float hp, const float speed,
                    const float engines_energy_consumtion, const float crew, const float worker_weeks_cost,
-                   const float warp_drive_energy)
+                   const float warp_drive_energy, const int ship_aggro)
     : sides_size(sides_size),
       inside_size(inside_size),
       cost(cost),
@@ -13,7 +13,8 @@ ShipHull::ShipHull(const int sides_size, const int inside_size, const std::map<R
       engines_energy_consumtion(engines_energy_consumtion),
       crew(crew),
       worker_weeks_cost(worker_weeks_cost),
-      warp_drive_energy(warp_drive_energy)
+      warp_drive_energy(warp_drive_energy),
+      ship_aggro(ship_aggro)
 {
 }
 
@@ -57,8 +58,7 @@ std::shared_ptr<Ship> Ship::ShipFromDesign(const int id, const std::shared_ptr<S
             if (m.weapon.has_value())
             {
                 Weapon w = m.weapon.value();
-                w.attack_count = w.attack_count * count;
-                ship->weapons.push_back(w);
+                ship->ship_weapons[type] += w.attack_count * count;
             }
             if (type == ModuleType::NanobotsSelfRepairModule)
             {
@@ -70,6 +70,8 @@ std::shared_ptr<Ship> Ship::ShipFromDesign(const int id, const std::shared_ptr<S
     ship->max_hp += hull.hp;
     ship->engines_energy_consumtion = hull.engines_energy_consumtion;
     ship->speed = hull.speed;
+
+    ship->ship_aggro = hull.ship_aggro;
 
     ship->hp = ship->max_hp;
     ship->energy = ship->max_energy / 2.0f;
@@ -150,9 +152,16 @@ void Fleet::UpdateFleet()
         return;
     }
 
+    fleet_aggro = 0;
     for (const auto &ship : ships)
     {
         ship->RegenShip();
+        fleet_aggro += ship->ship_aggro;
+    }
+
+    for (auto &[type, amount] : fleet_weapons)
+    {
+        amount.second = amount.first;
     }
 
     MoveFleet();
@@ -234,6 +243,7 @@ Fleet::Fleet(const unsigned int id, const std::shared_ptr<Sector> &location_sect
 {
     current_action = None;
     ships = {};
+    fleet_weapons = {};
     soldiers = 0.0f;
     civilians = 0.0f;
     human_capacity = 0.0f;
@@ -246,5 +256,136 @@ void Fleet::AddShipToFleet(const std::shared_ptr<Ship> &ship)
     civilians += ship->civilians;
     human_capacity += ship->human_capacity;
     construction_points += ship->construction_points;
+    fleet_aggro += ship->ship_aggro;
     ships.push_back(ship);
+    for (const auto &[type, amount] : ship->ship_weapons)
+    {
+        fleet_weapons[type].first += amount;
+        fleet_weapons[type].second += amount;
+    }
+}
+
+void Fleet::CountDamage()
+{
+    float damage_to_deal;
+    float damage_left_to_deal;
+
+    bool ship_was_destroyed = false;
+
+    float damage_sum = 0.0f;
+
+    for (const auto &[dmg_type, dmg] : gained_damage)
+    {
+        damage_sum += dmg;
+    }
+
+    if (damage_sum > 0.0f)
+    {
+        location_sector->fleets_in_fight.push_back(location_sector->present_fleets[id]);
+    }
+
+    auto counting_damage = [&](std::shared_ptr<Ship> ship, Weapon::SpecialFeatures type)
+    {
+        if (gained_damage[type] <= 0.0f)
+            return;
+
+        damage_to_deal = gained_damage[type] / (ship->ship_aggro / (float)fleet_aggro);
+        damage_left_to_deal = damage_to_deal;
+        if (type != Weapon::SpecialFeatures::BypassShield)
+        {
+            if (type == Weapon::SpecialFeatures::ShieldDamageBonus)
+                ship->shield -= damage_left_to_deal * Weapon::bonus_damage;
+            else
+                ship->shield -= damage_left_to_deal;
+            damage_left_to_deal = 0.0f;
+            if (ship->shield < 0.0f)
+            {
+                if (type == Weapon::SpecialFeatures::ShieldDamageBonus)
+                    damage_left_to_deal = -(ship->shield / Weapon::bonus_damage);
+                else
+                    damage_left_to_deal = -(ship->shield);
+                ship->shield = 0.0f;
+            }
+        }
+        if (damage_left_to_deal > 0.0f)
+        {
+            if (type == Weapon::SpecialFeatures::HPDamageBonus)
+                ship->hp -= damage_left_to_deal * Weapon::bonus_damage;
+            else
+                ship->hp -= damage_left_to_deal;
+            damage_left_to_deal = 0.0f;
+            if (ship->hp <= 0.0f)
+            {
+                if (type == Weapon::SpecialFeatures::HPDamageBonus)
+                    damage_left_to_deal = -(ship->hp / Weapon::bonus_damage);
+                else
+                    damage_left_to_deal = -(ship->hp);
+                ship->hp = 0.0f;
+                ship_was_destroyed = true;
+            }
+        }
+        gained_damage[type] -= damage_to_deal - damage_left_to_deal;
+    };
+
+    while (damage_sum > 0.0f && !empty_fleet)
+    {
+        for (const auto &ship : ships)
+        {
+            counting_damage(ship, Weapon::SpecialFeatures::ShieldDamageBonus);
+            counting_damage(ship, Weapon::SpecialFeatures::None);
+            counting_damage(ship, Weapon::SpecialFeatures::HPDamageBonus);
+            counting_damage(ship, Weapon::SpecialFeatures::BypassShield);
+        }
+
+        while (ship_was_destroyed)
+        {
+            ship_was_destroyed = false;
+            auto itr = ships.begin();
+            while (itr != ships.end())
+            {
+                if ((*itr)->hp <= 0.0f)
+                {
+                    auto &sh = *itr;
+                    civilians -= sh->civilians;
+                    soldiers -= sh->soldiers;
+                    human_capacity -= sh->human_capacity;
+                    construction_points -= sh->construction_points;
+
+                    fleet_aggro -= sh->ship_aggro;
+
+                    for (const auto &[type, amount] : sh->ship_weapons)
+                    {
+                        fleet_weapons[type].first -= amount;
+                    }
+
+                    location_sector->destroyed_ships.push_back({owner_id, sh->id});
+
+                    ships.erase(itr);
+                    ship_was_destroyed = true;
+                    break;
+                }
+                itr++;
+            }
+        }
+
+        if (ships.begin() == ships.end())
+            empty_fleet = true;
+
+        damage_sum = 0.0f;
+
+        for (const auto &[dmg_type, dmg] : gained_damage)
+        {
+            damage_sum += dmg;
+        }
+    }
+}
+
+std::map<Resource, float> Fleet::GetUpkeepCost()
+{
+    std::map<Resource, float> cost;
+    for (const auto &ship : ships)
+    {
+        cost += ship->design->upkeep;
+    }
+    return cost;
 }

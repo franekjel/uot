@@ -15,6 +15,8 @@ struct Weapon
     float damage;
     float range;
 
+    static constexpr float bonus_damage = 1.5f;
+
     enum SpecialFeatures
     {
         None = 0,

@@ -188,9 +188,21 @@ void Player::HandleWarpLoadingFleetRequest(int fleet_id)
 {
     if (owned_fleets.count(fleet_id) < 1)
         return;
-    if (owned_fleets[fleet_id]->current_action != Fleet::Action::None)
+    auto &current_fleet = owned_fleets[fleet_id];
+
+    if (current_fleet->current_action != Fleet::Action::None)
         return;
-    if (std::abs(owned_fleets[fleet_id]->position.squaredLength() - 1.0f) > Fleet::kNearValue)
+
+    auto &this_sector = current_fleet->location_sector;
+    bool is_near_warp_point = false;
+    for (const auto &neigh : this_sector->neighbors)
+    {
+        is_near_warp_point |=
+            ((neigh->position - this_sector->position).normalized() - current_fleet->position).squaredLength() <=
+            Fleet::kNearValue;
+    }
+
+    if (!is_near_warp_point)
         return;
     owned_fleets[fleet_id]->current_action = Fleet::Action::WarpLoading;
 }
