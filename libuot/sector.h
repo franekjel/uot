@@ -144,6 +144,12 @@ struct Sector
         float population;
     };
 
+    struct DestroyedShip
+    {
+        unsigned int ship_id;
+        unsigned int owner;
+    };
+
     void DecrementWatcher(unsigned int player_id);
     void IncrementWatcher(unsigned int player_id);
     void JumpFleet(unsigned int fleet_id);
@@ -151,4 +157,6 @@ struct Sector
     std::vector<JumpedFleet> jumped_fleets;
     std::vector<NewBase> new_bases;
     std::vector<NewColony> new_colonies;
+    std::vector<std::shared_ptr<Fleet>> fleets_in_fight;
+    std::vector<DestroyedShip> destroyed_ships;
 };

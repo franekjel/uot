@@ -291,6 +291,11 @@ void Fleet::CountDamage()
         damage_sum += dmg;
     }
 
+    if (damage_sum > 0.0f)
+    {
+        location_sector->fleets_in_fight.push_back(location_sector->present_fleets[id]);
+    }
+
     while (damage_sum > 0.0f && !empty_fleet)
     {
         for (const auto &ship : ships)
@@ -411,11 +416,11 @@ void Fleet::CountDamage()
                     human_capacity -= sh->human_capacity;
                     construction_points -= sh->construction_points;
 
+                    location_sector->destroyed_ships.push_back({owner_id, sh->id});
+
                     ships.erase(itr);
                     ship_was_destroyed = true;
                     break;
-
-                    // PO tu sie niszczy stateczki
                 }
                 itr++;
             }

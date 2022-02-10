@@ -224,9 +224,12 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
     for (auto& [id, sector] : galaxy->sectors)
     {
         sector->joined_fleets.clear();
+        sector->jumped_fleets.clear();
         sector->new_watchers.clear();
         sector->new_bases.clear();
         sector->new_colonies.clear();
+        sector->fleets_in_fight.clear();
+        sector->destroyed_ships.clear();
     }
 }
 
@@ -399,13 +402,11 @@ void PlayersList::CountEveryTurnNumbers()
                 fleets_to_remove.push_back(fleet_id);
         }
 
-        
         for (const auto& id : fleets_to_remove)
         {
             player->owned_fleets[id]->location_sector->present_fleets.erase(id);
             player->owned_fleets[id]->location_sector->DecrementWatcher(player_id);
             player->owned_fleets.erase(id);
         }
-        
     }
 }
