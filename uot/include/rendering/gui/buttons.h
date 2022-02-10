@@ -52,6 +52,48 @@ inline constexpr button_position designer_pos{40, 40 + buttons_meta::button_heig
 
 inline constexpr button_position research_pos{40, size_settings::context_area::height * 3 / 4,
                                               size_settings::context_area::width - 80, buttons_meta::button_y_offset};
+
+inline constexpr int fleet_button_width {(size_settings::context_area::width - 80) / 2 + 25};
+inline constexpr int fleet_button_height {40};
+inline constexpr int fleet_button_margin {10};
+inline constexpr int fleet_button_y_offset {size_settings::context_area::height * 1 / 2};
+
+inline constexpr button_position fleet_1_1{10, fleet_button_y_offset,
+                                           fleet_button_width,
+                                           fleet_button_height};
+
+inline constexpr button_position fleet_1_2{10 + fleet_button_width + fleet_button_margin, fleet_button_y_offset,
+                                           fleet_button_width,
+                                           fleet_button_height};
+
+inline constexpr button_position fleet_2_1{10, fleet_button_y_offset + fleet_button_height + fleet_button_margin,
+                                           fleet_button_width,
+                                           fleet_button_height};
+
+inline constexpr button_position fleet_2_2{10 + fleet_button_width + fleet_button_margin, fleet_button_y_offset + fleet_button_height + fleet_button_margin,
+                                           fleet_button_width,
+                                           fleet_button_height};
+
+inline constexpr button_position fleet_3_1{10, fleet_button_y_offset + (fleet_button_height + fleet_button_margin) * 2,
+                                           fleet_button_width,
+                                           fleet_button_height};
+
+inline constexpr button_position fleet_3_2{10 + fleet_button_width + fleet_button_margin, fleet_button_y_offset + (fleet_button_height + fleet_button_margin) * 2,
+                                           fleet_button_width,
+                                           fleet_button_height};
+
+inline constexpr button_position fleet_4_1{10, fleet_button_y_offset + (fleet_button_height + fleet_button_margin) * 3,
+                                           fleet_button_width,
+                                           fleet_button_height};
+
+inline constexpr button_position fleet_4_2{10 + fleet_button_width + fleet_button_margin, fleet_button_y_offset + (fleet_button_height + fleet_button_margin) * 3,
+                                           fleet_button_width,
+                                           fleet_button_height};
+
+inline constexpr button_position fleet_5_1{10, fleet_button_y_offset + (fleet_button_height + fleet_button_margin) * 4,
+                                           fleet_button_width * 2 + fleet_button_margin,
+                                           fleet_button_height};
+
 }  // namespace bpos
 
 namespace rendering
@@ -139,6 +181,69 @@ struct designer_button : button<designer_button>
 using popup_button =
     std::variant<std::unique_ptr<start_button>, std::unique_ptr<exit_button>, std::unique_ptr<back_button>>;
 using navigation_button = std::variant<std::unique_ptr<technology_button>, std::unique_ptr<designer_button>>;
+struct jump_button : button<jump_button>
+{
+    jump_button() : button<jump_button>{6, std::string("JUMP"), bpos::fleet_1_1, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
+struct build_base_button : button<build_base_button>
+{
+    build_base_button() : button<build_base_button>{7, std::string("BUILD"), bpos::fleet_1_2, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
+struct colonize_button : button<colonize_button>
+{
+    colonize_button() : button<colonize_button>{8, std::string("COLONIZE"), bpos::fleet_2_1, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
+struct civil_on_button : button<civil_on_button>
+{
+    civil_on_button() : button<civil_on_button>{9, std::string("CIVILIANS ON"), bpos::fleet_2_2, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
+struct civil_off_button : button<civil_off_button>
+{
+    civil_off_button() : button<civil_off_button>{10, std::string("CIVILIANS OFF"), bpos::fleet_3_1, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
+struct soldier_on_button : button<soldier_on_button>
+{
+    soldier_on_button() : button<soldier_on_button>{11, std::string("SOLDIERS ON"), bpos::fleet_3_2, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
+struct soldier_off_button : button<soldier_off_button>
+{
+    soldier_off_button() : button<soldier_off_button>{12, std::string("SOLDIERS OFF"), bpos::fleet_4_1, bcol::basic}
+    {
+    }
+    void _clicked(client_context& context);
+};
+
+struct invade_button : button<invade_button>
+{
+    invade_button() : button<invade_button>{4, std::string("INVADE"), bpos::fleet_4_2, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
+struct fleet_cancel_button : button<fleet_cancel_button>
+{
+    fleet_cancel_button() : button<fleet_cancel_button>{4, std::string("CANCEL"), bpos::fleet_5_1, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
+using popup_button = std::variant<std::unique_ptr<start_button>, std::unique_ptr<exit_button>>;
+using navigation_button = std::variant<std::unique_ptr<technology_button>>;
 using tech_menu_button = std::variant<std::unique_ptr<research_button>, std::unique_ptr<abort_research_button>>;
+using fleet_button =
+    std::variant<std::unique_ptr<jump_button>, std::unique_ptr<build_base_button>, std::unique_ptr<colonize_button>,
+                 std::unique_ptr<civil_on_button>, std::unique_ptr<civil_off_button>,
+                 std::unique_ptr<soldier_on_button>, std::unique_ptr<soldier_off_button>,
+                 std::unique_ptr<invade_button>, std::unique_ptr<fleet_cancel_button>>;
 
 #endif  // BUTTONS_H

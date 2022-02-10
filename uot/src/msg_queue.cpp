@@ -28,6 +28,12 @@ void msg_queue::reset()
     actions.buildRequests.clear();
     actions.moveFleetRequests.clear();
     actions.technologyRequest = Technology::TechnologyType::Empty;
+    actions.fleetActionRequests.clear();
+}
+
+void msg_queue::request_fleet_jump(unsigned int fleet_id)
+{
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::WarpLoading);
 }
 
 void msg_queue::build_ship(const int design_id, const int planet_id)

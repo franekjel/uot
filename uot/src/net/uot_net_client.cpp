@@ -262,6 +262,7 @@ void uot_net_client::handle_message(const std::string& data)
             const auto& sector_updates = payload_newturn->watched_sectors_updates;
             const auto& tech_data = payload_newturn->technology_updates;
             const auto& new_ships = payload_newturn->new_ships;
+            const auto& fleet_jumps = payload_newturn->jumped_fleets;
             auto state = context.getGameState();
             if (state.value->player != nullptr)
             {
@@ -366,6 +367,13 @@ void uot_net_client::handle_message(const std::string& data)
                         f->movement_vec = v;
                     }
                 }
+
+                for (const auto& fj : fleet_jumps)
+                {
+                    state.value->player->owned_fleets.find(fj.fleet_id)->second->location_sector
+                        = state.value->player->known_galaxy->sectors.find(fj.sector_id_to)->second;
+                }
+
                 context.gui->last_turn_time = std::chrono::steady_clock::now();
                 send_payload();
             }

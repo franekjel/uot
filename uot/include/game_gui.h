@@ -31,6 +31,7 @@ struct game_gui
 
     std::vector<popup_button> popup_buttons;
     std::vector<navigation_button> navigation_menu_buttons;
+    std::vector<fleet_button> selected_fleet_buttons;
 
     std::optional<Technology::TechnologyType> hovered_tech;
     std::optional<Technology::TechnologyType> current_tech;
@@ -40,6 +41,11 @@ struct game_gui
     std::unordered_map<unsigned int, unsigned int> galaxy_stars_textures;
 
     int GetTextureIndex(std::shared_ptr<SectorObject> p);
+    std::optional<std::shared_ptr<TTF_Font>> button_font;
+    void set_button_font(std::shared_ptr<TTF_Font>& new_font) { button_font = new_font; }
+    void reset_button_font() { button_font.reset(); }
+    std::optional<int> button_border_width;
+    std::optional<button_color> button_color_override;
 
     game_gui() {}
 

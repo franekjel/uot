@@ -3,6 +3,7 @@
 #include "game_resources.h"
 #include "msg_queue.h"
 #include "sdl_utilities.h"
+#include "fleet_utils.h"
 
 namespace rendering
 {
@@ -13,7 +14,7 @@ void draw_button(client_context& context, const std::string& text, const button_
     auto& gr = context.gr;
     auto& gui = context.gui;
 
-    constexpr int offset = 4;
+    int offset = gui->button_border_width.has_value() ? gui->button_border_width.value() : 4;
     // paint frame
 
     const SDL_Color& f = focused ? scheme.f_fg : scheme.fg;
@@ -31,7 +32,8 @@ void draw_button(client_context& context, const std::string& text, const button_
     SDL_RenderFillRect(r.get(), &dest);
 
     const auto button_offset_x = dest.w;
-    sdl_utilities::render_text(r.get(), gr->main_font, text, dest.x + dest.w / 2, dest.y + dest.h / 2, dest.w * 0.8, f);
+    sdl_utilities::render_text(r.get(), gui->button_font.has_value() ? gui->button_font.value() : gr->main_font, text,
+                               dest.x + dest.w / 2, dest.y + dest.h / 2, dest.w * 0.8, f);
 }
 }  // namespace rendering
 
@@ -113,4 +115,54 @@ void abort_research_button::_clicked(client_context& context)
 {
     context.getActionQueue().value->request_research(Technology::TechnologyType::None);
     context.gui->current_tech.reset();
+}
+
+void jump_button::_clicked(client_context& context)
+{
+    std::cout << "Jump\n";
+    if (jump_neighbor(context) == nullptr)
+    {
+        std::cout << "No collision :(";
+    }
+    context.getActionQueue().value->request_fleet_jump(context.gui->current_fleet.value()->id);
+}
+
+void build_base_button::_clicked(client_context& context)
+{
+    std::cout << "Build base\n";
+}
+
+void colonize_button::_clicked(client_context& context)
+{
+    std::cout << "Colonize\n";
+}
+
+void civil_on_button::_clicked(client_context& context)
+{
+    std::cout << "Embark civilians\n";
+}
+
+void civil_off_button::_clicked(client_context& context)
+{
+    std::cout << "Throw away civilians\n";
+}
+
+void soldier_on_button::_clicked(client_context& context)
+{
+    std::cout << "Embark soldiers\n";
+}
+
+void soldier_off_button::_clicked(client_context& context)
+{
+    std::cout << "Throw away soldiers\n";
+}
+
+void invade_button::_clicked(client_context& context)
+{
+    std::cout << "Invade\n";
+}
+
+void fleet_cancel_button::_clicked(client_context& context)
+{
+    std::cout << "Cancel\n";
 }
