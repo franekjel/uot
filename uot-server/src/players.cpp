@@ -224,9 +224,12 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
     for (auto& [id, sector] : galaxy->sectors)
     {
         sector->joined_fleets.clear();
+        sector->jumped_fleets.clear();
         sector->new_watchers.clear();
         sector->new_bases.clear();
         sector->new_colonies.clear();
+        sector->fleets_in_fight.clear();
+        sector->destroyed_ships.clear();
     }
 }
 

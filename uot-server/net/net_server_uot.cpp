@@ -196,6 +196,12 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
                     payload.joined_fleets.push_back(messageTypes::MsgFleetsJoin(joined_fleet));
             }
 
+            for (const auto& jumped_fleet : sector->jumped_fleets)
+            {
+                if (jumped_fleet.owner == player->id)
+                    payload.jumped_fleets.push_back(messageTypes::MsgFleetsJump(jumped_fleet));
+            }
+
             for (const auto& fleet_in_fight : sector->fleets_in_fight)
             {
                 if (fleet_in_fight->owner_id == player->id)
