@@ -6,14 +6,16 @@
 
 namespace iu = input_utilities;
 
-void render_list(client_context& context, std::shared_ptr<ui_list_state> l_st)
+void render_list(client_context& context, std::shared_ptr<ui_list_state> l_st, const bool use_button)
 {
     // render l_st elements
     auto& r = context.r;
     auto& gr = context.gr;
     auto& gui = context.gui;
 
-    l_st->action_button.draw(context, false);
+    if (use_button) {
+        l_st->action_button.draw(context, false);
+    }
 
     SDL_Rect curr_view;
     SDL_RenderGetViewport(r.get(), &curr_view);
@@ -52,6 +54,32 @@ void ui_list_state::handle_click(const int x, const int y)
         SDL_Rect curr_elem{w_off, action_button.pos.h / 2 + h_off + (h_off + h) * curr - offset, w, h};
         if (iu::check_collision(x, y, curr_elem.x, curr_elem.y, curr_elem.w, curr_elem.h))
         {
+            selected_elem = curr;
+            return;
+        }
+        ++curr;
+    }
+    selected_elem.reset();
+}
+
+void ui_list_state::handle_timed_click(client_context& context, const int x, const int y)
+{
+    int curr = 0;
+    for (const auto& e : elems)
+    {
+        SDL_Rect curr_elem{w_off, action_button.pos.h / 2 + h_off + (h_off + h) * curr - offset, w, h};
+        if (iu::check_collision(x, y, curr_elem.x, curr_elem.y, curr_elem.w, curr_elem.h))
+        {
+            if(selected_elem.has_value() && selected_elem.value() == curr) {
+                auto curr_time = std::chrono::duration_cast<std::chrono::duration<double>>(last_click - std::chrono::high_resolution_clock::now());
+                if(curr_time.count() < 0.5)
+                {
+                    action_button.clicked(context);
+                }
+                last_click = std::chrono::high_resolution_clock::now();
+                return;
+            }
+            // implicit else
             selected_elem = curr;
             return;
         }

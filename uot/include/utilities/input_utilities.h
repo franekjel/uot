@@ -30,12 +30,14 @@ enum class uot_event_type
     planet_left_click_queue,
     planet_left_click_built,
     planet_left_click_build,
+    planet_left_click_info,
     planet_left_click_resource,
     planet_left_click_else,
 
     planet_right_click_queue,
     planet_right_click_built,
     planet_right_click_build,
+    planet_right_click_info,
     planet_right_click_resource,
     planet_right_click_else,
 

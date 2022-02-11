@@ -50,6 +50,8 @@ void rendering::render_planet_view::render_planet_info(const client_context& con
     rendering::render_planet_helper(context, biggie ? 1.0 : 3.0, size_settings::planet_info_area::width / 2, 250,
                                     gr->planetTextures[object_id]);
 
+
+
     if (pl)
     {
         std::string info;
@@ -84,6 +86,37 @@ void rendering::render_planet_view::render_planet_info(const client_context& con
             sdl_utilities::render_text(r.get(), gr->secondary_font, info, size_settings::planet_info_area::width / 2,
                                        size_settings::planet_info_text_area::height / 2 + info_offset,
                                        size_settings::planet_info_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+        }
+
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+
+        x = x - size_settings::planet_info_area::x_offset;
+        y = y - size_settings::planet_info_area::y_offset;
+
+        if(x >=0 && y >= 0 &&
+                input_utilities::check_collision_circle(
+                    x, y, size_settings::planet_info_area::width / 2, 250,
+                    planets_meta::frame_height / 2)
+                ) {
+
+            // horizontal
+            const auto longer = planets_meta::frame_height / 2;
+            const auto shorter = planets_meta::frame_height / 10;
+            SDL_Rect hor { size_settings::planet_info_area::width / 2 - longer / 2,
+                        250 - shorter / 2,
+                        longer,
+                        shorter};
+            SDL_Rect ver { size_settings::planet_info_area::width / 2 - shorter / 2,
+                        250 - longer / 2,
+                        shorter,
+                        longer};
+
+            SDL_SetRenderDrawColor(context.r.get(), 0xFF, 0xFF, 0xFF, 0xFF);
+            sdl_utilities::set_render_viewport<size_settings::planet_info_area>(r.get());
+            SDL_RenderFillRect(context.r.get(), &hor);
+            SDL_RenderFillRect(context.r.get(), &ver);
+
         }
     }
 }
@@ -256,7 +289,7 @@ void rendering::render_planet_view::_draw(client_context& context)
         // draw queue
         sdl_utilities::set_render_viewport<size_settings::planet_queue_area>(r.get());
         sdl_utilities::paint_frame(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, SDL_Color{0x00, 0x00, 0x00, 0xFF});
-        render_list(context, queue);
+        render_list(context, queue, false);
 
         // =======================================================
         // draw list with upgradeable (or not) buildings already present on the planet
@@ -320,7 +353,7 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         else
         {
             // handle list element clicks
-            build->handle_click(x, y);
+            build->handle_timed_click(context, x, y);
         }
     }
 
@@ -339,7 +372,7 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         else
         {
             // handle list element clicks
-            built->handle_click(x, y);
+            build->handle_timed_click(context, x, y);
         }
     }
 
@@ -358,7 +391,7 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         else
         {
             // handle list element clicks
-            queue->handle_click(x, y);
+            build->handle_timed_click(context, x, y);
         }
     }
 
@@ -371,7 +404,6 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         auto res = build->handle_motion(_x, _y);
         if (res.has_value())
         {
-            std::cout << "ustawiam box" << std::endl;
             box = {x, y, _build[res.value()]};
             return;
         }
@@ -387,7 +419,6 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         auto res = built->handle_motion(_x, _y);
         if (res.has_value())
         {
-            std::cout << "ustawiam box" << std::endl;
             box = {x, y, _built[res.value()]};
             return;
         }
@@ -408,6 +439,20 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
             return;
         }
         box.reset();
+    }
+
+    if (et == iu::uot_event_type::planet_left_click_info)
+    {
+        using AreaType = size_settings::planet_info_area;
+        x = x - AreaType::x_offset;
+        y = y - AreaType::y_offset;
+
+        if (input_utilities::check_collision_circle(
+                    x, y, size_settings::planet_info_area::width / 2, 250,
+                    planets_meta::frame_height / 2)) {
+
+            context.view = down(context);
+        }
     }
 }
 

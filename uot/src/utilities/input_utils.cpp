@@ -106,6 +106,11 @@ uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, 
                 return m.button == SDL_BUTTON_LEFT ? uot_event_type::planet_left_click_build
                                                    : uot_event_type::planet_right_click_build;
             }
+            if (check_view_area_collision<size_settings::planet_info_area>(x, y))
+            {
+                return m.button == SDL_BUTTON_LEFT ? uot_event_type::planet_left_click_info
+                                                   : uot_event_type::planet_right_click_info;
+            }
             return m.button == SDL_BUTTON_LEFT ? uot_event_type::planet_left_click_else
                                                : uot_event_type::planet_right_click_else;
         }
