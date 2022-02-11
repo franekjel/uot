@@ -28,5 +28,8 @@ void render_fleet(const client_context& context, const std::shared_ptr<Fleet> f)
 void render_selected_fleet_info(const client_context& context);
 
 void render_selection_graphics(const client_context& context, const Point pos, const int tex_size);
+
+void render_fleet_weapon_ranges(const client_context& context, const Point pos, const std::shared_ptr<Fleet> f);
+
 }  // namespace rendering
 #endif  // GALAXY_RENDERING_H

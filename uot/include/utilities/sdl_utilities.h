@@ -19,6 +19,8 @@ std::shared_ptr<SDL_Texture> load_and_paint_texture_from_file(const std::string&
                                                               const std::shared_ptr<SDL_Renderer>& r,
                                                               const SDL_Color& c);
 
+std::shared_ptr<SDL_Texture> load_texture_from_svg(const std::string& svg, const std::shared_ptr<SDL_Renderer>& r);
+
 void paint_background(SDL_Renderer* r, const SDL_Color& c);
 
 void paint_frame(SDL_Renderer* r, const SDL_Color& f, const SDL_Color& b);

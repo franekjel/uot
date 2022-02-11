@@ -3,8 +3,11 @@
 
 #include <array>
 #include <atomic>
+#include <unordered_map>
 #include <vector>
+
 #include "SDL_mixer.h"
+#include "modules.h"
 #include "sdl_utilities.h"
 #include "singleton.h"
 #include "texture.h"
@@ -27,12 +30,13 @@ struct game_resources : public uncopiable
     std::shared_ptr<SDL_Texture> bk_texture;
     std::shared_ptr<SDL_Texture> sky_texture;
     std::shared_ptr<SDL_Texture> sky_square_texture;
-    std::shared_ptr<SDL_Texture> galaxy_boundary;
-    std::shared_ptr<SDL_Texture> portal;
+    texture_t galaxy_boundary;
+    texture_t jump_zone;
     std::shared_ptr<SDL_Texture> buildings_sprite;
     std::shared_ptr<SDL_Texture> buildings_blur_sprite;
     std::shared_ptr<SDL_Texture> resource_texture;
 
+    std::unordered_map<ModuleType, texture_t> circle_textures;
     std::array<texture_t, 16> fleet_textures;
 
     std::shared_ptr<TTF_Font> main_font;

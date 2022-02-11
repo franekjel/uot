@@ -11,6 +11,7 @@
 #include "assets.h"
 #include "gui/buttons.h"
 #include "planet.h"
+#include "ship.h"
 
 struct game_gui
 {

@@ -134,6 +134,16 @@ std::shared_ptr<SDL_Texture> sdl_utilities::load_and_paint_texture_from_file(con
     return ret;
 }
 
+std::shared_ptr<SDL_Texture> sdl_utilities::load_texture_from_svg(const std::string& svg,
+                                                                  const std::shared_ptr<SDL_Renderer>& r)
+{
+    SDL_RWops* rw = SDL_RWFromConstMem(svg.c_str(), svg.size());
+    SDL_Surface* surface = IMG_Load_RW(rw, 1);
+    const auto tex = std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(r.get(), surface), sdl_texture_deleter);
+    SDL_FreeSurface(surface);
+    return tex;
+}
+
 void sdl_utilities::paint_background(SDL_Renderer* r, const SDL_Color& c)
 {
     SDL_SetRenderDrawColor(r, c.r, c.g, c.b, c.a);
