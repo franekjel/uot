@@ -97,9 +97,20 @@ void Colony::UpdateBuildingQueue()
 
     while (building_queue.size() != 0 && building_queue.front().worker_week_units_left == 0.0f)
     {
-        if (building_queue.front().upgrade_of != Building::BuildingType::None)
+        if (building_queue.front().upgrade_of != Building::BuildingType::None &&
+            building_queue.front().type != Building::BuildingType::Soldier)
             buildings[building_queue.front().upgrade_of]--;
-        buildings[building_queue.front().type]++;
+
+        if (building_queue.front().type != Building::BuildingType::Soldier)
+        {
+            buildings[building_queue.front().type]++;
+        }
+        else
+        {
+            float new_soldiers = std::min(population - 1.0f, 5.0f);
+            soldiers += new_soldiers;
+            population -= new_soldiers;
+        }
         new_buildings.push_back(building_queue.front());
         building_queue.erase(building_queue.begin());
     }

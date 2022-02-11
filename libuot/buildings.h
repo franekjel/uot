@@ -50,6 +50,7 @@ struct Building
         ArchaeologicalSite,
         // ancient nanobots
         NanobotsExcavationFacility,
+        Soldier, // XD wojskowy beton
     };
 
     const std::string name;
@@ -389,6 +390,17 @@ const std::map<Building::BuildingType, Building> Buildings{
       300.0f,
       {Technology::TechnologyType::NanobotsActivation},
       Building::BuildingType::None}},
+
+    {Building::BuildingType::Soldier,
+     {"Soldier",
+      "Soldier",
+      {{Resource::Metals, 200.0f}, {Resource::RareMetals, 40.0f}},
+      {{Resource::Antimatter, 5.0f}},
+      10.0f,
+      {},
+      300.0f,
+      {Technology::TechnologyType::SoldiersTrainingProgram},
+      Building::BuildingType::MilitaryTrainingCentre}},
 };
 
 // Building which can be always build
