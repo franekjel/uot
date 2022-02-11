@@ -31,10 +31,11 @@ struct Player
     void HandleBuildRequest(Building::BuildingType type, Building::BuildingType upgrade_from, unsigned int colony_id);
     void HandleMoveFleetRequest(unsigned int fleet_id, Point position);
     void HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int second_fleet_id);
-    void HandleWarpLoadingFleetRequest(int fleet_id);
-    void HandleBuildAsteroidMineFleetRequest(int fleet_id);
-    void HandleCancelFleetRequest(int fleet_id);
-    void HandleColonizeFleetRequest(int fleet_id);
+    void HandleWarpLoadingFleetRequest(unsigned int fleet_id);
+    void HandleBuildAsteroidMineFleetRequest(unsigned int fleet_id);
+    void HandleCancelFleetRequest(unsigned int fleet_id);
+    void HandleColonizeFleetRequest(unsigned int fleet_id);
+    void HandleHumansMoveFleet(unsigned int fleet_id, HumanMovement type);
     void HandleStartTechnologyResearch(Technology::TechnologyType technology);
     void HandleShipDesignRequest(unsigned int id, bool delete_design, std::string name, ShipHull::Type hull_type,
                                  std::map<ModuleType, int> sides, std::map<ModuleType, int> inside);

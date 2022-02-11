@@ -105,6 +105,15 @@ struct Ship
     void MoveShip(float distance) { energy -= engines_energy_consumtion * (distance / speed); }
 };
 
+enum class HumanMovement
+{
+    KickOutCivilians,
+    KidnapCivilians,
+    DisembarkSoldiers,
+    BorrowSoldiers,
+};
+
+
 struct Fleet
 {
     unsigned int id;
@@ -165,6 +174,11 @@ struct Fleet
 
     void MoveFleet();
     void JumpFleet();
+
+    void MoveCiviliansToColony(std::shared_ptr<Colony> colony);
+    void MoveCiviliansFromColony(std::shared_ptr<Colony> colony);
+    void MoveSoldiersToColony(std::shared_ptr<Colony> colony);
+    void MoveSoldiersFromColony(std::shared_ptr<Colony> colony);
 
     // client only fields
     float current_hp;
