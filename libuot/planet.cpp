@@ -107,7 +107,7 @@ void Colony::UpdateBuildingQueue()
         }
         else
         {
-            float new_soldiers = std::min(population - 1.0f, 5.0f);
+            float new_soldiers = std::min(population - 1.0f, 5.0f /*magic number here, because*/);
             soldiers += new_soldiers;
             population -= new_soldiers;
         }
