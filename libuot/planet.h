@@ -131,6 +131,7 @@ struct Colony
     std::shared_ptr<Planet> planet;
     std::map<Building::BuildingType, int> buildings;
     float population;
+    float soldiers = 0.0f;
     float base_population_growth = 0.01f;
     float base_population_starving_death = 0.005f;
     std::shared_ptr<Player> owner;
