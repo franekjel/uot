@@ -385,6 +385,69 @@ void Fleet::CountDamage()
     }
 }
 
+void Fleet::MoveCiviliansToColony(std::shared_ptr<Colony> colony)
+{
+    float civilians_left_to_move = 5.0f;
+
+    auto iter = ships.begin();
+    while (civilians_left_to_move != 0.0f && iter != ships.end())
+    {
+        auto ship = *iter;
+        float added_civ = std::min(ship->civilians, civilians_left_to_move);
+        colony->population += added_civ;
+        ship->civilians -= added_civ;
+        civilians_left_to_move -= added_civ;
+        civilians -= added_civ;
+    }
+}
+void Fleet::MoveCiviliansFromColony(std::shared_ptr<Colony> colony)
+{
+    float civilians_left_to_move = 5.0f;
+
+    auto iter = ships.begin();
+    while (civilians_left_to_move != 0.0f && iter != ships.end())
+    {
+        auto ship = *iter;
+        float added_civ = std::min(std::min(colony->population - 1.0f, civilians_left_to_move),
+                                   ship->human_capacity - (ship->soldiers + ship->civilians));
+        colony->population -= added_civ;
+        ship->civilians += added_civ;
+        civilians_left_to_move -= added_civ;
+        civilians += added_civ;
+    }
+}
+void Fleet::MoveSoldiersToColony(std::shared_ptr<Colony> colony)
+{
+    float soldiers_left_to_move = 5.0f;
+
+    auto iter = ships.begin();
+    while (soldiers_left_to_move != 0.0f && iter != ships.end())
+    {
+        auto ship = *iter;
+        float added_sol = std::min(ship->soldiers, soldiers_left_to_move);
+        colony->soldiers += added_sol;
+        ship->civilians -= added_sol;
+        soldiers_left_to_move -= added_sol;
+        soldiers -= added_sol;
+    }
+}
+void Fleet::MoveSoldiersFromColony(std::shared_ptr<Colony> colony)
+{
+    float soldiers_left_to_move = 5.0f;
+
+    auto iter = ships.begin();
+    while (soldiers_left_to_move != 0.0f && iter != ships.end())
+    {
+        auto ship = *iter;
+        float added_sol = std::min(std::min(colony->soldiers, soldiers_left_to_move),
+                                   ship->human_capacity - (ship->soldiers + ship->civilians));
+        colony->population -= added_sol;
+        ship->soldiers += added_sol;
+        soldiers_left_to_move -= added_sol;
+        soldiers += added_sol;
+    }
+}
+
 std::map<Resource, float> Fleet::GetUpkeepCost()
 {
     std::map<Resource, float> cost;

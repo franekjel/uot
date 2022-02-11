@@ -184,7 +184,7 @@ void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int se
                                                          Sector::FleetParameters(owned_fleets[first_fleet_id])});
 }
 
-void Player::HandleWarpLoadingFleetRequest(int fleet_id)
+void Player::HandleWarpLoadingFleetRequest(unsigned int fleet_id)
 {
     if (owned_fleets.count(fleet_id) < 1)
         return;
@@ -207,7 +207,7 @@ void Player::HandleWarpLoadingFleetRequest(int fleet_id)
     owned_fleets[fleet_id]->current_action = Fleet::Action::WarpLoading;
 }
 
-void Player::HandleBuildAsteroidMineFleetRequest(int fleet_id)
+void Player::HandleBuildAsteroidMineFleetRequest(unsigned int fleet_id)
 {
     if (owned_fleets.count(fleet_id) < 1)
         return;
@@ -262,7 +262,7 @@ void Player::HandleBuildAsteroidMineFleetRequest(int fleet_id)
     handled_fleet->current_action = Fleet::Action::BuildAsteroidMine;
 }
 
-void Player::HandleCancelFleetRequest(int fleet_id)
+void Player::HandleCancelFleetRequest(unsigned int fleet_id)
 {
     if (owned_fleets.count(fleet_id) < 1)
         return;
@@ -295,7 +295,7 @@ void Player::HandleCancelFleetRequest(int fleet_id)
     current_fleet->current_action = Fleet::Action::None;
 }
 
-void Player::HandleColonizeFleetRequest(int fleet_id)
+void Player::HandleColonizeFleetRequest(unsigned int fleet_id)
 {
     if (owned_fleets.count(fleet_id) < 1)
         return;
@@ -451,4 +451,44 @@ void Player::HandleCreateShipRequest(unsigned int design_id, unsigned int planet
 
     current_colony->ship_building_queue.push_back({design, current_sector});
     current_colony->ship_building_queue_changed = true;
+}
+
+void Player::HandleHumansMoveFleet(unsigned int fleet_id, HumanMovement type)
+{
+    if (owned_fleets.count(fleet_id) < 1)
+        return;
+    const auto &fleet = owned_fleets[fleet_id];
+    std::shared_ptr<Colony> colony = nullptr;
+    for (const auto &object : fleet->location_sector->objects)
+    {
+        if ((object.second->position - fleet->position).squaredLength() < Fleet::kNearValue)
+        {
+            auto planet = std::dynamic_pointer_cast<Planet>(object.second);
+            if (planet && planet->colony && planet->colony->owner->id == id)
+            {
+                colony = planet->colony;
+                break;
+            }
+        }
+    }
+    if (!colony)
+        return;
+
+    switch (type)
+    {
+        case HumanMovement::KickOutCivilians:
+            fleet->MoveCiviliansToColony(colony);
+            break;
+        case HumanMovement::KidnapCivilians:
+            fleet->MoveCiviliansFromColony(colony);
+            break;
+        case HumanMovement::DisembarkSoldiers:
+            fleet->MoveSoldiersToColony(colony);
+            break;
+        case HumanMovement::BorrowSoldiers:
+            fleet->MoveSoldiersFromColony(colony);
+            break;
+        default:
+            break;
+    }
 }
