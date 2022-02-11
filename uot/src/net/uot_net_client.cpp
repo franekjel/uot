@@ -263,6 +263,7 @@ void uot_net_client::handle_message(const std::string& data)
             const auto& tech_data = payload_newturn->technology_updates;
             const auto& new_ships = payload_newturn->new_ships;
             const auto& fleet_jumps = payload_newturn->jumped_fleets;
+            const auto& a = payload_newturn->new_sectors;
             auto state = context.getGameState();
             if (state.value->player != nullptr)
             {
@@ -349,6 +350,18 @@ void uot_net_client::handle_message(const std::string& data)
                     updateFleet(fleet, s.fleet_parameters);
                 }
 
+                for (const auto& fj : fleet_jumps)
+                {
+                    auto& s1 = state.value->player->known_galaxy->sectors.at(fj.sector_id_from);
+                    auto& s2 = state.value->player->known_galaxy->sectors.at(fj.sector_id_to);
+                    auto& f = state.value->player->owned_fleets.at(fj.fleet_id);
+
+                    s2->present_fleets.insert({fj.fleet_id, f});
+                    s1->present_fleets.erase(fj.fleet_id);
+                    f->location_sector = s2;
+                    f->position = fj.position;
+                }
+
                 for (const auto& u : sector_updates)
                 {
                     auto s = state.value->player->known_galaxy->sectors[u.sector_id];
@@ -368,13 +381,9 @@ void uot_net_client::handle_message(const std::string& data)
                     }
                 }
 
-                for (const auto& fj : fleet_jumps)
-                {
-                    state.value->player->owned_fleets.find(fj.fleet_id)->second->location_sector
-                        = state.value->player->known_galaxy->sectors.find(fj.sector_id_to)->second;
-                }
-
                 context.gui->last_turn_time = std::chrono::steady_clock::now();
+                if (context.gui->current_fleet.has_value())
+                    update_all_fleet_buttons(context.gui->selected_fleet_buttons, context);
                 send_payload();
             }
         }

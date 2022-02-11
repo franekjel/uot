@@ -287,7 +287,7 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
                     const auto& pos = v->pos;
                     if (iu::check_collision(x, y, pos.x, pos.y, pos.w, pos.h))
                     {
-                        if (event_type == SDL_MOUSEBUTTONDOWN)
+                        if (event_type == SDL_MOUSEBUTTONDOWN && v->is_active())
                         {
                             v->clicked(context);
                             return;
@@ -300,6 +300,9 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
                 },
                 b);
         }
+
+        if (!hit)
+            context.gui->focused_button.reset();
     }
 }
 
@@ -395,6 +398,7 @@ void rendering::render_selected_fleet_info(client_context& context)
     gui->set_button_font(gr->action_button_font);
     for (auto& b : gui->selected_fleet_buttons)
     {
+        set_fleet_button_color(b, context);
         std::visit([&](auto&& v) { v->draw(context, v->button_id == gui->focused_button); }, b);
     }
     gui->reset_button_font();
