@@ -22,6 +22,7 @@ void Sector::JumpFleet(unsigned int fleet_id)
 
     this_fleet->JumpFleet();
     this_fleet->position = (position - dest->position).normalized();
+    this_fleet->wanted_position = this_fleet->position;
 
     present_fleets.erase(present_fleets.find(fleet_id));
 
