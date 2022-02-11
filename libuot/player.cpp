@@ -224,7 +224,7 @@ void Player::HandleBuildAsteroidMineFleetRequest(int fleet_id)
         if ((handled_fleet->position - obj->position).squaredLength() <= Fleet::kNearValue)
         {
             auto inhabitable = std::dynamic_pointer_cast<InhabitableObject>(obj);
-            if (inhabitable && !inhabitable->base)
+            if (inhabitable && (!inhabitable->base || inhabitable->base->owner->id != id))
             {
                 handled_fleet->base_building_object = inhabitable;
                 break;
