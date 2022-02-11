@@ -278,8 +278,6 @@ messageTypes::MsgFleetParameters::MsgFleetParameters(const Sector::FleetParamete
 {
     id = fleet_parameters.fleet_id;
     position = fleet_parameters.position;
-    soldiers = fleet_parameters.soldiers;
-    civilians = fleet_parameters.civilians;
     human_capacity = fleet_parameters.human_capacity;
     construction_points = fleet_parameters.construction_points;
     base_fleet_speed = fleet_parameters.base_fleet_speed;
@@ -288,4 +286,13 @@ messageTypes::MsgFleetParameters::MsgFleetParameters(const Sector::FleetParamete
     current_shields = fleet_parameters.current_shields;
     max_shields = fleet_parameters.max_shields;
     average_energy = fleet_parameters.average_energy;
+}
+
+messageTypes::MsgChangedFleetPopulation::MsgChangedFleetPopulation() {}
+
+messageTypes::MsgChangedFleetPopulation::MsgChangedFleetPopulation(const Sector::FleetPopChange& fleet)
+{
+    id = fleet.fleet_id;
+    soldiers = fleet.soldiers;
+    civilians = fleet.civilians;
 }

@@ -59,8 +59,6 @@ Sector::FleetParameters::FleetParameters(std::shared_ptr<Fleet> fleet)
 {
     fleet_id = fleet->id;
     position = fleet->position;
-    soldiers = fleet->soldiers;
-    civilians = fleet->civilians;
     human_capacity = fleet->human_capacity;
     construction_points = fleet->construction_points;
     current_hp = 0.0f;

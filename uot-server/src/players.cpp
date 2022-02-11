@@ -118,16 +118,25 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
         {
             case Fleet::Action::BuildAsteroidMine:
                 player->HandleBuildAsteroidMineFleetRequest(fleet_action_request.fleet_id);
+                break;
             case Fleet::Action::CancelAction:
                 player->HandleCancelFleetRequest(fleet_action_request.fleet_id);
+                break;
             case Fleet::Action::Colonize:
                 player->HandleColonizeFleetRequest(fleet_action_request.fleet_id);
-            case Fleet::Action::Invade:
-            case Fleet::Action::None:
                 break;
-
+            case Fleet::Action::Invade://TODO
+                break;
+            case Fleet::Action::KickOutCivilians:
+            case Fleet::Action::KidnapCivilians:
+            case Fleet::Action::DisembarkSoldiers:
+            case Fleet::Action::BorrowSoldiers:
+                player->HandleHumansMoveFleet(fleet_action_request.fleet_id, fleet_action_request.action);
+                break;
             case Fleet::Action::WarpLoading:
                 player->HandleWarpLoadingFleetRequest(fleet_action_request.fleet_id);
+                break;
+            case Fleet::Action::None:
                 break;
 
             default:
