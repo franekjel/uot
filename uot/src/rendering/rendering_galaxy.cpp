@@ -24,7 +24,7 @@ void rendering::render_sector_view::_draw(client_context& context)
 {
     render_background(context);
     auto& r = context.r;
-    auto& gr = context.gr;
+    const auto& gr = context.gr;
     auto& gui = context.gui;
 
     sdl_utilities::set_render_viewport<size_settings::resource_area>(r.get());
@@ -37,12 +37,12 @@ void rendering::render_sector_view::_draw(client_context& context)
     sdl_utilities::paint_frame_textured(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, gr->sky_texture);
     sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
 
-    SDL_Rect s{0, 0, selection_meta::bd_w, selection_meta::bd_h};
-    const auto _w = static_cast<int>(size_settings::play_area::height * 1.1);
-    const auto _h = static_cast<int>(size_settings::play_area::height * 1.1);
+    SDL_Rect s{0, 0, gr->galaxy_boundary.w, gr->galaxy_boundary.w};
+    const auto _w = static_cast<int>(size_settings::play_area::height);
+    const auto _h = static_cast<int>(size_settings::play_area::height);
     SDL_Rect d{size_settings::play_area::width / 2 - _w / 2, size_settings::play_area::height / 2 - _h / 2, _w, _h};
 
-    SDL_RenderCopyEx(r.get(), gr->galaxy_boundary.get(), &s, &d, 0.0, NULL, SDL_FLIP_NONE);
+    SDL_RenderCopyEx(r.get(), gr->galaxy_boundary.t.get(), &s, &d, 0.0, NULL, SDL_FLIP_NONE);
 
     if (gui->current_sector.has_value())
     {
@@ -53,13 +53,13 @@ void rendering::render_sector_view::_draw(client_context& context)
             const auto unit = (neighbor->position - gui->current_sector.value()->position).normalized();
             const auto offset = unit * 0.5 * size_settings::play_area::height;
 
-            SDL_Rect s{0, 0, selection_meta::bd_w, selection_meta::bd_h};
-            const auto _w = selection_meta::bd_w / 12;
-            const auto _h = selection_meta::bd_h / 12;
+            SDL_Rect s{0, 0, gr->jump_zone.w, gr->jump_zone.w};
+            const int _w = gr->jump_zone.w;
+            const int _h = gr->jump_zone.h;
             SDL_Rect d{size_settings::play_area::width / 2 + static_cast<int>(offset.x) - _w / 2,
                        size_settings::play_area::height / 2 + static_cast<int>(offset.y) - _h / 2, _w, _h};
 
-            SDL_RenderCopyEx(r.get(), gr->galaxy_boundary.get(), &s, &d, 0.0, NULL, SDL_FLIP_NONE);
+            SDL_RenderCopyEx(r.get(), gr->jump_zone.t.get(), &s, &d, 0.0, NULL, SDL_FLIP_NONE);
         }
         render_sector_galaxy_helper(context, curr);
     }
@@ -175,6 +175,7 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
                                                    int x, int y)
 {
     auto& gui = context.gui;
+    const auto& gr = context.gr;
     namespace iu = input_utilities;
     const auto et = input_utilities::get_event_type(event_type, m, x, y);
 
@@ -234,8 +235,8 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
             const auto unit = (neighbor->position - gui->current_sector.value()->position).normalized();
             const auto offset = unit * 0.5 * size_settings::play_area::height;
 
-            const auto _w = selection_meta::bd_w / 12;
-            const auto _h = selection_meta::bd_h / 12;
+            const auto _w = gr->jump_zone.w;
+            const auto _h = gr->jump_zone.h;
             const auto _x = size_settings::play_area::width / 2 + static_cast<int>(offset.x) - _w / 2;
             const auto _y = size_settings::play_area::height / 2 + static_cast<int>(offset.y) - _h / 2;
 

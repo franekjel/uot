@@ -77,17 +77,6 @@ bool PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy>
     players_net_names[id] = player_net_name;
     players_net_names_rev[player_net_name] = id;
 
-    std::shared_ptr<Sector> starting_sector = wholeGalaxy->sectors.at(startingSectorId);
-    auto& c = startingPlanet->colony;
-    c->population = 60.0f;
-    c->buildings = {{Building::Farms, 1}, {Building::PowerPlants, 2}, {Building::SmallOrbitalShipyard, 3}};
-    std::shared_ptr<ShipDesign> design = std::shared_ptr<ShipDesign>(
-        new ShipDesign(1, "AAA", ShipHull::GrandShipHull,
-                       {{ModuleType::AdvancedBigLaser, 1}, {ModuleType::SmallLaser, 1}, {ModuleType::Railgun, 1}},
-                       {{ModuleType::AdvancedBigReactor, 2}}));
-    new_player->ship_designs[1] = design;
-    c->ship_building_queue.push_back(ShipBuildProgress(design, starting_sector));
-
     return true;
 }
 

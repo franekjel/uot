@@ -69,11 +69,28 @@ void loadMedia(client_context& context)
     printf("Loading resources\n");
     gr->resource_texture =
         sdl_utilities::load_texture_from_file(std::string(resources_meta::resources_path), context.r);
-    printf("Loading neon circle");
-    gr->galaxy_boundary =
-        sdl_utilities::load_texture_from_file(std::string(selection_meta::galaxy_boundary), context.r);
+
+    {
+        const int r = (size_settings::play_area::height / 2 - 2);
+        const std::string svg = "<svg height='" + std::to_string(r * 2) + "' width='" + std::to_string(r * 2) +
+                                "'><circle cx='" + std::to_string(r) + "' cy='" + std::to_string(r) + "' r='" +
+                                std::to_string(r) +
+                                "' stroke='#eeeeee' stroke-width='3' "
+                                "fill='none' /></svg>";
+        gr->galaxy_boundary = texture_t{r * 2, r * 2, sdl_utilities::load_texture_from_svg(svg, context.r)};
+    }
+
+    {
+        const int r = std::sqrt(Fleet::kNearValue) * (size_settings::play_area::height / 2);
+        const std::string svg = "<svg height='" + std::to_string(r * 2) + "' width='" + std::to_string(r * 2) +
+                                "'><circle cx='" + std::to_string(r) + "' cy='" + std::to_string(r) + "' r='" +
+                                std::to_string(r) +
+                                "' stroke='#00ffff' stroke-width='2' "
+                                "fill='none' /></svg>";
+        gr->jump_zone = texture_t{r * 2, r * 2, sdl_utilities::load_texture_from_svg(svg, context.r)};
+    }
+
     printf("Loading  portal texture");
-    gr->portal = sdl_utilities::load_texture_from_file(std::string(selection_meta::portal), context.r);
     // load only the waiting screen planet texture
     gr->planetTextures.resize(planets_meta::num_planets);
 

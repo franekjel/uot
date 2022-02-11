@@ -247,7 +247,7 @@ const std::map<ModuleType, Module> Modules{
          Module("Big laser", 4, 10.0f,
                 {{Resource::Metals, 20.0f}, {Resource::RareMetals, 20.0f}, {Resource::Crystals, 20.0f}}, {},
                 Module::Sides),
-         Weapon(1, 90.0f, 1.2f, Weapon::ShieldDamageBonus))
+         Weapon(1, 90.0f, 1.1f, Weapon::ShieldDamageBonus))
 
     },
     {ModuleType::AdvancedBigLaser, Module::WeaponModule(Module("Advanced big laser", 4, 15.0f,
@@ -256,27 +256,27 @@ const std::map<ModuleType, Module> Modules{
                                                                 {Resource::Crystals, 20.0f},
                                                                 {Resource::DarkMatter, 2.0f}},
                                                                {}, Module::Sides),
-                                                        Weapon(1, 150.0f, 1.5f, Weapon::ShieldDamageBonus))
+                                                        Weapon(1, 150.0f, 1.3f, Weapon::ShieldDamageBonus))
 
     },
     {ModuleType::AntimatterCannon,
      Module::WeaponModule(
          Module("Antimatter cannon", 2, 1.0f, {{Resource::Metals, 10.0f}, {Resource::RareMetals, 15.0f}},
                 {{Resource::Antimatter, 0.25f}}, Module::Sides),
-         Weapon(1, 20.0f, 0.6f, Weapon::HPDamageBonus))
+         Weapon(1, 20.0f, 0.5f, Weapon::HPDamageBonus))
 
     },
     {ModuleType::Railgun,
      Module::WeaponModule(Module("Railgun", 1, 1.0f, {{Resource::Metals, 5.0f}, {Resource::RareMetals, 3.0f}},
                                  {{Resource::Metals, 0.1f}}, Module::Sides),
-                          Weapon(4, 2.0f, 0.6f, Weapon::None))
+                          Weapon(4, 2.0f, 0.5f, Weapon::None))
 
     },
     {ModuleType::AdvancedRailgun,
      Module::WeaponModule(Module("Advanced railgun", 1, 2.0f,
                                  {{Resource::Metals, 6.0f}, {Resource::RareMetals, 6.0f}, {Resource::Polymers, 3.0f}},
                                  {{Resource::Metals, 0.1f}}, Module::Sides),
-                          Weapon(4, 5.0f, 0.7f, Weapon::None))
+                          Weapon(4, 5.0f, 0.6f, Weapon::None))
 
     },
 };

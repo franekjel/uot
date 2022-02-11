@@ -31,7 +31,7 @@ struct game_resources : public uncopiable
     std::shared_ptr<SDL_Texture> sky_texture;
     std::shared_ptr<SDL_Texture> sky_square_texture;
     texture_t galaxy_boundary;
-    std::shared_ptr<SDL_Texture> portal;
+    texture_t jump_zone;
     std::shared_ptr<SDL_Texture> buildings_sprite;
     std::shared_ptr<SDL_Texture> buildings_blur_sprite;
     std::shared_ptr<SDL_Texture> resource_texture;

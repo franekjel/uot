@@ -53,15 +53,6 @@ namespace selection_meta
 constexpr int num_selection_textures = 2;
 constexpr int texture_width = 400;
 constexpr int texture_height = 400;
-constexpr std::string_view galaxy_boundary{"assets/neon_circle.png"};
-constexpr int bd_w = 901;
-constexpr int bd_h = 930;
-constexpr std::string_view portal{"assets/portal.png"};
-constexpr int port_w = 360;
-constexpr int port_h = 600;
-constexpr std::string_view weapon_range_circle{"assets/circle.png"};
-constexpr int circle_w = 128;
-constexpr int circle_h = 128;
 
 }  // namespace selection_meta
 

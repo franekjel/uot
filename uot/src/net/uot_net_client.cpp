@@ -327,6 +327,8 @@ void uot_net_client::handle_message(const std::string& data)
                         fleet = state.value->player->owned_fleets.at(s.fleet_parameters.id);
                     }
                     fleet->ships.emplace_back(ship);
+
+                    // TODO: this will be done be new fleetInfoRequest in future, leave now for tests
                     for (const auto& [t, c] : design->sides)
                     {
                         const auto& m = Modules.at(t);
