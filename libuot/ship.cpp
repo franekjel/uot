@@ -201,6 +201,11 @@ void Fleet::UpdateFleetSpeed()
 
 void Fleet::MoveFleet()
 {
+    if (current_action != Fleet::Action::None)
+    {
+        wanted_position = position;
+        return;
+    }
     if (std::isnan(wanted_position.x) || wanted_position == position)
         return;
     UpdateFleetSpeed();
