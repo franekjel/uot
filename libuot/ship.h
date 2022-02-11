@@ -105,14 +105,6 @@ struct Ship
     void MoveShip(float distance) { energy -= engines_energy_consumtion * (distance / speed); }
 };
 
-enum class HumanMovement
-{
-    KickOutCivilians,
-    KidnapCivilians,
-    DisembarkSoldiers,
-    BorrowSoldiers,
-};
-
 
 struct Fleet
 {
@@ -162,6 +154,10 @@ struct Fleet
         BuildAsteroidMine,
         Colonize,
         Invade,
+        KickOutCivilians,
+        KidnapCivilians,
+        DisembarkSoldiers,
+        BorrowSoldiers,
         CancelAction
     } current_action;
 

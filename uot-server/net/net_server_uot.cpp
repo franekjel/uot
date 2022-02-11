@@ -93,6 +93,11 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
             payload.updated_populations[colony.second->id] = colony.second->population;
             colony.second->population_changed = false;
         }
+        if (colony.second->soldiers_changed)
+        {
+            payload.updated_soldiers[colony.second->id] = colony.second->soldiers;
+            colony.second->soldiers_changed = false;
+        }
 
         if (colony.second->building_queue_changed)
         {
@@ -213,6 +218,12 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
             {
                 if (destroyed_ship.owner == player->id)
                     payload.destroyed_ships.push_back(destroyed_ship.ship_id);
+            }
+
+            for (const auto& changed_fleet : sector->fleets_changed)
+            {
+                if (changed_fleet.owner == player->id)
+                    payload.changed_fleet_populations.push_back(messageTypes::MsgChangedFleetPopulation(changed_fleet));
             }
 
             payload.watched_sectors_updates.push_back(sector_update_msg);

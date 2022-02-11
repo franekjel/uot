@@ -453,7 +453,7 @@ void Player::HandleCreateShipRequest(unsigned int design_id, unsigned int planet
     current_colony->ship_building_queue_changed = true;
 }
 
-void Player::HandleHumansMoveFleet(unsigned int fleet_id, HumanMovement type)
+void Player::HandleHumansMoveFleet(unsigned int fleet_id, Fleet::Action type)
 {
     if (owned_fleets.count(fleet_id) < 1)
         return;
@@ -476,16 +476,16 @@ void Player::HandleHumansMoveFleet(unsigned int fleet_id, HumanMovement type)
 
     switch (type)
     {
-        case HumanMovement::KickOutCivilians:
+        case Fleet::Action::KickOutCivilians:
             fleet->MoveCiviliansToColony(colony);
             break;
-        case HumanMovement::KidnapCivilians:
+        case Fleet::Action::KidnapCivilians:
             fleet->MoveCiviliansFromColony(colony);
             break;
-        case HumanMovement::DisembarkSoldiers:
+        case Fleet::Action::DisembarkSoldiers:
             fleet->MoveSoldiersToColony(colony);
             break;
-        case HumanMovement::BorrowSoldiers:
+        case Fleet::Action::BorrowSoldiers:
             fleet->MoveSoldiersFromColony(colony);
             break;
         default:
