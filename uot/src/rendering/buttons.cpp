@@ -95,7 +95,6 @@ void designer_button::_clicked(client_context& context)
     auto v = std::make_shared<rendering::render_designer_view>();
     v->init(context);
     context.view = std::move(v);
-
 }
 
 void research_button::_clicked(client_context& context)

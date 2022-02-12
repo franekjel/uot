@@ -25,34 +25,35 @@ std::array<std::string, 3> planet_names{
     "Hot Planet"         // a bit hotter
 };
 
-inline std::string get_planet_info(std::shared_ptr<Planet>& pl) {
-        std::string info;
-        info += "Population: " + std::to_string(static_cast<int>(pl->colony->population)) + "\n\n";
+inline std::string get_planet_info(std::shared_ptr<Planet>& pl)
+{
+    std::string info;
+    info += "Population: " + std::to_string(static_cast<int>(pl->colony->population)) + "\n\n";
 
-        info += "Gains: \n";
-        for (auto& g : pl->colony->GetColonyGains())
-        {
-            info += std::string(resourceNames.at(static_cast<int>(g.first))) + " " + std::to_string(g.second) + "\n";
-        }
+    info += "Gains: \n";
+    for (auto& g : pl->colony->GetColonyGains())
+    {
+        info += std::string(resourceNames.at(static_cast<int>(g.first))) + " " + std::to_string(g.second) + "\n";
+    }
 
-        info += "\n";
+    info += "\n";
 
-        info += "Expenses: \n";
-        for (auto& e : pl->colony->GetColonyExpenses())
-        {
-            info += std::string(resourceNames.at(static_cast<int>(e.first))) + " " + std::to_string(e.second) + "\n";
-        }
+    info += "Expenses: \n";
+    for (auto& e : pl->colony->GetColonyExpenses())
+    {
+        info += std::string(resourceNames.at(static_cast<int>(e.first))) + " " + std::to_string(e.second) + "\n";
+    }
 
-        info += "\n";
+    info += "\n";
 
-        info += "Features: \n";
-        for (auto& f : pl->planetary_features)
-        {
-            auto& feat = PlanetaryFeaturesTypes.at(f.first);
-            info += feat.name + " \n";
-        }
+    info += "Features: \n";
+    for (auto& f : pl->planetary_features)
+    {
+        auto& feat = PlanetaryFeaturesTypes.at(f.first);
+        info += feat.name + " \n";
+    }
 
-        return info;
+    return info;
 }
 
 void rendering::render_planet_view::render_planet_info(const client_context& context)
@@ -80,8 +81,6 @@ void rendering::render_planet_view::render_planet_info(const client_context& con
     rendering::render_planet_helper(context, biggie ? 1.0 : 3.0, size_settings::planet_info_area::width / 2, 250,
                                     gr->planetTextures[object_id]);
 
-
-
     if (pl)
     {
         sdl_utilities::set_render_viewport<size_settings::planet_info_text_area>(r.get());
@@ -100,31 +99,23 @@ void rendering::render_planet_view::render_planet_info(const client_context& con
         x = x - size_settings::planet_info_area::x_offset;
         y = y - size_settings::planet_info_area::y_offset;
 
-        if(x >=0 && y >= 0 &&
-                input_utilities::check_collision_circle(
-                    x, y, size_settings::planet_info_area::width / 2, 250,
-                    planets_meta::frame_height / 2)
-                ) {
-
+        if (x >= 0 && y >= 0 &&
+            input_utilities::check_collision_circle(x, y, size_settings::planet_info_area::width / 2, 250,
+                                                    planets_meta::frame_height / 2))
+        {
             // horizontal
             const auto longer = planets_meta::frame_height / 2;
             const auto shorter = planets_meta::frame_height / 10;
-            SDL_Rect hor { size_settings::planet_info_area::width / 2 - longer / 2,
-                        250 - shorter / 2,
-                        longer,
-                        shorter};
+            SDL_Rect hor{size_settings::planet_info_area::width / 2 - longer / 2, 250 - shorter / 2, longer, shorter};
 
-            SDL_Rect ver { size_settings::planet_info_area::width / 2 +
-                (current_sub == planet_sub::queue ? longer / 2 : -longer / 2 ) - shorter / 2,
-                        250 - longer / 4,
-                        shorter,
-                        longer / 2};
+            SDL_Rect ver{size_settings::planet_info_area::width / 2 +
+                             (current_sub == planet_sub::queue ? longer / 2 : -longer / 2) - shorter / 2,
+                         250 - longer / 4, shorter, longer / 2};
 
             SDL_SetRenderDrawColor(context.r.get(), 0xFF, 0xFF, 0xFF, 0xFF);
             sdl_utilities::set_render_viewport<size_settings::planet_info_area>(r.get());
             SDL_RenderFillRect(context.r.get(), &hor);
             SDL_RenderFillRect(context.r.get(), &ver);
-
         }
     }
 }
@@ -169,12 +160,14 @@ void rendering::render_planet_view::init(client_context& context)
         }
 
         auto gs = context.getGameState();
-        for(auto& sd : gs.value->player->ship_designs) {
+        for (auto& sd : gs.value->player->ship_designs)
+        {
             v_ship_build.push_back(sd.second->name);
             _ships_build.push_back(sd.second->id);
         }
 
-        for(auto& sd : pl->colony->ship_building_queue) {
+        for (auto& sd : pl->colony->ship_building_queue)
+        {
             v_ship_queue.push_back(sd.ship->design->name + " " + std::to_string(sd.worker_week_units_left));
             _ships_queue.push_back(sd.ship->design->id);
         }
@@ -232,7 +225,8 @@ void rendering::render_planet_view::init(client_context& context)
                                    _ships_queue.push_back(d_id);
                                    ships_queue->elems.push_back(
                                        gs.value->player->ship_designs.at(d_id)->name + " " +
-                                       std::to_string(static_cast<int>(gs.value->player->ship_designs.at(d_id)->worker_weeks_cost)));
+                                       std::to_string(static_cast<int>(
+                                           gs.value->player->ship_designs.at(d_id)->worker_weeks_cost)));
                                }
                            }
                            else if (io)
@@ -291,7 +285,6 @@ void rendering::render_planet_view::init(client_context& context)
                        {
                            if (queue->selected_elem.has_value())
                            {
-
                            }
                        },
                        "CANCEL",
@@ -299,7 +292,8 @@ void rendering::render_planet_view::init(client_context& context)
         300, 50, 50, 10);
 }
 
-inline void rendering::render_planet_view::refresh_lists(client_context &context, std::shared_ptr<Planet>& pl) {
+inline void rendering::render_planet_view::refresh_lists(client_context& context, std::shared_ptr<Planet>& pl)
+{
     build->elems.clear();
     built->elems.clear();
     queue->elems.clear();
@@ -322,31 +316,33 @@ inline void rendering::render_planet_view::refresh_lists(client_context &context
     {
         for (int i = 0; i < b.second; ++i)
         {
-        built->elems.push_back(Buildings.at(b.first).name);
-        _built.push_back(b.first);
+            built->elems.push_back(Buildings.at(b.first).name);
+            _built.push_back(b.first);
         }
     }
 
     for (const auto& b : pl->colony->building_queue)
     {
         queue->elems.push_back(Buildings.at(b.type).name + "  " +
-                   std::to_string(static_cast<int>(b.worker_week_units_left)));
+                               std::to_string(static_cast<int>(b.worker_week_units_left)));
         _queue.push_back(b.type);
     }
 
     auto gs = context.getGameState();
-    for(auto& sd : gs.value->player->ship_designs) {
-         ships_build->elems.push_back(sd.second->name);
+    for (auto& sd : gs.value->player->ship_designs)
+    {
+        ships_build->elems.push_back(sd.second->name);
         _ships_build.push_back(sd.second->id);
     }
 
-    for(auto& sd : pl->colony->ship_building_queue) {
+    for (auto& sd : pl->colony->ship_building_queue)
+    {
         ships_queue->elems.push_back(sd.ship->design->name);
         _ships_queue.push_back(sd.ship->design->id);
     }
 }
 
-inline void rendering::render_planet_view::render_queue_lists(client_context &context)
+inline void rendering::render_planet_view::render_queue_lists(client_context& context)
 {
     auto& r = context.r;
 
@@ -361,10 +357,10 @@ inline void rendering::render_planet_view::render_queue_lists(client_context &co
     sdl_utilities::set_render_viewport<size_settings::planet_ships_queue_area>(r.get());
     sdl_utilities::paint_frame(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, SDL_Color{0x00, 0x00, 0x00, 0xFF});
     render_list(context, ships_queue);
-
 }
 
-inline void rendering::render_planet_view::render_build_lists(client_context &context) {
+inline void rendering::render_planet_view::render_build_lists(client_context& context)
+{
     auto& r = context.r;
 
     sdl_utilities::set_render_viewport<size_settings::planet_build_area>(r.get());
@@ -440,8 +436,8 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
 {
     namespace iu = input_utilities;
     const auto et = current_sub == planet_sub::queue
-            ? input_utilities::get_planet_event_type(event_type, m, x, y)
-            : input_utilities::get_planet_build_event_type(event_type, m, x, y);
+                        ? input_utilities::get_planet_event_type(event_type, m, x, y)
+                        : input_utilities::get_planet_build_event_type(event_type, m, x, y);
 
     auto& curr_b = context.gui->current_building;
     if (et == iu::uot_event_type::planet_left_click_build)
@@ -552,13 +548,10 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         x = x - AreaType::x_offset;
         y = y - AreaType::y_offset;
 
-        if (input_utilities::check_collision_circle(
-                    x, y, size_settings::planet_info_area::width / 2, 250,
-                    planets_meta::frame_height / 2)) {
-
-            current_sub = current_sub == planet_sub::build
-                    ? planet_sub::queue
-                    : planet_sub::build;
+        if (input_utilities::check_collision_circle(x, y, size_settings::planet_info_area::width / 2, 250,
+                                                    planets_meta::frame_height / 2))
+        {
+            current_sub = current_sub == planet_sub::build ? planet_sub::queue : planet_sub::build;
         }
     }
 }
@@ -600,7 +593,8 @@ void rendering::render_planet_view::key_handler(client_context& context, Uint16 
     }
 }
 
-inline std::string get_building_info(Building::BuildingType type) {
+inline std::string get_building_info(Building::BuildingType type)
+{
     std::string cost_string = " COST: \n";
     cost_string += "  Work: " + std::to_string(int(Buildings.at(type).worker_weeks_cost)) + "\n";
     for (const auto& e : Buildings.at(type).cost)
@@ -629,7 +623,8 @@ inline std::string get_building_info(Building::BuildingType type) {
 
     upkeep_string += "   Workers: " + std::to_string((int)Buildings.at(type).workers) + "\n\n";
 
-    return std::string(Buildings.at(type).description) + "\n\n" + cost_string + "\n" + production_string + upkeep_string;
+    return std::string(Buildings.at(type).description) + "\n\n" + cost_string + "\n" + production_string +
+           upkeep_string;
 }
 
 void rendering::render_building_info_box(client_context& context, Building::BuildingType type, int x, int y)
@@ -651,11 +646,7 @@ void rendering::render_building_info_box(client_context& context, Building::Buil
 
     SDL_RenderCopyEx(context.r.get(), context.gr->buildings_sprite.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 
-
-
-    sdl_utilities::render_text(
-        r.get(), gr->infobox_font,
-        get_building_info(type),
-        buildings_meta::frame_width / 2, buildings_meta::frame_height / 2, buildings_meta::frame_width,
-        SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text(r.get(), gr->infobox_font, get_building_info(type), buildings_meta::frame_width / 2,
+                               buildings_meta::frame_height / 2, buildings_meta::frame_width,
+                               SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
 }

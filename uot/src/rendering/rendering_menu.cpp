@@ -56,7 +56,7 @@ void rendering::render_menu_view::_mouse_handler(client_context& context, Uint32
         x = x - size_settings::popup_menu_area::x_offset;
         y = y - size_settings::popup_menu_area::y_offset;
 
-        bool hit { false };
+        bool hit{false};
         for (const auto& b : context.gui->popup_buttons)
         {
             std::visit(
@@ -71,7 +71,8 @@ void rendering::render_menu_view::_mouse_handler(client_context& context, Uint32
                     }
                 },
                 b);
-            if(hit) return;
+            if (hit)
+                return;
         }
     }
     // motion in the popup buttons area

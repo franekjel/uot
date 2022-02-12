@@ -9,7 +9,6 @@ namespace rendering
 {
 struct render_designer_view : render_view<render_designer_view>
 {
-
     view_t _up();
     view_t _down(client_context& context);
 
@@ -19,7 +18,7 @@ struct render_designer_view : render_view<render_designer_view>
     void _draw(client_context& context);
     void init(client_context& context);
 
-    inline void refresh_lists(client_context &context);
+    inline void refresh_lists(client_context& context);
 
     std::shared_ptr<ui_list_state> modules_available;
     std::shared_ptr<ui_list_state> modules_chosen;
@@ -28,8 +27,7 @@ struct render_designer_view : render_view<render_designer_view>
     std::vector<ModuleType> _chosen;
 
     Uint32 info_offset{0u};
-
 };
 
 }  // namespace rendering
-#endif // RENDERING_DESIGNER_H
+#endif  // RENDERING_DESIGNER_H

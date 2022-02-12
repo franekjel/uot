@@ -1,10 +1,10 @@
 #ifndef UI_LIST_H
 #define UI_LIST_H
+#include <chrono>
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
-#include <chrono>
 #include "gui/buttons.h"
 
 struct client_context;
@@ -20,7 +20,6 @@ struct ui_list_state
     int h;
     int h_off;
     std::chrono::high_resolution_clock::time_point last_click;
-
 
     void handle_click(const int x, const int y);
     void handle_timed_click(client_context& context, const int x, const int y);
