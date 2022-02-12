@@ -88,7 +88,7 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
     auto player = players[players_net_names_rev[player_net_name]];
 
     if (player->is_loser)
-        return;
+        return false;
 
     for (const auto& build : payload->buildRequests)
     {
