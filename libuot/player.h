@@ -55,6 +55,8 @@ struct Player
            const unsigned int& starting_colony_obj_id);
     std::map<Resource, bool> resources_changed;
     std::set<Technology::TechnologyType> new_technologies;
+    std::vector<unsigned int> lost_objects;
+    std::vector<std::shared_ptr<Colony>> new_colonies;
 
     struct ChangedDesign
     {

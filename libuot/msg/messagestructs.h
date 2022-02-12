@@ -49,7 +49,8 @@ struct MsgColony
     std::map<Building::BuildingType, int> buildings;
     float population;
     int owner_id;
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgColony, id, buildings, population, owner_id)
+    unsigned int planet_id;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgColony, id, buildings, population, owner_id, planet_id)
     MsgColony();
     MsgColony(const std::shared_ptr<Colony>& colony);
 };

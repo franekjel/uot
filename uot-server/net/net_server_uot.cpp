@@ -262,8 +262,20 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
         payload.ship_designs.push_back(ship_design);
     }
 
+    for (const auto& lost_obj : player->lost_objects)
+    {
+        payload.lost_objects.push_back(lost_obj);
+    }
+
+    for (const auto& new_col : player->new_colonies)
+    {
+        payload.invaded_colonies.push_back(messageTypes::MsgColony(new_col));
+    }
+
     player->new_technologies.clear();
     player->changed_designs.clear();
+    player->lost_objects.clear();
+    player->new_colonies.clear();
 
     txrx.send_reliable(player_net_name, payload.Serialize());
 }

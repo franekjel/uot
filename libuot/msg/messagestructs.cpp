@@ -40,6 +40,7 @@ messageTypes::MsgColony::MsgColony() { buildings = {}; }
 messageTypes::MsgColony::MsgColony(const std::shared_ptr<Colony>& colony)
     : id(colony->id), population(colony->population), owner_id(colony->owner->id)
 {
+    planet_id = colony->planet->id;
     for (auto building : colony->buildings)
         buildings[building.first] = building.second;
 }
