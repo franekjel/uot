@@ -242,20 +242,23 @@ void PlayersList::CountWeeklyNumbers()
         if (!have_any_colony)
         {
             player->is_loser = true;
-            // TODO PO informuj o przegranej
         }
     }
 
-    std::vector<unsigned int> potential_winners = {};
+    int number_of_not_loosers = 0;
+    unsigned int potential_winner;
     for (const auto& [player_id, player] : players)
     {
         if (!(player->is_loser))
-            potential_winners.push_back(player_id);
+        {
+            number_of_not_loosers++;
+            potential_winner = player_id;
+        }
     }
-    if (potential_winners.size() == 1)
+    if (number_of_not_loosers == 1)
     {
-        auto& winner = players[potential_winners[0]];
-        // TODO PO informuj o zwyciestwie
+        auto& winner = players[potential_winner];
+        winner->is_winner = true;
     }
 }
 

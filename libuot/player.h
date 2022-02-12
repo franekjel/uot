@@ -64,6 +64,7 @@ struct Player
     std::vector<unsigned int> fleet_info_requests;
 
     bool is_loser = false;
+    bool is_winner = false;
 
     struct ChangedDesign
     {
