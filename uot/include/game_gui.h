@@ -37,6 +37,10 @@ struct game_gui
     SDL_Point tech_offset = {0, 0};
     SDL_Point tech_size = {0, 0};
 
+    std::unordered_map<unsigned int, unsigned int> galaxy_stars_textures;
+
+    int GetTextureIndex(std::shared_ptr<SectorObject> p);
+
     game_gui() {}
 
     int get_next_button_id() { return user_button_id++; }

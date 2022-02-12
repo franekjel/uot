@@ -10,9 +10,9 @@ void rendering::render_universe_view::_wheel_handler(client_context& context, in
 
 void rendering::render_selected_sector_info(const client_context& context)
 {
-    auto& r = context.r;
-    auto& gr = context.gr;
-    auto& gui = context.gui;
+    const auto& r = context.r;
+    const auto& gr = context.gr;
+    const auto& gui = context.gui;
 
     auto sector_id = gui->current_sector.value()->sector_id % 10 + 1;
 
@@ -79,12 +79,9 @@ void rendering::render_universe_view::_draw(client_context& context)
 }
 void rendering::render_sector_selection(const client_context& context)
 {
-    static const auto tile_x = size_settings::play_area::width / generation_meta::sqrt_num_sectors;
-    static const auto tile_y = size_settings::play_area::height / generation_meta::sqrt_num_sectors;
-
-    auto& r = context.r;
-    auto& gr = context.gr;
-    auto& gui = context.gui;
+    const auto& r = context.r;
+    const auto& gr = context.gr;
+    const auto& gui = context.gui;
 
     if (!gui->current_sector.has_value())
     {
@@ -111,11 +108,12 @@ void rendering::render_sector_selection(const client_context& context)
 void rendering::render_sector_universe_helper(const client_context& context, const std::shared_ptr<Sector>& sector)
 {
     const auto& gr = context.gr;
+    const auto& gui = context.gui;
 
     const auto corrected_x = size_settings::play_area::width * (0.5f + 0.5f * sector->position.x);
     const auto corrected_y = size_settings::play_area::height * (0.5f + 0.5f * sector->position.y);
     render_planet_helper(context, planets_meta::sector_multiplier, corrected_x, corrected_y,
-                         gr->planetTextures[sector->sector_id % 10 + 1]);
+                         gr->planetTextures[gui->galaxy_stars_textures.at(sector->sector_id)]);
 
     SDL_SetRenderDrawColor(context.r.get(), 0xFF, 0xFF, 0xFF, 0xFF);
 

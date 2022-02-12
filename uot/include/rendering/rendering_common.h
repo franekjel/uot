@@ -1,5 +1,7 @@
 #ifndef RENDERING_COMMON_H
 #define RENDERING_COMMON_H
+#include <memory>
+#include "sectorobject.h"
 #include "texture.h"
 
 struct client_context;

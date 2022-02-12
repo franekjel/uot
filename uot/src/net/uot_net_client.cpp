@@ -83,6 +83,7 @@ void uot_net_client::handle_message(const std::string& data)
                 s->position = msgGalaxy.sectors[i].position;
                 sectors_map.insert(std::pair<int, std::shared_ptr<Sector>>(s->sector_id, s));
                 sectors_vec.push_back(s);
+                context.gui->galaxy_stars_textures[s->sector_id] = UNDISCOVERED;
             }
 
             // Add "empty" sectors;
@@ -99,6 +100,7 @@ void uot_net_client::handle_message(const std::string& data)
                         s->position = neigh.position;
                         sectors_map.insert(std::pair<int, std::shared_ptr<Sector>>(s->sector_id, s));
                         sectors_vec.push_back(s);
+                        context.gui->galaxy_stars_textures[neigh.id] = UNDISCOVERED;
                     }
                 }
             }
@@ -134,6 +136,9 @@ void uot_net_client::handle_message(const std::string& data)
                             stars_map.insert(std::pair<int, std::shared_ptr<Star>>(star.id, s_star));
                             sectors_vec[j]->objects.insert({s_star->id, s_star});
                         }
+                        if (!stars.empty())
+                            context.gui->galaxy_stars_textures[msgGalaxy.sectors[i].id] =
+                                context.gui->GetTextureIndex(sectors_vec[j]->objects.at(stars.front().id));
                     }
                 }
             }

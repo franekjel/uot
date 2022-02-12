@@ -8,6 +8,7 @@
 #include "game_state.h"
 #include "input_utilities.h"
 #include "msg_queue.h"
+#include "planet.h"
 #include "player.h"
 
 void rendering::render_sector_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov)
@@ -96,7 +97,8 @@ void rendering::render_object_selection(const client_context& context)
     render_selection_graphics(context, pos, tex_size);
     const auto x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * pos.x;
     const auto y = size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * pos.y;
-    render_planet_helper(context, 0.8, x, y, gr->planetTextures[11 + gui->current_object.value()->id % 18]);
+    int textureIdx = gui->GetTextureIndex(gui->current_object.value());
+    render_planet_helper(context, 0.8, x, y, gr->planetTextures[textureIdx]);
 }
 
 void rendering::render_selected_object_info(const client_context& context)
@@ -105,14 +107,14 @@ void rendering::render_selected_object_info(const client_context& context)
     const auto& gr = context.gr;
     const auto& gui = context.gui;
 
-    auto object_id = GAS_GIANT_1 + gui->current_object.value()->id % (planets_meta::num_planets - GAS_GIANT_1);
     sdl_utilities::render_text(r.get(), gr->main_font, "PLANET NAME", size_settings::context_area::width / 2,
                                fonts::main_font_size / 2 + 30, size_settings::context_area::width - 50,
                                {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
+    int textureIdx = gui->GetTextureIndex(gui->current_object.value());
     render_planet_helper(context, 2.0, size_settings::context_area::width / 2,
-                         std::min(250, planets_meta::texture_size[object_id] * 2), gr->planetTextures[object_id]);
+                         std::min(250, planets_meta::texture_size[textureIdx] * 2), gr->planetTextures[textureIdx]);
 
     auto pl = std::dynamic_pointer_cast<Planet>(gui->current_object.value());
     auto io = std::dynamic_pointer_cast<InhabitableObject>(gui->current_object.value());
@@ -131,27 +133,29 @@ void rendering::render_selected_object_info(const client_context& context)
 void rendering::render_sector_sector_helper(const client_context& context, const std::shared_ptr<Sector>& sector)
 {
     const auto& gr = context.gr;
+    const auto& gui = context.gui;
     for (const auto& [id, p] : sector->objects)
     {
         const auto planet_x =
             size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * p->position.x;
         const auto planet_y =
             size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * p->position.y;
-        render_planet_helper(context, 0.8, planet_x, planet_y, gr->planetTextures[11 + p->id % 18]);
 
         // always the same rec size
+        int textureIdx = gui->GetTextureIndex(p);
+        render_planet_helper(context, 0.8, planet_x, planet_y, gr->planetTextures[textureIdx]);
+
         auto pl = std::dynamic_pointer_cast<Planet>(p);
         auto io = std::dynamic_pointer_cast<InhabitableObject>(p);
-
         if (pl)
         {
-            const auto id = (pl->colony && pl->colony->owner) ? pl->colony->owner->id : 0;
-            render_planet_owner(context, id, 0.8, planet_x, planet_y, gr->planetTextures[12]);
+            const unsigned int player_id = (pl->colony && pl->colony->owner) ? pl->colony->owner->id : 0;
+            render_planet_owner(context, player_id, 0.8, planet_x, planet_y, gr->planetTextures[textureIdx]);
         }
-        if (io)
+        else if (io)
         {
-            const auto id = (io->base && io->base->owner) ? io->base->owner->id : 0;
-            render_planet_owner(context, id, 0.8, planet_x, planet_y, gr->planetTextures[12]);
+            const unsigned int player_id = (io->base && io->base->owner) ? io->base->owner->id : 0;
+            render_planet_owner(context, player_id, 0.8, planet_x, planet_y, gr->planetTextures[textureIdx]);
         }
     }
 
