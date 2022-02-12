@@ -164,6 +164,11 @@ void Player::HandleBuildRequest(Building::BuildingType type, Building::BuildingT
     auto colony = owned_colonies.find(colony_id);
     if (colony == owned_colonies.end())
         return;
+
+    auto av_buildings = colony->second->GetAvailableBuildings();
+    if (av_buildings.count(type) == 0 || av_buildings[type] <= 0)
+        return;
+
     for (const auto &res : building.cost)
     {
         if (owned_resources[res.first] < res.second)
@@ -390,6 +395,21 @@ void Player::HandleShipDesignRequest(unsigned int id, bool delete_design, std::s
         changed_designs.push_back({id, nullptr, true});
         ship_designs.erase(id);
         return;
+    }
+
+    if (available_hulls.count(hull_type) == 0)
+        return;
+
+    for (const auto &side : sides)
+    {
+        if (available_modules.count(side.first) == 0)
+            return;
+    }
+
+    for (const auto &ins : inside)
+    {
+        if (available_modules.count(ins.first) == 0)
+            return;
     }
 
     auto sides_size = ShipHulls.at(hull_type).sides_size;
