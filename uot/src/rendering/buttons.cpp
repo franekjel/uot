@@ -81,7 +81,9 @@ void technology_button::_clicked(client_context& context)
     {
         throw std::runtime_error("couldnt plat the click sound");
     }
+#ifdef UOT_DEBUG
     printf("Technology button clicked\n");
+#endif
     context.view = std::make_shared<rendering::render_tech_view>();
 }
 
@@ -91,7 +93,9 @@ void designer_button::_clicked(client_context& context)
     {
         throw std::runtime_error("couldnt plat the click sound");
     }
+#ifdef UOT_DEBUG
     printf("Designer button clicked\n");
+#endif
     auto v = std::make_shared<rendering::render_designer_view>();
     v->init(context);
     context.view = std::move(v);
