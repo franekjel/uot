@@ -68,7 +68,7 @@ bool fleet_can_build(client_context& context)
         if (p == nullptr || p->resource_deposit.empty() || p->base != nullptr)
             continue;
 
-        if ((s->position - f->position).squaredLength() > Fleet::kNearValue)
+        if ((p->position - f->position).squaredLength() > Fleet::kNearValue)
             continue;
 
         auto [labour_cost, base_cost] = p->CalcBaseCost();
@@ -84,10 +84,115 @@ bool fleet_can_build(client_context& context)
     return false;
 }
 
-bool fleet_can_civils_on(client_context& context) { return false; }
-bool fleet_can_civils_off(client_context& context) { return false; }
-bool fleet_can_soldiers_on(client_context& context) { return false; }
-bool fleet_can_soldiers_off(client_context& context) { return false; }
+bool fleet_can_civils_off(client_context& context)
+{
+    if (!context.gui->current_fleet.has_value() || !context.gui->current_sector.has_value())
+        return false;
+
+    auto& s = context.gui->current_sector.value();
+    auto& f = context.gui->current_fleet.value();
+
+    if (f->civilians <= 0.0f)
+        return false;
+
+    for (auto& o : s->objects)
+    {
+        Planet* p = dynamic_cast<Planet*>(o.second.get());
+        if (p == nullptr || p->colony == nullptr || p->colony->owner->id != context.getGameState().value->player->id)
+            continue;
+
+        if ((p->position - f->position).squaredLength() > Fleet::kNearValue)
+            continue;
+
+        return true;
+    }
+
+    return false;
+}
+
+bool fleet_can_civils_on(client_context& context)
+{
+    if (!context.gui->current_fleet.has_value() || !context.gui->current_sector.has_value())
+        return false;
+
+    auto& s = context.gui->current_sector.value();
+    auto& f = context.gui->current_fleet.value();
+
+    if (f->human_capacity - (f->civilians + f->soldiers) <= 0.0f)
+        return false;
+
+    for (auto& o : s->objects)
+    {
+        Planet* p = dynamic_cast<Planet*>(o.second.get());
+        if (p == nullptr || p->colony == nullptr || p->colony->owner->id != context.getGameState().value->player->id)
+            continue;
+
+        if (p->colony->population <= 1.0f)
+            continue;
+
+        if ((p->position - f->position).squaredLength() > Fleet::kNearValue)
+            continue;
+
+        return true;
+    }
+
+    return false;
+}
+
+bool fleet_can_soldiers_off(client_context& context)
+{
+    if (!context.gui->current_fleet.has_value() || !context.gui->current_sector.has_value())
+        return false;
+
+    auto& s = context.gui->current_sector.value();
+    auto& f = context.gui->current_fleet.value();
+
+    if (f->soldiers <= 0.0f)
+        return false;
+
+    for (auto& o : s->objects)
+    {
+        Planet* p = dynamic_cast<Planet*>(o.second.get());
+        if (p == nullptr || p->colony == nullptr || p->colony->owner->id != context.getGameState().value->player->id)
+            continue;
+
+        if ((p->position - f->position).squaredLength() > Fleet::kNearValue)
+            continue;
+
+        return true;
+    }
+
+    return false;
+}
+
+bool fleet_can_soldiers_on(client_context& context)
+{
+    if (!context.gui->current_fleet.has_value() || !context.gui->current_sector.has_value())
+        return false;
+
+    auto& s = context.gui->current_sector.value();
+    auto& f = context.gui->current_fleet.value();
+
+    if (f->human_capacity - (f->civilians + f->soldiers) <= 0.0f)
+        return false;
+
+    for (auto& o : s->objects)
+    {
+        Planet* p = dynamic_cast<Planet*>(o.second.get());
+        if (p == nullptr || p->colony == nullptr || p->colony->owner->id != context.getGameState().value->player->id)
+            continue;
+
+        if (p->colony->soldiers <= 0.0f)
+            continue;
+
+        if ((p->position - f->position).squaredLength() > Fleet::kNearValue)
+            continue;
+
+        return true;
+    }
+
+    return false;
+}
 
 bool fleet_can_invade(client_context& context)
 {

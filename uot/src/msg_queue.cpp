@@ -62,22 +62,22 @@ void msg_queue::request_fleet_colonize(unsigned int fleet_id)
 
 void msg_queue::request_fleet_civil_on(unsigned int fleet_id)
 {
-    // TODO : server WiP
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::KidnapCivilians);
 }
 
 void msg_queue::request_fleet_civil_off(unsigned int fleet_id)
 {
-    //  TODO : server WiP
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::KickOutCivilians);
 }
 
 void msg_queue::request_fleet_soldiers_on(unsigned int fleet_id)
 {
-    //  TODO : server WiP
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::BorrowSoldiers);
 }
 
 void msg_queue::request_fleet_soldiers_off(unsigned int fleet_id)
 {
-    //  TODO : server WiP
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::DisembarkSoldiers);
 }
 
 void msg_queue::request_fleet_invade(unsigned int fleet_id)
