@@ -53,7 +53,9 @@ void uot_net_client::handle_status_change(net_status status)
 
 void uot_net_client::handle_message(const std::string& data)
 {
+#ifdef UOT_DEBUG
     std::cout << "Message :: " << data << "\n";
+#endif
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(data);
     auto type = des->GetType();
     switch (type)
