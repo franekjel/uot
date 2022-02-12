@@ -50,13 +50,13 @@ struct Module
         Inside,
     } destination;
 
-    float generating_energy;       // reactors only
-    float energy_capacity;         // reactors only
-    float shield_capacity;         // shields only
-    float additional_hp;           // armor only
-    float contruction_speed;       // construction modules only
-    float human_capacity;          // quarters only
-    std::optional<Weapon> weapon;  // weapons only
+    float generating_energy = 0.0f;       // reactors only
+    float energy_capacity = 0.0f;    // reactors only
+    float shield_capacity = 0.0f;         // shields only
+    float additional_hp = 0.0f;      // armor only
+    float contruction_speed = 0.0f;       // construction modules only
+    float human_capacity = 0.0f;     // quarters only
+    std::optional<Weapon> weapon;    // weapons only
     static constexpr float nanobots_hp_regen_amount = 20.0f;
     const std::vector<Technology::TechnologyType> required_technologies;
 
