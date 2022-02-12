@@ -75,7 +75,10 @@ enum planet_types
     PLANET_NORMAL_3,  
     PLANET_HOT_1,
     PLANET_HOT_2,
-    PLANET_HOT_3  // 31th
+    PLANET_HOT_3,
+    DARK_MATTER_1,
+    DARK_MATTER_2,
+    DARK_MATTER_3  // 31th
 };
 
 namespace selection_meta
@@ -97,7 +100,7 @@ constexpr float multiplier = 100.f;
 namespace planets_meta
 {
 constexpr float sector_multiplier = 0.3f;
-constexpr int num_planets = 59;
+constexpr int num_planets = 62;
 constexpr int num_frames = 50;
 constexpr int frame_width = 300;
 constexpr int frame_height = 300;
@@ -105,8 +108,8 @@ constexpr int frame_duration = 4;
 
 constexpr std::array<int, num_planets> texture_size = {300, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 100,
                                                        100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100,
-                                                       100, 100, 100, 100, 100, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
-    200, 200, 200, 200, 200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+                                                       100, 100, 100, 100, 100, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
+    200, 200, 200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
 constexpr std::array<std::string_view, num_planets> planet_texture_paths = {
     "assets/menu_planet_sheet.png", "assets/sector_1.png",    "assets/sector_2.png",   "assets/sector_3.png",
@@ -140,6 +143,9 @@ constexpr std::array<std::string_view, num_planets> planet_texture_paths = {
     "assets/planet_hot_1.png",
     "assets/planet_hot_2.png",
     "assets/planet_hot_3.png",
+    "assets/dark_matter_1.png",
+    "assets/dark_matter_2.png",
+    "assets/dark_matter_3.png",
 
 };
 }  // namespace planets_meta

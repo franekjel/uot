@@ -59,7 +59,7 @@ int rendering::GetTextureIndex(std::shared_ptr<SectorObject> p)
 
         if ((int)(io->object_type) == 3)  // DarkMatterCloud
         {
-            
+            return planet_types::DARK_MATTER_1 + (id % 3);
         }
     }
 
