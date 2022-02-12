@@ -86,6 +86,8 @@ struct ActionsPayload : BasePayload  // Player's actions
 
 struct NewTurnPayload : BasePayload  // New turn
 {
+    bool you_lost;
+    bool you_won;
     std::map<Resource, float> updated_resources; /*resource, amount*/
     std::map<int, float> updated_populations;    /*colony_id, population*/
     std::map<int, float> updated_soldiers;       /*colony_id, soldiers*/
@@ -105,9 +107,9 @@ struct NewTurnPayload : BasePayload  // New turn
     std::vector<MsgColony> invaded_colonies;
     std::vector<MsgDetailedFleetInfo> fleet_info_response;
     MessageType GetType() override { return MessageType::NewTurn; }
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(NewTurnPayload, updated_resources, updated_populations, updated_soldiers,
-                                   technology_updates, buildings_updates, watched_sectors_updates, new_sectors,
-                                   joined_fleets, jumped_fleets, ship_designs, ships_updates, new_ships,
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(NewTurnPayload, you_lost, you_won, updated_resources, updated_populations,
+                                   updated_soldiers, technology_updates, buildings_updates, watched_sectors_updates,
+                                   new_sectors, joined_fleets, jumped_fleets, ship_designs, ships_updates, new_ships,
                                    fleets_in_fight, changed_fleet_populations, destroyed_ships, lost_objects,
                                    invaded_colonies, fleet_info_response)
     std::string Serialize() override

@@ -77,6 +77,9 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
 {
     messageTypes::NewTurnPayload payload;
 
+    payload.you_lost = false;
+    payload.you_won = false;
+
     for (const auto& resource : player->owned_resources)
     {
         if (player->resources_changed[resource.first])
