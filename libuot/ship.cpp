@@ -432,8 +432,8 @@ void Fleet::MoveCiviliansFromColony(std::shared_ptr<Colony> colony)
         ship->civilians += added_civ;
         civilians_left_to_move -= added_civ;
         civilians += added_civ;
-        changed = true;
         iter++;
+        changed = true;
     }
 
     if (changed)
@@ -455,8 +455,8 @@ void Fleet::MoveSoldiersToColony(std::shared_ptr<Colony> colony)
         ship->soldiers -= added_sol;
         soldiers_left_to_move -= added_sol;
         soldiers -= added_sol;
-        changed = true;
         iter++;
+        changed = true;
     }
 
     if (changed)
@@ -479,8 +479,8 @@ void Fleet::MoveSoldiersFromColony(std::shared_ptr<Colony> colony)
         ship->soldiers += added_sol;
         soldiers_left_to_move -= added_sol;
         soldiers += added_sol;
-        changed = true;
         iter++;
+        changed = true;
     }
 
     if (changed)
