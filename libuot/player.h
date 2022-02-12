@@ -63,6 +63,8 @@ struct Player
     std::vector<std::shared_ptr<Colony>> new_colonies;
     std::vector<unsigned int> fleet_info_requests;
 
+    bool is_loser = false;
+
     struct ChangedDesign
     {
         unsigned int design_id;

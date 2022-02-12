@@ -86,6 +86,10 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
                                        std::shared_ptr<messageTypes::ActionsPayload> payload)
 {
     auto player = players[players_net_names_rev[player_net_name]];
+
+    if (player->is_loser)
+        return;
+
     for (const auto& build : payload->buildRequests)
     {
         player->HandleBuildRequest(build.building_type, build.upgrade_from, build.colony_id);
@@ -169,13 +173,14 @@ void PlayersList::CountWeeklyNumbers()
     //    thread.join();
 
     // Let it be synchornic for now - can be done async but too much work for now
-
     for (auto& player : players)
         CountWeeklyNumbersPlayer(player.second);
 
     // here are weekly actions performed that could not have been done multithreadedly
     for (auto& [player_id, player] : players)
     {
+        if (player->is_loser)
+            continue;
         auto& player_fleets = player->owned_fleets;
         for (const auto& [fleet_id, fleet] : player_fleets)
         {
@@ -228,6 +233,29 @@ void PlayersList::CountWeeklyNumbers()
                 }
             }
         }
+
+        bool have_any_colony = false;
+        for (const auto& [colony_id, colony] : player->owned_colonies)
+        {
+            have_any_colony |= !!colony;
+        }
+        if (!have_any_colony)
+        {
+            player->is_loser = true;
+            // TODO PO informuj o przegranej
+        }
+    }
+
+    std::vector<unsigned int> potential_winners = {};
+    for (const auto& [player_id, player] : players)
+    {
+        if (!(player->is_loser))
+            potential_winners.push_back(player_id);
+    }
+    if (potential_winners.size() == 1)
+    {
+        auto& winner = players[potential_winners[0]];
+        // TODO PO informuj o zwyciestwie
     }
 }
 
@@ -264,6 +292,8 @@ void PlayersList::SendStartGameMessage(net_server_uot& messaging_service, std::s
 
 void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
 {
+    if (player->is_loser)
+        return;
     auto& player_resources = player->owned_resources;
     auto& player_resources_change = player->resources_changed;
     auto& player_colonies = player->owned_colonies;
