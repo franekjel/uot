@@ -25,17 +25,17 @@ int rendering::GetTextureIndex(std::shared_ptr<SectorObject> p)
         const auto id = (pl->colony && pl->colony->owner) ? pl->colony->owner->id : 0;
         if ((int)(pl->climate) == 0)  // temperate
         {
-            
+            return planet_types::PLANET_NORMAL_1 + (id % 3);
         }
 
         if ((int)(pl->climate) == 1)  // cold
         {
-            
+            return planet_types::PLANET_COLD_1 + (id % 3);
         }
 
         if ((int)(pl->climate) == 2)  // hot
         {
-            
+            return planet_types::PLANET_HOT_1 + (id % 3);
         }
     }
 
@@ -54,7 +54,7 @@ int rendering::GetTextureIndex(std::shared_ptr<SectorObject> p)
 
         if ((int)(io->object_type) == 2)  // Asteroid
         {
-            
+            return planet_types::ASTEROID_1 + (id % 3);
         }
 
         if ((int)(io->object_type) == 3)  // DarkMatterCloud

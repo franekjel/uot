@@ -63,7 +63,19 @@ enum planet_types
     STAR_BLACK_HOLE_3,
     STAR_BROWN_DWARF_1,
     STAR_BROWN_DWARF_2,
-    STAR_BROWN_DWARF_3  // 31th
+    STAR_BROWN_DWARF_3,
+    ASTEROID_1,
+    ASTEROID_2,
+    ASTEROID_3,
+    PLANET_COLD_1,
+    PLANET_COLD_2,
+    PLANET_COLD_3,  
+     PLANET_NORMAL_1,
+    PLANET_NORMAL_2,
+    PLANET_NORMAL_3,  
+    PLANET_HOT_1,
+    PLANET_HOT_2,
+    PLANET_HOT_3  // 31th
 };
 
 namespace selection_meta
@@ -85,7 +97,7 @@ constexpr float multiplier = 100.f;
 namespace planets_meta
 {
 constexpr float sector_multiplier = 0.3f;
-constexpr int num_planets = 47;
+constexpr int num_planets = 59;
 constexpr int num_frames = 50;
 constexpr int frame_width = 300;
 constexpr int frame_height = 300;
@@ -93,8 +105,8 @@ constexpr int frame_duration = 4;
 
 constexpr std::array<int, num_planets> texture_size = {300, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 100,
                                                        100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100,
-                                                       100, 100, 100, 100, 100, 200, 200, 200, 200, 200, 200, 200,
-                                                       200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
+                                                       100, 100, 100, 100, 100, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
+    200, 200, 200, 200, 200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
 constexpr std::array<std::string_view, num_planets> planet_texture_paths = {
     "assets/menu_planet_sheet.png", "assets/sector_1.png",    "assets/sector_2.png",   "assets/sector_3.png",
@@ -116,6 +128,18 @@ constexpr std::array<std::string_view, num_planets> planet_texture_paths = {
     "assets/star_brown_dwaft_1.png",
     "assets/star_brown_dwaft_2.png",
     "assets/star_brown_dwaft_3.png",
+    "assets/asteroid_1.png",
+    "assets/asteroid_2.png",
+    "assets/asteroid_3.png",
+    "assets/planet_cold_1.png",
+    "assets/planet_cold_2.png",
+    "assets/planet_cold_3.png",
+    "assets/planet_normal_1.png",
+    "assets/planet_normal_2.png",
+    "assets/planet_normal_3.png",
+    "assets/planet_hot_1.png",
+    "assets/planet_hot_2.png",
+    "assets/planet_hot_3.png",
 
 };
 }  // namespace planets_meta
