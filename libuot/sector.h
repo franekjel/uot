@@ -97,8 +97,6 @@ struct Sector
     {
         unsigned int fleet_id;
         Point position;
-        float soldiers;
-        float civilians;
         float human_capacity;
         float construction_points;
         float base_fleet_speed;
@@ -150,6 +148,14 @@ struct Sector
         unsigned int owner;
     };
 
+    struct FleetPopChange
+    {
+        unsigned int fleet_id;
+        unsigned int owner;
+        float civilians;
+        float soldiers;
+    };
+
     void DecrementWatcher(unsigned int player_id);
     void IncrementWatcher(unsigned int player_id);
     void JumpFleet(unsigned int fleet_id);
@@ -159,4 +165,5 @@ struct Sector
     std::vector<NewColony> new_colonies;
     std::vector<std::shared_ptr<Fleet>> fleets_in_fight;
     std::vector<DestroyedShip> destroyed_ships;
+    std::vector<FleetPopChange> fleets_changed;
 };

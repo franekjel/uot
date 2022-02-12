@@ -146,8 +146,6 @@ struct MsgFleetParameters
     bool new_fleet;
     unsigned int id;
     Point position;
-    float soldiers;
-    float civilians;
     float human_capacity;
     float construction_points;
     float base_fleet_speed;
@@ -157,11 +155,21 @@ struct MsgFleetParameters
     float max_shields;
     float average_energy;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleetParameters, new_fleet, id, position, soldiers, civilians, human_capacity,
-                                   construction_points, base_fleet_speed, current_hp, max_hp, current_shields,
-                                   max_shields, average_energy)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleetParameters, new_fleet, id, position, human_capacity, construction_points,
+                                   base_fleet_speed, current_hp, max_hp, current_shields, max_shields, average_energy)
     MsgFleetParameters();
     MsgFleetParameters(const Sector::FleetParameters& fleet_parameters, bool new_fleet_);
+};
+
+struct MsgChangedFleetPopulation
+{
+    unsigned int id;
+    float soldiers;
+    float civilians;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgChangedFleetPopulation, id, soldiers, civilians)
+    MsgChangedFleetPopulation();
+    MsgChangedFleetPopulation(const Sector::FleetPopChange& fleet);
 };
 
 struct MsgShipUpdate
