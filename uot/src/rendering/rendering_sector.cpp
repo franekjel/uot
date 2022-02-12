@@ -97,7 +97,7 @@ void rendering::render_object_selection(const client_context& context)
     render_selection_graphics(context, pos, tex_size);
     const auto x = size_settings::play_area::width / 2 + (size_settings::play_area::height / 2) * pos.x;
     const auto y = size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * pos.y;
-    int textureIdx = GetTextureIndex(gui->current_object.value());
+    int textureIdx = gui->GetTextureIndex(gui->current_object.value());
     render_planet_helper(context, 0.8, x, y, gr->planetTextures[textureIdx]);
 }
 
@@ -112,7 +112,7 @@ void rendering::render_selected_object_info(const client_context& context)
                                {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
-    int textureIdx = GetTextureIndex(gui->current_object.value());
+    int textureIdx = gui->GetTextureIndex(gui->current_object.value());
     render_planet_helper(context, 2.0, size_settings::context_area::width / 2,
                          std::min(250, planets_meta::texture_size[textureIdx] * 2), gr->planetTextures[textureIdx]);
 
@@ -133,6 +133,7 @@ void rendering::render_selected_object_info(const client_context& context)
 void rendering::render_sector_sector_helper(const client_context& context, const std::shared_ptr<Sector>& sector)
 {
     const auto& gr = context.gr;
+    const auto& gui = context.gui;
     for (const auto& [id, p] : sector->objects)
     {
         const auto planet_x =
@@ -141,7 +142,7 @@ void rendering::render_sector_sector_helper(const client_context& context, const
             size_settings::play_area::height / 2 + (size_settings::play_area::height / 2) * p->position.y;
 
         // always the same rec size
-        int textureIdx = GetTextureIndex(p);
+        int textureIdx = gui->GetTextureIndex(p);
         render_planet_helper(context, 0.8, planet_x, planet_y, gr->planetTextures[textureIdx]);
 
         auto pl = std::dynamic_pointer_cast<Planet>(p);

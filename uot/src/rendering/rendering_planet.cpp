@@ -76,7 +76,7 @@ void rendering::render_planet_view::render_planet_info(const client_context& con
                                {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
-    int textureIdx = GetTextureIndex(gui->current_object.value());
+    int textureIdx = gui->GetTextureIndex(gui->current_object.value());
     const bool biggie = planets_meta::texture_size[textureIdx] == 300;
     rendering::render_planet_helper(context, biggie ? 1.0 : 3.0, size_settings::planet_info_area::width / 2, 250,
                                     gr->planetTextures[textureIdx]);

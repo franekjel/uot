@@ -29,7 +29,7 @@ set(SRCS
     include/net/uot_net_client.h
     include/msg_queue.h
 
-    src/game_state.cpp
+    src/game_gui.cpp
     src/utilities/input_utils.cpp
     src/main.cpp
     src/net/client_txrx.cpp
@@ -45,7 +45,9 @@ set(SRCS
     src/utilities/sdl_utils.cpp
     src/utilities/setup_utils.cpp
     src/net/uot_net_client.cpp
-    src/msg_queue.cpp)
+    src/msg_queue.cpp
+
+)
 
 
 include_directories(include/)
