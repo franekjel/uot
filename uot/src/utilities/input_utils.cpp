@@ -99,6 +99,11 @@ uot_event_type get_designer_event_type(Uint32 event_type, SDL_MouseButtonEvent m
             {
                 return uot_event_type::designer_motion_chosen;
             }
+
+            if (check_view_area_collision<size_settings::designer_hull_area>(x, y))
+            {
+                return uot_event_type::designer_motion_hull;
+            }
         }
         case SDL_MOUSEBUTTONDOWN:
         {
@@ -113,7 +118,20 @@ uot_event_type get_designer_event_type(Uint32 event_type, SDL_MouseButtonEvent m
                 return m.button == SDL_BUTTON_LEFT ? uot_event_type::designer_left_click_chosen
                                                    : uot_event_type::designer_right_click_chosen;
             }
+
+            if (check_view_area_collision<size_settings::designer_hull_area>(x, y))
+            {
+                return m.button == SDL_BUTTON_LEFT ? uot_event_type::designer_left_click_hull
+                                                   : uot_event_type::designer_right_click_hull;
+            }
+
+            if (check_view_area_collision<size_settings::designer_info_area>(x, y))
+            {
+                return m.button == SDL_BUTTON_LEFT ? uot_event_type::designer_left_click_info
+                                                   : uot_event_type::designer_right_click_info;
+            }
         }
+
     }
     return uot_event_type::other;
 }
@@ -194,10 +212,21 @@ uot_event_type get_designer_scroll_type(int x, int y)
         return uot_event_type::designer_scroll_available;
     }
 
-    if (check_view_area_collision<size_settings::designer_available_area>(x, y))
+    if (check_view_area_collision<size_settings::designer_chosen_area>(x, y))
     {
         return uot_event_type::designer_scroll_chosen;
     }
+
+    if (check_view_area_collision<size_settings::designer_hull_area>(x, y))
+    {
+        return uot_event_type::designer_scroll_hull;
+    }
+
+    if (check_view_area_collision<size_settings::designer_info_text_area>(x, y))
+    {
+        return uot_event_type::designer_scroll_info_text;
+    }
+
     return uot_event_type::other;
 }
 
