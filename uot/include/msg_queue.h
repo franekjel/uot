@@ -11,6 +11,15 @@ struct msg_queue
     void request_fleet_move(unsigned int fleet_id, const Point pos);
     void build_design(std::shared_ptr<ShipDesign>& design, const bool _delete);
     void build_ship(const int design_id, const int planet_id);
+    void request_fleet_jump(unsigned int fleet_id);
+    void request_fleet_build(unsigned int fleet_id);
+    void request_fleet_colonize(unsigned int fleet_id);
+    void request_fleet_civil_on(unsigned int fleet_id);
+    void request_fleet_civil_off(unsigned int fleet_id);
+    void request_fleet_soldiers_on(unsigned int fleet_id);
+    void request_fleet_soldiers_off(unsigned int fleet_id);
+    void request_fleet_invade(unsigned int fleet_id);
+    void request_fleet_cancel(unsigned int fleet_id);
     void reset();
 };
 

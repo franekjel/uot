@@ -187,8 +187,17 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
     auto& current_sector = context.gui->current_sector;
     auto& current_object = context.gui->current_object;
     auto& current_fleet = context.gui->current_fleet;
-    x = x - AreaType::x_offset;
-    y = y - AreaType::y_offset;
+    if (et == input_utilities::uot_event_type::left_click_context ||
+        et == input_utilities::uot_event_type::motion_context)
+    {
+        x = x - size_settings::context_area::x_offset;
+        y = y - size_settings::context_area::y_offset;
+    }
+    else
+    {
+        x = x - AreaType::x_offset;
+        y = y - AreaType::y_offset;
+    }
 
     if (et == iu::uot_event_type::left_click_play)
     {
@@ -266,6 +275,35 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
             f->wanted_position = pos;
         }
     }
+    else if (et == iu::uot_event_type::left_click_context || et == iu::uot_event_type::motion_context)
+    {
+        bool hit = false;
+
+        for (auto& b : gui->selected_fleet_buttons)
+        {
+            std::visit(
+                [&](auto&& v)
+                {
+                    const auto& pos = v->pos;
+                    if (iu::check_collision(x, y, pos.x, pos.y, pos.w, pos.h))
+                    {
+                        if (event_type == SDL_MOUSEBUTTONDOWN && v->is_active())
+                        {
+                            v->clicked(context);
+                            return;
+                        }
+
+                        context.gui->focused_button = v->button_id;
+                        hit = true;
+                        return;
+                    }
+                },
+                b);
+        }
+
+        if (!hit)
+            context.gui->focused_button.reset();
+    }
 }
 
 void rendering::render_sector_view::key_handler(client_context& context, Uint16 k)
@@ -327,7 +365,7 @@ void rendering::render_selection_graphics(const client_context& context, const P
                      SDL_GetTicks() / 100, NULL, SDL_FLIP_NONE);
 }
 
-void rendering::render_selected_fleet_info(const client_context& context)
+void rendering::render_selected_fleet_info(client_context& context)
 {
     const auto& r = context.r;
     const auto& gr = context.gr;
@@ -355,6 +393,15 @@ void rendering::render_selected_fleet_info(const client_context& context)
     sdl_utilities::render_text(r.get(), gr->secondary_font, fleet_info, size_settings::context_area::width / 2,
                                fonts::main_font_size / 2 + 30 + gui->current_fleet_info_offset,
                                size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+
+    sdl_utilities::set_render_viewport<size_settings::context_area>(r.get());
+    gui->set_button_font(gr->action_button_font);
+    for (auto& b : gui->selected_fleet_buttons)
+    {
+        set_fleet_button_color(b, context);
+        std::visit([&](auto&& v) { v->draw(context, v->button_id == gui->focused_button); }, b);
+    }
+    gui->reset_button_font();
 }
 
 void rendering::render_fleet_weapon_ranges(const client_context& context, const Point pos,

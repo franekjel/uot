@@ -22,6 +22,7 @@ set(SRCS
     include/rendering/ui_list.h
     include/utilities/sdl_utilities.h
     include/utilities/setup_utils.h
+    include/utilities/fleet_utils.h
     include/singleton.h
     include/constants/size_settings.h
     include/rendering/texture.h
@@ -46,8 +47,8 @@ set(SRCS
     src/utilities/setup_utils.cpp
     src/net/uot_net_client.cpp
     src/msg_queue.cpp
-
-)
+    src/utilities/fleet_utils.cpp
+    )
 
 
 include_directories(include/)

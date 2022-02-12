@@ -47,6 +47,15 @@ void init(client_context& context)
     context.gui->popup_buttons.push_back(std::make_unique<exit_button>());
     context.gui->navigation_menu_buttons.push_back(std::make_unique<technology_button>());
     context.gui->navigation_menu_buttons.push_back(std::make_unique<designer_button>());
+    context.gui->selected_fleet_buttons.push_back(std::make_unique<jump_button>());
+    context.gui->selected_fleet_buttons.push_back(std::make_unique<invade_button>());
+    context.gui->selected_fleet_buttons.push_back(std::make_unique<build_base_button>());
+    context.gui->selected_fleet_buttons.push_back(std::make_unique<colonize_button>());
+    context.gui->selected_fleet_buttons.push_back(std::make_unique<civil_on_button>());
+    context.gui->selected_fleet_buttons.push_back(std::make_unique<civil_off_button>());
+    context.gui->selected_fleet_buttons.push_back(std::make_unique<soldier_on_button>());
+    context.gui->selected_fleet_buttons.push_back(std::make_unique<soldier_off_button>());
+    context.gui->selected_fleet_buttons.push_back(std::make_unique<fleet_cancel_button>());
 }
 
 void loadMedia(client_context& context)
