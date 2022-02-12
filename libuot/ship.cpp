@@ -111,9 +111,9 @@ float Ship::GetShipSpeed()
 void Ship::RegenShip()
 {
     energy += energy_regen;
-    energy = std::max(energy, max_energy);
+    energy = std::min(energy, max_energy);
     hp += hp_regen;
-    hp = std::max(hp, max_hp);
+    hp = std::min(hp, max_hp);
     float shield_regeneration = std::min(max_shield - shield, max_shield * shield_regen_percentage);
     float shield_regen_cost = shield_regeneration * shield_regen_energy_cost;
     if (energy >= shield_regen_cost)
