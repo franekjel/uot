@@ -137,6 +137,8 @@ struct Fleet
     float building_progress;
     float full_building_progress;
 
+    std::shared_ptr<Colony> invaded_colony; // used only if there is a colony currently being invaded
+
     std::map<Weapon::SpecialFeatures, float> gained_damage = {
         {Weapon::SpecialFeatures::BypassShield, 0.0f},
         {Weapon::SpecialFeatures::HPDamageBonus, 0.0f},
@@ -146,6 +148,12 @@ struct Fleet
 
     static constexpr float kNearValue = 0.01f;
     static constexpr float kColonizationCost = 10.0f;
+    static constexpr float kBaseInvasionFightingNumber = 0.5f;
+    static constexpr float kInvasionColonyWinProbability = 0.7f;
+    static constexpr float kInvasionMaxWinnerDeathRate = 0.3f;
+    static constexpr float kInvasionMaxLoserDeathRate = 1.0f;
+
+    static constexpr float kEpsSoldiers= 0.001f;
 
     enum Action
     {
@@ -179,6 +187,10 @@ struct Fleet
     void MoveCiviliansFromColony(std::shared_ptr<Colony> colony);
     void MoveSoldiersToColony(std::shared_ptr<Colony> colony);
     void MoveSoldiersFromColony(std::shared_ptr<Colony> colony);
+
+    void KillSoldiers(float number);
+
+    void InvadeColony(std::shared_ptr<Colony> colony);
 
     // client only fields
     float current_hp;

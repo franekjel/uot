@@ -398,8 +398,10 @@ void Fleet::MoveCiviliansToColony(std::shared_ptr<Colony> colony)
         ship->civilians -= added_civ;
         civilians_left_to_move -= added_civ;
         civilians -= added_civ;
+        iter++;
     }
 }
+
 void Fleet::MoveCiviliansFromColony(std::shared_ptr<Colony> colony)
 {
     float civilians_left_to_move = 5.0f;
@@ -414,8 +416,10 @@ void Fleet::MoveCiviliansFromColony(std::shared_ptr<Colony> colony)
         ship->civilians += added_civ;
         civilians_left_to_move -= added_civ;
         civilians += added_civ;
+        iter++;
     }
 }
+
 void Fleet::MoveSoldiersToColony(std::shared_ptr<Colony> colony)
 {
     float soldiers_left_to_move = 5.0f;
@@ -429,8 +433,10 @@ void Fleet::MoveSoldiersToColony(std::shared_ptr<Colony> colony)
         ship->civilians -= added_sol;
         soldiers_left_to_move -= added_sol;
         soldiers -= added_sol;
+        iter++;
     }
 }
+
 void Fleet::MoveSoldiersFromColony(std::shared_ptr<Colony> colony)
 {
     float soldiers_left_to_move = 5.0f;
@@ -445,6 +451,7 @@ void Fleet::MoveSoldiersFromColony(std::shared_ptr<Colony> colony)
         ship->soldiers += added_sol;
         soldiers_left_to_move -= added_sol;
         soldiers += added_sol;
+        iter++;
     }
 }
 
@@ -456,4 +463,29 @@ std::map<Resource, float> Fleet::GetUpkeepCost()
         cost += ship->design->upkeep;
     }
     return cost;
+}
+
+void Fleet::InvadeColony(std::shared_ptr<Colony> colony)
+{
+    if (current_action != Fleet::Action::None)
+        return;
+    current_action = Fleet::Action::Invade;
+    invaded_colony = colony;
+}
+
+void Fleet::KillSoldiers(float number)
+{
+    float soldiers_left_kill = number;
+
+    auto iter = ships.begin();
+    while (soldiers_left_kill != 0.0f && iter != ships.end())
+    {
+        auto ship = *iter;
+        float killed_sol = std::min(soldiers_left_kill,
+                                   ship->soldiers);
+        ship->soldiers -= killed_sol;
+        soldiers_left_kill -= killed_sol;
+        soldiers -= killed_sol;
+        iter++;
+    }
 }
