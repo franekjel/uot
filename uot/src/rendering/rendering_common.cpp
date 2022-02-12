@@ -22,7 +22,7 @@ int rendering::GetTextureIndex(std::shared_ptr<SectorObject> p)
    
     if (pl)
     {
-        const auto id = (pl->colony && pl->colony->owner) ? pl->colony->owner->id : 0;
+        const auto id = pl->id;
         if ((int)(pl->climate) == 0)  // temperate
         {
             return planet_types::PLANET_NORMAL_1 + (id % 3);
@@ -41,7 +41,7 @@ int rendering::GetTextureIndex(std::shared_ptr<SectorObject> p)
 
     if (io)
     {
-        const auto id = (io->base && io->base->owner) ? io->base->owner->id : 0;
+        const auto id = io->id;
         if ((int)(io->object_type) == 0)  // InhabitablePlanet
         {
             return planet_types::NO_ATM_1 + (id % 3);
