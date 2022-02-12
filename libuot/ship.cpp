@@ -511,8 +511,7 @@ void Fleet::KillSoldiers(float number)
     while (soldiers_left_kill != 0.0f && iter != ships.end())
     {
         auto ship = *iter;
-        float killed_sol = std::min(soldiers_left_kill,
-                                   ship->soldiers);
+        float killed_sol = std::min(soldiers_left_kill, ship->soldiers);
         ship->soldiers -= killed_sol;
         soldiers_left_kill -= killed_sol;
         soldiers -= killed_sol;

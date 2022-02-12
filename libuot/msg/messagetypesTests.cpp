@@ -121,11 +121,11 @@ bool operator==(messageTypes::MsgNewColony& f1, messageTypes::MsgNewColony& f2)
 
 bool operator==(messageTypes::MsgFleetParameters& f1, messageTypes::MsgFleetParameters& f2)
 {
-    if (f1.id != f2.id || f1.new_fleet != f2.new_fleet || f1.position != f2.position || f1.soldiers != f2.soldiers ||
-        f1.civilians != f2.civilians || f1.human_capacity != f2.human_capacity ||
-        f1.construction_points != f2.construction_points || f1.base_fleet_speed != f2.base_fleet_speed ||
-        f1.current_hp != f2.current_hp || f1.max_hp != f2.max_hp || f1.current_shields != f2.current_shields ||
-        f1.max_shields != f2.max_shields || f1.average_energy != f2.average_energy)
+    if (f1.id != f2.id || f1.new_fleet != f2.new_fleet || f1.position != f2.position ||
+        f1.human_capacity != f2.human_capacity || f1.construction_points != f2.construction_points ||
+        f1.base_fleet_speed != f2.base_fleet_speed || f1.current_hp != f2.current_hp || f1.max_hp != f2.max_hp ||
+        f1.current_shields != f2.current_shields || f1.max_shields != f2.max_shields ||
+        f1.average_energy != f2.average_energy)
         return false;
 
     return true;
@@ -414,8 +414,6 @@ void NewTurnPayloadTest()
     Sector::FleetParameters flp;
     flp.fleet_id = 1;
     flp.position = {0.0f, 2.0f};
-    flp.soldiers = 4.0f;
-    flp.civilians = 5.0f;
     flp.human_capacity = 6.0f;
     flp.construction_points = 8.0f;
     flp.base_fleet_speed = -1.0f;
@@ -453,8 +451,6 @@ void NewTurnPayloadTest()
     Sector::FleetParameters flp2;
     flp2.fleet_id = 3;
     flp2.position = {0.2f, 2.0f};
-    flp2.soldiers = 4.1f;
-    flp2.civilians = 8.0f;
     flp2.human_capacity = 3.9f;
     flp2.construction_points = 4.0f;
     flp2.base_fleet_speed = 4.0f;

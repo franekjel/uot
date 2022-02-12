@@ -127,7 +127,8 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
             case Fleet::Action::Colonize:
                 player->HandleColonizeFleetRequest(fleet_action_request.fleet_id);
                 break;
-            case Fleet::Action::Invade://TODO
+            case Fleet::Action::Invade:
+                player->HandleInvadeFleetRequest(fleet_action_request.fleet_id);
                 break;
             case Fleet::Action::KickOutCivilians:
             case Fleet::Action::KidnapCivilians:
@@ -241,6 +242,7 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
         sector->new_colonies.clear();
         sector->fleets_in_fight.clear();
         sector->destroyed_ships.clear();
+        sector->fleets_changed.clear();
     }
 }
 
@@ -421,8 +423,8 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
 
             if (fleet->soldiers > 0.0f)
             {
-                float used_fleet_soldiers = std::min(Fleet::kBaseInvasionFightingNumber, fleet->soldiers); 
-                float used_colony_soldiers = std::min(Fleet::kBaseInvasionFightingNumber, fleet->soldiers); 
+                float used_fleet_soldiers = std::min(Fleet::kBaseInvasionFightingNumber, fleet->soldiers);
+                float used_colony_soldiers = std::min(Fleet::kBaseInvasionFightingNumber, fleet->soldiers);
 
                 float colony_win_probability =
                     Fleet::kInvasionColonyWinProbability * (used_colony_soldiers / used_fleet_soldiers);
@@ -441,6 +443,9 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
                     invaded_colony->soldiers -= looser_deaths_rate * used_colony_soldiers;
                     fleet->KillSoldiers(used_fleet_soldiers * winner_deaths_rate);
                 }
+
+                fleet->location_sector->fleets_changed.push_back(
+                    {fleet->id, fleet->owner_id, fleet->civilians, fleet->soldiers});
             }
 
             if (invaded_colony->soldiers <= Fleet::kEpsSoldiers)
@@ -453,6 +458,15 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
 
                 fleet->invaded_colony = nullptr;
                 fleet->current_action = Fleet::Action::None;
+                invaded_colony->building_queue.clear();
+                invaded_colony->ship_building_queue.clear();
+                invaded_colony->building_queue_changed = false;
+                invaded_colony->ship_building_queue_changed = false;
+
+                invaded_colony->owner->lost_objects.push_back(invaded_colony->planet->id);
+                player->new_colonies.push_back(invaded_colony);
+                fleet->location_sector->new_colonies.push_back({invaded_colony->id, invaded_colony->planet->id,
+                                                                invaded_colony->owner->id, invaded_colony->population});
             }
             else if (fleet->soldiers <= Fleet::kEpsSoldiers)
             {
