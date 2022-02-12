@@ -130,7 +130,7 @@ void rendering::render_selected_object_info(const client_context& context)
                                size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 }
 
-void rendering::render_sector_sector_helper(const client_context& context, const std::shared_ptr<Sector>& sector)
+void rendering::render_sector_sector_helper(client_context& context, const std::shared_ptr<Sector>& sector)
 {
     const auto& gr = context.gr;
     const auto& gui = context.gui;
@@ -161,7 +161,12 @@ void rendering::render_sector_sector_helper(const client_context& context, const
 
     for (auto& [id, f] : sector->present_fleets)
     {
-        f->owner_id = 1;  // TODO: REMOVE IN FINAL VERSION (for now we don't have enough info about fleets)
+        render_fleet(context, f);
+    }
+
+    const auto& gs = context.getGameState().value;
+    for (auto& [id, f] : gs->enemies_fleet_in_current_sector)
+    {
         render_fleet(context, f);
     }
 }
@@ -384,9 +389,9 @@ void rendering::render_selected_fleet_info(client_context& context)
         "shields: " + std::to_string(int(f->current_shields)) + "/" + std::to_string(int(f->max_shields)) + "\n";
     fleet_info += "avg energy: " + std::to_string(int(f->average_energy * 100.0f)) + "%\n";
     fleet_info += "ships:\n";
-    for (const auto& s : f->ships)
+    for (const auto& [id, s] : f->ships)
     {
-        fleet_info += " id" + std::to_string(s->id) + ": " + s->design->name + "\n";
+        fleet_info += " id" + std::to_string(id) + ": " + s->design->name + "\n";
     }
 
     sdl_utilities::set_render_viewport<size_settings::fleet_info_area>(r.get());

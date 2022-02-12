@@ -39,6 +39,8 @@ struct game_resources : public uncopiable
     std::unordered_map<ModuleType, texture_t> circle_textures;
     std::array<texture_t, 16> fleet_textures;
 
+    texture_t missile_texture;
+
     std::shared_ptr<TTF_Font> main_font;
     std::shared_ptr<TTF_Font> secondary_font;
     std::shared_ptr<TTF_Font> resource_font;

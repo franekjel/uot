@@ -89,6 +89,13 @@ struct Sector
     std::map<unsigned int, std::shared_ptr<SectorObject>> objects;
     std::map<unsigned int, std::shared_ptr<Fleet>> present_fleets;
 
+    Sector() = default;
+    Sector(const unsigned int sector_id, const Point &position,
+           const std::map<unsigned int, std::shared_ptr<SectorObject>> &objects = {})
+        : sector_id(sector_id), position(position), objects(objects)
+    {
+    }
+
     // fields below are server-only
     std::map<unsigned int, unsigned int> watchers;  // players who are watching the sector, only for server purpose
     std::map<unsigned int, int> new_watchers;

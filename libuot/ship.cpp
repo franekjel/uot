@@ -130,23 +130,18 @@ void Ship::RegenShip()
 
 void Fleet::UpdateFleet()
 {
-    int to_delete = -1;
-    do
+    for (auto it = ships.begin(), next_it = it; it != ships.end(); it = next_it)
     {
-        to_delete = -1;
-        for (int i = 0; i < ships.size(); i++)
+        next_it++;
+        if (it->second->hp <= 0.0f)
         {
-            if (ships[i]->hp <= 0)
-            {
-                to_delete = i;
-                break;
-            }
+            ships.erase(it);
         }
-        if (to_delete >= 0)
-        {
-            ships.erase(ships.begin() + to_delete);
-        }
-    } while (to_delete >= 0);
+    }
+
+    for (const auto &[id, ship] : ships)
+    {
+    }
 
     if (ships.size() == 0)
     {
@@ -155,7 +150,7 @@ void Fleet::UpdateFleet()
     }
 
     fleet_aggro = 0;
-    for (const auto &ship : ships)
+    for (const auto &[id, ship] : ships)
     {
         ship->RegenShip();
         fleet_aggro += ship->ship_aggro;
@@ -171,7 +166,7 @@ void Fleet::UpdateFleet()
     if (current_action == Action::WarpLoading)
     {
         bool is_ready_to_jump = true;
-        for (const auto &ship : ships)
+        for (const auto &[id, ship] : ships)
         {
             is_ready_to_jump &= ship->ChargeWarpDrive();
         }
@@ -190,8 +185,8 @@ void Fleet::UpdateFleetSpeed()
         return;
     }
 
-    float minimum_speed = ships.front()->GetShipSpeed();
-    for (const auto &ship : ships)
+    float minimum_speed = ships.begin()->second->GetShipSpeed();
+    for (const auto &[id, ship] : ships)
     {
         float speed = ship->GetShipSpeed();
         if (speed < minimum_speed)
@@ -217,7 +212,7 @@ void Fleet::MoveFleet()
     float movement_length = std::sqrt(movement_vec.squaredLength());
     if (movement_length > fleet_speed_per_turn)
     {
-        for (const auto &ship : ships)
+        for (const auto &[id, ship] : ships)
         {
             ship->MoveShip(fleet_speed_per_turn);
         }
@@ -226,7 +221,7 @@ void Fleet::MoveFleet()
     }
     else
     {
-        for (const auto &ship : ships)
+        for (const auto &[id, ship] : ships)
         {
             ship->MoveShip(movement_length);
         }
@@ -236,7 +231,7 @@ void Fleet::MoveFleet()
 
 void Fleet::JumpFleet()
 {
-    for (const auto &ship : ships)
+    for (const auto &[id, ship] : ships)
     {
         ship->JumpShip();
     }
@@ -264,7 +259,7 @@ void Fleet::AddShipToFleet(const std::shared_ptr<Ship> &ship)
     human_capacity += ship->human_capacity;
     construction_points += ship->construction_points;
     fleet_aggro += ship->ship_aggro;
-    ships.push_back(ship);
+    ships.insert({ship->id, ship});
     for (const auto &[type, amount] : ship->ship_weapons)
     {
         fleet_weapons[type].first += amount;
@@ -286,7 +281,6 @@ void Fleet::CountDamage()
     {
         damage_sum += dmg;
     }
-
     if (damage_sum > 0.0f)
     {
         location_sector->fleets_in_fight.push_back(location_sector->present_fleets[id]);
@@ -338,7 +332,7 @@ void Fleet::CountDamage()
 
     while (damage_sum > 0.0f && !empty_fleet)
     {
-        for (const auto &ship : ships)
+        for (const auto &[id, ship] : ships)
         {
             counting_damage(ship, Weapon::SpecialFeatures::ShieldDamageBonus);
             counting_damage(ship, Weapon::SpecialFeatures::None);
@@ -352,9 +346,9 @@ void Fleet::CountDamage()
             auto itr = ships.begin();
             while (itr != ships.end())
             {
-                if ((*itr)->hp <= 0.0f)
+                if (itr->second->hp <= 0.0f)
                 {
-                    auto &sh = *itr;
+                    auto &sh = itr->second;
                     civilians -= sh->civilians;
                     soldiers -= sh->soldiers;
                     human_capacity -= sh->human_capacity;
@@ -402,10 +396,10 @@ void Fleet::MoveCiviliansToColony(std::shared_ptr<Colony> colony)
     while (civilians_left_to_move != 0.0f && iter != ships.end())
     {
         auto ship = *iter;
-        float added_civ = std::min(ship->civilians, civilians_left_to_move);
+        float added_civ = std::min(ship.second->civilians, civilians_left_to_move);
         colony->population += added_civ;
         colony->population_changed = true;
-        ship->civilians -= added_civ;
+        ship.second->civilians -= added_civ;
         civilians_left_to_move -= added_civ;
         civilians -= added_civ;
         iter++;
@@ -426,10 +420,10 @@ void Fleet::MoveCiviliansFromColony(std::shared_ptr<Colony> colony)
     {
         auto ship = *iter;
         float added_civ = std::min(std::min(colony->population - 1.0f, civilians_left_to_move),
-                                   ship->human_capacity - (ship->soldiers + ship->civilians));
+                                   ship.second->human_capacity - (ship.second->soldiers + ship.second->civilians));
         colony->population -= added_civ;
         colony->population_changed = true;
-        ship->civilians += added_civ;
+        ship.second->civilians += added_civ;
         civilians_left_to_move -= added_civ;
         civilians += added_civ;
         iter++;
@@ -449,10 +443,10 @@ void Fleet::MoveSoldiersToColony(std::shared_ptr<Colony> colony)
     while (soldiers_left_to_move != 0.0f && iter != ships.end())
     {
         auto ship = *iter;
-        float added_sol = std::min(ship->soldiers, soldiers_left_to_move);
+        float added_sol = std::min(ship.second->soldiers, soldiers_left_to_move);
         colony->soldiers += added_sol;
         colony->soldiers_changed = true;
-        ship->soldiers -= added_sol;
+        ship.second->soldiers -= added_sol;
         soldiers_left_to_move -= added_sol;
         soldiers -= added_sol;
         iter++;
@@ -473,10 +467,10 @@ void Fleet::MoveSoldiersFromColony(std::shared_ptr<Colony> colony)
     {
         auto ship = *iter;
         float added_sol = std::min(std::min(colony->soldiers, soldiers_left_to_move),
-                                   ship->human_capacity - (ship->soldiers + ship->civilians));
+                                   ship.second->human_capacity - (ship.second->soldiers + ship.second->civilians));
         colony->soldiers -= added_sol;
         colony->soldiers_changed = true;
-        ship->soldiers += added_sol;
+        ship.second->soldiers += added_sol;
         soldiers_left_to_move -= added_sol;
         soldiers += added_sol;
         iter++;
@@ -490,7 +484,7 @@ void Fleet::MoveSoldiersFromColony(std::shared_ptr<Colony> colony)
 std::map<Resource, float> Fleet::GetUpkeepCost()
 {
     std::map<Resource, float> cost;
-    for (const auto &ship : ships)
+    for (const auto &[id, ship] : ships)
     {
         cost += ship->design->upkeep;
     }
@@ -513,8 +507,8 @@ void Fleet::KillSoldiers(float number)
     while (soldiers_left_kill != 0.0f && iter != ships.end())
     {
         auto ship = *iter;
-        float killed_sol = std::min(soldiers_left_kill, ship->soldiers);
-        ship->soldiers -= killed_sol;
+        float killed_sol = std::min(soldiers_left_kill, ship.second->soldiers);
+        ship.second->soldiers -= killed_sol;
         soldiers_left_kill -= killed_sol;
         soldiers -= killed_sol;
         iter++;

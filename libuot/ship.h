@@ -112,7 +112,7 @@ struct Ship
 struct Fleet
 {
     unsigned int id;
-    std::vector<std::shared_ptr<Ship>> ships;
+    std::map<unsigned int, std::shared_ptr<Ship>> ships;
     float soldiers;
     float civilians;
     float human_capacity;

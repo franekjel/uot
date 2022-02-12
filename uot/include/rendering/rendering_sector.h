@@ -15,7 +15,7 @@ struct render_sector_view : render_view<render_sector_view>
     void _wheel_handler(client_context& context, int x, int y, int xmov, int ymov);
 };
 
-void render_sector_sector_helper(const client_context& context, const std::shared_ptr<Sector>& sector);
+void render_sector_sector_helper(client_context& context, const std::shared_ptr<Sector>& sector);
 
 void render_sector_object();
 
