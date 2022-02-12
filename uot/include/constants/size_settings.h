@@ -49,6 +49,14 @@ struct planet_build_area : area_properties<400, 770, 1190, 10>
 {
 };
 
+struct designer_available_area : area_properties<400, 770, 1190, 10>
+{
+};
+
+struct designer_chosen_area : area_properties<400, 770, 10, 10>
+{
+};
+
 struct planet_ships_build_area : area_properties<400, 770, 10, 10>
 {
 };

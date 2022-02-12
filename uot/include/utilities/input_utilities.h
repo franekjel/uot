@@ -48,6 +48,15 @@ enum class uot_event_type
     planet_scroll_other,
     planet_scroll_resource,
 
+    designer_scroll_available,
+    designer_scroll_chosen,
+    designer_motion_available,
+    designer_motion_chosen,
+    designer_left_click_available,
+    designer_right_click_available,
+    designer_left_click_chosen,
+    designer_right_click_chosen,
+
     other
 };
 
@@ -85,7 +94,11 @@ uot_event_type get_event_type(Uint32 event_type, SDL_MouseButtonEvent m, int x, 
 
 uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
 
+uot_event_type get_designer_event_type(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
+
 uot_event_type get_planet_scroll_type(int x, int y);
+
+uot_event_type get_designer_scroll_type(int x, int y);
 
 uot_event_type get_planet_build_event_type(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
 

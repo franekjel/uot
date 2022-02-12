@@ -46,6 +46,7 @@ void init(client_context& context)
     context.gui->popup_buttons.push_back(std::make_unique<start_button>());
     context.gui->popup_buttons.push_back(std::make_unique<exit_button>());
     context.gui->navigation_menu_buttons.push_back(std::make_unique<technology_button>());
+    context.gui->navigation_menu_buttons.push_back(std::make_unique<designer_button>());
 }
 
 void loadMedia(client_context& context)

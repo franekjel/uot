@@ -42,6 +42,17 @@ void start_button::_clicked(client_context& context)
         throw std::runtime_error("couldnt plat the click sound");
     }
     context.view = std::make_shared<rendering::render_universe_view>();
+    context.gui->popup_buttons.erase(context.gui->popup_buttons.begin(), context.gui->popup_buttons.begin() + 1);
+    context.gui->popup_buttons.insert(context.gui->popup_buttons.begin(), std::make_unique<back_button>());
+}
+
+void back_button::_clicked(client_context& context)
+{
+    if (Mix_PlayChannel(-1, context.gr->open_ship.get(), 0) == -1)
+    {
+        throw std::runtime_error("couldnt plat the click sound");
+    }
+    context.view = std::make_shared<rendering::render_universe_view>();
 }
 
 void exit_button::_clicked(client_context& context)
@@ -72,6 +83,19 @@ void technology_button::_clicked(client_context& context)
     }
     printf("Technology button clicked\n");
     context.view = std::make_shared<rendering::render_tech_view>();
+}
+
+void designer_button::_clicked(client_context& context)
+{
+    if (Mix_PlayChannel(-1, context.gr->click.get(), 0) == -1)
+    {
+        throw std::runtime_error("couldnt plat the click sound");
+    }
+    printf("Designer button clicked\n");
+    auto v = std::make_shared<rendering::render_designer_view>();
+    v->init(context);
+    context.view = std::move(v);
+
 }
 
 void research_button::_clicked(client_context& context)

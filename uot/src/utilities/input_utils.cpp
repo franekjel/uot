@@ -84,6 +84,40 @@ uot_event_type get_planet_build_event_type(Uint32 event_type, SDL_MouseButtonEve
     return uot_event_type::other;
 }
 
+uot_event_type get_designer_event_type(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y) {
+
+    switch (event_type)
+    {
+        case SDL_MOUSEMOTION:
+        {
+            if (check_view_area_collision<size_settings::designer_available_area>(x, y))
+            {
+                return uot_event_type::designer_motion_available;
+            }
+
+            if (check_view_area_collision<size_settings::designer_chosen_area>(x, y))
+            {
+                return uot_event_type::designer_motion_chosen;
+            }
+        }
+        case SDL_MOUSEBUTTONDOWN:
+        {
+            if (check_view_area_collision<size_settings::designer_available_area>(x, y))
+            {
+                return m.button == SDL_BUTTON_LEFT ? uot_event_type::designer_left_click_available
+                           : uot_event_type::designer_right_click_available;
+            }
+
+            if (check_view_area_collision<size_settings::designer_chosen_area>(x, y))
+            {
+                return m.button == SDL_BUTTON_LEFT ? uot_event_type::designer_left_click_chosen
+                           : uot_event_type::designer_right_click_chosen;
+            }
+        }
+    }
+        return uot_event_type::other;
+}
+
 uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y)
 {
     switch (event_type)
@@ -151,6 +185,20 @@ uot_event_type get_planet_build_scroll_type(int x, int y) {
     }
 
     return uot_event_type::planet_scroll_other;
+}
+
+uot_event_type get_designer_scroll_type(int x, int y) {
+
+    if (check_view_area_collision<size_settings::designer_available_area>(x, y))
+    {
+        return uot_event_type::designer_scroll_available;
+    }
+
+    if (check_view_area_collision<size_settings::designer_available_area>(x, y))
+    {
+        return uot_event_type::designer_scroll_chosen;
+    }
+    return uot_event_type::other;
 }
 
 uot_event_type get_planet_scroll_type(int x, int y)
