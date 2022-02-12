@@ -133,6 +133,7 @@ void uot_net_client::handle_message(const std::string& data)
             ///
 
             context.gui->last_turn_time = std::chrono::steady_clock::now();
+            context.gui->do_gui_per_turn_update(context);
             send_payload();
         }
         break;

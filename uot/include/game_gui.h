@@ -46,6 +46,7 @@ struct game_gui
     void reset_button_font() { button_font.reset(); }
     std::optional<int> button_border_width;
     std::optional<button_color> button_color_override;
+    void do_gui_per_turn_update(client_context& context);
 
     game_gui() {}
 
