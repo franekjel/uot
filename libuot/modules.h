@@ -57,15 +57,18 @@ struct Module
     float human_capacity;          // quarters only
     std::optional<Weapon> weapon;  // weapons only
     static constexpr float nanobots_hp_regen_amount = 20.0f;
+    const std::vector<Technology::TechnologyType> required_technologies;
 
     Module(const std::string& name, const int size, const float energy_usage, const std::map<Resource, float>& cost,
-           const std::map<Resource, float>& additional_upkeep, const ModuleDestination destination)
+           const std::map<Resource, float>& additional_upkeep, const ModuleDestination destination,
+           const std::vector<Technology::TechnologyType> required_technologies)
         : name(name),
           size(size),
           energy_usage(energy_usage),
           cost(cost),
           additional_upkeep(additional_upkeep),
-          destination(destination)
+          destination(destination),
+          required_technologies(required_technologies)
     {
     }
 
@@ -145,100 +148,113 @@ enum class ModuleType
 
 const std::map<ModuleType, Module> Modules{
 
-    {ModuleType::SmallReactor, Module::Reactor(Module("Basic small reactor", 2, 0.0f, {{Resource::Metals, 5.0f}},
-                                                      {{Resource::Antimatter, 1.0f}}, Module::Inside),
-                                               5.0f)},
+    {ModuleType::SmallReactor,
+     Module::Reactor(Module("Basic small reactor", 2, 0.0f, {{Resource::Metals, 5.0f}}, {{Resource::Antimatter, 1.0f}},
+                            Module::Inside, {Technology::TechnologyType::Spaceships}),
+                     5.0f)},
 
     {ModuleType::ImprovedSmallReactor,
-     Module::Reactor(Module("Improved small reactor", 2, 0.0f,
-                            {{Resource::Metals, 5.0f}, {Resource::RareMetals, 3.0f}, {Resource::Crystals, 3.0f}},
-                            {{Resource::Antimatter, 2.0f}}, Module::Inside),
-                     12.0f)},
+     Module::Reactor(
+         Module("Improved small reactor", 2, 0.0f,
+                {{Resource::Metals, 5.0f}, {Resource::RareMetals, 3.0f}, {Resource::Crystals, 3.0f}},
+                {{Resource::Antimatter, 2.0f}}, Module::Inside, {Technology::TechnologyType::ImprovedReactor}),
+         12.0f)},
     {ModuleType::ImprovedBigReactor,
-     Module::Reactor(Module("Improved big reactor", 6, 0.0f,
-                            {{Resource::Metals, 25.0f}, {Resource::RareMetals, 10.0f}, {Resource::Crystals, 10.0f}},
-                            {{Resource::Antimatter, 5.0f}}, Module::Inside),
-                     40.0f)},
+     Module::Reactor(
+         Module("Improved big reactor", 6, 0.0f,
+                {{Resource::Metals, 25.0f}, {Resource::RareMetals, 10.0f}, {Resource::Crystals, 10.0f}},
+                {{Resource::Antimatter, 5.0f}}, Module::Inside, {Technology::TechnologyType::ImprovedReactor}),
+         40.0f)},
 
     {ModuleType::AdvancedSmallReactor, Module::Reactor(Module("Advanced small reactor", 2, 0.0f,
                                                               {{Resource::Metals, 5.0f},
                                                                {Resource::RareMetals, 5.0f},
                                                                {Resource::Crystals, 5.0f},
                                                                {Resource::DarkMatter, 3.0f}},
-                                                              {{Resource::Antimatter, 2.0f}}, Module::Inside),
+                                                              {{Resource::Antimatter, 2.0f}}, Module::Inside,
+                                                              {Technology::TechnologyType::AdvancedReactor}),
                                                        20.0f)},
     {ModuleType::AdvancedBigReactor, Module::Reactor(Module("Advanced big reactor", 6, 0.0f,
                                                             {{Resource::Metals, 20.0f},
                                                              {Resource::RareMetals, 20.0f},
                                                              {Resource::Crystals, 20.0f},
                                                              {Resource::DarkMatter, 15.0f}},
-                                                            {{Resource::Antimatter, 5.0f}}, Module::Inside),
+                                                            {{Resource::Antimatter, 5.0f}}, Module::Inside,
+                                                            {Technology::TechnologyType::AdvancedReactor}),
                                                      55.0f)},
 
     {ModuleType::BasicShieldGenerator,
-     Module::ShieldGenerator(Module("Basic shield generator", 1, 1.5f,
-                                    {{Resource::Metals, 5.0f}, {Resource::Crystals, 3.0f}}, {}, Module::Inside),
-                             100.0f)},
+     Module::ShieldGenerator(
+         Module("Basic shield generator", 1, 1.5f, {{Resource::Metals, 5.0f}, {Resource::Crystals, 3.0f}}, {},
+                Module::Inside, {Technology::TechnologyType::EnergyShields}),
+         100.0f)},
     {ModuleType::ImprovedShieldGenerator,
-     Module::ShieldGenerator(Module("Improved shield generator", 1, 3.0f,
-                                    {{Resource::RareMetals, 5.0f}, {Resource::Crystals, 10.0f}}, {}, Module::Inside),
-                             200.0f)},
+     Module::ShieldGenerator(
+         Module("Improved shield generator", 1, 3.0f, {{Resource::RareMetals, 5.0f}, {Resource::Crystals, 10.0f}}, {},
+                Module::Inside, {Technology::TechnologyType::ImprovedEnergyShields}),
+         200.0f)},
     {ModuleType::AdvancedShieldGenerator,
      Module::ShieldGenerator(
          Module("Advanced shield generator", 1, 6.0f,
                 {{Resource::Metals, 5.0f}, {Resource::Crystals, 10.0f}, {Resource::DarkMatter, 5.0f}}, {},
-                Module::Inside),
+                Module::Inside, {Technology::TechnologyType::AdvancedEnergyShields}),
          400.0f)},
 
     {ModuleType::MetalArmorPlates,
-     Module::ArmorPlates(Module("Metal armor plates", 2, 0.0f, {{Resource::Metals, 15.0f}}, {}, Module::Sides),
+     Module::ArmorPlates(Module("Metal armor plates", 2, 0.0f, {{Resource::Metals, 15.0f}}, {}, Module::Sides,
+                                {Technology::TechnologyType::Spaceships}),
                          100.0f)},
     {ModuleType::ImprovedArmorPlates,
      Module::ArmorPlates(Module("Armor plates enchanced with rare metals", 2, 0.0f,
-                                {{Resource::Metals, 15.0f}, {Resource::RareMetals, 10.0f}}, {}, Module::Sides),
+                                {{Resource::Metals, 15.0f}, {Resource::RareMetals, 10.0f}}, {}, Module::Sides,
+                                {Technology::TechnologyType::ImprovedArmor}),
                          200.0f)},
-    {ModuleType::AdvancedArmorPlates, Module::ArmorPlates(Module("Advanced armor plates", 2, 0.0f,
-                                                                 {{Resource::Metals, 15.0f},
-                                                                  {Resource::RareMetals, 10.0f},
-                                                                  {Resource::Polymers, 10.0f},
-                                                                  {Resource::Crystals, 5.0f}},
-                                                                 {}, Module::Sides),
-                                                          400.0f)},
+    {ModuleType::AdvancedArmorPlates,
+     Module::ArmorPlates(Module("Advanced armor plates", 2, 0.0f,
+                                {{Resource::Metals, 15.0f},
+                                 {Resource::RareMetals, 10.0f},
+                                 {Resource::Polymers, 10.0f},
+                                 {Resource::Crystals, 5.0f}},
+                                {}, Module::Sides, {Technology::TechnologyType::AdvancedArmor}),
+                         400.0f)},
 
-    {ModuleType::Quarters,
-     Module::Quarters(Module("Quarters", 2, 1.0f, {{Resource::Metals, 25.0f}}, {}, Module::Inside), 5.0f)},
+    {ModuleType::Quarters, Module::Quarters(Module("Quarters", 2, 1.0f, {{Resource::Metals, 25.0f}}, {}, Module::Inside,
+                                                   {Technology::TechnologyType::Spaceships}),
+                                            5.0f)},
 
     {ModuleType::BasicContructionModule,
-     Module::ContructionModule(
-         Module("Basic construction module", 4, 4.0f, {{Resource::Metals, 10.0f}}, {}, Module::Sides), 2.0f)},
+     Module::ContructionModule(Module("Basic construction module", 4, 4.0f, {{Resource::Metals, 10.0f}}, {},
+                                      Module::Sides, {Technology::TechnologyType::Spaceships}),
+                               2.0f)},
     {ModuleType::AdvancedContructionModule,
      Module::ContructionModule(
          Module("Advanced construction module", 4, 4.0f,
                 {{Resource::Metals, 10.0f}, {Resource::RareMetals, 5.0f}, {Resource::Crystals, 2.0f}}, {},
-                Module::Sides),
+                Module::Sides, {Technology::TechnologyType::AdvancedSpaceEngineering}),
          4.0f)},
     {ModuleType::NanobotsContructionModule,
      Module::ContructionModule(
          Module("Nanobots construction module", 4, 4.0f,
                 {{Resource::Metals, 10.0f}, {Resource::RareMetals, 4.0f}, {Resource::AncientNanobots, 4.0f}}, {},
-                Module::Sides),
+                Module::Sides, {Technology::TechnologyType::NanobotsEngineering}),
          8.0f)},
 
     {ModuleType::NanobotsSelfRepairModule,
      Module("Nanobots self-repair module", 4, 8.0f,
             {{Resource::Metals, 20.0f}, {Resource::RareMetals, 10.0f}, {Resource::AncientNanobots, 20.0f}},
-            {{Resource::AncientNanobots, 0.05f}, {Resource::Antimatter, 0.1f}}, Module::Inside)},
+            {{Resource::AncientNanobots, 0.05f}, {Resource::Antimatter, 0.1f}}, Module::Inside,
+            {Technology::TechnologyType::NanobotsEngineering})},
 
     {ModuleType::SmallLaser,
-     Module::WeaponModule(
-         Module("Small laser", 1, 2.0f, {{Resource::Metals, 5.0f}, {Resource::Crystals, 3.0f}}, {}, Module::Sides),
-         Weapon(2, 4.0f, 0.4f, Weapon::ShieldDamageBonus))
+     Module::WeaponModule(Module("Small laser", 1, 2.0f, {{Resource::Metals, 5.0f}, {Resource::Crystals, 3.0f}}, {},
+                                 Module::Sides, {Technology::TechnologyType::Spaceships}),
+                          Weapon(2, 4.0f, 0.4f, Weapon::ShieldDamageBonus))
 
     },
     {ModuleType::ImprovedSmallLaser,
      Module::WeaponModule(Module("Advanced small laser", 1, 4.0f,
                                  {{Resource::Metals, 5.0f}, {Resource::RareMetals, 5.0f}, {Resource::Crystals, 6.0f}},
-                                 {}, Module::Sides),
+                                 {}, Module::Sides, {Technology::TechnologyType::ImprovedLaserTechnology}),
                           Weapon(3, 6.0f, 0.4f, Weapon::ShieldDamageBonus))
 
     },
@@ -246,37 +262,39 @@ const std::map<ModuleType, Module> Modules{
      Module::WeaponModule(
          Module("Big laser", 4, 10.0f,
                 {{Resource::Metals, 20.0f}, {Resource::RareMetals, 20.0f}, {Resource::Crystals, 20.0f}}, {},
-                Module::Sides),
+                Module::Sides, {Technology::TechnologyType::ImprovedLaserTechnology}),
          Weapon(1, 90.0f, 1.1f, Weapon::ShieldDamageBonus))
 
     },
-    {ModuleType::AdvancedBigLaser, Module::WeaponModule(Module("Advanced big laser", 4, 15.0f,
-                                                               {{Resource::Metals, 20.0f},
-                                                                {Resource::RareMetals, 20.0f},
-                                                                {Resource::Crystals, 20.0f},
-                                                                {Resource::DarkMatter, 2.0f}},
-                                                               {}, Module::Sides),
-                                                        Weapon(1, 150.0f, 1.3f, Weapon::ShieldDamageBonus))
+    {ModuleType::AdvancedBigLaser,
+     Module::WeaponModule(Module("Advanced big laser", 4, 15.0f,
+                                 {{Resource::Metals, 20.0f},
+                                  {Resource::RareMetals, 20.0f},
+                                  {Resource::Crystals, 20.0f},
+                                  {Resource::DarkMatter, 2.0f}},
+                                 {}, Module::Sides, {Technology::TechnologyType::AdvancedLaserTechnology}),
+                          Weapon(1, 150.0f, 1.3f, Weapon::ShieldDamageBonus))
 
     },
     {ModuleType::AntimatterCannon,
      Module::WeaponModule(
          Module("Antimatter cannon", 2, 1.0f, {{Resource::Metals, 10.0f}, {Resource::RareMetals, 15.0f}},
-                {{Resource::Antimatter, 0.25f}}, Module::Sides),
+                {{Resource::Antimatter, 0.25f}}, Module::Sides, {Technology::TechnologyType::AntimatterProcessing}),
          Weapon(1, 20.0f, 0.5f, Weapon::HPDamageBonus))
 
     },
     {ModuleType::Railgun,
      Module::WeaponModule(Module("Railgun", 1, 1.0f, {{Resource::Metals, 5.0f}, {Resource::RareMetals, 3.0f}},
-                                 {{Resource::Metals, 0.1f}}, Module::Sides),
+                                 {{Resource::Metals, 0.1f}}, Module::Sides, {Technology::TechnologyType::Spaceships}),
                           Weapon(4, 2.0f, 0.5f, Weapon::None))
 
     },
     {ModuleType::AdvancedRailgun,
-     Module::WeaponModule(Module("Advanced railgun", 1, 2.0f,
-                                 {{Resource::Metals, 6.0f}, {Resource::RareMetals, 6.0f}, {Resource::Polymers, 3.0f}},
-                                 {{Resource::Metals, 0.1f}}, Module::Sides),
-                          Weapon(4, 5.0f, 0.6f, Weapon::None))
+     Module::WeaponModule(
+         Module("Advanced railgun", 1, 2.0f,
+                {{Resource::Metals, 6.0f}, {Resource::RareMetals, 6.0f}, {Resource::Polymers, 3.0f}},
+                {{Resource::Metals, 0.1f}}, Module::Sides, {Technology::TechnologyType::AdvancedRailgun}),
+         Weapon(4, 5.0f, 0.6f, Weapon::None))
 
     },
 };
