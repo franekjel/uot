@@ -10,6 +10,12 @@ namespace rendering
 {
 struct render_planet_view : render_view<render_planet_view>
 {
+    enum class planet_sub
+    {
+        build,
+        queue
+    };
+
     view_t _up();
     view_t _down(client_context& context);
     void _mouse_handler(client_context& context, Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
@@ -18,14 +24,23 @@ struct render_planet_view : render_view<render_planet_view>
     void _draw(client_context& context);
     void init(client_context& context);
     void render_planet_info(const client_context& context);
+    inline void render_queue_lists(client_context& context);
+    inline void render_build_lists(client_context& context);
+    inline void refresh_lists(client_context& context, std::shared_ptr<Planet>& pl);
 
     std::shared_ptr<ui_list_state> queue;
     std::shared_ptr<ui_list_state> built;
-    std::shared_ptr<ui_list_state> build;
+    std::shared_ptr<ui_list_state> ships_queue;
 
-    std::vector<Building::BuildingType> _build;
+    std::shared_ptr<ui_list_state> build;
+    std::shared_ptr<ui_list_state> ships_build;
+
     std::vector<Building::BuildingType> _built;
     std::vector<Building::BuildingType> _queue;
+    std::vector<unsigned int> _ships_queue;
+
+    std::vector<Building::BuildingType> _build;
+    std::vector<unsigned int> _ships_build;
 
     struct info_box
     {
@@ -36,6 +51,7 @@ struct render_planet_view : render_view<render_planet_view>
     std::optional<info_box> box;
 
     Uint32 info_offset{0u};
+    planet_sub current_sub{planet_sub::queue};
 };
 
 void render_building_info_box(client_context& context, Building::BuildingType type, int x, int y);

@@ -1,5 +1,5 @@
-#ifndef RENDERING_GALAXY_H
-#define RENDERING_GALAXY_H
+#ifndef RENDERING_SECTOR_H
+#define RENDERING_SECTOR_H
 #include "rendering_common.h"
 #include "rendering_views.h"
 
@@ -15,7 +15,7 @@ struct render_sector_view : render_view<render_sector_view>
     void _wheel_handler(client_context& context, int x, int y, int xmov, int ymov);
 };
 
-void render_sector_galaxy_helper(const client_context& context, const std::shared_ptr<Sector>& sector);
+void render_sector_sector_helper(const client_context& context, const std::shared_ptr<Sector>& sector);
 
 void render_sector_object();
 
@@ -32,4 +32,4 @@ void render_selection_graphics(const client_context& context, const Point pos, c
 void render_fleet_weapon_ranges(const client_context& context, const Point pos, const std::shared_ptr<Fleet> f);
 
 }  // namespace rendering
-#endif  // GALAXY_RENDERING_H
+#endif  // SECTOR_RENDERING_H

@@ -29,3 +29,14 @@ void msg_queue::reset()
     actions.moveFleetRequests.clear();
     actions.technologyRequest = Technology::TechnologyType::Empty;
 }
+
+void msg_queue::build_ship(const int design_id, const int planet_id)
+{
+    messageTypes::MsgCreateShip request(design_id, planet_id);
+    actions.createShipRequests.push_back(request);
+}
+
+void msg_queue::build_design(std::shared_ptr<ShipDesign>& design, const bool _delete)
+{
+    messageTypes::MsgShipDesign request(design, _delete);
+}

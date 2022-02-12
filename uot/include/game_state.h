@@ -6,7 +6,7 @@
 #include <optional>
 #include <variant>
 #include <vector>
-#include "../../libuot/galaxy.h"
+#include "../../libuot/sector.h"
 #include "sdl_utilities.h"
 #include "singleton.h"
 #include "uncopiable.h"
@@ -24,7 +24,7 @@ struct game_state : public uncopiable
     friend singleton<game_state>;
 
    public:
-    void reset_galaxy();
+    void reset_sector();
     std::shared_ptr<Player> player;
     std::map<unsigned int, std::shared_ptr<Planet>> planets;
 };

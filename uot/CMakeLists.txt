@@ -12,7 +12,8 @@ set(SRCS
     include/rendering/rendering.h
     include/rendering/rendering_all_views.h
     include/rendering/rendering_common.h
-    include/rendering/rendering_galaxy.h
+    include/rendering/rendering_sector.h
+    include/rendering/rendering_designer.h
     include/rendering/rendering_menu.h
     include/rendering/rendering_planet.h
     include/rendering/rendering_universe.h
@@ -33,10 +34,11 @@ set(SRCS
     src/main.cpp
     src/net/client_txrx.cpp
     src/rendering/rendering_common.cpp
-    src/rendering/rendering_galaxy.cpp
+    src/rendering/rendering_sector.cpp
     src/rendering/rendering_menu.cpp
     src/rendering/rendering_planet.cpp
     src/rendering/rendering_universe.cpp
+    src/rendering/rendering_designer.cpp
     src/rendering/rendering_tech.cpp
     src/rendering/ui_list.cpp
     src/rendering/buttons.cpp

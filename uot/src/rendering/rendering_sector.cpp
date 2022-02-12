@@ -1,5 +1,5 @@
 #define _USE_MATH_DEFINES
-#include "rendering_galaxy.h"
+#include "rendering_sector.h"
 #include <cmath>
 
 #include "client_context.h"
@@ -37,12 +37,12 @@ void rendering::render_sector_view::_draw(client_context& context)
     sdl_utilities::paint_frame_textured(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, gr->sky_texture);
     sdl_utilities::set_render_viewport<size_settings::play_area>(r.get());
 
-    SDL_Rect s{0, 0, gr->galaxy_boundary.w, gr->galaxy_boundary.w};
+    SDL_Rect s{0, 0, gr->sector_boundary.w, gr->sector_boundary.w};
     const auto _w = static_cast<int>(size_settings::play_area::height);
     const auto _h = static_cast<int>(size_settings::play_area::height);
     SDL_Rect d{size_settings::play_area::width / 2 - _w / 2, size_settings::play_area::height / 2 - _h / 2, _w, _h};
 
-    SDL_RenderCopyEx(r.get(), gr->galaxy_boundary.t.get(), &s, &d, 0.0, NULL, SDL_FLIP_NONE);
+    SDL_RenderCopyEx(r.get(), gr->sector_boundary.t.get(), &s, &d, 0.0, NULL, SDL_FLIP_NONE);
 
     if (gui->current_sector.has_value())
     {
@@ -61,7 +61,7 @@ void rendering::render_sector_view::_draw(client_context& context)
 
             SDL_RenderCopyEx(r.get(), gr->jump_zone.t.get(), &s, &d, 0.0, NULL, SDL_FLIP_NONE);
         }
-        render_sector_galaxy_helper(context, curr);
+        render_sector_sector_helper(context, curr);
     }
     render_object_selection(context);
     // =======================================================
@@ -128,7 +128,7 @@ void rendering::render_selected_object_info(const client_context& context)
                                size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 }
 
-void rendering::render_sector_galaxy_helper(const client_context& context, const std::shared_ptr<Sector>& sector)
+void rendering::render_sector_sector_helper(const client_context& context, const std::shared_ptr<Sector>& sector)
 {
     const auto& gr = context.gr;
     for (const auto& [id, p] : sector->objects)

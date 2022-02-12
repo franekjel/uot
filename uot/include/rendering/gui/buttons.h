@@ -45,8 +45,10 @@ inline constexpr button_position exit_pos{(size_settings::popup_menu_area::width
                                           planets_meta::frame_height / 2 + 60 + 2 * buttons_meta::button_y_offset,
                                           buttons_meta::button_width, buttons_meta::button_height};
 
-inline constexpr button_position tech_pos{40, 40, size_settings::context_area::width - 80,
-                                          buttons_meta::button_y_offset};
+inline constexpr button_position tech_pos{40, 40, size_settings::context_area::width - 80, buttons_meta::button_height};
+
+inline constexpr button_position designer_pos{40, 40 + buttons_meta::button_height + buttons_meta::button_y_offset,
+                                              size_settings::context_area::width - 80, buttons_meta::button_height};
 
 inline constexpr button_position research_pos{40, size_settings::context_area::height * 3 / 4,
                                               size_settings::context_area::width - 80, buttons_meta::button_y_offset};
@@ -86,6 +88,12 @@ struct start_button : button<start_button>
     void _clicked(client_context& context);
 };
 
+struct back_button : button<back_button>
+{
+    back_button() : button<back_button>{0, std::string("BACK"), bpos::start_pos, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
 struct exit_button : button<exit_button>
 {
     exit_button() : button<exit_button>{1, std::string("EXIT"), bpos::exit_pos, bcol::basic} {}
@@ -122,8 +130,15 @@ struct abort_research_button : button<abort_research_button>
     void _clicked(client_context& context);
 };
 
-using popup_button = std::variant<std::unique_ptr<start_button>, std::unique_ptr<exit_button>>;
-using navigation_button = std::variant<std::unique_ptr<technology_button>>;
+struct designer_button : button<designer_button>
+{
+    designer_button() : button<designer_button>{5, std::string("SHIPS"), bpos::designer_pos, bcol::basic} {}
+    void _clicked(client_context& context);
+};
+
+using popup_button =
+    std::variant<std::unique_ptr<start_button>, std::unique_ptr<exit_button>, std::unique_ptr<back_button>>;
+using navigation_button = std::variant<std::unique_ptr<technology_button>, std::unique_ptr<designer_button>>;
 using tech_menu_button = std::variant<std::unique_ptr<research_button>, std::unique_ptr<abort_research_button>>;
 
 #endif  // BUTTONS_H

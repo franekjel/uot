@@ -56,6 +56,7 @@ void rendering::render_menu_view::_mouse_handler(client_context& context, Uint32
         x = x - size_settings::popup_menu_area::x_offset;
         y = y - size_settings::popup_menu_area::y_offset;
 
+        bool hit{false};
         for (const auto& b : context.gui->popup_buttons)
         {
             std::visit(
@@ -66,9 +67,12 @@ void rendering::render_menu_view::_mouse_handler(client_context& context, Uint32
                     {
                         // calling a lambda, possibly losing a few instructions
                         v->clicked(context);
+                        hit = true;
                     }
                 },
                 b);
+            if (hit)
+                return;
         }
     }
     // motion in the popup buttons area
