@@ -59,6 +59,7 @@ struct Player
     std::set<Technology::TechnologyType> new_technologies;
     std::vector<unsigned int> lost_objects;
     std::vector<std::shared_ptr<Colony>> new_colonies;
+    std::vector<unsigned int> fleet_info_requests;
 
     struct ChangedDesign
     {

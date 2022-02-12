@@ -297,3 +297,41 @@ messageTypes::MsgChangedFleetPopulation::MsgChangedFleetPopulation(const Sector:
     soldiers = fleet.soldiers;
     civilians = fleet.civilians;
 }
+
+messageTypes::MsgDetailedShipInfo::MsgDetailedShipInfo() {}
+
+messageTypes::MsgDetailedShipInfo::MsgDetailedShipInfo(std::shared_ptr<Ship> ship)
+    : id(id),
+      hp(hp),
+      max_hp(max_hp),
+      hp_regen(hp_regen),
+      shield(shield),
+      max_shield(max_shield),
+      energy(energy),
+      energy_regen(energy_regen),
+      max_energy(max_energy),
+      soldiers(soldiers),
+      civilians(civilians),
+      human_capacity(human_capacity),
+      speed(speed),
+      design_id(ship->design->id),
+      weapons(ship->ship_weapons)
+{
+}
+
+messageTypes::MsgDetailedFleetInfo::MsgDetailedFleetInfo() {}
+
+messageTypes::MsgDetailedFleetInfo::MsgDetailedFleetInfo(std::shared_ptr<Fleet> fleet)
+    : id(fleet->id),
+      soldiers(fleet->soldiers),
+      civilians(fleet->civilians),
+      human_capacity(fleet->human_capacity),
+      position(fleet->position),
+      wanted_position(fleet->wanted_position),
+      current_action(fleet->current_action)
+{
+    for (const auto& ship : fleet->ships)
+    {
+        ships.push_back(messageTypes::MsgDetailedShipInfo(ship));
+    }
+}
