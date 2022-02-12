@@ -14,6 +14,90 @@ void rendering::render_background(const client_context& context)
     SDL_RenderCopyEx(r.get(), gr->bk_texture.get(), nullptr, nullptr, 0, nullptr, SDL_FLIP_NONE);
 }
 
+int rendering::GetTextureIndex(std::shared_ptr<SectorObject> p)
+{
+    auto pl = std::dynamic_pointer_cast<Planet>(p);
+    auto io = std::dynamic_pointer_cast<InhabitableObject>(p);
+    auto st = std::dynamic_pointer_cast<Star>(p);
+   
+    if (pl)
+    {
+        const auto id = (pl->colony && pl->colony->owner) ? pl->colony->owner->id : 0;
+        if ((int)(pl->climate) == 0)  // temperate
+        {
+            
+        }
+
+        if ((int)(pl->climate) == 1)  // cold
+        {
+            
+        }
+
+        if ((int)(pl->climate) == 2)  // hot
+        {
+            
+        }
+    }
+
+    if (io)
+    {
+        const auto id = (io->base && io->base->owner) ? io->base->owner->id : 0;
+        if ((int)(io->object_type) == 0)  // InhabitablePlanet
+        {
+            return planet_types::NO_ATM_1 + (id % 3);
+        }
+
+        if ((int)(io->object_type) == 1)  // GasGiant
+        {
+            return planet_types::GAS_GIANT_1 + (id % 3);
+        }
+
+        if ((int)(io->object_type) == 2)  // Asteroid
+        {
+            
+        }
+
+        if ((int)(io->object_type) == 3)  // DarkMatterCloud
+        {
+            
+        }
+    }
+
+    if (st)
+    {
+        const auto id = st->id;
+        if ((int)(st->star_type) == 0)  // Sunny
+        {
+            return planet_types::STAR_SUNNY_1 + (id % 3);
+        }
+
+        if ((int)(st->star_type) == 1)  // BlueGiant
+        {
+            return planet_types::STAR_BLUE_GIANT_1 + (id % 3);
+        }
+
+        if ((int)(st->star_type) == 2)  // RedGiant
+        {
+            return planet_types::STAR_RED_GIANT_1 + (id % 3);
+        }
+
+        if ((int)(st->star_type) == 3)  // WhiteDwarf
+        {
+            return planet_types::STAR_WHITE_DWARF_1 + (id % 3);
+        }
+        
+        if ((int)(st->star_type) == 4)  // BrownDwarf
+        {
+            return planet_types::STAR_BROWN_DWARF_1 + (id % 3);
+        }
+
+        if ((int)(st->star_type) == 5)  // BlackHole
+        {
+            return planet_types::STAR_BLACK_HOLE_1 + (id % 3);
+        }
+    }
+}
+
 void rendering::render_planet_helper(const client_context& context, const float size_multiplier, const int x_off,
                                      const int y_off, const texture_t& tex)
 {

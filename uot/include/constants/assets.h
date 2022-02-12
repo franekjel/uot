@@ -45,7 +45,25 @@ enum planet_types
     TERRAN_D_3,
     TERRAN_W_1,
     TERRAN_W_2,
-    TERRAN_W_3  // 29th
+    TERRAN_W_3,
+    STAR_BLUE_GIANT_1,
+    STAR_BLUE_GIANT_2,
+    STAR_BLUE_GIANT_3,
+    STAR_RED_GIANT_1,
+    STAR_RED_GIANT_2,
+    STAR_RED_GIANT_3,
+    STAR_WHITE_DWARF_1,
+    STAR_WHITE_DWARF_2,
+    STAR_WHITE_DWARF_3,
+    STAR_SUNNY_1,
+    STAR_SUNNY_2,
+    STAR_SUNNY_3,
+    STAR_BLACK_HOLE_1,
+    STAR_BLACK_HOLE_2,
+    STAR_BLACK_HOLE_3,
+    STAR_BROWN_DWARF_1,
+    STAR_BROWN_DWARF_2,
+    STAR_BROWN_DWARF_3  // 31th
 };
 
 namespace selection_meta
@@ -72,15 +90,16 @@ constexpr float multiplier = 100.f;
 namespace planets_meta
 {
 constexpr float sector_multiplier = 0.3f;
-constexpr int num_planets = 29;
+constexpr int num_planets = 47;
 constexpr int num_frames = 50;
 constexpr int frame_width = 300;
 constexpr int frame_height = 300;
 constexpr int frame_duration = 4;
 
-constexpr std::array<int, num_planets> texture_size = {300, 200, 200, 200, 200, 200, 200, 200, 200, 200,
-                                                       200, 100, 100, 100, 100, 100, 100, 100, 100, 100,
-                                                       300, 300, 300, 100, 100, 100, 100, 100, 100};
+constexpr std::array<int, num_planets> texture_size = {300, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 100,
+                                                       100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100,
+                                                       100, 100, 100, 100, 100, 200, 200, 200, 200, 200, 200, 200,
+                                                       200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200};
 
 constexpr std::array<std::string_view, num_planets> planet_texture_paths = {
     "assets/menu_planet_sheet.png", "assets/sector_1.png",    "assets/sector_2.png",   "assets/sector_3.png",
@@ -89,8 +108,20 @@ constexpr std::array<std::string_view, num_planets> planet_texture_paths = {
     "assets/gas_giant_2.png",       "assets/gas_giant_3.png", "assets/islands_1.png",  "assets/islands_2.png",
     "assets/islands_3.png",         "assets/no_atm_1.png",    "assets/no_atm_2.png",   "assets/no_atm_3.png",
     "assets/rings_1.png",           "assets/rings_2.png",     "assets/rings_3.png",    "assets/terran_d_1.png",
-    "assets/terran_d_2.png",        "assets/terran_d_3.png",  "assets/terran_w_1.png", "assets/terran_w_2.png",
-    "assets/terran_w_3.png",
+    "assets/terran_d_2.png",        "assets/terran_d_3.png",  "assets/terran_w_1.png", "assets/terran_w_2.png",        
+    "assets/terran_w_3.png",        "assets/star_blue_giant_1.png",
+    "assets/star_blue_giant_2.png", "assets/star_blue_giant_3.png",  "assets/star_red_giant_1.png", "assets/star_red_giant_2.png", "assets/star_red_giant_3.png",
+    "assets/star_white_dwarf_1.png", "assets/star_white_dwarf_2.png", "assets/star_white_dwarf_3.png",
+    "assets/star_sunny_1.png",
+    "assets/star_sunny_2.png",
+    "assets/star_sunny_3.png",
+    "assets/star_black_hole_1.png",
+    "assets/star_black_hole_2.png",
+    "assets/star_black_hole_3.png",
+    "assets/star_brown_dwaft_1.png",
+    "assets/star_brown_dwaft_2.png",
+    "assets/star_brown_dwaft_3.png",
+
 };
 }  // namespace planets_meta
 

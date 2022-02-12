@@ -35,7 +35,6 @@ void rendering::render_planet_view::render_planet_info(const client_context& con
     auto io = std::dynamic_pointer_cast<InhabitableObject>(gui->current_object.value());
     auto st = std::dynamic_pointer_cast<Star>(gui->current_object.value());
 
-    auto object_id = GAS_GIANT_1 + gui->current_object.value()->id % (planets_meta::num_planets - GAS_GIANT_1);
     std::string name =
         pl   ? planet_names[static_cast<int>(pl->climate)]
         : io ? (std::string(resourceNames[static_cast<int>(io->resource_deposit.begin()->first)]) + " Object")
@@ -46,9 +45,10 @@ void rendering::render_planet_view::render_planet_info(const client_context& con
                                {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
-    const bool biggie = planets_meta::texture_size[object_id] == 300;
+    int textureIdx = GetTextureIndex(gui->current_object.value());
+    const bool biggie = planets_meta::texture_size[textureIdx] == 300;
     rendering::render_planet_helper(context, biggie ? 1.0 : 3.0, size_settings::planet_info_area::width / 2, 250,
-                                    gr->planetTextures[object_id]);
+                                    gr->planetTextures[textureIdx]);
 
     if (pl)
     {
