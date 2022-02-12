@@ -138,9 +138,6 @@ void rendering::render_tech_view::_draw(client_context& context)
 
 void rendering::render_tech_info(client_context& context, std::shared_ptr<game_state> gs)
 {
-    static const auto tile_x = size_settings::play_area::width / generation_meta::sqrt_num_sectors;
-    static const auto tile_y = size_settings::play_area::height / generation_meta::sqrt_num_sectors;
-
     auto& r = context.r;
     auto& gr = context.gr;
     auto& gui = context.gui;

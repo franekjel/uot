@@ -1,8 +1,8 @@
 #ifndef RENDERING_COMMON_H
 #define RENDERING_COMMON_H
-#include "texture.h"
-#include "sectorobject.h"
 #include <memory>
+#include "sectorobject.h"
+#include "texture.h"
 
 struct client_context;
 

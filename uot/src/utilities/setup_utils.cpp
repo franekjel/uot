@@ -91,7 +91,6 @@ void loadMedia(client_context& context)
         gr->jump_zone = texture_t{r * 2, r * 2, sdl_utilities::load_texture_from_svg(svg, context.r)};
     }
 
-    printf("Loading  portal texture");
     // load only the waiting screen planet texture
     gr->planetTextures.resize(planets_meta::num_planets);
 

@@ -8,8 +8,8 @@
 #include "game_state.h"
 #include "input_utilities.h"
 #include "msg_queue.h"
-#include "player.h"
 #include "planet.h"
+#include "player.h"
 
 void rendering::render_sector_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov)
 {
@@ -142,8 +142,20 @@ void rendering::render_sector_sector_helper(const client_context& context, const
 
         // always the same rec size
         int textureIdx = GetTextureIndex(p);
-        render_planet_owner(context, id, 0.8, planet_x, planet_y, gr->planetTextures[textureIdx]);
         render_planet_helper(context, 0.8, planet_x, planet_y, gr->planetTextures[textureIdx]);
+
+        auto pl = std::dynamic_pointer_cast<Planet>(p);
+        auto io = std::dynamic_pointer_cast<InhabitableObject>(p);
+        if (pl)
+        {
+            const unsigned int player_id = (pl->colony && pl->colony->owner) ? pl->colony->owner->id : 0;
+            render_planet_owner(context, player_id, 0.8, planet_x, planet_y, gr->planetTextures[textureIdx]);
+        }
+        else if (io)
+        {
+            const unsigned int player_id = (io->base && io->base->owner) ? io->base->owner->id : 0;
+            render_planet_owner(context, player_id, 0.8, planet_x, planet_y, gr->planetTextures[textureIdx]);
+        }
     }
 
     for (auto& [id, f] : sector->present_fleets)

@@ -19,7 +19,7 @@ int rendering::GetTextureIndex(std::shared_ptr<SectorObject> p)
     auto pl = std::dynamic_pointer_cast<Planet>(p);
     auto io = std::dynamic_pointer_cast<InhabitableObject>(p);
     auto st = std::dynamic_pointer_cast<Star>(p);
-   
+
     if (pl)
     {
         const auto id = pl->id;
@@ -85,7 +85,7 @@ int rendering::GetTextureIndex(std::shared_ptr<SectorObject> p)
         {
             return planet_types::STAR_WHITE_DWARF_1 + (id % 3);
         }
-        
+
         if ((int)(st->star_type) == 4)  // BrownDwarf
         {
             return planet_types::STAR_BROWN_DWARF_1 + (id % 3);

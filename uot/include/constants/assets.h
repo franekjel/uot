@@ -69,10 +69,10 @@ enum planet_types
     ASTEROID_3,
     PLANET_COLD_1,
     PLANET_COLD_2,
-    PLANET_COLD_3,  
-     PLANET_NORMAL_1,
+    PLANET_COLD_3,
+    PLANET_NORMAL_1,
     PLANET_NORMAL_2,
-    PLANET_NORMAL_3,  
+    PLANET_NORMAL_3,
     PLANET_HOT_1,
     PLANET_HOT_2,
     PLANET_HOT_3,
@@ -89,14 +89,6 @@ constexpr int texture_height = 400;
 
 }  // namespace selection_meta
 
-namespace generation_meta
-{
-constexpr bool use_uniform_sectors = false;
-constexpr int num_sectors = 64;
-constexpr int sqrt_num_sectors = 8;
-constexpr float multiplier = 100.f;
-}  // namespace generation_meta
-
 namespace planets_meta
 {
 constexpr float sector_multiplier = 0.3f;
@@ -106,22 +98,50 @@ constexpr int frame_width = 300;
 constexpr int frame_height = 300;
 constexpr int frame_duration = 4;
 
-constexpr std::array<int, num_planets> texture_size = {300, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 100,
-                                                       100, 100, 100, 100, 100, 100, 100, 100, 300, 300, 300, 100,
-                                                       100, 100, 100, 100, 100, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
+constexpr std::array<int, num_planets> texture_size = {
+    300, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 300,
+    300, 300, 100, 100, 100, 100, 100, 100, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
     200, 200, 200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
 constexpr std::array<std::string_view, num_planets> planet_texture_paths = {
-    "assets/menu_planet_sheet.png", "assets/sector_1.png",    "assets/sector_2.png",   "assets/sector_3.png",
-    "assets/sector_4.png",          "assets/sector_5.png",    "assets/sector_6.png",   "assets/sector_7.png",
-    "assets/sector_8.png",          "assets/sector_9.png",    "assets/sector_10.png",  "assets/gas_giant_1.png",
-    "assets/gas_giant_2.png",       "assets/gas_giant_3.png", "assets/islands_1.png",  "assets/islands_2.png",
-    "assets/islands_3.png",         "assets/no_atm_1.png",    "assets/no_atm_2.png",   "assets/no_atm_3.png",
-    "assets/rings_1.png",           "assets/rings_2.png",     "assets/rings_3.png",    "assets/terran_d_1.png",
-    "assets/terran_d_2.png",        "assets/terran_d_3.png",  "assets/terran_w_1.png", "assets/terran_w_2.png",        
-    "assets/terran_w_3.png",        "assets/star_blue_giant_1.png",
-    "assets/star_blue_giant_2.png", "assets/star_blue_giant_3.png",  "assets/star_red_giant_1.png", "assets/star_red_giant_2.png", "assets/star_red_giant_3.png",
-    "assets/star_white_dwarf_1.png", "assets/star_white_dwarf_2.png", "assets/star_white_dwarf_3.png",
+    "assets/menu_planet_sheet.png",
+    "assets/sector_1.png",
+    "assets/sector_2.png",
+    "assets/sector_3.png",
+    "assets/sector_4.png",
+    "assets/sector_5.png",
+    "assets/sector_6.png",
+    "assets/sector_7.png",
+    "assets/sector_8.png",
+    "assets/sector_9.png",
+    "assets/sector_10.png",
+    "assets/gas_giant_1.png",
+    "assets/gas_giant_2.png",
+    "assets/gas_giant_3.png",
+    "assets/islands_1.png",
+    "assets/islands_2.png",
+    "assets/islands_3.png",
+    "assets/no_atm_1.png",
+    "assets/no_atm_2.png",
+    "assets/no_atm_3.png",
+    "assets/rings_1.png",
+    "assets/rings_2.png",
+    "assets/rings_3.png",
+    "assets/terran_d_1.png",
+    "assets/terran_d_2.png",
+    "assets/terran_d_3.png",
+    "assets/terran_w_1.png",
+    "assets/terran_w_2.png",
+    "assets/terran_w_3.png",
+    "assets/star_blue_giant_1.png",
+    "assets/star_blue_giant_2.png",
+    "assets/star_blue_giant_3.png",
+    "assets/star_red_giant_1.png",
+    "assets/star_red_giant_2.png",
+    "assets/star_red_giant_3.png",
+    "assets/star_white_dwarf_1.png",
+    "assets/star_white_dwarf_2.png",
+    "assets/star_white_dwarf_3.png",
     "assets/star_sunny_1.png",
     "assets/star_sunny_2.png",
     "assets/star_sunny_3.png",
@@ -146,7 +166,6 @@ constexpr std::array<std::string_view, num_planets> planet_texture_paths = {
     "assets/dark_matter_1.png",
     "assets/dark_matter_2.png",
     "assets/dark_matter_3.png",
-
 };
 }  // namespace planets_meta
 
