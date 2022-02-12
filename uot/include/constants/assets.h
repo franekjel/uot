@@ -90,6 +90,13 @@ constexpr int texture_height = 400;
 
 }  // namespace selection_meta
 
+namespace weapons_meta
+{
+constexpr std::string_view missile_path = "assets/red_bullet.png";
+constexpr int missile_w = 127;
+constexpr int missile_h = 123;
+}  // namespace weapons_meta
+
 namespace planets_meta
 {
 constexpr float sector_multiplier = 0.3f;

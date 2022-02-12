@@ -51,6 +51,8 @@ struct Player
     Player(const unsigned int player_id_, const std::shared_ptr<Galaxy>& known_galaxy_,
            const std::map<Resource, float>& owned_resources_, const std::shared_ptr<Colony>& starting_colony);
 
+    Player(const unsigned int player_id_) : id(player_id_){};
+
     // fields below are server-only
     Player(const unsigned int player_id_, const std::shared_ptr<Galaxy>& whole_galaxy_,
            const std::map<Resource, float>& owned_resources_, const unsigned int& starting_sector_id,

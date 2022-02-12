@@ -13,7 +13,8 @@ Player::Player(const unsigned int id_, const std::shared_ptr<Galaxy> &known_gala
         resources_changed[resource.first] = true;
     }
     owned_colonies = {};
-    owned_colonies[starting_colony->id] = starting_colony;
+    if (starting_colony)
+        owned_colonies[starting_colony->id] = starting_colony;
     owned_space_bases = {};
     owned_fleets = {};
     researched_technology = {};
@@ -207,12 +208,12 @@ void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int se
     if ((first_fleet->position - second_fleet->position).squaredLength() > Fleet::kNearValue)
         return;
 
-    for (const auto &ship : second_fleet->ships)
+    for (const auto &[id, ship] : second_fleet->ships)
     {
         ship->fleet = first_fleet;
     }
 
-    first_fleet->ships.insert(first_fleet->ships.end(), second_fleet->ships.begin(), second_fleet->ships.end());
+    first_fleet->ships.merge(second_fleet->ships);
 
     first_fleet->location_sector->present_fleets.erase(
         first_fleet->location_sector->present_fleets.find(second_fleet_id));
@@ -318,7 +319,7 @@ void Player::HandleCancelFleetRequest(unsigned int fleet_id)
     switch (current_fleet->current_action)
     {
         case Fleet::Action::WarpLoading:
-            for (auto &ship : current_fleet->ships)
+            for (auto &[id, ship] : current_fleet->ships)
             {
                 ship->warp_drive_charge = 0.0f;
             }

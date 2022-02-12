@@ -1,4 +1,5 @@
 #include "game_gui.h"
+#include "client_context.h"
 
 int game_gui::GetTextureIndex(std::shared_ptr<SectorObject> p)
 {
@@ -83,4 +84,9 @@ int game_gui::GetTextureIndex(std::shared_ptr<SectorObject> p)
         }
     }
     return UNDISCOVERED;
+}
+
+void game_gui::do_gui_per_turn_update(client_context& context)
+{
+    update_all_fleet_buttons(context.gui->selected_fleet_buttons, context);
 }

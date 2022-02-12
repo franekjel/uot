@@ -154,6 +154,7 @@ struct Colony
 
     std::map<Building::BuildingType, int> GetAvailableBuildings();
 
+    Colony() = default;
     Colony(const unsigned int id, const std::shared_ptr<Planet> planet_);
 
     // fields below are server-only
