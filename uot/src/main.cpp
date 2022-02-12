@@ -55,6 +55,13 @@ int main(int argc, char* argv[])
         volatile bool quit = false;
         SDL_Event e;
 
+#ifdef UOT_DEBUG
+#define FPS_INTERVAL 1.0                       // seconds.
+        Uint32 fps_lasttime = SDL_GetTicks();  // the last recorded time.
+        Uint32 fps_current;                    // the current FPS.
+        Uint32 fps_frames = 0;                 // frames passed since the last recorded fps.
+#endif
+
         nc.connect_to_server();
         while (!quit)
         {
@@ -95,6 +102,17 @@ int main(int argc, char* argv[])
                 (context.gui->planet_frame + 1 == (planets_meta::num_frames * planets_meta::frame_duration))
                     ? 0
                     : context.gui->planet_frame + 1;
+
+#ifdef UOT_DEBUG
+            fps_frames++;
+            if (fps_lasttime < SDL_GetTicks() - FPS_INTERVAL * 1000)
+            {
+                fps_lasttime = SDL_GetTicks();
+                fps_current = fps_frames;
+                std::cout << "\n\n FPS:  " << fps_current << "\n\n";
+                fps_frames = 0;
+            }
+#endif
         }
 
         nc.disconnect_from_server();

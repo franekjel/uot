@@ -3,6 +3,8 @@
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 
+#define UOT_DEBUG true
+
 struct Point
 {
     float x, y;

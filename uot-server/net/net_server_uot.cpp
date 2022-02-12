@@ -35,7 +35,9 @@ void net_server_uot::handle_status_change(const std::string& player_name, net_se
 }
 void net_server_uot::handle_message(const std::string& player_name, const std::string& data)
 {
+#ifdef UOT_DEBUG
     std::cout << player_name << ": " << data << "\n";
+#endif
 
     auto deserialized = messageTypes::Deserialize(data);
     if (!!deserialized)

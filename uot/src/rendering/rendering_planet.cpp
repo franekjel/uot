@@ -177,13 +177,10 @@ void rendering::render_planet_view::init(client_context& context)
         v_build,
         generic_button{[&, pl, io, st](client_context& context)
                        {
-                           std::cout << "Action button clicked " << std::endl;
                            if (pl)
                            {
                                if (build->selected_elem.has_value())
                                {
-                                   std::cout << "Action button clicked on "
-                                             << build->elems[build->selected_elem.value()] << std::endl;
                                    auto mq = context.getActionQueue().value;
                                    auto t = _build[build->selected_elem.value()];
                                    mq->build_building(pl->colony->id, t);
@@ -242,37 +239,32 @@ void rendering::render_planet_view::init(client_context& context)
 
     built = std::make_shared<ui_list_state>(
         v_built,
-        generic_button{
-            [&, pl, io, st](client_context& context)
-            {
-                std::cout << "Action button clicked " << std::endl;
-                if (built->selected_elem.has_value())
-                {
-                    std::cout << "Action button clicked on " << built->elems[built->selected_elem.value()] << std::endl;
-                    auto mq = context.getActionQueue().value;
-                    auto t = _built[built->selected_elem.value()];
-                    auto up = Buildings.at(t).upgrade;
-                    mq->upgrade_building(pl->colony->id, t, up);
-                    pl->colony->buildings[t]--;
+        generic_button{[&, pl, io, st](client_context& context)
+                       {
+                           if (built->selected_elem.has_value())
+                           {
+                               auto mq = context.getActionQueue().value;
+                               auto t = _built[built->selected_elem.value()];
+                               auto up = Buildings.at(t).upgrade;
+                               mq->upgrade_building(pl->colony->id, t, up);
+                               pl->colony->buildings[t]--;
 
-                    _queue.push_back(Buildings.at(t).upgrade);
-                    queue->elems.push_back(Buildings.at(up).name + " " +
-                                           std::to_string(static_cast<int>(Buildings.at(up).worker_weeks_cost)));
-                }
-            },
-            "UPGRADE",
-            {size_settings::planet_built_area::width / 2 - 140, 670, 280, 50}},
+                               _queue.push_back(Buildings.at(t).upgrade);
+                               queue->elems.push_back(
+                                   Buildings.at(up).name + " " +
+                                   std::to_string(static_cast<int>(Buildings.at(up).worker_weeks_cost)));
+                           }
+                       },
+                       "UPGRADE",
+                       {size_settings::planet_built_area::width / 2 - 140, 670, 280, 50}},
         300, 50, 50, 10);
 
     queue = std::make_shared<ui_list_state>(
         v_queue,
         generic_button{[&, pl, io, st](client_context& context)
                        {
-                           std::cout << "Action button clicked " << std::endl;
                            if (queue->selected_elem.has_value())
                            {
-                               std::cout << "Action button clicked on " << queue->elems[queue->selected_elem.value()]
-                                         << std::endl;
                            }
                        },
                        "CANCEL",
