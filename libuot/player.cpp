@@ -287,7 +287,7 @@ void Player::HandleCancelFleetRequest(unsigned int fleet_id)
             current_fleet->full_building_progress = 0.0f;
             break;
         case Fleet::Action::Invade:
-            // TODO
+            current_fleet->invaded_colony = nullptr;
             break;
         default:
             break;
@@ -491,4 +491,27 @@ void Player::HandleHumansMoveFleet(unsigned int fleet_id, HumanMovement type)
         default:
             break;
     }
+}
+
+void Player::HandleInvadeFleetRequest(unsigned int fleet_id)
+{
+    if (owned_fleets.count(fleet_id) < 1)
+        return;
+    const auto &fleet = owned_fleets[fleet_id];
+    std::shared_ptr<Colony> colony = nullptr;
+    for (const auto &object : fleet->location_sector->objects)
+    {
+        if ((object.second->position - fleet->position).squaredLength() < Fleet::kNearValue)
+        {
+            auto planet = std::dynamic_pointer_cast<Planet>(object.second);
+            if (planet && planet->colony && planet->colony->owner->id != id)
+            {
+                colony = planet->colony;
+                break;
+            }
+        }
+    }
+    if (!colony)
+        return;
+    fleet->InvadeColony(colony);
 }

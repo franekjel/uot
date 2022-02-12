@@ -1,6 +1,8 @@
 #include "../headers/players.h"
 #include <climits>
 
+float GetRandom() { return (std::rand() % 1001) * 0.001f; }
+
 unsigned int PlayersList::GetStartingSectorId(std::shared_ptr<Galaxy> wholeGalaxy)
 {
     for (const auto& [id, sector] : wholeGalaxy->sectors)
@@ -401,6 +403,53 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
                 int number_of_shots = atacks.second;
                 other_fleet->gained_damage[weapon.special_features] += number_of_shots * weapon.damage;
                 atacks.second -= number_of_shots;
+            }
+        }
+
+        if (fleet->current_action == Fleet::Action::Invade)
+        {
+            auto& invaded_colony = fleet->invaded_colony;
+
+            if (fleet->soldiers > 0.0f)
+            {
+                float used_fleet_soldiers = std::min(Fleet::kBaseInvasionFightingNumber, fleet->soldiers); 
+                float used_colony_soldiers = std::min(Fleet::kBaseInvasionFightingNumber, fleet->soldiers); 
+
+                float colony_win_probability =
+                    Fleet::kInvasionColonyWinProbability * (used_colony_soldiers / used_fleet_soldiers);
+
+                float winner_deaths_rate = GetRandom() * Fleet::kInvasionMaxWinnerDeathRate;
+                float looser_deaths_rate = GetRandom() * Fleet::kInvasionMaxLoserDeathRate;
+                if (GetRandom() < colony_win_probability)
+                {
+                    // colony is a winner
+                    invaded_colony->soldiers -= winner_deaths_rate * used_colony_soldiers;
+                    fleet->KillSoldiers(used_fleet_soldiers * looser_deaths_rate);
+                }
+                else
+                {
+                    // fleet is a winner
+                    invaded_colony->soldiers -= looser_deaths_rate * used_colony_soldiers;
+                    fleet->KillSoldiers(used_fleet_soldiers * winner_deaths_rate);
+                }
+            }
+
+            if (invaded_colony->soldiers <= Fleet::kEpsSoldiers)
+            {
+                invaded_colony->owner->owned_colonies.erase(invaded_colony->id);
+                fleet->location_sector->DecrementWatcher(invaded_colony->owner->id);
+                invaded_colony->owner = player;
+                fleet->location_sector->IncrementWatcher(player->id);
+                player->owned_colonies[invaded_colony->id] = invaded_colony;
+
+                fleet->invaded_colony = nullptr;
+                fleet->current_action = Fleet::Action::None;
+            }
+            else if (fleet->soldiers <= Fleet::kEpsSoldiers)
+            {
+                fleet->soldiers = 0.0f;
+                fleet->invaded_colony = nullptr;
+                fleet->current_action = Fleet::Action::None;
             }
         }
     }

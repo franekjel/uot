@@ -35,6 +35,7 @@ struct Player
     void HandleBuildAsteroidMineFleetRequest(unsigned int fleet_id);
     void HandleCancelFleetRequest(unsigned int fleet_id);
     void HandleColonizeFleetRequest(unsigned int fleet_id);
+    void HandleInvadeFleetRequest(unsigned int fleet_id);
     void HandleHumansMoveFleet(unsigned int fleet_id, HumanMovement type);
     void HandleStartTechnologyResearch(Technology::TechnologyType technology);
     void HandleShipDesignRequest(unsigned int id, bool delete_design, std::string name, ShipHull::Type hull_type,
