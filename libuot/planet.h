@@ -131,6 +131,7 @@ struct Colony
     std::shared_ptr<Planet> planet;
     std::map<Building::BuildingType, int> buildings;
     float population;
+    float soldiers = 0.0f;
     float base_population_growth = 0.01f;
     float base_population_starving_death = 0.005f;
     std::shared_ptr<Player> owner;
@@ -157,6 +158,7 @@ struct Colony
 
     // fields below are server-only
     bool population_changed;
+    bool soldiers_changed;
     bool building_queue_changed;
     bool ship_building_queue_changed;
     std::vector<BuildingBuildProgress> new_buildings;

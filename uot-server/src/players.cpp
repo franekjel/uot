@@ -1,6 +1,8 @@
 #include "../headers/players.h"
 #include <climits>
 
+float GetRandom() { return (std::rand() % 1001) * 0.001f; }
+
 unsigned int PlayersList::GetStartingSectorId(std::shared_ptr<Galaxy> wholeGalaxy)
 {
     for (const auto& [id, sector] : wholeGalaxy->sectors)
@@ -118,20 +120,38 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
         {
             case Fleet::Action::BuildAsteroidMine:
                 player->HandleBuildAsteroidMineFleetRequest(fleet_action_request.fleet_id);
+                break;
             case Fleet::Action::CancelAction:
                 player->HandleCancelFleetRequest(fleet_action_request.fleet_id);
+                break;
             case Fleet::Action::Colonize:
                 player->HandleColonizeFleetRequest(fleet_action_request.fleet_id);
-            case Fleet::Action::Invade:
-            case Fleet::Action::None:
                 break;
-
+            case Fleet::Action::Invade:
+                player->HandleInvadeFleetRequest(fleet_action_request.fleet_id);
+                break;
+            case Fleet::Action::KickOutCivilians:
+            case Fleet::Action::KidnapCivilians:
+            case Fleet::Action::DisembarkSoldiers:
+            case Fleet::Action::BorrowSoldiers:
+                player->HandleHumansMoveFleet(fleet_action_request.fleet_id, fleet_action_request.action);
+                break;
             case Fleet::Action::WarpLoading:
                 player->HandleWarpLoadingFleetRequest(fleet_action_request.fleet_id);
+                break;
+            case Fleet::Action::None:
                 break;
 
             default:
                 break;
+        }
+    }
+
+    for (const auto& fir : payload->fleetInfoRequests)
+    {
+        if (player->owned_fleets.count(fir) != 0)
+        {
+            player->fleet_info_requests.push_back(fir);
         }
     }
 
@@ -230,6 +250,7 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
         sector->new_colonies.clear();
         sector->fleets_in_fight.clear();
         sector->destroyed_ships.clear();
+        sector->fleets_changed.clear();
     }
 }
 
@@ -401,6 +422,65 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
                 int number_of_shots = atacks.second;
                 other_fleet->gained_damage[weapon.special_features] += number_of_shots * weapon.damage;
                 atacks.second -= number_of_shots;
+            }
+        }
+
+        if (fleet->current_action == Fleet::Action::Invade)
+        {
+            auto& invaded_colony = fleet->invaded_colony;
+
+            if (fleet->soldiers > 0.0f)
+            {
+                float used_fleet_soldiers = std::min(Fleet::kBaseInvasionFightingNumber, fleet->soldiers);
+                float used_colony_soldiers = std::min(Fleet::kBaseInvasionFightingNumber, fleet->soldiers);
+
+                float colony_win_probability =
+                    Fleet::kInvasionColonyWinProbability * (used_colony_soldiers / used_fleet_soldiers);
+
+                float winner_deaths_rate = GetRandom() * Fleet::kInvasionMaxWinnerDeathRate;
+                float looser_deaths_rate = GetRandom() * Fleet::kInvasionMaxLoserDeathRate;
+                if (GetRandom() < colony_win_probability)
+                {
+                    // colony is a winner
+                    invaded_colony->soldiers -= winner_deaths_rate * used_colony_soldiers;
+                    fleet->KillSoldiers(used_fleet_soldiers * looser_deaths_rate);
+                }
+                else
+                {
+                    // fleet is a winner
+                    invaded_colony->soldiers -= looser_deaths_rate * used_colony_soldiers;
+                    fleet->KillSoldiers(used_fleet_soldiers * winner_deaths_rate);
+                }
+
+                fleet->location_sector->fleets_changed.push_back(
+                    {fleet->id, fleet->owner_id, fleet->civilians, fleet->soldiers});
+            }
+
+            if (invaded_colony->soldiers <= Fleet::kEpsSoldiers)
+            {
+                invaded_colony->owner->owned_colonies.erase(invaded_colony->id);
+                fleet->location_sector->DecrementWatcher(invaded_colony->owner->id);
+                invaded_colony->owner = player;
+                fleet->location_sector->IncrementWatcher(player->id);
+                player->owned_colonies[invaded_colony->id] = invaded_colony;
+
+                fleet->invaded_colony = nullptr;
+                fleet->current_action = Fleet::Action::None;
+                invaded_colony->building_queue.clear();
+                invaded_colony->ship_building_queue.clear();
+                invaded_colony->building_queue_changed = false;
+                invaded_colony->ship_building_queue_changed = false;
+
+                invaded_colony->owner->lost_objects.push_back(invaded_colony->planet->id);
+                player->new_colonies.push_back(invaded_colony);
+                fleet->location_sector->new_colonies.push_back({invaded_colony->id, invaded_colony->planet->id,
+                                                                invaded_colony->owner->id, invaded_colony->population});
+            }
+            else if (fleet->soldiers <= Fleet::kEpsSoldiers)
+            {
+                fleet->soldiers = 0.0f;
+                fleet->invaded_colony = nullptr;
+                fleet->current_action = Fleet::Action::None;
             }
         }
     }

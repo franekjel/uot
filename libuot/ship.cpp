@@ -3,7 +3,8 @@
 ShipHull::ShipHull(const int sides_size, const int inside_size, const std::map<Resource, float> &cost,
                    const std::map<Resource, float> &additional_upkeep, const float hp, const float speed,
                    const float engines_energy_consumtion, const float crew, const float worker_weeks_cost,
-                   const float warp_drive_energy, const int ship_aggro)
+                   const float warp_drive_energy, const int ship_aggro,
+                   const std::vector<Technology::TechnologyType> required_technologies)
     : sides_size(sides_size),
       inside_size(inside_size),
       cost(cost),
@@ -14,7 +15,8 @@ ShipHull::ShipHull(const int sides_size, const int inside_size, const std::map<R
       crew(crew),
       worker_weeks_cost(worker_weeks_cost),
       warp_drive_energy(warp_drive_energy),
-      ship_aggro(ship_aggro)
+      ship_aggro(ship_aggro),
+      required_technologies(required_technologies)
 {
 }
 
@@ -276,6 +278,7 @@ void Fleet::CountDamage()
     float damage_left_to_deal;
 
     bool ship_was_destroyed = false;
+    bool any_ship_destroyed = false;
 
     float damage_sum = 0.0f;
 
@@ -327,6 +330,7 @@ void Fleet::CountDamage()
                     damage_left_to_deal = -(ship->hp);
                 ship->hp = 0.0f;
                 ship_was_destroyed = true;
+                any_ship_destroyed = true;
             }
         }
         gained_damage[type] -= damage_to_deal - damage_left_to_deal;
@@ -367,6 +371,7 @@ void Fleet::CountDamage()
 
                     ships.erase(itr);
                     ship_was_destroyed = true;
+                    any_ship_destroyed = true;
                     break;
                 }
                 itr++;
@@ -382,7 +387,104 @@ void Fleet::CountDamage()
         {
             damage_sum += dmg;
         }
+
+        if (any_ship_destroyed)
+            location_sector->fleets_changed.push_back({id, owner_id, civilians, soldiers});
     }
+}
+
+void Fleet::MoveCiviliansToColony(std::shared_ptr<Colony> colony)
+{
+    float civilians_left_to_move = 5.0f;
+    bool changed = false;
+
+    auto iter = ships.begin();
+    while (civilians_left_to_move != 0.0f && iter != ships.end())
+    {
+        auto ship = *iter;
+        float added_civ = std::min(ship->civilians, civilians_left_to_move);
+        colony->population += added_civ;
+        colony->population_changed = true;
+        ship->civilians -= added_civ;
+        civilians_left_to_move -= added_civ;
+        civilians -= added_civ;
+        iter++;
+        changed = true;
+    }
+
+    if (changed)
+        location_sector->fleets_changed.push_back({id, owner_id, civilians, soldiers});
+}
+
+void Fleet::MoveCiviliansFromColony(std::shared_ptr<Colony> colony)
+{
+    float civilians_left_to_move = 5.0f;
+    bool changed = false;
+
+    auto iter = ships.begin();
+    while (civilians_left_to_move != 0.0f && iter != ships.end())
+    {
+        auto ship = *iter;
+        float added_civ = std::min(std::min(colony->population - 1.0f, civilians_left_to_move),
+                                   ship->human_capacity - (ship->soldiers + ship->civilians));
+        colony->population -= added_civ;
+        colony->population_changed = true;
+        ship->civilians += added_civ;
+        civilians_left_to_move -= added_civ;
+        civilians += added_civ;
+        iter++;
+        changed = true;
+    }
+
+    if (changed)
+        location_sector->fleets_changed.push_back({id, owner_id, civilians, soldiers});
+}
+
+void Fleet::MoveSoldiersToColony(std::shared_ptr<Colony> colony)
+{
+    float soldiers_left_to_move = 5.0f;
+    bool changed = false;
+
+    auto iter = ships.begin();
+    while (soldiers_left_to_move != 0.0f && iter != ships.end())
+    {
+        auto ship = *iter;
+        float added_sol = std::min(ship->soldiers, soldiers_left_to_move);
+        colony->soldiers += added_sol;
+        colony->soldiers_changed = true;
+        ship->soldiers -= added_sol;
+        soldiers_left_to_move -= added_sol;
+        soldiers -= added_sol;
+        iter++;
+        changed = true;
+    }
+
+    if (changed)
+        location_sector->fleets_changed.push_back({id, owner_id, civilians, soldiers});
+}
+
+void Fleet::MoveSoldiersFromColony(std::shared_ptr<Colony> colony)
+{
+    float soldiers_left_to_move = 5.0f;
+    bool changed = false;
+
+    auto iter = ships.begin();
+    while (soldiers_left_to_move != 0.0f && iter != ships.end())
+    {
+        auto ship = *iter;
+        float added_sol = std::min(std::min(colony->soldiers, soldiers_left_to_move),
+                                   ship->human_capacity - (ship->soldiers + ship->civilians));
+        colony->soldiers -= added_sol;
+        colony->soldiers_changed = true;
+        ship->soldiers += added_sol;
+        soldiers_left_to_move -= added_sol;
+        soldiers += added_sol;
+        iter++;
+        changed = true;
+    }
+
+    if (changed)
+        location_sector->fleets_changed.push_back({id, owner_id, civilians, soldiers});
 }
 
 std::map<Resource, float> Fleet::GetUpkeepCost()
@@ -393,4 +495,28 @@ std::map<Resource, float> Fleet::GetUpkeepCost()
         cost += ship->design->upkeep;
     }
     return cost;
+}
+
+void Fleet::InvadeColony(std::shared_ptr<Colony> colony)
+{
+    if (current_action != Fleet::Action::None)
+        return;
+    current_action = Fleet::Action::Invade;
+    invaded_colony = colony;
+}
+
+void Fleet::KillSoldiers(float number)
+{
+    float soldiers_left_kill = number;
+
+    auto iter = ships.begin();
+    while (soldiers_left_kill != 0.0f && iter != ships.end())
+    {
+        auto ship = *iter;
+        float killed_sol = std::min(soldiers_left_kill, ship->soldiers);
+        ship->soldiers -= killed_sol;
+        soldiers_left_kill -= killed_sol;
+        soldiers -= killed_sol;
+        iter++;
+    }
 }

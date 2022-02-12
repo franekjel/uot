@@ -22,6 +22,7 @@ void Sector::JumpFleet(unsigned int fleet_id)
 
     this_fleet->JumpFleet();
     this_fleet->position = (position - dest->position).normalized();
+    this_fleet->wanted_position = this_fleet->position;
 
     present_fleets.erase(present_fleets.find(fleet_id));
 
@@ -58,8 +59,6 @@ Sector::FleetParameters::FleetParameters(std::shared_ptr<Fleet> fleet)
 {
     fleet_id = fleet->id;
     position = fleet->position;
-    soldiers = fleet->soldiers;
-    civilians = fleet->civilians;
     human_capacity = fleet->human_capacity;
     construction_points = fleet->construction_points;
     current_hp = 0.0f;

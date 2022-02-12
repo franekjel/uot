@@ -77,6 +77,9 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
 {
     messageTypes::NewTurnPayload payload;
 
+    payload.you_lost = false;
+    payload.you_won = false;
+
     for (const auto& resource : player->owned_resources)
     {
         if (player->resources_changed[resource.first])
@@ -92,6 +95,11 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
         {
             payload.updated_populations[colony.second->id] = colony.second->population;
             colony.second->population_changed = false;
+        }
+        if (colony.second->soldiers_changed)
+        {
+            payload.updated_soldiers[colony.second->id] = colony.second->soldiers;
+            colony.second->soldiers_changed = false;
         }
 
         if (colony.second->building_queue_changed)
@@ -215,6 +223,12 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
                     payload.destroyed_ships.push_back(destroyed_ship.ship_id);
             }
 
+            for (const auto& changed_fleet : sector->fleets_changed)
+            {
+                if (changed_fleet.owner == player->id)
+                    payload.changed_fleet_populations.push_back(messageTypes::MsgChangedFleetPopulation(changed_fleet));
+            }
+
             payload.watched_sectors_updates.push_back(sector_update_msg);
         }
     }
@@ -251,8 +265,27 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
         payload.ship_designs.push_back(ship_design);
     }
 
+    for (const auto& lost_obj : player->lost_objects)
+    {
+        payload.lost_objects.push_back(lost_obj);
+    }
+
+    for (const auto& new_col : player->new_colonies)
+    {
+        payload.invaded_colonies.push_back(messageTypes::MsgColony(new_col));
+    }
+
+    for (const auto& fir : player->fleet_info_requests)
+    {
+        if (player->owned_fleets.count(fir))
+            payload.fleet_info_response.push_back(messageTypes::MsgDetailedFleetInfo(player->owned_fleets[fir]));
+    }
+
     player->new_technologies.clear();
     player->changed_designs.clear();
+    player->lost_objects.clear();
+    player->new_colonies.clear();
+    player->fleet_info_requests.clear();
 
     txrx.send_reliable(player_net_name, payload.Serialize());
 }

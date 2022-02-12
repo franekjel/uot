@@ -79,6 +79,48 @@ void Player::DiscoverTechnology(Technology::TechnologyType technology)
         }
     }
 
+    for (const auto &b : Modules)
+    {
+        const auto &required = b.second.required_technologies;
+        if (find(required.begin(), required.end(), technology) != required.end())
+        {
+            if (required.size() == 1)  // pewnie najczęstszy przypadek, dlatego wyróżniam
+                available_modules.insert(b.first);
+            else
+            {
+                int intersection_count = 0;
+
+                for (const auto &r : required)
+                    if (find(known_technologies.begin(), known_technologies.end(), r) != known_technologies.end())
+                        intersection_count++;
+
+                if (intersection_count == required.size())  // sprawdzenie czy znamy wszystkie wymagane technologie
+                    available_modules.insert(b.first);
+            }
+        }
+    }
+
+    for (const auto &b : ShipHulls)
+    {
+        const auto &required = b.second.required_technologies;
+        if (find(required.begin(), required.end(), technology) != required.end())
+        {
+            if (required.size() == 1)  // pewnie najczęstszy przypadek, dlatego wyróżniam
+                available_hulls.insert(b.first);
+            else
+            {
+                int intersection_count = 0;
+
+                for (const auto &r : required)
+                    if (find(known_technologies.begin(), known_technologies.end(), r) != known_technologies.end())
+                        intersection_count++;
+
+                if (intersection_count == required.size())  // sprawdzenie czy znamy wszystkie wymagane technologie
+                    available_hulls.insert(b.first);
+            }
+        }
+    }
+
     for (const auto &[res, bonus] : tech.resources_modifiers_planet)
     {
         if (resources_modifiers_planet.count(res) > 0)
@@ -122,6 +164,11 @@ void Player::HandleBuildRequest(Building::BuildingType type, Building::BuildingT
     auto colony = owned_colonies.find(colony_id);
     if (colony == owned_colonies.end())
         return;
+
+    auto av_buildings = colony->second->GetAvailableBuildings();
+    if (av_buildings.count(type) == 0 || av_buildings[type] <= 0)
+        return;
+
     for (const auto &res : building.cost)
     {
         if (owned_resources[res.first] < res.second)
@@ -184,7 +231,7 @@ void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int se
                                                          Sector::FleetParameters(owned_fleets[first_fleet_id])});
 }
 
-void Player::HandleWarpLoadingFleetRequest(int fleet_id)
+void Player::HandleWarpLoadingFleetRequest(unsigned int fleet_id)
 {
     if (owned_fleets.count(fleet_id) < 1)
         return;
@@ -207,7 +254,7 @@ void Player::HandleWarpLoadingFleetRequest(int fleet_id)
     owned_fleets[fleet_id]->current_action = Fleet::Action::WarpLoading;
 }
 
-void Player::HandleBuildAsteroidMineFleetRequest(int fleet_id)
+void Player::HandleBuildAsteroidMineFleetRequest(unsigned int fleet_id)
 {
     if (owned_fleets.count(fleet_id) < 1)
         return;
@@ -224,7 +271,7 @@ void Player::HandleBuildAsteroidMineFleetRequest(int fleet_id)
         if ((handled_fleet->position - obj->position).squaredLength() <= Fleet::kNearValue)
         {
             auto inhabitable = std::dynamic_pointer_cast<InhabitableObject>(obj);
-            if (inhabitable && !inhabitable->base)
+            if (inhabitable && (!inhabitable->base || inhabitable->base->owner->id != id))
             {
                 handled_fleet->base_building_object = inhabitable;
                 break;
@@ -262,7 +309,7 @@ void Player::HandleBuildAsteroidMineFleetRequest(int fleet_id)
     handled_fleet->current_action = Fleet::Action::BuildAsteroidMine;
 }
 
-void Player::HandleCancelFleetRequest(int fleet_id)
+void Player::HandleCancelFleetRequest(unsigned int fleet_id)
 {
     if (owned_fleets.count(fleet_id) < 1)
         return;
@@ -287,7 +334,7 @@ void Player::HandleCancelFleetRequest(int fleet_id)
             current_fleet->full_building_progress = 0.0f;
             break;
         case Fleet::Action::Invade:
-            // TODO
+            current_fleet->invaded_colony = nullptr;
             break;
         default:
             break;
@@ -295,7 +342,7 @@ void Player::HandleCancelFleetRequest(int fleet_id)
     current_fleet->current_action = Fleet::Action::None;
 }
 
-void Player::HandleColonizeFleetRequest(int fleet_id)
+void Player::HandleColonizeFleetRequest(unsigned int fleet_id)
 {
     if (owned_fleets.count(fleet_id) < 1)
         return;
@@ -348,6 +395,21 @@ void Player::HandleShipDesignRequest(unsigned int id, bool delete_design, std::s
         changed_designs.push_back({id, nullptr, true});
         ship_designs.erase(id);
         return;
+    }
+
+    if (available_hulls.count(hull_type) == 0)
+        return;
+
+    for (const auto &side : sides)
+    {
+        if (available_modules.count(side.first) == 0)
+            return;
+    }
+
+    for (const auto &ins : inside)
+    {
+        if (available_modules.count(ins.first) == 0)
+            return;
     }
 
     auto sides_size = ShipHulls.at(hull_type).sides_size;
@@ -451,4 +513,67 @@ void Player::HandleCreateShipRequest(unsigned int design_id, unsigned int planet
 
     current_colony->ship_building_queue.push_back({design, current_sector});
     current_colony->ship_building_queue_changed = true;
+}
+
+void Player::HandleHumansMoveFleet(unsigned int fleet_id, Fleet::Action type)
+{
+    if (owned_fleets.count(fleet_id) < 1)
+        return;
+    const auto &fleet = owned_fleets[fleet_id];
+    std::shared_ptr<Colony> colony = nullptr;
+    for (const auto &object : fleet->location_sector->objects)
+    {
+        if ((object.second->position - fleet->position).squaredLength() < Fleet::kNearValue)
+        {
+            auto planet = std::dynamic_pointer_cast<Planet>(object.second);
+            if (planet && planet->colony && planet->colony->owner->id == id)
+            {
+                colony = planet->colony;
+                break;
+            }
+        }
+    }
+    if (!colony)
+        return;
+
+    switch (type)
+    {
+        case Fleet::Action::KickOutCivilians:
+            fleet->MoveCiviliansToColony(colony);
+            break;
+        case Fleet::Action::KidnapCivilians:
+            fleet->MoveCiviliansFromColony(colony);
+            break;
+        case Fleet::Action::DisembarkSoldiers:
+            fleet->MoveSoldiersToColony(colony);
+            break;
+        case Fleet::Action::BorrowSoldiers:
+            fleet->MoveSoldiersFromColony(colony);
+            break;
+        default:
+            break;
+    }
+}
+
+void Player::HandleInvadeFleetRequest(unsigned int fleet_id)
+{
+    if (owned_fleets.count(fleet_id) < 1)
+        return;
+    const auto &fleet = owned_fleets[fleet_id];
+    std::shared_ptr<Colony> colony = nullptr;
+    for (const auto &object : fleet->location_sector->objects)
+    {
+        if ((object.second->position - fleet->position).squaredLength() < Fleet::kNearValue)
+        {
+            auto planet = std::dynamic_pointer_cast<Planet>(object.second);
+            if (planet && planet->colony && planet->colony->owner->id != id)
+            {
+                colony = planet->colony;
+                break;
+            }
+        }
+    }
+    if (!colony)
+        return;
+    fleet->InvadeColony(colony);
 }

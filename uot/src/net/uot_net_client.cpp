@@ -386,8 +386,6 @@ void uot_net_client::send_payload()
 void uot_net_client::updateFleet(const std::shared_ptr<Fleet> f, const messageTypes::MsgFleetParameters p)
 {
     f->position = p.position;
-    f->soldiers = p.soldiers;
-    f->civilians = p.civilians;
     f->human_capacity = p.human_capacity;
     f->construction_points = p.construction_points;
     f->fleet_speed_per_turn = p.base_fleet_speed;

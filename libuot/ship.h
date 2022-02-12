@@ -24,6 +24,7 @@ struct ShipHull
     float worker_weeks_cost;
     float warp_drive_energy;  // energy need to warp
     int ship_aggro;
+    const std::vector<Technology::TechnologyType> required_technologies;
 
     enum Type
     {
@@ -35,17 +36,20 @@ struct ShipHull
     ShipHull(const int sides_size, const int inside_size, const std::map<Resource, float>& cost,
              const std::map<Resource, float>& additional_upkeep, const float hp, const float speed,
              const float engines_energy_consumtion, const float crew, const float worker_weeks_cost,
-             const float warp_drive_energy, const int ship_aggro);
+             const float warp_drive_energy, const int ship_aggro,
+             const std::vector<Technology::TechnologyType> required_technologies);
 };
 
 const std::map<ShipHull::Type, ShipHull> ShipHulls{
     {ShipHull::SmallShipHull, ShipHull(4, 4, {{Resource::Metals, 50.0f}}, {{Resource::Antimatter, 0.5f}}, 80.0f, 0.04f,
-                                       1.0f, 0.1f, 60.0f, 15.0f, 1)},
-    {ShipHull::MediumShipHull, ShipHull(12, 12, {{Resource::Metals, 100.0f}, {Resource::RareMetals, 20.0f}},
-                                        {{Resource::Antimatter, 1.2f}}, 250.0f, 0.03f, 2.5f, 0.25f, 120.0f, 40.0f, 2)},
+                                       1.0f, 0.1f, 60.0f, 15.0f, 1, {Technology::TechnologyType::Spaceships})},
+    {ShipHull::MediumShipHull,
+     ShipHull(12, 12, {{Resource::Metals, 100.0f}, {Resource::RareMetals, 20.0f}}, {{Resource::Antimatter, 1.2f}},
+              250.0f, 0.03f, 2.5f, 0.25f, 120.0f, 40.0f, 2, {Technology::TechnologyType::AdvancedSpaceships})},
     {ShipHull::GrandShipHull,
      ShipHull(36, 36, {{Resource::Metals, 200.0f}, {Resource::RareMetals, 40.0f}, {Resource::Polymers, 20.0f}},
-              {{Resource::Antimatter, 2.5f}}, 700.0f, 0.02f, 4.0f, 0.5f, 250.0f, 80.0f, 4)}
+              {{Resource::Antimatter, 2.5f}}, 700.0f, 0.02f, 4.0f, 0.5f, 250.0f, 80.0f, 4,
+              {Technology::TechnologyType::SpaceCruisers})}
 
 };
 
@@ -128,6 +132,8 @@ struct Fleet
     float building_progress;
     float full_building_progress;
 
+    std::shared_ptr<Colony> invaded_colony;  // used only if there is a colony currently being invaded
+
     std::map<Weapon::SpecialFeatures, float> gained_damage = {
         {Weapon::SpecialFeatures::BypassShield, 0.0f},
         {Weapon::SpecialFeatures::HPDamageBonus, 0.0f},
@@ -137,6 +143,12 @@ struct Fleet
 
     static constexpr float kNearValue = 0.01f;
     static constexpr float kColonizationCost = 10.0f;
+    static constexpr float kBaseInvasionFightingNumber = 0.5f;
+    static constexpr float kInvasionColonyWinProbability = 0.7f;
+    static constexpr float kInvasionMaxWinnerDeathRate = 0.3f;
+    static constexpr float kInvasionMaxLoserDeathRate = 1.0f;
+
+    static constexpr float kEpsSoldiers = 0.001f;
 
     enum Action
     {
@@ -145,6 +157,10 @@ struct Fleet
         BuildAsteroidMine,
         Colonize,
         Invade,
+        KickOutCivilians,
+        KidnapCivilians,
+        DisembarkSoldiers,
+        BorrowSoldiers,
         CancelAction
     } current_action;
 
@@ -165,6 +181,15 @@ struct Fleet
 
     void MoveFleet();
     void JumpFleet();
+
+    void MoveCiviliansToColony(std::shared_ptr<Colony> colony);
+    void MoveCiviliansFromColony(std::shared_ptr<Colony> colony);
+    void MoveSoldiersToColony(std::shared_ptr<Colony> colony);
+    void MoveSoldiersFromColony(std::shared_ptr<Colony> colony);
+
+    void KillSoldiers(float number);
+
+    void InvadeColony(std::shared_ptr<Colony> colony);
 
     // client only fields
     float current_hp;

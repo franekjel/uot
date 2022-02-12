@@ -40,6 +40,7 @@ messageTypes::MsgColony::MsgColony() { buildings = {}; }
 messageTypes::MsgColony::MsgColony(const std::shared_ptr<Colony>& colony)
     : id(colony->id), population(colony->population), owner_id(colony->owner->id)
 {
+    planet_id = colony->planet->id;
     for (auto building : colony->buildings)
         buildings[building.first] = building.second;
 }
@@ -278,8 +279,6 @@ messageTypes::MsgFleetParameters::MsgFleetParameters(const Sector::FleetParamete
 {
     id = fleet_parameters.fleet_id;
     position = fleet_parameters.position;
-    soldiers = fleet_parameters.soldiers;
-    civilians = fleet_parameters.civilians;
     human_capacity = fleet_parameters.human_capacity;
     construction_points = fleet_parameters.construction_points;
     base_fleet_speed = fleet_parameters.base_fleet_speed;
@@ -288,4 +287,51 @@ messageTypes::MsgFleetParameters::MsgFleetParameters(const Sector::FleetParamete
     current_shields = fleet_parameters.current_shields;
     max_shields = fleet_parameters.max_shields;
     average_energy = fleet_parameters.average_energy;
+}
+
+messageTypes::MsgChangedFleetPopulation::MsgChangedFleetPopulation() {}
+
+messageTypes::MsgChangedFleetPopulation::MsgChangedFleetPopulation(const Sector::FleetPopChange& fleet)
+{
+    id = fleet.fleet_id;
+    soldiers = fleet.soldiers;
+    civilians = fleet.civilians;
+}
+
+messageTypes::MsgDetailedShipInfo::MsgDetailedShipInfo() {}
+
+messageTypes::MsgDetailedShipInfo::MsgDetailedShipInfo(std::shared_ptr<Ship> ship)
+    : id(id),
+      hp(hp),
+      max_hp(max_hp),
+      hp_regen(hp_regen),
+      shield(shield),
+      max_shield(max_shield),
+      energy(energy),
+      energy_regen(energy_regen),
+      max_energy(max_energy),
+      soldiers(soldiers),
+      civilians(civilians),
+      human_capacity(human_capacity),
+      speed(speed),
+      design_id(ship->design->id),
+      weapons(ship->ship_weapons)
+{
+}
+
+messageTypes::MsgDetailedFleetInfo::MsgDetailedFleetInfo() {}
+
+messageTypes::MsgDetailedFleetInfo::MsgDetailedFleetInfo(std::shared_ptr<Fleet> fleet)
+    : id(fleet->id),
+      soldiers(fleet->soldiers),
+      civilians(fleet->civilians),
+      human_capacity(fleet->human_capacity),
+      position(fleet->position),
+      wanted_position(fleet->wanted_position),
+      current_action(fleet->current_action)
+{
+    for (const auto& ship : fleet->ships)
+    {
+        ships.push_back(messageTypes::MsgDetailedShipInfo(ship));
+    }
 }
