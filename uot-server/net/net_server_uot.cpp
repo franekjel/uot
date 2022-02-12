@@ -272,10 +272,17 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
         payload.invaded_colonies.push_back(messageTypes::MsgColony(new_col));
     }
 
+    for (const auto& fir : player->fleet_info_requests)
+    {
+        if (player->owned_fleets.count(fir))
+            payload.fleet_info_response.push_back(messageTypes::MsgDetailedFleetInfo(player->owned_fleets[fir]));
+    }
+
     player->new_technologies.clear();
     player->changed_designs.clear();
     player->lost_objects.clear();
     player->new_colonies.clear();
+    player->fleet_info_requests.clear();
 
     txrx.send_reliable(player_net_name, payload.Serialize());
 }

@@ -318,4 +318,46 @@ struct MsgFleetActionRequest
     MsgFleetActionRequest(int fleet_id_, Fleet::Action action_);
 };
 
+struct MsgDetailedShipInfo
+{
+    unsigned int id;
+    float hp;
+    float max_hp;
+    float hp_regen;
+    float shield;
+    float max_shield;
+    float energy;
+    float energy_regen;
+    float max_energy;
+    float soldiers;
+    float civilians;
+    float human_capacity;
+    float speed;
+
+    unsigned int design_id;
+    std::map<ModuleType, int> weapons;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgDetailedShipInfo, id, hp, max_hp, hp_regen, shield, max_shield, energy,
+                                   energy_regen, max_energy, soldiers, civilians, human_capacity, speed, design_id,
+                                   weapons)
+    MsgDetailedShipInfo();
+    MsgDetailedShipInfo(std::shared_ptr<Ship> ship);
+};
+
+struct MsgDetailedFleetInfo
+{
+    unsigned int id;
+    float soldiers;
+    float civilians;
+    float human_capacity;
+    Point position;
+    Point wanted_position;
+    Fleet::Action current_action;
+    std::vector<MsgDetailedShipInfo> ships;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgDetailedFleetInfo, id, soldiers, civilians, human_capacity, position,
+                                   wanted_position, current_action, ships)
+    MsgDetailedFleetInfo();
+    MsgDetailedFleetInfo(std::shared_ptr<Fleet> fleet);
+};
+
 }  // namespace messageTypes

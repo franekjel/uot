@@ -147,6 +147,14 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
         }
     }
 
+    for (const auto& fir : payload->fleetInfoRequests)
+    {
+        if (player->owned_fleets.count(fir) != 0)
+        {
+            player->fleet_info_requests.push_back(fir);
+        }
+    }
+
     return true;
 }
 

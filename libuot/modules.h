@@ -8,6 +8,7 @@
 
 #include <optional>
 #include "resource.h"
+#include "technology.h"
 
 struct Weapon
 {
