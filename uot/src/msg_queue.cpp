@@ -29,11 +29,8 @@ void msg_queue::reset()
     actions.moveFleetRequests.clear();
     actions.technologyRequest = Technology::TechnologyType::Empty;
     actions.fleetActionRequests.clear();
-}
-
-void msg_queue::request_fleet_jump(unsigned int fleet_id)
-{
-    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::WarpLoading);
+    actions.shipDesignRequests.clear();
+    actions.createShipRequests.clear();
 }
 
 void msg_queue::build_ship(const int design_id, const int planet_id)
@@ -45,6 +42,14 @@ void msg_queue::build_ship(const int design_id, const int planet_id)
 void msg_queue::build_design(std::shared_ptr<ShipDesign>& design, const bool _delete)
 {
     messageTypes::MsgShipDesign request(design, _delete);
+    actions.shipDesignRequests.push_back(request);
+}
+
+void msg_queue::request_fleet_jump(unsigned int fleet_id)
+{
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::WarpLoading);
+}
+
 void msg_queue::request_fleet_build(unsigned int fleet_id)
 {
     actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::BuildAsteroidMine);

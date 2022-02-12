@@ -174,6 +174,7 @@ struct designer_button : button<designer_button>
 using popup_button =
     std::variant<std::unique_ptr<start_button>, std::unique_ptr<exit_button>, std::unique_ptr<back_button>>;
 using navigation_button = std::variant<std::unique_ptr<technology_button>, std::unique_ptr<designer_button>>;
+
 struct jump_button : button<jump_button>
 {
     jump_button() : button<jump_button>{6, std::string("JUMP"), bpos::fleet_1_1, bcol::basic} {}
@@ -255,8 +256,6 @@ struct fleet_cancel_button : button<fleet_cancel_button>
     void _clicked(client_context& context);
 };
 
-using popup_button = std::variant<std::unique_ptr<start_button>, std::unique_ptr<exit_button>>;
-using navigation_button = std::variant<std::unique_ptr<technology_button>>;
 using tech_menu_button = std::variant<std::unique_ptr<research_button>, std::unique_ptr<abort_research_button>>;
 using fleet_button =
     std::variant<std::unique_ptr<jump_button>, std::unique_ptr<build_base_button>, std::unique_ptr<colonize_button>,

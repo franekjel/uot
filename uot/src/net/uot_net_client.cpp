@@ -263,7 +263,6 @@ void uot_net_client::handle_message(const std::string& data)
             const auto& tech_data = payload_newturn->technology_updates;
             const auto& new_ships = payload_newturn->new_ships;
             const auto& fleet_jumps = payload_newturn->jumped_fleets;
-            const auto& a = payload_newturn->new_sectors;
             auto state = context.getGameState();
             if (state.value->player != nullptr)
             {
