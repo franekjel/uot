@@ -50,7 +50,7 @@ struct Building
         ArchaeologicalSite,
         // ancient nanobots
         NanobotsExcavationFacility,
-        Soldier, // XD wojskowy beton
+        Soldier,  // XD wojskowy beton
     };
 
     const std::string name;
