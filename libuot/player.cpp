@@ -79,6 +79,48 @@ void Player::DiscoverTechnology(Technology::TechnologyType technology)
         }
     }
 
+    for (const auto &b : Modules)
+    {
+        const auto &required = b.second.required_technologies;
+        if (find(required.begin(), required.end(), technology) != required.end())
+        {
+            if (required.size() == 1)  // pewnie najczęstszy przypadek, dlatego wyróżniam
+                available_modules.insert(b.first);
+            else
+            {
+                int intersection_count = 0;
+
+                for (const auto &r : required)
+                    if (find(known_technologies.begin(), known_technologies.end(), r) != known_technologies.end())
+                        intersection_count++;
+
+                if (intersection_count == required.size())  // sprawdzenie czy znamy wszystkie wymagane technologie
+                    available_modules.insert(b.first);
+            }
+        }
+    }
+
+    for (const auto &b : ShipHulls)
+    {
+        const auto &required = b.second.required_technologies;
+        if (find(required.begin(), required.end(), technology) != required.end())
+        {
+            if (required.size() == 1)  // pewnie najczęstszy przypadek, dlatego wyróżniam
+                available_hulls.insert(b.first);
+            else
+            {
+                int intersection_count = 0;
+
+                for (const auto &r : required)
+                    if (find(known_technologies.begin(), known_technologies.end(), r) != known_technologies.end())
+                        intersection_count++;
+
+                if (intersection_count == required.size())  // sprawdzenie czy znamy wszystkie wymagane technologie
+                    available_hulls.insert(b.first);
+            }
+        }
+    }
+
     for (const auto &[res, bonus] : tech.resources_modifiers_planet)
     {
         if (resources_modifiers_planet.count(res) > 0)

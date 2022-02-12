@@ -3,7 +3,8 @@
 ShipHull::ShipHull(const int sides_size, const int inside_size, const std::map<Resource, float> &cost,
                    const std::map<Resource, float> &additional_upkeep, const float hp, const float speed,
                    const float engines_energy_consumtion, const float crew, const float worker_weeks_cost,
-                   const float warp_drive_energy, const int ship_aggro)
+                   const float warp_drive_energy, const int ship_aggro,
+                   const std::vector<Technology::TechnologyType> required_technologies)
     : sides_size(sides_size),
       inside_size(inside_size),
       cost(cost),
@@ -14,7 +15,8 @@ ShipHull::ShipHull(const int sides_size, const int inside_size, const std::map<R
       crew(crew),
       worker_weeks_cost(worker_weeks_cost),
       warp_drive_energy(warp_drive_energy),
-      ship_aggro(ship_aggro)
+      ship_aggro(ship_aggro),
+      required_technologies(required_technologies)
 {
 }
 

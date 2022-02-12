@@ -26,6 +26,8 @@ struct Player
     std::set<Technology::TechnologyType> known_technologies;
     std::set<Technology::TechnologyType> available_technologies;
     std::set<Building::BuildingType> available_buildings;
+    std::set<ModuleType> available_modules;
+    std::set<ShipHull::Type> available_hulls;
     TechnologyProgress researched_technology;
 
     void HandleBuildRequest(Building::BuildingType type, Building::BuildingType upgrade_from, unsigned int colony_id);
