@@ -61,7 +61,7 @@ void uot_net_client::handle_message(const std::string& data)
         case messageTypes::StartGame:
         {
             auto payload_start = std::dynamic_pointer_cast<messageTypes::StartGamePayload>(des);
-            auto msgGalaxy = payload_start->galaxy;
+            auto msgSector = payload_start->sector;
             std::map<unsigned int, std::shared_ptr<Sector>> sectors_map;
             std::map<unsigned int, std::shared_ptr<Star>> stars_map;
             std::map<unsigned int, std::shared_ptr<Planet>> planets_map;
@@ -70,27 +70,27 @@ void uot_net_client::handle_message(const std::string& data)
             std::map<unsigned int, std::shared_ptr<InhabitableObject>> inhabitables_map;
             std::vector<std::shared_ptr<Sector>> sectors_vec;
 
-            std::shared_ptr<Galaxy> galaxy_ptr = std::make_shared<Galaxy>();
+            std::shared_ptr<Sector> sector_ptr = std::make_shared<Sector>();
             std::shared_ptr<Colony> colony_ptr = std::make_shared<Colony>(0, nullptr);
             unsigned int player_id = payload_start->player_id;
             std::shared_ptr<Player> player_ptr =
-                std::make_shared<Player>(player_id, galaxy_ptr, std::map<Resource, float>{}, colony_ptr);
+                std::make_shared<Player>(player_id, sector_ptr, std::map<Resource, float>{}, colony_ptr);
 
-            for (int i = 0; i < msgGalaxy.sectors.size(); i++)
+            for (int i = 0; i < msgSector.sectors.size(); i++)
             {
                 const auto s = std::make_shared<Sector>();
-                s->sector_id = msgGalaxy.sectors[i].id;
-                s->position = msgGalaxy.sectors[i].position;
+                s->sector_id = msgSector.sectors[i].id;
+                s->position = msgSector.sectors[i].position;
                 sectors_map.insert(std::pair<int, std::shared_ptr<Sector>>(s->sector_id, s));
                 sectors_vec.push_back(s);
             }
 
             // Add "empty" sectors;
-            for (int i = 0; i < msgGalaxy.sectors.size(); i++)
+            for (int i = 0; i < msgSector.sectors.size(); i++)
             {
-                for (int j = 0; j < msgGalaxy.sectors[i].neighbors.size(); ++j)
+                for (int j = 0; j < msgSector.sectors[i].neighbors.size(); ++j)
                 {
-                    auto neigh = msgGalaxy.sectors[i].neighbors[j];
+                    auto neigh = msgSector.sectors[i].neighbors[j];
 
                     if (sectors_map.count(neigh.id) < 1)
                     {
@@ -104,12 +104,12 @@ void uot_net_client::handle_message(const std::string& data)
             }
 
             // Setting neighbors sectors references
-            for (int i = 0; i < msgGalaxy.sectors.size(); i++)
+            for (int i = 0; i < msgSector.sectors.size(); i++)
             {
-                auto& sec = sectors_map[msgGalaxy.sectors[i].id];
-                for (int sec_idx = 0; sec_idx < msgGalaxy.sectors[i].neighbors.size(); sec_idx++)
+                auto& sec = sectors_map[msgSector.sectors[i].id];
+                for (int sec_idx = 0; sec_idx < msgSector.sectors[i].neighbors.size(); sec_idx++)
                 {
-                    auto neighb_id = msgGalaxy.sectors[i].neighbors[sec_idx].id;
+                    auto neighb_id = msgSector.sectors[i].neighbors[sec_idx].id;
                     auto& neighb = sectors_map[neighb_id];
                     sec->neighbors.insert(neighb);
                     neighb->neighbors.insert(sec);
@@ -117,19 +117,19 @@ void uot_net_client::handle_message(const std::string& data)
             }
 
             // Setting stars for sectors
-            for (int i = 0; i < msgGalaxy.sectors.size(); i++)
+            for (int i = 0; i < msgSector.sectors.size(); i++)
             {
                 for (int j = 0; j < sectors_vec.size(); j++)
                 {
-                    if (msgGalaxy.sectors[i].id == sectors_vec[j]->sector_id)
+                    if (msgSector.sectors[i].id == sectors_vec[j]->sector_id)
                     {
-                        std::vector<messageTypes::MsgStar> stars = msgGalaxy.sectors[i].stars;
+                        std::vector<messageTypes::MsgStar> stars = msgSector.sectors[i].stars;
 
                         for (int star_idx = 0; star_idx < stars.size(); star_idx++)
                         {
                             messageTypes::MsgStar star = stars[star_idx];
                             SectorObject _sectorObject =
-                                SectorObject(star.id, star.position, star.object_size, msgGalaxy.sectors[i].id);
+                                SectorObject(star.id, star.position, star.object_size, msgSector.sectors[i].id);
                             std::shared_ptr<Star> s_star = std::make_shared<Star>(_sectorObject, star.starType);
                             stars_map.insert(std::pair<int, std::shared_ptr<Star>>(star.id, s_star));
                             sectors_vec[j]->objects.insert({s_star->id, s_star});
@@ -139,19 +139,19 @@ void uot_net_client::handle_message(const std::string& data)
             }
 
             // Setting planets for sectors
-            for (int i = 0; i < msgGalaxy.sectors.size(); i++)
+            for (int i = 0; i < msgSector.sectors.size(); i++)
             {
                 for (int j = 0; j < sectors_vec.size(); j++)
                 {
-                    if (msgGalaxy.sectors[i].id == sectors_vec[j]->sector_id)
+                    if (msgSector.sectors[i].id == sectors_vec[j]->sector_id)
                     {
-                        std::vector<messageTypes::MsgPlanet> planets = msgGalaxy.sectors[i].planets;
+                        std::vector<messageTypes::MsgPlanet> planets = msgSector.sectors[i].planets;
 
                         for (int planet_idx = 0; planet_idx < planets.size(); planet_idx++)
                         {
                             messageTypes::MsgPlanet planet = planets[planet_idx];
                             SectorObject _sectorObject =
-                                SectorObject(planet.id, planet.position, planet.object_size, msgGalaxy.sectors[i].id);
+                                SectorObject(planet.id, planet.position, planet.object_size, msgSector.sectors[i].id);
 
                             std::map<PlanetaryFeatures::PlanetaryFeatureType, int> planetary_features;
                             for (int feat = 0; feat < planet.planetary_features.size(); feat++)
@@ -188,19 +188,19 @@ void uot_net_client::handle_message(const std::string& data)
             }
 
             // Setting inhabitables for sectors
-            for (int i = 0; i < msgGalaxy.sectors.size(); i++)
+            for (int i = 0; i < msgSector.sectors.size(); i++)
             {
                 for (int j = 0; j < sectors_vec.size(); j++)
                 {
-                    if (msgGalaxy.sectors[i].id == sectors_vec[j]->sector_id)
+                    if (msgSector.sectors[i].id == sectors_vec[j]->sector_id)
                     {
-                        std::vector<messageTypes::MsgInhabitable> inhabitables = msgGalaxy.sectors[i].inhabitables;
+                        std::vector<messageTypes::MsgInhabitable> inhabitables = msgSector.sectors[i].inhabitables;
 
                         for (int inhabitable_idx = 0; inhabitable_idx < inhabitables.size(); inhabitable_idx++)
                         {
                             messageTypes::MsgInhabitable inhabitable = inhabitables[inhabitable_idx];
                             SectorObject _sectorObject = SectorObject(inhabitable.id, inhabitable.position,
-                                                                      inhabitable.object_size, msgGalaxy.sectors[i].id);
+                                                                      inhabitable.object_size, msgSector.sectors[i].id);
                             std::shared_ptr<InhabitableObject> s_inhabitable = std::make_shared<InhabitableObject>(
                                 _sectorObject, inhabitable.resurce_deposit, inhabitable.object_type);
 
@@ -226,7 +226,7 @@ void uot_net_client::handle_message(const std::string& data)
 
             for (int i = 0; i < sectors_vec.size(); i++)
             {
-                galaxy_ptr->sectors.insert({sectors_vec[i]->sector_id, sectors_vec[i]});
+                sector_ptr->sectors.insert({sectors_vec[i]->sector_id, sectors_vec[i]});
             }
 
             for (const auto& u : payload_start->starting_ships_designs)
@@ -315,7 +315,7 @@ void uot_net_client::handle_message(const std::string& data)
                     std::shared_ptr<Fleet> fleet;
                     if (s.fleet_parameters.new_fleet)
                     {
-                        auto sector = state.value->player->known_galaxy->sectors.at(
+                        auto sector = state.value->player->known_sector->sectors.at(
                             state.value->planets.at(s.planet_id)->sector_id);
                         const auto& p = s.fleet_parameters;
                         fleet = std::make_shared<Fleet>(p.id, sector, p.position, state.value->player->id);
@@ -343,7 +343,7 @@ void uot_net_client::handle_message(const std::string& data)
 
                 for (const auto& u : sector_updates)
                 {
-                    auto s = state.value->player->known_galaxy->sectors[u.sector_id];
+                    auto s = state.value->player->known_sector->sectors[u.sector_id];
                     for (const auto& fu : u.fleets)
                     {
                         auto& f = s->present_fleets.at(fu.id);

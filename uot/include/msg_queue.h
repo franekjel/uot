@@ -9,6 +9,7 @@ struct msg_queue
     void upgrade_building(int colony_id, Building::BuildingType type_from, Building::BuildingType type_to);
     void request_research(Technology::TechnologyType tech);
     void request_fleet_move(unsigned int fleet_id, const Point pos);
+    void build_ship(const int design_id, const int planet_id);
     void reset();
 };
 

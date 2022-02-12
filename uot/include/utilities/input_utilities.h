@@ -87,6 +87,9 @@ uot_event_type get_planet_event_type(Uint32 event_type, SDL_MouseButtonEvent m, 
 
 uot_event_type get_planet_scroll_type(int x, int y);
 
+uot_event_type get_planet_build_event_type(Uint32 event_type, SDL_MouseButtonEvent m, int x, int y);
+
+uot_event_type get_planet_build_scroll_type(int x, int y);
 }  // namespace input_utilities
 
 #endif  // INPUT_UTILITIES_H

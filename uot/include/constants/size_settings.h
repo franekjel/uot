@@ -33,7 +33,7 @@ struct context_area : area_properties<350, 700, 1225, 50>
 };
 
 // PLANET VIEW
-struct planet_built_area : area_properties<400, 380, 10, 10>
+struct planet_built_area : area_properties<400, 770, 1190, 10>
 {
 };
 
@@ -41,7 +41,15 @@ struct planet_queue_area : area_properties<400, 380, 10, 400>
 {
 };
 
+struct planet_ships_queue_area : area_properties<400, 380, 10, 10>
+{
+};
+
 struct planet_build_area : area_properties<400, 770, 1190, 10>
+{
+};
+
+struct planet_ships_build_area : area_properties<400, 770, 10, 10>
 {
 };
 
@@ -49,7 +57,7 @@ struct planet_info_area : area_properties<700, 770, 450, 10>
 {
 };
 
-struct planet_info_text_area : area_properties<700, 330, 450, 450>
+struct planet_info_text_area : area_properties<700, 310, 450, 450>
 {
 };
 

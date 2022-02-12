@@ -54,7 +54,7 @@ void rendering::render_universe_view::_draw(client_context& context)
     if (gs->player)
     {
         // universe render here
-        for (const auto& sector : gs->player->known_galaxy->sectors)
+        for (const auto& sector : gs->player->known_sector->sectors)
         {
             render_sector_universe_helper(context, sector.second);
         }
@@ -153,7 +153,7 @@ void rendering::render_universe_view::_mouse_handler(client_context& context, Ui
         x = x - AreaType::x_offset;
         y = y - AreaType::y_offset;
         const int sprite_off = planets_meta::texture_size[SECTOR_1] * planets_meta::sector_multiplier * 0.5f;
-        for (const auto& [id, s] : gs->player->known_galaxy->sectors)
+        for (const auto& [id, s] : gs->player->known_sector->sectors)
         {
             if (iu::check_collision(x, y, size_settings::play_area::width * (0.5f + 0.5f * s->position.x) - sprite_off,
                                     size_settings::play_area::height * (0.5f + 0.5f * s->position.y) - sprite_off,

@@ -77,7 +77,7 @@ void loadMedia(client_context& context)
                                 std::to_string(r) +
                                 "' stroke='#eeeeee' stroke-width='3' "
                                 "fill='none' /></svg>";
-        gr->galaxy_boundary = texture_t{r * 2, r * 2, sdl_utilities::load_texture_from_svg(svg, context.r)};
+        gr->sector_boundary = texture_t{r * 2, r * 2, sdl_utilities::load_texture_from_svg(svg, context.r)};
     }
 
     {

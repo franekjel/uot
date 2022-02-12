@@ -21,7 +21,7 @@ void render_list(client_context& context, std::shared_ptr<ui_list_state> l_st, c
     SDL_RenderGetViewport(r.get(), &curr_view);
     auto old_view{curr_view};
     curr_view.y += l_st->action_button.pos.h / 2;
-    curr_view.h = l_st->action_button.pos.y - l_st->action_button.pos.h / 2;
+    curr_view.h = l_st->action_button.pos.y - l_st->action_button.pos.h / 2 - 15;
 
     SDL_RenderSetViewport(r.get(), &curr_view);
 
