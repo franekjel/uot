@@ -17,14 +17,27 @@ struct render_designer_view : render_view<render_designer_view>
     void key_handler(client_context& context, Uint16 k);
     void _draw(client_context& context);
     void init(client_context& context);
+    void render_design_info(client_context& context);
+    std::string get_design_cost();
+    std::string get_design_upkeep();
+    std::string get_design_worker_cost();
 
     inline void refresh_lists(client_context& context);
 
     std::shared_ptr<ui_list_state> modules_available;
     std::shared_ptr<ui_list_state> modules_chosen;
+    std::shared_ptr<ui_list_state> hull;
 
     std::vector<ModuleType> _available;
     std::vector<ModuleType> _chosen;
+    std::vector<ShipHull::Type> _hull;
+
+    std::map<Resource, float> current_costs;
+    std::map<Resource, float> current_upkeep;
+
+    int current_worker_weeks { 0 };
+
+    std::unique_ptr<generic_button> create_design_button;
 
     Uint32 info_offset{0u};
 };

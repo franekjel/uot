@@ -49,13 +49,20 @@ enum class uot_event_type
     planet_scroll_resource,
 
     designer_scroll_available,
+    designer_scroll_hull,
     designer_scroll_chosen,
+    designer_scroll_info_text,
     designer_motion_available,
     designer_motion_chosen,
+    designer_motion_hull,
     designer_left_click_available,
     designer_right_click_available,
     designer_left_click_chosen,
     designer_right_click_chosen,
+    designer_right_click_hull,
+    designer_left_click_hull,
+    designer_left_click_info,
+    designer_right_click_info,
 
     other
 };
