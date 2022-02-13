@@ -438,7 +438,6 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
                         ? input_utilities::get_planet_event_type(event_type, m, x, y)
                         : input_utilities::get_planet_build_event_type(event_type, m, x, y);
 
-    auto& curr_b = context.gui->current_building;
     if (et == iu::uot_event_type::planet_left_click_build)
     {
         using AreaType = size_settings::planet_build_area;
@@ -455,6 +454,25 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         {
             // handle list element clicks
             build->handle_timed_click(context, x, y);
+        }
+    }
+
+    if (et == iu::uot_event_type::planet_left_click_ship_build)
+    {
+        using AreaType = size_settings::planet_ships_build_area;
+        x = x - AreaType::x_offset;
+        y = y - AreaType::y_offset;
+
+        if (iu::check_collision(x, y, ships_build->action_button.pos.x, ships_build->action_button.pos.y,
+                                ships_build->action_button.pos.w, ships_build->action_button.pos.h))
+        {
+            ships_build->action_button.clicked(context);
+            ships_build->selected_elem.reset();
+        }
+        else
+        {
+            // handle list element clicks
+            ships_build->handle_timed_click(context, x, y);
         }
     }
 
@@ -493,6 +511,25 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         {
             // handle list element clicks
             queue->handle_timed_click(context, x, y);
+        }
+    }
+
+    if (et == iu::uot_event_type::planet_left_click_ship_queue)
+    {
+        using AreaType = size_settings::planet_ships_queue_area;
+        x = x - AreaType::x_offset;
+        y = y - AreaType::y_offset;
+
+        if (iu::check_collision(x, y, ships_queue->action_button.pos.x, ships_queue->action_button.pos.y,
+                                ships_queue->action_button.pos.w, ships_queue->action_button.pos.h))
+        {
+            ships_queue->action_button.clicked(context);
+            ships_queue->selected_elem.reset();
+        }
+        else
+        {
+            // handle list element clicks
+            ships_queue->handle_timed_click(context, x, y);
         }
     }
 
@@ -575,6 +612,18 @@ void rendering::render_planet_view::_wheel_handler(client_context& context, int 
     {
         queue->offset =
             std::clamp(0, static_cast<int>(queue->offset + 4 * ymov), static_cast<int>(queue->elems.size() * 80));
+    }
+
+    if (et == iu::uot_event_type::planet_scroll_ship_queue)
+    {
+        ships_queue->offset = std::clamp(0, static_cast<int>(ships_queue->offset + 4 * ymov),
+                                         static_cast<int>(ships_queue->elems.size() * 80));
+    }
+
+    if (et == iu::uot_event_type::planet_scroll_ship_build)
+    {
+        ships_build->offset = std::clamp(0, static_cast<int>(ships_build->offset + 4 * ymov),
+                                         static_cast<int>(ships_build->elems.size() * 80));
     }
 
     if (et == iu::uot_event_type::planet_scroll_info)
