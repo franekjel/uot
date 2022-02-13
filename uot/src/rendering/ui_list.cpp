@@ -74,13 +74,12 @@ void ui_list_state::handle_timed_click(client_context& context, const int x, con
         {
             if (selected_elem.has_value() && selected_elem.value() == curr)
             {
-                auto curr_time = std::chrono::duration_cast<std::chrono::duration<double>>(
-                    last_click - std::chrono::high_resolution_clock::now());
-                if (curr_time.count() < 0.5)
+                auto curr_time = last_click - SDL_GetTicks();
+                if (curr_time < 500)
                 {
                     action_button.clicked(context);
                 }
-                last_click = std::chrono::high_resolution_clock::now();
+                last_click = SDL_GetTicks();
                 return;
             }
             // implicit else

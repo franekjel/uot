@@ -402,7 +402,13 @@ void rendering::render_planet_view::_draw(client_context& context)
 
         if (box.has_value())
         {
-            rendering::render_building_info_box(context, box.value().type, box.value().x, box.value().y);
+            if(box->building_type.has_value()) {
+                rendering::render_building_info_box(context, box.value().building_type.value(), box.value().x, box.value().y);
+            }
+
+            if(box->design_id.has_value()) {
+                rendering::render_ship_info_box(context, box.value().design_id.value(), box.value().x, box.value().y);
+            }
         }
 
         sdl_utilities::set_render_viewport<size_settings::planet_info_area>(r.get());
@@ -548,6 +554,36 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         box.reset();
     }
 
+    if (et == iu::uot_event_type::planet_motion_ship_build)
+    {
+        using AreaType = size_settings::planet_ships_build_area;
+        int _x = x - AreaType::x_offset;
+        int _y = y - AreaType::y_offset;
+
+        auto res = ships_build->handle_motion(_x, _y);
+        if (res.has_value())
+        {
+            box = {x, y, {}, _ships_build[res.value()]};
+            return;
+        }
+        box.reset();
+    }
+
+    if (et == iu::uot_event_type::planet_motion_ship_queue)
+    {
+        using AreaType = size_settings::planet_ships_queue_area;
+        int _x = x - AreaType::x_offset;
+        int _y = y - AreaType::y_offset;
+
+        auto res = ships_queue->handle_motion(_x, _y);
+        if (res.has_value())
+        {
+            box = {x, y, {}, _ships_build[res.value()]};
+            return;
+        }
+        box.reset();
+    }
+
     if (et == iu::uot_event_type::planet_motion_built)
     {
         using AreaType = size_settings::planet_built_area;
@@ -641,6 +677,10 @@ void rendering::render_planet_view::key_handler(client_context& context, Uint16 
     }
 }
 
+inline std::string get_ship_info(const std::shared_ptr<ShipDesign>& design_id) {
+    return "opis designu totalnie tutaj";
+}
+
 inline std::string get_building_info(Building::BuildingType type)
 {
     std::string cost_string = " COST: \n";
@@ -695,6 +735,21 @@ void rendering::render_building_info_box(client_context& context, Building::Buil
     SDL_RenderCopyEx(context.r.get(), context.gr->buildings_sprite.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 
     sdl_utilities::render_text(r.get(), gr->infobox_font, get_building_info(type), buildings_meta::frame_width / 2,
+                               buildings_meta::frame_height / 2, buildings_meta::frame_width,
+                               SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
+}
+
+void rendering::render_ship_info_box(client_context& context, const unsigned int design_id, int x, int y) {
+    auto& r = context.r;
+    auto& gr = context.gr;
+    auto gs = context.getGameState();
+
+    const auto& d = gs.value->player->ship_designs[design_id];
+
+    sdl_utilities::set_viewport(r.get(), x, y, buildings_meta::frame_width, buildings_meta::frame_height);
+    sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
+
+    sdl_utilities::render_text(r.get(), gr->infobox_font, get_ship_info(d), buildings_meta::frame_width / 2,
                                buildings_meta::frame_height / 2, buildings_meta::frame_width,
                                SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
 }

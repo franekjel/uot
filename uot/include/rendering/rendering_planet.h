@@ -45,7 +45,8 @@ struct render_planet_view : render_view<render_planet_view>
     struct info_box
     {
         int x, y;
-        Building::BuildingType type;
+        std::optional<Building::BuildingType> building_type;
+        std::optional<unsigned int> design_id;
     };
 
     std::optional<info_box> box;
@@ -55,6 +56,7 @@ struct render_planet_view : render_view<render_planet_view>
 };
 
 void render_building_info_box(client_context& context, Building::BuildingType type, int x, int y);
+void render_ship_info_box(client_context& context, const unsigned int design_id, int x, int y);
 
 }  // namespace rendering
 #endif  // PLANET_RENDERING_H
