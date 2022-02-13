@@ -4,7 +4,7 @@
 
 #include "common.h"
 
-static constexpr float habitable_planet_base_chance = 0.01f;
+static constexpr float habitable_planet_base_chance = 1.0f;
 
 static std::normal_distribution<> size_distribution{1.0, 0.15};
 
@@ -150,7 +150,7 @@ std::map<unsigned int, std::shared_ptr<SectorObject>> GalaxyGenerator::GenerateS
 
     for (const auto &pos : objects_positions)
     {
-        switch (std::discrete_distribution<>({1, 3, 3})(gen))
+        switch (std::discrete_distribution<>({1, 300, 3})(gen))
         {
             case 0:
             {
