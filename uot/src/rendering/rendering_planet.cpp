@@ -400,6 +400,11 @@ void rendering::render_planet_view::_draw(client_context& context)
     {
         current_sub == planet_sub::queue ? render_queue_lists(context) : render_build_lists(context);
 
+        sdl_utilities::set_render_viewport<size_settings::planet_info_area>(r.get());
+        sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
+
+        render_planet_info(context);
+
         if (box.has_value())
         {
             if (box->building_type.has_value())
@@ -414,10 +419,6 @@ void rendering::render_planet_view::_draw(client_context& context)
             }
         }
 
-        sdl_utilities::set_render_viewport<size_settings::planet_info_area>(r.get());
-        sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
-
-        render_planet_info(context);
     }
     else if (io)
     {

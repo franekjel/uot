@@ -155,6 +155,14 @@ void rendering::render_designer_view::render_design_info(client_context& context
     auto& gui = context.gui;
 
     sdl_utilities::set_render_viewport<size_settings::designer_info_area>(r.get());
+
+    SDL_Rect s {0, 0, cabin_meta::w, cabin_meta::h};
+    constexpr float scale = size_settings::designer_info_area::width / static_cast<float>(cabin_meta::w);
+    SDL_Rect d {0, 0, size_settings::designer_info_area::width,
+                static_cast<int>(scale * cabin_meta::h)};
+
+    SDL_RenderCopyEx(r.get(), gr->cabin_texture.get(), &s, &d, 0., NULL, SDL_FLIP_NONE);
+
     sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
 
     std::string name = "New Design";
@@ -173,9 +181,9 @@ void rendering::render_designer_view::render_design_info(client_context& context
     auto wcost = get_design_worker_cost();
 
     sdl_utilities::render_text(r.get(), gr->secondary_font, general_info + "\n" + cost + upkeep + wcost,
-                               size_settings::designer_info_text_area::width / 2,
+                               size_settings::designer_info_text_area::width / 2 + 80,
                                size_settings::designer_info_text_area::height / 2 + info_offset,
-                               size_settings::designer_info_text_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+                               size_settings::designer_info_text_area::width - 120, {0xFF, 0xFF, 0xFF, 0xFF});
 
     using AreaType = size_settings::designer_info_area;
     sdl_utilities::set_render_viewport<AreaType>(r.get());
