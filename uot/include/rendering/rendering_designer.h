@@ -7,7 +7,6 @@
 
 namespace rendering
 {
-
 struct render_designer_view : render_view<render_designer_view>
 {
     view_t _up();
@@ -33,6 +32,8 @@ struct render_designer_view : render_view<render_designer_view>
     std::vector<ModuleType> _available;
     std::vector<ModuleType> _chosen;
     std::vector<ShipHull::Type> _hull;
+    std::optional<ShipDesign> cur_design;
+    void update_current_design();
 
     std::map<Resource, float> current_costs;
     std::map<Resource, float> current_upkeep;

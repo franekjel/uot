@@ -441,7 +441,7 @@ void Player::HandleShipDesignRequest(unsigned int id, bool delete_design, std::s
         return;
     }
 
-    if (!IsShipDesignCorrect(id, name, hull_type, sides, inside))
+    if (!IsShipDesignCorrect(hull_type, sides, inside))
         return;
 
     auto current_design = std::make_shared<ShipDesign>(id, name, hull_type, sides, inside);
