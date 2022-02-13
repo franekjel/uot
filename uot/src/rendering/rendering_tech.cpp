@@ -204,7 +204,7 @@ void rendering::render_tech_view::_mouse_handler(client_context& context, Uint32
     const auto et = iu::get_event_type(event_type, m, x, y);
     if (et == iu::uot_event_type::left_click_play || et == iu::uot_event_type::motion_play)
     {
-        using AreaType = size_settings::play_area;
+        using AreaType = size_settings::tech_area;
         auto state = context.getGameState();
         auto& gs = state.value;
         auto& gr = context.gr;

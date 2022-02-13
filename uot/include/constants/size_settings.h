@@ -89,7 +89,7 @@ struct tech_node_size : area_properties<250, 60, 8, 3>
 {
 };
 
-struct tech_area : area_properties<1080, 680, 35, 60>
+struct tech_area : area_properties<1180, 800, 30, 30>
 {
 };
 
