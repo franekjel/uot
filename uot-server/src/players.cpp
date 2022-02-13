@@ -348,6 +348,7 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
         }
 
         float food_bilans = colony_gains[Resource::Food] - colony.second->population * population_food_usage;
+        player_resources[Resource::Food] += food_bilans;
 
         if (food_bilans >= 0)
         {
