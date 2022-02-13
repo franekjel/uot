@@ -291,7 +291,9 @@ void uot_net_client::parseShipsUpdates(std::shared_ptr<game_state>& state,
 
     for (const auto& a : ships_updates)
     {
-        if (a.days_remaining != 0)
+        // MAGIC NUMBER, DEPENDS ON
+        // LAST SERVER SENT VALUE
+        if (a.days_remaining != 1)
         {
             ShipBuildProgress b{state->player->ship_designs[a.design_id],
                                 state->player->known_galaxy->sectors.at(state->planets.at(a.planet_id)->sector_id)};
