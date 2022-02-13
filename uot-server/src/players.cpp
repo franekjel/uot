@@ -234,12 +234,7 @@ void PlayersList::CountWeeklyNumbers()
             }
         }
 
-        bool have_any_colony = false;
-        for (const auto& [colony_id, colony] : player->owned_colonies)
-        {
-            have_any_colony |= !!colony;
-        }
-        if (!have_any_colony)
+        if (player->owned_colonies.empty())
         {
             player->is_loser = true;
             number_of_loosers++;
