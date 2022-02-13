@@ -184,9 +184,36 @@ void Fleet::UpdateFleet()
         fleet_aggro += ship->ship_aggro;
     }
 
-    for (auto &[type, amount] : fleet_weapons)
+    for (const auto &[id, ship] : ships)
     {
-        amount.second = amount.first;
+        ship->ship_weapons_current_state.clear();
+        float needed_energy = 0.0f;
+        for (const auto &[type, count] : ship->ship_weapons)
+        {
+            if (fleet_weapons[type].second == fleet_weapons[type].first)
+                continue;
+            float part = count / (float)fleet_weapons[type].first;
+            ship->ship_weapons_current_state[type] = (fleet_weapons[type].first - fleet_weapons[type].second) * part;
+            needed_energy += ship->ship_weapons_current_state[type] * (Modules.at(type).energy_usage) /
+                             Modules.at(type).weapon.value().attack_count;
+        }
+        if (needed_energy <= 0.0f)
+        {
+            ship->reload_modifier = -1.0f;
+            continue;
+        }
+        ship->reload_modifier = std::clamp(ship->energy / needed_energy, 0.0f, 1.0f);
+        ship->energy -= needed_energy * ship->reload_modifier;
+    }
+    for (const auto &[id, ship] : ships)
+    {
+        if (ship->reload_modifier <= 0.0f)
+            continue;
+        for (auto &[type, count] : ship->ship_weapons_current_state)
+        {
+            fleet_weapons[type].second += std::round(count * ship->reload_modifier);
+            count -= count * ship->reload_modifier;
+        }
     }
 
     MoveFleet();

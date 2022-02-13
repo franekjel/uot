@@ -102,6 +102,8 @@ struct Ship
     std::shared_ptr<Fleet> fleet;
 
     std::map<ModuleType, int> ship_weapons;
+    std::map<ModuleType, float> ship_weapons_current_state;
+    float reload_modifier = -1.0f;
 
     static std::shared_ptr<Ship> ShipFromDesign(const int id, const std::shared_ptr<ShipDesign> design);
 
