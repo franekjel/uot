@@ -1,17 +1,15 @@
 #include "rendering/rendering_designer.h"
+#include <array>
 #include "client_context.h"
+#include "game_resources.h"
 #include "input_utilities.h"
 #include "msg_queue.h"
 #include "player.h"
 #include "rendering/rendering_universe.h"
-#include "game_resources.h"
-#include <array>
 
 using namespace rendering;
 
-constexpr std::array<std::string_view, 3> hull_names {
-    "Small Hull", "Medium Hull", "Grand Hull"
-};
+constexpr std::array<std::string_view, 3> hull_names{"Small Hull", "Medium Hull", "Grand Hull"};
 
 view_t render_designer_view::_up() { return std::make_shared<render_universe_view>(); }
 
@@ -62,33 +60,39 @@ void render_designer_view::_mouse_handler(client_context& context, Uint32 event_
     }
 }
 
-std::string rendering::render_designer_view::get_design_cost() {
-    std::string cost {"Current costs: \n"};
+std::string rendering::render_designer_view::get_design_cost()
+{
+    std::string cost{"Current costs: \n"};
     bool h = hull->selected_elem.has_value();
-    for(auto &[r, c] : current_costs) {
+    for (auto& [r, c] : current_costs)
+    {
         const auto val = (h && ShipHulls.at(_hull[hull->selected_elem.value()]).cost.count(r) > 0)
-                ? c + ShipHulls.at(_hull[hull->selected_elem.value()]).cost.at(r)
-                : c;
+                             ? c + ShipHulls.at(_hull[hull->selected_elem.value()]).cost.at(r)
+                             : c;
         cost += std::string(resourceNames[static_cast<int>(r)]) + ": " + std::to_string(static_cast<int>(val)) + "\n";
     }
-
 
     return cost + "\n";
 }
 
-std::string rendering::render_designer_view::get_design_upkeep() {
-    std::string upkeep {"Current upkeep: \n"};
-    for(auto &[r, c] : current_upkeep) {
+std::string rendering::render_designer_view::get_design_upkeep()
+{
+    std::string upkeep{"Current upkeep: \n"};
+    for (auto& [r, c] : current_upkeep)
+    {
         upkeep += std::string(resourceNames[static_cast<int>(r)]) + ": " + std::to_string(static_cast<int>(c)) + "\n";
     }
 
     return upkeep + "\n";
 }
 
-std::string rendering::render_designer_view::get_design_worker_cost() {
-    return "Worker weeks: " + std::to_string(static_cast<int>(current_worker_weeks + (hull->selected_elem.has_value()
-                                                                                      ? ShipHulls.at(_hull[hull->selected_elem.value()]).worker_weeks_cost
-                                                                                      : 0)));
+std::string rendering::render_designer_view::get_design_worker_cost()
+{
+    return "Worker weeks: " +
+           std::to_string(static_cast<int>(current_worker_weeks +
+                                           (hull->selected_elem.has_value()
+                                                ? ShipHulls.at(_hull[hull->selected_elem.value()]).worker_weeks_cost
+                                                : 0)));
 }
 
 void rendering::render_designer_view::render_design_info(client_context& context)
@@ -114,7 +118,8 @@ void rendering::render_designer_view::render_design_info(client_context& context
     // worker cost
     auto wcost = get_design_worker_cost();
 
-    sdl_utilities::render_text(r.get(), gr->secondary_font, cost + upkeep + wcost, size_settings::designer_info_text_area::width / 2,
+    sdl_utilities::render_text(r.get(), gr->secondary_font, cost + upkeep + wcost,
+                               size_settings::designer_info_text_area::width / 2,
                                size_settings::designer_info_text_area::height / 2 + info_offset,
                                size_settings::designer_info_text_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 
@@ -126,10 +131,9 @@ void rendering::render_designer_view::render_design_info(client_context& context
     y = y - AreaType::y_offset;
 
     const auto& pos = create_design_button->pos;
-    auto b_hit =  (input_utilities::check_collision(x, y, pos.x, pos.y, pos.w, pos.h));
+    auto b_hit = (input_utilities::check_collision(x, y, pos.x, pos.y, pos.w, pos.h));
 
     create_design_button->draw(context, b_hit);
-
 }
 
 void render_designer_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov)
@@ -199,7 +203,8 @@ void render_designer_view::init(client_context& context)
 {
     std::vector<std::string> v_available;
     std::vector<std::string> v_chosen;
-    std::vector<std::string> v_hulls {std::string(hull_names[0]), std::string(hull_names[1]), std::string(hull_names[2])};
+    std::vector<std::string> v_hulls{std::string(hull_names[0]), std::string(hull_names[1]),
+                                     std::string(hull_names[2])};
 
     auto gs = context.getGameState();
     for (auto& m : Modules)
@@ -220,12 +225,14 @@ void render_designer_view::init(client_context& context)
                                _chosen.push_back(_available[v]);
                                modules_chosen->elems.push_back(modules_available->elems[v]);
 
-                               for(auto &[r, c] : Modules.at(_available[v]).cost) {
-                                    current_costs[r] += c;
+                               for (auto& [r, c] : Modules.at(_available[v]).cost)
+                               {
+                                   current_costs[r] += c;
                                }
 
-                               for(auto &[r, c] : Modules.at(_available[v]).cost) {
-                                    current_upkeep[r] += c;
+                               for (auto& [r, c] : Modules.at(_available[v]).cost)
+                               {
+                                   current_upkeep[r] += c;
                                }
 
                                current_worker_weeks += Modules.at(_available[v]).worker_weeks_cost_per_size;
@@ -243,19 +250,20 @@ void render_designer_view::init(client_context& context)
                            if (modules_chosen->selected_elem.has_value())
                            {
                                auto v = modules_chosen->selected_elem.value();
-                               for(auto &[r, c] : Modules.at(_chosen[v]).cost) {
-                                    current_costs[r] -= c;
+                               for (auto& [r, c] : Modules.at(_chosen[v]).cost)
+                               {
+                                   current_costs[r] -= c;
                                }
 
-                               for(auto &[r, c] : Modules.at(_chosen[v]).cost) {
-                                    current_upkeep[r] -= c;
+                               for (auto& [r, c] : Modules.at(_chosen[v]).cost)
+                               {
+                                   current_upkeep[r] -= c;
                                }
 
                                current_worker_weeks -= Modules.at(_chosen[v]).worker_weeks_cost_per_size;
                                modules_chosen->elems.erase(modules_chosen->elems.cbegin() + v,
                                                            modules_chosen->elems.cbegin() + v + 1);
                                _chosen.erase(_chosen.cbegin() + v, _chosen.cbegin() + v + 1);
-
                            }
                        },
                        "REMOVE",
@@ -264,44 +272,46 @@ void render_designer_view::init(client_context& context)
 
     hull = std::make_shared<ui_list_state>(
         v_hulls,
-        generic_button{[&](client_context& context)
-                       {
-                       },
+        generic_button{[&](client_context& context) {},
                        "DUMMY",
                        {size_settings::planet_build_area::width / 2 - 180, 360, 360, 50}},
         300, 50, 50, 10);
 
-    create_design_button = std::make_unique<generic_button> (generic_button{
-                [&](client_context& context)
+    create_design_button = std::make_unique<generic_button>(
+        generic_button{[&](client_context& context)
                        {
-                                 static unsigned int id { 0u };
-                                 std::cout << "click" << std::endl;
-                                 if(hull->selected_elem.has_value()) {
-                                     std::map<ModuleType, int> sides;
-                                     std::map<ModuleType, int> inside;
-                                     for(auto e : _chosen) {
-                                        if(Modules.at(e).destination == Module::ModuleDestination::Inside) {
-                                            inside[e]++;
-                                        } else if ( Modules.at(e).destination == Module::ModuleDestination::Sides ) {
-                                            sides[e]++;
-                                        }
-                                     }
-                                     auto s = std::make_shared<ShipDesign>(id++,  "New Design" + std::to_string(id), _hull[hull->selected_elem.value()], sides, inside);
+                           static unsigned int id{0u};
+                           std::cout << "click" << std::endl;
+                           if (hull->selected_elem.has_value())
+                           {
+                               std::map<ModuleType, int> sides;
+                               std::map<ModuleType, int> inside;
+                               for (auto e : _chosen)
+                               {
+                                   if (Modules.at(e).destination == Module::ModuleDestination::Inside)
+                                   {
+                                       inside[e]++;
+                                   }
+                                   else if (Modules.at(e).destination == Module::ModuleDestination::Sides)
+                                   {
+                                       sides[e]++;
+                                   }
+                               }
+                               auto s = std::make_shared<ShipDesign>(id++, "New Design" + std::to_string(id),
+                                                                     _hull[hull->selected_elem.value()], sides, inside);
 
-                                     auto mq = context.getActionQueue().value;
-                                     mq->build_design(s, false);
-                                     _chosen.clear();
-                                     modules_chosen->elems.clear();
-                                     hull->selected_elem.reset();
-                                     current_costs.clear();
-                                     current_upkeep.clear();
-                                     current_worker_weeks = 0u;
-                                 }
-
+                               auto mq = context.getActionQueue().value;
+                               mq->build_design(s, false);
+                               _chosen.clear();
+                               modules_chosen->elems.clear();
+                               hull->selected_elem.reset();
+                               current_costs.clear();
+                               current_upkeep.clear();
+                               current_worker_weeks = 0u;
+                           }
                        },
                        "CREATE",
-                       {size_settings::designer_info_area::width / 2 - 150, 700, 300, 50}}
-                );
+                       {size_settings::designer_info_area::width / 2 - 150, 700, 300, 50}});
 }
 
 inline void render_designer_view::refresh_lists(client_context& context) {}

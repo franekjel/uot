@@ -131,7 +131,6 @@ uot_event_type get_designer_event_type(Uint32 event_type, SDL_MouseButtonEvent m
                                                    : uot_event_type::designer_right_click_info;
             }
         }
-
     }
     return uot_event_type::other;
 }

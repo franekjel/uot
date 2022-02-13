@@ -35,7 +35,7 @@ struct render_designer_view : render_view<render_designer_view>
     std::map<Resource, float> current_costs;
     std::map<Resource, float> current_upkeep;
 
-    int current_worker_weeks { 0 };
+    int current_worker_weeks{0};
 
     std::unique_ptr<generic_button> create_design_button;
 
