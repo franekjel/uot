@@ -61,8 +61,14 @@ int main(int argc, char* argv[])
         Uint32 fps_current;                    // the current FPS.
         Uint32 fps_frames = 0;                 // frames passed since the last recorded fps.
 #endif
+        if (argc > 1)
+        {
+            std::string ipv4(argv[1]);
+            nc.connect_to_server(ipv4);
+        }
+        else
+            nc.connect_to_server();
 
-        nc.connect_to_server();
         while (!quit)
         {
             while (SDL_PollEvent(&e) != 0)
