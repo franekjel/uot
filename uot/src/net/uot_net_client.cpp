@@ -6,18 +6,16 @@
 #include "msg/messagetypes.h"
 #include "msg_queue.h"
 
-void uot_net_client::connect_to_server() { run(); }
-
 void uot_net_client::disconnect_from_server()
 {
     disconnected = true;
     txrx.disconnect();
 }
 
-void uot_net_client::run()
+void uot_net_client::connect_to_server(std::string ipv4)
 {
     disconnected = false;
-    txrx.connect("127.0.0.1", 7645);
+    txrx.connect(ipv4, 7645);
 }
 
 uot_net_client::uot_net_client(client_context& cc)
@@ -28,6 +26,12 @@ uot_net_client::uot_net_client(client_context& cc)
     name = "player" + std::to_string(id);
     gen = std::mt19937(dev());
     txrx.set_as_handler();
+}
+
+bool uot_net_client::ipv4_correct(std::string& ipv4)
+{
+    unsigned char a, b, c, d;
+    return sscanf(ipv4.c_str(), "%hhu.%hhu.%hhu.%hhu", &a, &b, &c, &d) == 4;
 }
 
 std::string uot_net_client::get_name()

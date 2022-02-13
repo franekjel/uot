@@ -20,10 +20,10 @@ struct uot_net_client : net_client
     std::thread player_payload;
 
     void input_thread();
-    void run();
-    void connect_to_server();
+    void connect_to_server(std::string ipv4 = "127.0.0.1");
     void disconnect_from_server();
     void disconnect();
+    bool ipv4_correct(std::string& ipv4);
     std::string get_name() override;
     void handle_status_change(net_status status) override;
     void handle_message(const std::string& data) override;
