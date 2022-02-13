@@ -163,6 +163,7 @@ void Fleet::UpdateFleet()
         next_it++;
         if (it->second->hp <= 0.0f)
         {
+            location_sector->destroyed_ships.push_back({it->second->id, owner_id});
             ships.erase(it);
         }
     }
@@ -416,7 +417,7 @@ void Fleet::CountDamage()
                         fleet_weapons[type].first -= amount;
                     }
 
-                    location_sector->destroyed_ships.push_back({owner_id, sh->id});
+                    location_sector->destroyed_ships.push_back({sh->id, owner_id});
 
                     ships.erase(itr);
                     ship_was_destroyed = true;
