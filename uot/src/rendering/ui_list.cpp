@@ -74,7 +74,7 @@ void ui_list_state::handle_timed_click(client_context& context, const int x, con
         {
             if (selected_elem.has_value() && selected_elem.value() == curr)
             {
-                auto curr_time = last_click - SDL_GetTicks();
+                auto curr_time = SDL_GetTicks() - last_click;
                 if (curr_time < 500)
                 {
                     action_button.clicked(context);
