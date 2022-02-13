@@ -84,6 +84,34 @@ std::shared_ptr<Ship> Ship::ShipFromDesign(const int id, const std::shared_ptr<S
     return ship;
 }
 
+bool IsShipDesignCorrect(const ShipHull::Type hull_type, const std::map<ModuleType, int> &sides,
+                         const std::map<ModuleType, int> &inside)
+{
+    float max_energy = 0.0f;
+    float max_hp = 0.0f;
+
+    for (const auto &modules : {sides, inside})
+    {
+        for (const auto &[type, count] : modules)
+        {
+            const auto &m = Modules.at(type);
+            max_hp += m.additional_hp * static_cast<float>(count);
+            max_energy += m.energy_capacity * static_cast<float>(count);
+        }
+    }
+
+    const auto &hull = ShipHulls.at(hull_type);
+    max_hp += hull.hp;
+
+    return max_energy > 0.0f && max_hp > 0.0f;
+}
+
+bool IsShipDesignPossible(const ShipHull::Type hull_type, const unsigned int sides_size, const unsigned int inside_size)
+{
+    const auto &hull = ShipHulls.at(hull_type);
+    return inside_size <= hull.inside_size && sides_size <= hull.sides_size;
+}
+
 void Ship::JumpShip() { warp_drive_charge = 0.0f; }
 
 bool Ship::ChargeWarpDrive()

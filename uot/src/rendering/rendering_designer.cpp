@@ -246,10 +246,13 @@ void rendering::render_designer_view::render_design_info(client_context& context
     x = x - AreaType::x_offset;
     y = y - AreaType::y_offset;
 
-    const auto& pos = create_design_button->pos;
-    auto b_hit = (input_utilities::check_collision(x, y, pos.x, pos.y, pos.w, pos.h));
+    if (cur_design.has_value())
+    {
+        const auto& pos = create_design_button->pos;
+        auto b_hit = (input_utilities::check_collision(x, y, pos.x, pos.y, pos.w, pos.h));
 
-    create_design_button->draw(context, b_hit);
+        create_design_button->draw(context, b_hit);
+    }
 }
 
 void render_designer_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov)
@@ -492,41 +495,29 @@ void render_designer_view::init(client_context& context)
                        {size_settings::planet_build_area::width / 2 - 180, 360, 360, 50}},
         300, 50, 50, 10);
 
-    create_design_button = std::make_unique<generic_button>(
-        generic_button{[&](client_context& context)
-                       {
-                           static unsigned int id{0u};
-                           std::cout << "click" << std::endl;
-                           if (hull->selected_elem.has_value())
-                           {
-                               std::map<ModuleType, int> sides;
-                               std::map<ModuleType, int> inside;
-                               for (auto e : _chosen)
-                               {
-                                   if (Modules.at(e).destination == Module::ModuleDestination::Inside)
-                                   {
-                                       inside[e]++;
-                                   }
-                                   else if (Modules.at(e).destination == Module::ModuleDestination::Sides)
-                                   {
-                                       sides[e]++;
-                                   }
-                               }
-                               auto s = std::make_shared<ShipDesign>(id++, "New Design" + std::to_string(id),
-                                                                     _hull[hull->selected_elem.value()], sides, inside);
+    create_design_button = std::make_unique<generic_button>(generic_button{
+        [&](client_context& context)
+        {
+            if (cur_design.has_value())
+            {
+                static unsigned int id{0u};
+                std::cout << "click" << std::endl;
+                auto s = std::make_shared<ShipDesign>(id++, "New Design" + std::to_string(id), cur_design->hull_type,
+                                                      std::move(cur_design->sides), std::move(cur_design->inside));
 
-                               auto mq = context.getActionQueue().value;
-                               mq->build_design(s, false);
-                               _chosen.clear();
-                               modules_chosen->elems.clear();
-                               hull->selected_elem.reset();
-                               current_costs.clear();
-                               current_upkeep.clear();
-                               current_worker_weeks = 0u;
-                           }
-                       },
-                       "CREATE",
-                       {size_settings::designer_info_area::width / 2 - 150, 700, 300, 50}});
+                cur_design.reset();
+                auto mq = context.getActionQueue().value;
+                mq->build_design(s, false);
+                _chosen.clear();
+                modules_chosen->elems.clear();
+                hull->selected_elem.reset();
+                current_costs.clear();
+                current_upkeep.clear();
+                current_worker_weeks = 0u;
+            }
+        },
+        "CREATE",
+        {size_settings::designer_info_area::width / 2 - 150, 700, 300, 50}});
 }
 
 inline void render_designer_view::refresh_lists(client_context& context)
@@ -548,4 +539,33 @@ inline void render_designer_view::refresh_lists(client_context& context)
         hull->elems.push_back(std::string(hull_names[static_cast<int>(h) - static_cast<int>(ShipHull::SmallShipHull)]));
         _hull.push_back(h);
     }
+
+    update_current_design();
+}
+
+void render_designer_view::update_current_design()
+{
+    if (hull->selected_elem.has_value())
+    {
+        std::map<ModuleType, int> sides;
+        std::map<ModuleType, int> inside;
+        for (auto e : _chosen)
+        {
+            if (Modules.at(e).destination == Module::ModuleDestination::Inside)
+            {
+                inside[e]++;
+            }
+            else if (Modules.at(e).destination == Module::ModuleDestination::Sides)
+            {
+                sides[e]++;
+            }
+        }
+        if (IsShipDesignPossible(_hull[hull->selected_elem.value()], sh_info.taken_sides, sh_info.taken_inside) &&
+            IsShipDesignCorrect(_hull[hull->selected_elem.value()], sides, inside))
+            cur_design = ShipDesign(0, "NOTHING", _hull[hull->selected_elem.value()], sides, inside);
+        else
+            cur_design.reset();
+    }
+    else
+        cur_design.reset();
 }
