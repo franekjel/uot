@@ -13,6 +13,13 @@
 #include "planet.h"
 #include "ship.h"
 
+struct sector_client_info
+{
+    unsigned int planet_cnt;
+    unsigned int deposit_cnt;
+    unsigned int fleet_cnt;
+};
+
 struct game_gui
 {
     // whenever we want to create a button, it should be done using this as id
@@ -46,7 +53,10 @@ struct game_gui
     void reset_button_font() { button_font.reset(); }
     std::optional<int> button_border_width;
     std::optional<button_color> button_color_override;
+    std::optional<sector_client_info> cur_sector_info;
     void do_gui_per_turn_update(client_context& context);
+
+    unsigned int player_id_cache = 0;
 
     game_gui() {}
 

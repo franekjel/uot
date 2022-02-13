@@ -1,6 +1,8 @@
 #define _USE_MATH_DEFINES
 #include "rendering_sector.h"
 #include <cmath>
+#include <iomanip>
+#include <sstream>
 
 #include "client_context.h"
 #include "game_gui.h"
@@ -107,27 +109,73 @@ void rendering::render_selected_object_info(const client_context& context)
     const auto& gr = context.gr;
     const auto& gui = context.gui;
 
-    sdl_utilities::render_text(r.get(), gr->main_font, "PLANET NAME", size_settings::context_area::width / 2,
-                               fonts::main_font_size / 2 + 30, size_settings::context_area::width - 50,
-                               {0xFF, 0xFF, 0xFF, 0xFF});
+    auto pl = std::dynamic_pointer_cast<Planet>(gui->current_object.value());
+    auto io = std::dynamic_pointer_cast<InhabitableObject>(gui->current_object.value());
+    auto st = std::dynamic_pointer_cast<Star>(gui->current_object.value());
+    std::string type = pl ? "PLANET " : io ? "OBJECT " : "STAR ";
+    sdl_utilities::render_text(r.get(), gr->main_font, type + std::to_string(gui->current_object.value()->id),
+                               size_settings::context_area::width / 2, fonts::main_font_size / 2 + 30,
+                               size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
     int textureIdx = gui->GetTextureIndex(gui->current_object.value());
     render_planet_helper(context, 2.0, size_settings::context_area::width / 2,
                          std::min(250, planets_meta::texture_size[textureIdx] * 2), gr->planetTextures[textureIdx]);
 
-    auto pl = std::dynamic_pointer_cast<Planet>(gui->current_object.value());
-    auto io = std::dynamic_pointer_cast<InhabitableObject>(gui->current_object.value());
-    auto st = std::dynamic_pointer_cast<Star>(gui->current_object.value());
-
-    std::string type = pl ? "Planet" : io ? "Inh Object" : "Star";
-
     // render planet info
-    sdl_utilities::render_text(r.get(), gr->secondary_font,
-                               " planet index: " + std::to_string(gui->current_object.value()->id) + "\n type " + type +
-                                   " \n planet info 2\n planet info 3",
-                               size_settings::context_area::width / 2, size_settings::context_area::height * 0.75,
-                               size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+    std::stringstream info;
+    info << std::fixed << std::setprecision(0);
+
+    if (pl)
+    {
+        if (pl->colony)
+        {
+            info << "Owner: " + std::to_string(pl->colony->owner->id);
+            info << (pl->colony->owner->id == gui->player_id_cache ? " (you)\n" : "\n");
+            info << "Population: " << roundf(pl->colony->population) << "\n";
+            info << "Soldiers: " << roundf(pl->colony->soldiers) << "\n";
+        }
+
+        info << "Features: ";
+        if (pl->planetary_features.empty())
+            info << "None";
+
+        for (auto& f : pl->planetary_features)
+        {
+            if (f.second < 0)
+                continue;
+            info << PlanetaryFeaturesTypes.find(f.first)->second.name + ", ";
+        }
+    }
+    else if (io)
+    {
+        info << "Base: ";
+        if (io->base)
+        {
+            info << "owned by " + std::to_string(io->base->owner->id);
+            info << (io->base->owner->id == gui->player_id_cache ? " (you)\n" : "\n");
+        }
+        else
+            info << "none\n";
+
+        info << "Resources:";
+        if (io->resource_deposit.empty())
+            info << " none\n";
+        else
+            info << "\n";
+        for (auto& res : io->resource_deposit)
+        {
+            info << resourceNames[static_cast<int>(res.first)] << " (" << roundf(res.second) << ")\n";
+        }
+    }
+    else if (st)
+    {
+        info << "The center of this sector\n";
+    }
+
+    sdl_utilities::render_text(r.get(), gr->secondary_font, info.str(), size_settings::context_area::width / 2,
+                               size_settings::context_area::height * 0.75, size_settings::context_area::width - 50,
+                               {0xFF, 0xFF, 0xFF, 0xFF});
 }
 
 void rendering::render_sector_sector_helper(client_context& context, const std::shared_ptr<Sector>& sector)
@@ -237,7 +285,8 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
 
             if (iu::check_collision(x, y, planet_x - 0.5 * tex_size, planet_y - 0.5 * tex_size, tex_size, tex_size))
             {
-                if (current_object.has_value() && current_object.value()->position == sec_obj->position)
+                if (current_object.has_value() && current_object.value()->position == sec_obj->position &&
+                    dynamic_cast<Planet*>(current_object.value().get()))
                 {
                     context.view = down(context);
                     current_object.reset();
@@ -393,6 +442,14 @@ void rendering::render_selected_fleet_info(client_context& context)
     {
         fleet_info += " id" + std::to_string(id) + ": " + s->design->name + "\n";
     }
+
+    std::stringstream ss;
+    ss << "civilians: " << std::fixed << std::setprecision(0) << f->civilians << "\n";
+    ss << "soldiers: " << std::fixed << std::setprecision(0) << f->soldiers << "\n";
+    ss << "places left: " << std::fixed << std::setprecision(0) << (f->human_capacity - (f->civilians + f->soldiers))
+       << "\n";
+
+    fleet_info += ss.str();
 
     sdl_utilities::set_render_viewport<size_settings::fleet_info_area>(r.get());
     sdl_utilities::render_text(r.get(), gr->secondary_font, fleet_info, size_settings::context_area::width / 2,
