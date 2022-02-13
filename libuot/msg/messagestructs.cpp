@@ -327,7 +327,6 @@ messageTypes::MsgDetailedFleetInfo::MsgDetailedFleetInfo(std::shared_ptr<Fleet> 
       civilians(fleet->civilians),
       human_capacity(fleet->human_capacity),
       position(fleet->position),
-      wanted_position(fleet->wanted_position),
       current_action(fleet->current_action)
 {
     for (const auto& [id, ship] : fleet->ships)

@@ -67,6 +67,7 @@ void rendering::render_sector_view::_draw(client_context& context)
         render_sector_sector_helper(context, curr);
     }
     render_object_selection(context);
+
     // =======================================================
     // draw the right, information / GUI panel
     sdl_utilities::set_render_viewport<size_settings::context_area>(r.get());
@@ -223,6 +224,8 @@ void rendering::render_sector_sector_helper(client_context& context, const std::
     {
         render_fleet(context, f);
     }
+
+    render_animations(context);
 }
 
 rendering::view_t rendering::render_sector_view::_up() { return std::make_shared<render_universe_view>(); }
@@ -315,6 +318,7 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
 
             if (iu::check_collision(x, y, _x, _y, _w, _h))
             {
+                gui->reset_selection();
                 current_sector = neighbor;
             }
         }
@@ -370,8 +374,7 @@ void rendering::render_sector_view::key_handler(client_context& context, Uint16 
 {
     if (k == SDLK_ESCAPE)
     {
-        context.gui->current_object.reset();
-        context.gui->current_fleet.reset();
+        context.gui->reset_selection();
         context.view = _up();
     }
 }
@@ -486,5 +489,13 @@ void rendering::render_fleet_weapon_ranges(const client_context& context, const 
         const SDL_Rect s{0, 0, tex.w, tex.h};
         const SDL_Rect d{static_cast<int>(x - 0.5 * tex.w), static_cast<int>(y - 0.5 * tex.h), tex.w, tex.h};
         SDL_RenderCopyEx(r.get(), tex.t.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
+    }
+}
+
+void rendering::render_animations(const client_context& context)
+{
+    for (const auto& [id, a] : context.gui->fight_animations)
+    {
+        a->Render(context.r);
     }
 }

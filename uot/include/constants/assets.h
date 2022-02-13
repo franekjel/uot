@@ -92,9 +92,15 @@ constexpr int texture_height = 400;
 
 namespace weapons_meta
 {
-constexpr std::string_view missile_path = "assets/red_bullet.png";
+constexpr std::string_view missile_path = "assets/missile.png";
 constexpr int missile_w = 127;
 constexpr int missile_h = 123;
+constexpr std::string_view explosion1_path = "assets/explosion-1.png";
+constexpr int explosion1_w = 256;
+constexpr int explosion1_h = 32;
+constexpr std::string_view explosion2_path = "assets/explosion-2.png";
+constexpr int explosion2_w = 384;
+constexpr int explosion2_h = 48;
 }  // namespace weapons_meta
 
 namespace planets_meta

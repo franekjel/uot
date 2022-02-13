@@ -8,6 +8,7 @@
 #include <sector.h>
 #include <sectorobject.h>
 #include <technology.h>
+#include "animation.h"
 #include "assets.h"
 #include "gui/buttons.h"
 #include "planet.h"
@@ -47,6 +48,9 @@ struct game_gui
 
     std::unordered_map<unsigned int, unsigned int> galaxy_stars_textures;
 
+    std::map<unsigned int, std::unique_ptr<Animation>> fight_animations;
+    unsigned int last_id = 1;
+
     int GetTextureIndex(std::shared_ptr<SectorObject> p);
     std::optional<std::shared_ptr<TTF_Font>> button_font;
     void set_button_font(std::shared_ptr<TTF_Font>& new_font) { button_font = new_font; }
@@ -61,6 +65,17 @@ struct game_gui
     game_gui() {}
 
     int get_next_button_id() { return user_button_id++; }
+
+    void reset_selection()
+    {
+        current_sector.reset();
+        current_object.reset();
+        current_fleet.reset();
+        current_building.reset();
+        focused_building.reset();
+        focused_button.reset();
+        fight_animations.clear();
+    }
 };
 
 #endif

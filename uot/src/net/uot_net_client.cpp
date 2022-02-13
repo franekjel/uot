@@ -21,11 +21,12 @@ void uot_net_client::run()
 }
 
 uot_net_client::uot_net_client(client_context& cc)
-    : txrx(*this, 40), disconnected(true), getting_input(false), context(cc)
+    : context(cc), txrx(*this, 40), getting_input(false), disconnected(true)
 {
     srand(time(nullptr));
     int id = rand() % 1000 + 1;
     name = "player" + std::to_string(id);
+    gen = std::mt19937(dev());
     txrx.set_as_handler();
 }
 
@@ -107,15 +108,13 @@ void uot_net_client::handle_message(const std::string& data)
 
             parseShipsUpdates(state, newturn_msg->ships_updates);
 
-            parseFleetsInFight(state, newturn_msg->fleets_in_fight);
-
             parseFleetsPopulationChanges(state, newturn_msg->changed_fleet_populations);
-
-            parseDestroyedShips(state, newturn_msg->destroyed_ships);
 
             parseJumpedFleets(state, newturn_msg->jumped_fleets);
 
             parseWatchedSectorUpdate(state, newturn_msg->watched_sectors_updates);
+
+            parseDestroyedShips(state, newturn_msg->destroyed_ships);
 
             parseJoinedFleets(state, newturn_msg->joined_fleets);
 
@@ -132,8 +131,15 @@ void uot_net_client::handle_message(const std::string& data)
             ///
             ///
 
+            if (context.gui->current_fleet.has_value())
+            {
+                auto mq = context.getActionQueue().value;
+                mq->actions.fleetInfoRequests.push_back(context.gui->current_fleet.value()->id);
+            }
+
             context.gui->last_turn_time = std::chrono::steady_clock::now();
             context.gui->do_gui_per_turn_update(context);
+
             send_payload();
         }
         break;
@@ -366,7 +372,7 @@ void uot_net_client::parseWatchedSectorUpdate(
     const std::vector<messageTypes::MsgWatchedSectorUpdate>& watched_sectors_updates)
 {
     const unsigned int player_id = state->player->id;
-    std::map<unsigned int, std::shared_ptr<Fleet>> enemies_fleet_in_current_sector;
+
     for (const auto& u : watched_sectors_updates)
     {
         auto s = state->player->known_galaxy->sectors[u.sector_id];
@@ -390,24 +396,33 @@ void uot_net_client::parseWatchedSectorUpdate(
         }
         if (context.gui->current_sector.has_value() && context.gui->current_sector.value()->sector_id == u.sector_id)
         {
+            std::map<unsigned int, std::shared_ptr<Fleet>> enemies_fleet_in_current_sector;
             for (const auto& fu : u.fleets)
             {
-                if (fu.player_id != player_id)
+                if (fu.player_id == player_id)
+                    continue;
+                std::shared_ptr<Fleet> enemy_fleet;
+                auto p = state->enemies_fleet_in_current_sector.find(fu.id);
+                if (p != state->enemies_fleet_in_current_sector.end())
                 {
-                    if (state->enemies_fleet_in_current_sector.count(fu.id))
-                    {
-                        enemies_fleet_in_current_sector.insert(state->enemies_fleet_in_current_sector.extract(fu.id));
-                        enemies_fleet_in_current_sector[fu.id]->position = fu.position;
-                    }
-                    else
-                        enemies_fleet_in_current_sector[fu.id] = std::make_shared<Fleet>(
-                            fu.id, state->player->known_galaxy->sectors.at(u.sector_id), fu.position, fu.player_id);
-                    enemies_fleet_in_current_sector.at(fu.id)->wanted_position = fu.predicted_position;
+                    enemy_fleet = p->second;
+                    enemies_fleet_in_current_sector.insert(*p);
+                    enemy_fleet->position = fu.position;
                 }
+                else
+                {
+                    enemy_fleet = std::make_shared<Fleet>(fu.id, state->player->known_galaxy->sectors.at(u.sector_id),
+                                                          fu.position, fu.player_id);
+                    enemies_fleet_in_current_sector[fu.id] = enemy_fleet;
+                }
+                enemy_fleet->wanted_position = fu.predicted_position;
+                enemy_fleet->movement_vec = fu.predicted_position - fu.position;
             }
+            state->enemies_fleet_in_current_sector = enemies_fleet_in_current_sector;
+
+            updateAnimations(state, u.fleets_in_fight);
         }
     }
-    state->enemies_fleet_in_current_sector = enemies_fleet_in_current_sector;
 }
 
 void uot_net_client::parseDestroyedShips(std::shared_ptr<game_state>& state,
@@ -415,7 +430,20 @@ void uot_net_client::parseDestroyedShips(std::shared_ptr<game_state>& state,
 {
     for (const auto id : destroyed_ships)
     {
-        auto& fleet = state->ships.at(id)->fleet;
+        auto& ship = state->ships.at(id);
+        auto& fleet = ship->fleet;
+
+        for (const auto& [t, c] : ship->design->sides)
+        {
+            const auto& m = Modules.at(t);
+            if (m.weapon.has_value())
+            {
+                fleet->fleet_weapons[t].first -= c;
+            }
+            if (!fleet->fleet_weapons[t].first)
+                fleet->fleet_weapons.erase(t);
+        }
+
         fleet->ships.erase(id);
         state->ships.erase(id);
         if (fleet->ships.empty())
@@ -440,16 +468,9 @@ void uot_net_client::parseDesigns(std::shared_ptr<game_state>& state,
     }
 }
 
-void uot_net_client::parseFleetsInFight(std::shared_ptr<game_state>& state,
-                                        const std::vector<messageTypes::MsgFleetParameters>& fleets)
-{
-    // TODO: Does this return only our fleet or all fleets?
-}
-
 void uot_net_client::parseFleetInfo(std::shared_ptr<Fleet> f, const messageTypes::MsgDetailedFleetInfo& i)
 {
     f->position = i.position;
-    f->wanted_position = i.wanted_position;
     f->human_capacity = i.human_capacity;
     f->civilians = i.civilians;
     f->soldiers = i.soldiers;
@@ -499,6 +520,19 @@ void uot_net_client::parseJoinedFleets(std::shared_ptr<game_state>& state,
             context.gui->current_fleet.reset();
         f2->location_sector->present_fleets.erase(f2->id);
         state->player->owned_fleets.erase(f2->id);
+
+        f1->fleet_weapons.clear();
+        for (const auto& [id, s] : f1->ships)
+        {
+            for (const auto& [t, c] : s->design->sides)
+            {
+                const auto& m = Modules.at(t);
+                if (m.weapon.has_value())
+                {
+                    f1->fleet_weapons[t].first += c;
+                }
+            }
+        }
     }
 }
 
@@ -530,4 +564,61 @@ void uot_net_client::parseInvadedColonies(std::shared_ptr<game_state>& state,
 {
     // TODO: This is just update of soldier count? If so why that big message, simple struct {id, soldiers_number}
     // should be sufficient
+}
+
+void uot_net_client::updateAnimations(std::shared_ptr<game_state>& state,
+                                      const std::vector<messageTypes::MsgFleetParameters>& fleets_in_fight)
+{
+    auto& anims = context.gui->fight_animations;
+    for (auto it = anims.begin(), it_next = it; it != anims.end(); it = it_next)
+    {
+        it_next++;
+        if (it->second->ToDelete())
+            anims.erase(it);
+    }
+
+    for (const auto& in_fight : fleets_in_fight)
+    {
+        auto& fleet = state->player->owned_fleets.at(in_fight.id);
+        updateFleet(fleet, in_fight);
+
+        for (const auto& [w, c] : fleet->fleet_weapons)
+        {
+            for (const auto& [other_fleet_id, other_fleet] : state->enemies_fleet_in_current_sector)
+            {
+                const float range = Modules.at(w).weapon.value().range;
+                if (other_fleet_id != fleet->id && other_fleet->owner_id != fleet->owner_id &&
+                    (other_fleet->position - fleet->position).squaredLength() <= range * range)
+                {
+                    switch (std::discrete_distribution<>({6, 3, 3, 1, 1, 1, 1})(gen))
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            anims[context.gui->last_id++] =
+                                Animation::MissileAnimation(fleet->position, other_fleet->position, context.gr);
+                            break;
+                        case 2:
+                            anims[context.gui->last_id++] =
+                                Animation::MissileAnimation(other_fleet->position, fleet->position, context.gr);
+                            break;
+                        case 3:
+                            anims[context.gui->last_id++] = Animation::Explosion1Animation(fleet->position, context.gr);
+                            break;
+                        case 4:
+                            anims[context.gui->last_id++] =
+                                Animation::Explosion1Animation(other_fleet->position, context.gr);
+                            break;
+                        case 5:
+                            anims[context.gui->last_id++] = Animation::Explosion2Animation(fleet->position, context.gr);
+                            break;
+                        case 6:
+                            anims[context.gui->last_id++] =
+                                Animation::Explosion2Animation(other_fleet->position, context.gr);
+                            break;
+                    }
+                }
+            }
+        }
+    }
 }

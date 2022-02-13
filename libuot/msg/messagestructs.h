@@ -48,7 +48,7 @@ struct MsgColony
     unsigned int id;
     std::map<Building::BuildingType, int> buildings;
     float population;
-    int owner_id;
+    unsigned int owner_id;
     unsigned int planet_id;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgColony, id, buildings, population, owner_id, planet_id)
     MsgColony();
@@ -206,7 +206,7 @@ struct MsgTechnologyUpdate
 
 struct MsgBuildingsUpdates
 {
-    int colony_id;
+    unsigned int colony_id;
     Building::BuildingType building_type;
     Building::BuildingType upgrade_of;  // set if new building is upgrade of another, otherwise, set to None
     int days_remaining;                 // days reamaining to build end, 0 means end of build
@@ -272,18 +272,19 @@ struct MsgNewColony
 
 struct MsgWatchedSectorUpdate
 {
-    int sector_id;
+    unsigned int sector_id;
     std::vector<MsgFleet> fleets;  // every fleet in sector, these which flew away, are just not shown
     std::vector<MsgNewColony> new_colonies;
     std::vector<MsgNewBase> new_bases;
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgWatchedSectorUpdate, sector_id, fleets, new_colonies, new_bases)
+    std::vector<MsgFleetParameters> fleets_in_fight;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgWatchedSectorUpdate, sector_id, fleets, new_colonies, new_bases, fleets_in_fight)
     MsgWatchedSectorUpdate();
     MsgWatchedSectorUpdate(int sector_id_);
 };
 
 struct MsgBuildRequest
 {
-    int colony_id;
+    unsigned int colony_id;
     Building::BuildingType building_type;
     Building::BuildingType upgrade_from;  // set if some building should be upgraded, otherwise, set to None
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgBuildRequest, colony_id, building_type, upgrade_from)
@@ -293,7 +294,7 @@ struct MsgBuildRequest
 
 struct MsgMoveFleetRequest
 {
-    int fleet_id;
+    unsigned int fleet_id;
     Point position;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgMoveFleetRequest, fleet_id, position)
     MsgMoveFleetRequest();
@@ -302,8 +303,8 @@ struct MsgMoveFleetRequest
 
 struct MsgJoinFleetsRequest
 {
-    int fleet1_id;
-    int fleet2_id;
+    unsigned int fleet1_id;
+    unsigned int fleet2_id;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgJoinFleetsRequest, fleet1_id, fleet2_id)
     MsgJoinFleetsRequest();
     MsgJoinFleetsRequest(int fleet1_id_, int fleet2_id_);
@@ -311,7 +312,7 @@ struct MsgJoinFleetsRequest
 
 struct MsgFleetActionRequest
 {
-    int fleet_id;
+    unsigned int fleet_id;
     Fleet::Action action;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgFleetActionRequest, fleet_id, action)
     MsgFleetActionRequest();
@@ -351,11 +352,10 @@ struct MsgDetailedFleetInfo
     float civilians;
     float human_capacity;
     Point position;
-    Point wanted_position;
     Fleet::Action current_action;
     std::vector<MsgDetailedShipInfo> ships;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgDetailedFleetInfo, id, soldiers, civilians, human_capacity, position,
-                                   wanted_position, current_action, ships)
+                                   current_action, ships)
     MsgDetailedFleetInfo();
     MsgDetailedFleetInfo(std::shared_ptr<Fleet> fleet);
 };

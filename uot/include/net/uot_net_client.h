@@ -1,6 +1,8 @@
 #pragma once
+#include <random>
 #include <string>
 #include <thread>
+
 #include "buildings.h"
 #include "client_context.h"
 #include "msg/messagestructs.h"
@@ -48,9 +50,6 @@ struct uot_net_client : net_client
     void parseDesigns(std::shared_ptr<game_state>& state,
                       const std::vector<messageTypes::MsgShipDesignResponse>& ship_designs);
 
-    void parseFleetsInFight(std::shared_ptr<game_state>& state,
-                            const std::vector<messageTypes::MsgFleetParameters>& fleets);
-
     void parseFleetInfo(std::shared_ptr<Fleet> f, const messageTypes::MsgDetailedFleetInfo& i);
 
     void parseFleetsPopulationChanges(std::shared_ptr<game_state>& state,
@@ -64,4 +63,11 @@ struct uot_net_client : net_client
 
     void parseLostObjects(std::shared_ptr<game_state>& state, const std::vector<unsigned int>& lost);
     void parseInvadedColonies(std::shared_ptr<game_state>& state, const std::vector<messageTypes::MsgColony>& invaded);
+
+    void updateAnimations(std::shared_ptr<game_state>& state,
+                          const std::vector<messageTypes::MsgFleetParameters>& fleets_in_fight);
+
+    // not best place for this but I don't have better idea
+    std::random_device dev;
+    std::mt19937 gen;
 };

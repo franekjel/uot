@@ -12,14 +12,6 @@ static const std::vector<Star::StarType> all_star_types = {Star::StarType::Sunny
                                                            Star::StarType::RedGiant,   Star::StarType::WhiteDwarf,
                                                            Star::StarType::BrownDwarf, Star::StarType::BlackHole};
 
-Point GalaxyGenerator::PointOnCircle(float r)
-{
-    std::uniform_real_distribution<float> dist(-1.0, 1.0);
-    Point p = Point(dist(gen), dist(gen));
-    p *= r / sqrtf(p.squaredLength());
-    return p;
-}
-
 bool too_close(std::vector<Point> all, Point b, const float Eps)
 {
     for (const auto &p : all)
