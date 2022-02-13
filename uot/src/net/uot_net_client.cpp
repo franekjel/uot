@@ -284,6 +284,22 @@ void uot_net_client::parseShipsUpdates(std::shared_ptr<game_state>& state,
                                        const std::vector<messageTypes::MsgShipUpdate>& ships_updates)
 {
     // TODO: should it be like parseBuildingsUpdates? @Pawel?
+    for (const auto& a : ships_updates)
+    {
+        state->planets[a.planet_id]->colony->ship_building_queue.clear();
+    }
+
+    for (const auto& a : ships_updates)
+    {
+        if (a.days_remaining != 0)
+        {
+            ShipBuildProgress b{state->player->ship_designs[a.design_id],
+                                state->player->known_galaxy->sectors.at(state->planets.at(a.planet_id)->sector_id)};
+
+            b.worker_week_units_left = a.days_remaining;
+            state->planets[a.planet_id]->colony->ship_building_queue.push_back(b);
+        }
+    }
 }
 
 void uot_net_client::parseTechnologyUpdate(std::shared_ptr<game_state>& state,
