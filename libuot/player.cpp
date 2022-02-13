@@ -330,6 +330,7 @@ void Player::HandleCancelFleetRequest(unsigned int fleet_id)
             current_fleet->full_building_progress = 0.0f;
             break;
         case Fleet::Action::Colonize:
+            current_fleet->colony_building_object->is_being_colonized = false;
             current_fleet->colony_building_object = nullptr;
             current_fleet->building_progress = 0.0f;
             current_fleet->full_building_progress = 0.0f;
@@ -361,9 +362,10 @@ void Player::HandleColonizeFleetRequest(unsigned int fleet_id)
         if ((handled_fleet->position - obj->position).squaredLength() <= Fleet::kNearValue)
         {
             auto planet = std::dynamic_pointer_cast<Planet>(obj);
-            if (planet && !planet->colony)
+            if (planet && !planet->colony && !planet->is_being_colonized)
             {
                 handled_fleet->colony_building_object = planet;
+                planet->is_being_colonized = true;
                 break;
             }
         }

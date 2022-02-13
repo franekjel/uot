@@ -217,6 +217,7 @@ void PlayersList::CountWeeklyNumbers()
                 {
                     auto& cb_object = fleet->colony_building_object;
                     cb_object->colony = std::make_shared<Colony>(id_source++, cb_object);
+                    cb_object->is_being_colonized = false;
                     auto& colony = cb_object->colony;
                     player->owned_colonies[fleet->colony_building_object->colony->id] =
                         fleet->colony_building_object->colony;
@@ -543,6 +544,9 @@ void PlayersList::CountEveryTurnNumbers()
 
         for (const auto& id : fleets_to_remove)
         {
+            if (player->owned_fleets[id]->current_action == Fleet::Action::Colonize &&
+                player->owned_fleets[id]->colony_building_object)
+                player->owned_fleets[id]->colony_building_object->is_being_colonized = false;
             player->owned_fleets[id]->location_sector->present_fleets.erase(id);
             player->owned_fleets[id]->location_sector->DecrementWatcher(player_id);
             player->owned_fleets.erase(id);
