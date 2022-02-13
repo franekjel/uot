@@ -60,13 +60,51 @@ void render_designer_view::_mouse_handler(client_context& context, Uint32 event_
     }
 }
 
+std::string rendering::render_designer_view::get_general_info()
+{
+    auto _h = hull->selected_elem.has_value();
+    general_info disp_info = sh_info;
+
+    if (_h)
+    {
+        const auto& h = ShipHulls.at(_hull[hull->selected_elem.value()]);
+        disp_info.hp += h.hp;
+        disp_info.energy_use_normal += h.engines_energy_consumtion;
+        disp_info.energy_use_max += h.engines_energy_consumtion;
+        disp_info.speed = h.speed;
+        disp_info.ship_aggro = h.ship_aggro;
+        disp_info.space_inside = h.inside_size;
+        disp_info.space_sides = h.sides_size;
+    }
+
+    auto ret = std::string("Current design: \n");
+    ret += "Free space inside: " + std::to_string(disp_info.taken_inside) + "/" +
+           std::to_string(disp_info.space_inside) + "\n";
+    ret += "Free space sides: " + std::to_string(disp_info.taken_sides) + "/" + std::to_string(disp_info.space_sides) +
+           "\n";
+    ret += "HP: " + std::to_string(disp_info.hp) + "\n";
+    ret += "HP regeneration: " + std::to_string(disp_info.hp_regen) + "\n";
+    ret += "Max Energy: " + std::to_string(disp_info.max_energy) + "\n";
+    ret += "Energy use: " + std::to_string(disp_info.energy_use_normal) + "\n";
+    ret += "Max energy use: " + std::to_string(disp_info.energy_use_max) + "\n";
+    ret += "Energy regeneration: " + std::to_string(disp_info.energy_regen) + "\n";
+    ret += "Shields: " + std::to_string(disp_info.shields) + "\n";
+    ret += "Human Capacity: " + std::to_string(disp_info.human_capacity) + "\n";
+    ret += "Construction Points: " + std::to_string(disp_info.construction) + "\n";
+    ret += "Attack count: " + std::to_string(disp_info.attack) + "\n";
+    ret += "Speed: " + std::to_string(disp_info.speed) + "\n";
+    ret += "Ship aggro: " + std::to_string(disp_info.ship_aggro) + "\n";
+    return ret;
+}
+
 std::string rendering::render_designer_view::get_design_cost()
 {
     std::string cost{"Current costs: \n"};
     bool _h = hull->selected_elem.has_value();
     std::map<Resource, float> disp_c = current_costs;
 
-    if(_h) {
+    if (_h)
+    {
         auto& h = ShipHulls.at(_hull[hull->selected_elem.value()]);
         disp_c += h.cost;
     }
@@ -84,14 +122,14 @@ std::string rendering::render_designer_view::get_design_upkeep()
 
     std::map<Resource, float> disp_upk;
 
-    if (hull->selected_elem.has_value()) {
+    if (hull->selected_elem.has_value())
+    {
         auto& h = ShipHulls.at(_hull[hull->selected_elem.value()]);
         disp_upk += h.additional_upkeep;
         disp_upk += ShipDesign::percentage_cost_upkeep * h.cost;
     }
 
     disp_upk += current_upkeep;
-
 
     for (auto& [r, c] : disp_upk)
     {
@@ -126,6 +164,7 @@ void rendering::render_designer_view::render_design_info(client_context& context
                                {0xFF, 0xFF, 0xFF, 0xFF});
 
     sdl_utilities::set_render_viewport<size_settings::designer_info_text_area>(r.get());
+    auto general_info = get_general_info();
     // cost
     auto cost = get_design_cost();
     // upkepp
@@ -133,7 +172,7 @@ void rendering::render_designer_view::render_design_info(client_context& context
     // worker cost
     auto wcost = get_design_worker_cost();
 
-    sdl_utilities::render_text(r.get(), gr->secondary_font, cost + upkeep + wcost,
+    sdl_utilities::render_text(r.get(), gr->secondary_font, general_info + "\n" + cost + upkeep + wcost,
                                size_settings::designer_info_text_area::width / 2,
                                size_settings::designer_info_text_area::height / 2 + info_offset,
                                size_settings::designer_info_text_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
@@ -241,12 +280,39 @@ void render_designer_view::init(client_context& context)
                            {
                                const auto v = modules_available->selected_elem.value();
                                const auto& m = Modules.at(_available[v]);
+
                                _chosen.push_back(_available[v]);
                                modules_chosen->elems.push_back(modules_available->elems[v]);
 
                                current_costs += m.cost;
                                current_upkeep += m.additional_upkeep;
                                current_worker_weeks += m.worker_weeks_cost_per_size * m.size;
+
+                               if (m.destination == Module::ModuleDestination::Inside)
+                               {
+                                   sh_info.taken_inside += m.size;
+                               }
+                               else
+                               {
+                                   sh_info.taken_sides += m.size;
+                               }
+                               sh_info.hp += m.additional_hp;
+                               sh_info.max_energy += m.energy_capacity;
+                               sh_info.energy_regen += m.generating_energy;
+                               sh_info.energy_use_normal += m.energy_usage;
+                               sh_info.energy_use_max += m.energy_usage;
+                               sh_info.shields += m.shield_capacity;
+                               sh_info.human_capacity = m.human_capacity;
+                               sh_info.hp_regen = _available[v] == ModuleType::NanobotsSelfRepairModule
+                                                      ? Module::nanobots_hp_regen_amount
+                                                      : 0;
+
+                               sh_info.construction += m.contruction_speed;
+                               if (m.weapon.has_value())
+                               {
+                                   auto& w = m.weapon.value();
+                                   sh_info.attack += w.attack_count;
+                               }
                            }
                        },
                        "ADD",
@@ -263,11 +329,39 @@ void render_designer_view::init(client_context& context)
                                const auto v = modules_chosen->selected_elem.value();
                                const auto& m = Modules.at(_chosen[v]);
 
-                               for(const auto& [r, c] : m.cost) {
+                               if (m.destination == Module::ModuleDestination::Inside)
+                               {
+                                   sh_info.taken_inside -= m.size;
+                               }
+                               else
+                               {
+                                   sh_info.taken_sides -= m.size;
+                               }
+                               sh_info.hp -= m.additional_hp;
+                               sh_info.max_energy -= m.energy_capacity;
+                               sh_info.energy_regen -= m.generating_energy;
+                               sh_info.energy_use_normal -= m.energy_usage;
+                               sh_info.energy_use_max -= m.energy_usage;
+                               sh_info.shields -= m.shield_capacity;
+                               sh_info.human_capacity = m.human_capacity;
+                               sh_info.hp_regen = _available[v] == ModuleType::NanobotsSelfRepairModule
+                                                      ? Module::nanobots_hp_regen_amount
+                                                      : 0;
+
+                               sh_info.construction -= m.contruction_speed;
+                               if (m.weapon.has_value())
+                               {
+                                   auto& w = m.weapon.value();
+                                   sh_info.attack -= w.attack_count;
+                               }
+
+                               for (const auto& [r, c] : m.cost)
+                               {
                                    current_costs[r] -= c;
                                }
 
-                               for(const auto& [r, c] : m.additional_upkeep) {
+                               for (const auto& [r, c] : m.additional_upkeep)
+                               {
                                    current_upkeep[r] -= c;
                                }
 

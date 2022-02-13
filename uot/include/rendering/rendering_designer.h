@@ -7,6 +7,7 @@
 
 namespace rendering
 {
+
 struct render_designer_view : render_view<render_designer_view>
 {
     view_t _up();
@@ -19,6 +20,7 @@ struct render_designer_view : render_view<render_designer_view>
     void init(client_context& context);
     void render_design_info(client_context& context);
     std::string get_design_cost();
+    std::string get_general_info();
     std::string get_design_upkeep();
     std::string get_design_worker_cost();
 
@@ -40,6 +42,36 @@ struct render_designer_view : render_view<render_designer_view>
     std::unique_ptr<generic_button> create_design_button;
 
     Uint32 info_offset{0u};
+
+    struct general_info
+    {
+        // wolne miejsce
+        int space_inside{0};
+        int taken_inside{0};
+        int space_sides{0};
+        int taken_sides{0};
+        // hp,
+        int hp{0};
+        // max energia,
+        int max_energy{0};
+        // normalny bilans energii,
+        int energy_use_normal{0};
+        // maksymalne zużycie energii,
+        int energy_use_max{0};
+        int energy_regen{0};
+        // tarcze,
+        int shields{0};
+        // pojemność ludzi,
+        int human_capacity{0};
+        // regeneracja hp,
+        int hp_regen{0};
+        // punkty konstrukcji
+        int construction{0};
+        int attack{0};
+        int engines_energy_consumption{0};
+        int speed{0};
+        int ship_aggro{0};
+    } sh_info;
 };
 
 }  // namespace rendering
