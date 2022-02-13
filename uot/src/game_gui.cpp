@@ -1,5 +1,6 @@
 #include "game_gui.h"
 #include "client_context.h"
+#include "player.h"
 
 int game_gui::GetTextureIndex(std::shared_ptr<SectorObject> p)
 {
@@ -86,7 +87,36 @@ int game_gui::GetTextureIndex(std::shared_ptr<SectorObject> p)
     return UNDISCOVERED;
 }
 
+static void update_cur_sector_info(client_context& context)
+{
+    if (!context.gui->current_sector.has_value())
+    {
+        context.gui->cur_sector_info.reset();
+        return;
+    }
+
+    auto& s = context.gui->current_sector.value();
+    sector_client_info info = {0, 0, static_cast<unsigned int>(s->present_fleets.size())};
+    for (auto& o : s->objects)
+    {
+        Planet* p = dynamic_cast<Planet*>(o.second.get());
+        if (p)
+        {
+            info.planet_cnt++;
+            continue;
+        }
+
+        InhabitableObject* inh = dynamic_cast<InhabitableObject*>(o.second.get());
+        if (inh)
+            info.deposit_cnt += inh->resource_deposit.size();
+    }
+
+    context.gui->cur_sector_info = info;
+}
+
 void game_gui::do_gui_per_turn_update(client_context& context)
 {
     update_all_fleet_buttons(context.gui->selected_fleet_buttons, context);
+    update_cur_sector_info(context);
+    player_id_cache = context.getGameState().value->player->id;
 }
