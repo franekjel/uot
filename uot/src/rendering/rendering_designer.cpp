@@ -156,10 +156,9 @@ void rendering::render_designer_view::render_design_info(client_context& context
 
     sdl_utilities::set_render_viewport<size_settings::designer_info_area>(r.get());
 
-    SDL_Rect s {0, 0, cabin_meta::w, cabin_meta::h};
+    SDL_Rect s{0, 0, cabin_meta::w, cabin_meta::h};
     constexpr float scale = size_settings::designer_info_area::width / static_cast<float>(cabin_meta::w);
-    SDL_Rect d {0, 0, size_settings::designer_info_area::width,
-                static_cast<int>(scale * cabin_meta::h)};
+    SDL_Rect d{0, 0, size_settings::designer_info_area::width, static_cast<int>(scale * cabin_meta::h)};
 
     SDL_RenderCopyEx(r.get(), gr->cabin_texture.get(), &s, &d, 0., NULL, SDL_FLIP_NONE);
 

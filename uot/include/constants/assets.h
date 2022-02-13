@@ -216,11 +216,12 @@ constexpr int total_size = 256;
 constexpr int single_size = 128 / 8;
 }  // namespace resources_meta
 
-namespace cabin_meta {
+namespace cabin_meta
+{
 constexpr std::string_view cabin_path = "assets/cabin.png";
 constexpr int w = 384;
 constexpr int h = 216;
-}
+}  // namespace cabin_meta
 
 namespace buildings_meta
 {
@@ -232,7 +233,6 @@ struct s_pos
     int w;
     int h;
 };
-
 
 // PlanetaryAdministration, ImprovedMetalsMine, MetalsMine, Farm,
 // Greenhouses

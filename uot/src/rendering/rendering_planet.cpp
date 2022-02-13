@@ -418,7 +418,6 @@ void rendering::render_planet_view::_draw(client_context& context)
                 rendering::render_ship_info_box(context, box.value().design_id.value(), box.value().x, box.value().y);
             }
         }
-
     }
     else if (io)
     {
