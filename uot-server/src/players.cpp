@@ -262,7 +262,9 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
 {
     for (auto& player : players)
     {
-        messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first], galaxy);
+        if (!player.second->stop_sending)
+            messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first],
+                                                    galaxy);
     }
 
     // cleanup
