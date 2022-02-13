@@ -80,6 +80,9 @@ void loadMedia(client_context& context)
     gr->resource_texture =
         sdl_utilities::load_texture_from_file(std::string(resources_meta::resources_path), context.r);
 
+    printf("Loading cabin\n");
+    gr->cabin_texture = sdl_utilities::load_texture_from_file(std::string(cabin_meta::cabin_path), context.r);
+
     {
         const int r = (size_settings::play_area::height / 2 - 2);
         const std::string svg = "<svg height='" + std::to_string(r * 2) + "' width='" + std::to_string(r * 2) +

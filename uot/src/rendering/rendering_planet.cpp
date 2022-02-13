@@ -140,8 +140,11 @@ void rendering::render_planet_view::init(client_context& context)
         auto available_buildings = pl->colony->GetAvailableBuildings();
         for (const auto& [b, count] : available_buildings)
         {
-            v_build.push_back(Buildings.at(b).name);
-            _build.push_back(b);
+            if (count > 0)
+            {
+                v_build.push_back(Buildings.at(b).name);
+                _build.push_back(b);
+            }
         }
 
         for (const auto& b : pl->colony->buildings)
@@ -168,8 +171,8 @@ void rendering::render_planet_view::init(client_context& context)
 
         for (auto& sd : pl->colony->ship_building_queue)
         {
-            v_ship_queue.push_back(sd.ship->design->name + " " + std::to_string(sd.worker_week_units_left));
-            _ships_queue.push_back(sd.ship->design->id);
+            v_ship_queue.push_back(sd.design->name + " " + std::to_string(sd.worker_week_units_left));
+            _ships_queue.push_back(sd.design->id);
         }
     }
 
@@ -188,6 +191,7 @@ void rendering::render_planet_view::init(client_context& context)
                                    // dodać sprawdzanie czy zasoby pozwalają na
                                    // dodanie tego budynku
                                    _queue.push_back(t);
+
                                    queue->elems.push_back(
                                        Buildings.at(t).name + " " +
                                        std::to_string(static_cast<int>(Buildings.at(t).worker_weeks_cost)));
@@ -300,8 +304,11 @@ inline void rendering::render_planet_view::refresh_lists(client_context& context
     auto available_buildings = pl->colony->GetAvailableBuildings();
     for (const auto& [b, count] : available_buildings)
     {
-        build->elems.push_back(Buildings.at(b).name);
-        _build.push_back(b);
+        if (count > 0)
+        {
+            build->elems.push_back(Buildings.at(b).name);
+            _build.push_back(b);
+        }
     }
 
     for (const auto& b : pl->colony->buildings)
@@ -329,8 +336,8 @@ inline void rendering::render_planet_view::refresh_lists(client_context& context
 
     for (auto& sd : pl->colony->ship_building_queue)
     {
-        ships_queue->elems.push_back(sd.ship->design->name);
-        _ships_queue.push_back(sd.ship->design->id);
+        ships_queue->elems.push_back(sd.design->name);
+        _ships_queue.push_back(sd.design->id);
     }
 }
 
@@ -393,15 +400,24 @@ void rendering::render_planet_view::_draw(client_context& context)
     {
         current_sub == planet_sub::queue ? render_queue_lists(context) : render_build_lists(context);
 
-        if (box.has_value())
-        {
-            rendering::render_building_info_box(context, box.value().type, box.value().x, box.value().y);
-        }
-
         sdl_utilities::set_render_viewport<size_settings::planet_info_area>(r.get());
         sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
 
         render_planet_info(context);
+
+        if (box.has_value())
+        {
+            if (box->building_type.has_value())
+            {
+                rendering::render_building_info_box(context, box.value().building_type.value(), box.value().x,
+                                                    box.value().y);
+            }
+
+            if (box->design_id.has_value())
+            {
+                rendering::render_ship_info_box(context, box.value().design_id.value(), box.value().x, box.value().y);
+            }
+        }
     }
     else if (io)
     {
@@ -431,7 +447,6 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
                         ? input_utilities::get_planet_event_type(event_type, m, x, y)
                         : input_utilities::get_planet_build_event_type(event_type, m, x, y);
 
-    auto& curr_b = context.gui->current_building;
     if (et == iu::uot_event_type::planet_left_click_build)
     {
         using AreaType = size_settings::planet_build_area;
@@ -451,6 +466,25 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         }
     }
 
+    if (et == iu::uot_event_type::planet_left_click_ship_build)
+    {
+        using AreaType = size_settings::planet_ships_build_area;
+        x = x - AreaType::x_offset;
+        y = y - AreaType::y_offset;
+
+        if (iu::check_collision(x, y, ships_build->action_button.pos.x, ships_build->action_button.pos.y,
+                                ships_build->action_button.pos.w, ships_build->action_button.pos.h))
+        {
+            ships_build->action_button.clicked(context);
+            ships_build->selected_elem.reset();
+        }
+        else
+        {
+            // handle list element clicks
+            ships_build->handle_timed_click(context, x, y);
+        }
+    }
+
     if (et == iu::uot_event_type::planet_left_click_built)
     {
         using AreaType = size_settings::planet_built_area;
@@ -466,7 +500,7 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         else
         {
             // handle list element clicks
-            build->handle_timed_click(context, x, y);
+            built->handle_timed_click(context, x, y);
         }
     }
 
@@ -485,7 +519,26 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         else
         {
             // handle list element clicks
-            build->handle_timed_click(context, x, y);
+            queue->handle_timed_click(context, x, y);
+        }
+    }
+
+    if (et == iu::uot_event_type::planet_left_click_ship_queue)
+    {
+        using AreaType = size_settings::planet_ships_queue_area;
+        x = x - AreaType::x_offset;
+        y = y - AreaType::y_offset;
+
+        if (iu::check_collision(x, y, ships_queue->action_button.pos.x, ships_queue->action_button.pos.y,
+                                ships_queue->action_button.pos.w, ships_queue->action_button.pos.h))
+        {
+            ships_queue->action_button.clicked(context);
+            ships_queue->selected_elem.reset();
+        }
+        else
+        {
+            // handle list element clicks
+            ships_queue->handle_timed_click(context, x, y);
         }
     }
 
@@ -499,6 +552,36 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         if (res.has_value())
         {
             box = {x, y, _build[res.value()]};
+            return;
+        }
+        box.reset();
+    }
+
+    if (et == iu::uot_event_type::planet_motion_ship_build)
+    {
+        using AreaType = size_settings::planet_ships_build_area;
+        int _x = x - AreaType::x_offset;
+        int _y = y - AreaType::y_offset;
+
+        auto res = ships_build->handle_motion(_x, _y);
+        if (res.has_value())
+        {
+            box = {x, y, {}, _ships_build[res.value()]};
+            return;
+        }
+        box.reset();
+    }
+
+    if (et == iu::uot_event_type::planet_motion_ship_queue)
+    {
+        using AreaType = size_settings::planet_ships_queue_area;
+        int _x = x - AreaType::x_offset;
+        int _y = y - AreaType::y_offset;
+
+        auto res = ships_queue->handle_motion(_x, _y);
+        if (res.has_value())
+        {
+            box = {x, y, {}, _ships_build[res.value()]};
             return;
         }
         box.reset();
@@ -570,6 +653,18 @@ void rendering::render_planet_view::_wheel_handler(client_context& context, int 
             std::clamp(0, static_cast<int>(queue->offset + 4 * ymov), static_cast<int>(queue->elems.size() * 80));
     }
 
+    if (et == iu::uot_event_type::planet_scroll_ship_queue)
+    {
+        ships_queue->offset = std::clamp(0, static_cast<int>(ships_queue->offset + 4 * ymov),
+                                         static_cast<int>(ships_queue->elems.size() * 80));
+    }
+
+    if (et == iu::uot_event_type::planet_scroll_ship_build)
+    {
+        ships_build->offset = std::clamp(0, static_cast<int>(ships_build->offset + 4 * ymov),
+                                         static_cast<int>(ships_build->elems.size() * 80));
+    }
+
     if (et == iu::uot_event_type::planet_scroll_info)
     {
         info_offset += 4 * ymov;
@@ -584,6 +679,8 @@ void rendering::render_planet_view::key_handler(client_context& context, Uint16 
         context.view = _up();
     }
 }
+
+inline std::string get_ship_info(const std::shared_ptr<ShipDesign>& design_id) { return "opis designu totalnie tutaj"; }
 
 inline std::string get_building_info(Building::BuildingType type)
 {
@@ -639,6 +736,22 @@ void rendering::render_building_info_box(client_context& context, Building::Buil
     SDL_RenderCopyEx(context.r.get(), context.gr->buildings_sprite.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 
     sdl_utilities::render_text(r.get(), gr->infobox_font, get_building_info(type), buildings_meta::frame_width / 2,
+                               buildings_meta::frame_height / 2, buildings_meta::frame_width,
+                               SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
+}
+
+void rendering::render_ship_info_box(client_context& context, const unsigned int design_id, int x, int y)
+{
+    auto& r = context.r;
+    auto& gr = context.gr;
+    auto gs = context.getGameState();
+
+    const auto& d = gs.value->player->ship_designs[design_id];
+
+    sdl_utilities::set_viewport(r.get(), x, y, buildings_meta::frame_width, buildings_meta::frame_height);
+    sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
+
+    sdl_utilities::render_text(r.get(), gr->infobox_font, get_ship_info(d), buildings_meta::frame_width / 2,
                                buildings_meta::frame_height / 2, buildings_meta::frame_width,
                                SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
 }
