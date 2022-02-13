@@ -190,6 +190,8 @@ void PlayersList::CountWeeklyNumbers()
                 {
                     if (fleet->base_building_object->base)
                     {
+                        fleet->base_building_object->base->owner->lost_objects.push_back(
+                            fleet->base_building_object->id);
                         fleet->base_building_object->base->owner->owned_space_bases.erase(
                             fleet->base_building_object->base->owner->owned_space_bases.find(
                                 fleet->base_building_object->base->id));
