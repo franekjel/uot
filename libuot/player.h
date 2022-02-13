@@ -65,6 +65,7 @@ struct Player
 
     bool is_loser = false;
     bool is_winner = false;
+    bool stop_sending = false;
 
     struct ChangedDesign
     {

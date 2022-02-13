@@ -82,6 +82,9 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
     payload.you_lost = player->is_loser;
     payload.you_won = player->is_winner;
 
+    if (player->is_loser)
+        player->stop_sending = true;
+
     for (const auto& resource : player->owned_resources)
     {
         if (player->resources_changed[resource.first])
