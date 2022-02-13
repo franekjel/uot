@@ -163,6 +163,7 @@ void Fleet::UpdateFleet()
         next_it++;
         if (it->second->hp <= 0.0f)
         {
+            location_sector->destroyed_ships.push_back({owner_id, it->second->id});
             ships.erase(it);
         }
     }
