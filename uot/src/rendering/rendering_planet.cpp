@@ -171,8 +171,8 @@ void rendering::render_planet_view::init(client_context& context)
 
         for (auto& sd : pl->colony->ship_building_queue)
         {
-            v_ship_queue.push_back(sd.ship->design->name + " " + std::to_string(sd.worker_week_units_left));
-            _ships_queue.push_back(sd.ship->design->id);
+            v_ship_queue.push_back(sd.design->name + " " + std::to_string(sd.worker_week_units_left));
+            _ships_queue.push_back(sd.design->id);
         }
     }
 
@@ -336,8 +336,8 @@ inline void rendering::render_planet_view::refresh_lists(client_context& context
 
     for (auto& sd : pl->colony->ship_building_queue)
     {
-        ships_queue->elems.push_back(sd.ship->design->name);
-        _ships_queue.push_back(sd.ship->design->id);
+        ships_queue->elems.push_back(sd.design->name);
+        _ships_queue.push_back(sd.design->id);
     }
 }
 
