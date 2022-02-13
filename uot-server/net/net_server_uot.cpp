@@ -79,8 +79,11 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
 {
     messageTypes::NewTurnPayload payload;
 
-    payload.you_lost = false;
-    payload.you_won = false;
+    payload.you_lost = player->is_loser;
+    payload.you_won = player->is_winner;
+
+    if (player->is_loser)
+        player->stop_sending = true;
 
     for (const auto& resource : player->owned_resources)
     {
@@ -288,8 +291,14 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
     player->lost_objects.clear();
     player->new_colonies.clear();
     player->fleet_info_requests.clear();
-
-    txrx.send_reliable(player_net_name, payload.Serialize());
+    try
+    {
+        txrx.send_reliable(player_net_name, payload.Serialize());
+    }
+    catch (std::runtime_error er)
+    {
+        std::cout << "Error while sending message: " << er.what() << std::endl;
+    }
 }
 
 void net_server_uot::send_game_begin_message(std::shared_ptr<Player>& player, std::string player_net_name,
@@ -310,7 +319,14 @@ void net_server_uot::send_game_begin_message(std::shared_ptr<Player>& player, st
         payload.starting_ships_designs.emplace_back(messageTypes::MsgShipDesignResponse(d.second->id, d.second, false));
     }
 
-    txrx.send_reliable(player_net_name, payload.Serialize());
+    try
+    {
+        txrx.send_reliable(player_net_name, payload.Serialize());
+    }
+    catch (std::runtime_error er)
+    {
+        std::cout << "Error while sending message: " << er.what() << std::endl;
+    }
 }
 
 void net_server_uot::read_input()

@@ -86,6 +86,10 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
                                        std::shared_ptr<messageTypes::ActionsPayload> payload)
 {
     auto player = players[players_net_names_rev[player_net_name]];
+
+    if (player->is_loser)
+        return false;
+
     for (const auto& build : payload->buildRequests)
     {
         player->HandleBuildRequest(build.building_type, build.upgrade_from, build.colony_id);
@@ -169,13 +173,14 @@ void PlayersList::CountWeeklyNumbers()
     //    thread.join();
 
     // Let it be synchornic for now - can be done async but too much work for now
-
     for (auto& player : players)
         CountWeeklyNumbersPlayer(player.second);
 
     // here are weekly actions performed that could not have been done multithreadedly
     for (auto& [player_id, player] : players)
     {
+        if (player->is_loser)
+            continue;
         auto& player_fleets = player->owned_fleets;
         for (const auto& [fleet_id, fleet] : player_fleets)
         {
@@ -228,6 +233,27 @@ void PlayersList::CountWeeklyNumbers()
                 }
             }
         }
+
+        if (player->owned_colonies.empty())
+        {
+            player->is_loser = true;
+            number_of_loosers++;
+        }
+    }
+
+    int number_of_not_loosers = PlayersCount() - number_of_loosers;
+    if (number_of_not_loosers == 1)
+    {
+        unsigned int potential_winner;
+        for (const auto& [player_id, player] : players)
+        {
+            if (!(player->is_loser))
+            {
+                potential_winner = player_id;
+            }
+        }
+        auto& winner = players[potential_winner];
+        winner->is_winner = true;
     }
 }
 
@@ -236,7 +262,9 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
 {
     for (auto& player : players)
     {
-        messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first], galaxy);
+        if (!player.second->stop_sending)
+            messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first],
+                                                    galaxy);
     }
 
     // cleanup
@@ -264,6 +292,8 @@ void PlayersList::SendStartGameMessage(net_server_uot& messaging_service, std::s
 
 void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
 {
+    if (player->is_loser)
+        return;
     auto& player_resources = player->owned_resources;
     auto& player_resources_change = player->resources_changed;
     auto& player_colonies = player->owned_colonies;
