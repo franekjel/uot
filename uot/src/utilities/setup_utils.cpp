@@ -76,6 +76,17 @@ void loadMedia(client_context& context)
     gr->buildings_blur_sprite =
         sdl_utilities::load_texture_from_file(std::string(basic_textures::building_blur_sprite_path), context.r);
 
+    printf("Loading fight animations\n");
+    gr->missile_texture =
+        texture_t{weapons_meta::missile_w, weapons_meta::missile_h,
+                  sdl_utilities::load_texture_from_file(std::string(weapons_meta::missile_path), context.r)};
+    gr->explosion1_texture =
+        texture_t{weapons_meta::explosion1_w, weapons_meta::explosion1_h,
+                  sdl_utilities::load_texture_from_file(std::string(weapons_meta::explosion1_path), context.r)};
+    gr->explosion2_texture =
+        texture_t{weapons_meta::explosion2_w, weapons_meta::explosion2_h,
+                  sdl_utilities::load_texture_from_file(std::string(weapons_meta::explosion2_path), context.r)};
+
     printf("Loading resources\n");
     gr->resource_texture =
         sdl_utilities::load_texture_from_file(std::string(resources_meta::resources_path), context.r);

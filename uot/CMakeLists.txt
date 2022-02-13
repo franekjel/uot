@@ -20,6 +20,7 @@ set(SRCS
     include/rendering/rendering_tech.h
     include/rendering/rendering_views.h
     include/rendering/ui_list.h
+    include/rendering/animation.h
     include/utilities/sdl_utilities.h
     include/utilities/setup_utils.h
     include/utilities/fleet_utils.h
@@ -43,6 +44,7 @@ set(SRCS
     src/rendering/rendering_tech.cpp
     src/rendering/ui_list.cpp
     src/rendering/buttons.cpp
+    src/rendering/animation.cpp
     src/utilities/sdl_utils.cpp
     src/utilities/setup_utils.cpp
     src/net/uot_net_client.cpp

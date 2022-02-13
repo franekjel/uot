@@ -122,7 +122,9 @@ void abort_research_button::_clicked(client_context& context)
 
 void jump_button::_clicked(client_context& context)
 {
-    context.getActionQueue().value->request_fleet_jump(context.gui->current_fleet.value()->id);
+    if (context.gui->current_fleet.has_value())
+        context.getActionQueue().value->request_fleet_jump(context.gui->current_fleet.value()->id);
+    context.gui->current_fleet.reset();
 }
 
 void build_base_button::_clicked(client_context& context)

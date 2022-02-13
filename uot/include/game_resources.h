@@ -41,6 +41,8 @@ struct game_resources : public uncopiable
     std::array<texture_t, 16> fleet_textures;
 
     texture_t missile_texture;
+    texture_t explosion1_texture;
+    texture_t explosion2_texture;
 
     std::shared_ptr<TTF_Font> main_font;
     std::shared_ptr<TTF_Font> secondary_font;

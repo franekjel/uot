@@ -430,7 +430,7 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
             for (const auto& [other_fleet_id, other_fleet] : fleet->location_sector->present_fleets)
             {
                 if (other_fleet_id != fleet_id && other_fleet->owner_id != fleet->owner_id &&
-                    (other_fleet->position - fleet_position).squaredLength() <= weapon.range)
+                    (other_fleet->position - fleet_position).squaredLength() <= weapon.range * weapon.range)
                 {
                     in_distance.push_back(other_fleet);
                     fleet_values_sum += other_fleet->fleet_aggro;

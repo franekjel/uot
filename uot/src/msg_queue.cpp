@@ -31,6 +31,8 @@ void msg_queue::reset()
     actions.fleetActionRequests.clear();
     actions.shipDesignRequests.clear();
     actions.createShipRequests.clear();
+    actions.fleetInfoRequests.clear();
+    actions.joinFleetsRequests.clear();
 }
 
 void msg_queue::build_ship(const int design_id, const int planet_id)

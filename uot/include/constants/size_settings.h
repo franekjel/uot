@@ -20,15 +20,15 @@ struct window_area : area_properties<1600, 900, 0, 0>
 {
 };
 
-struct resource_area : area_properties<1550, 40, 25, 800>
+struct resource_area : area_properties<1560, 40, 20, 850>
 {
 };
 
-struct play_area : area_properties<1100, 700, 25, 50>
+struct play_area : area_properties<1200, 820, 20, 20>
 {
 };
 
-struct context_area : area_properties<350, 700, 1225, 50>
+struct context_area : area_properties<350, 820, 1230, 20>
 {
 };
 

@@ -203,38 +203,38 @@ void net_server_uot::send_new_turn_message(int turn_number, std::shared_ptr<Play
                 sector_update_msg.new_colonies.push_back(messageTypes::MsgNewColony(new_colony));
             }
 
-            for (const auto& joined_fleet : sector->joined_fleets)
-            {
-                if (joined_fleet.owner == player->id)
-                    payload.joined_fleets.push_back(messageTypes::MsgFleetsJoin(joined_fleet));
-            }
-
-            for (const auto& jumped_fleet : sector->jumped_fleets)
-            {
-                if (jumped_fleet.owner == player->id)
-                    payload.jumped_fleets.push_back(messageTypes::MsgFleetsJump(jumped_fleet));
-            }
-
             for (const auto& fleet_in_fight : sector->fleets_in_fight)
             {
                 if (fleet_in_fight->owner_id == player->id)
-                    payload.fleets_in_fight.push_back(
+                    sector_update_msg.fleets_in_fight.push_back(
                         messageTypes::MsgFleetParameters(Sector::FleetParameters(fleet_in_fight), false));
             }
 
-            for (const auto& destroyed_ship : sector->destroyed_ships)
-            {
-                if (destroyed_ship.owner == player->id)
-                    payload.destroyed_ships.push_back(destroyed_ship.ship_id);
-            }
-
-            for (const auto& changed_fleet : sector->fleets_changed)
-            {
-                if (changed_fleet.owner == player->id)
-                    payload.changed_fleet_populations.push_back(messageTypes::MsgChangedFleetPopulation(changed_fleet));
-            }
-
             payload.watched_sectors_updates.push_back(sector_update_msg);
+        }
+
+        for (const auto& joined_fleet : sector->joined_fleets)
+        {
+            if (joined_fleet.owner == player->id)
+                payload.joined_fleets.push_back(messageTypes::MsgFleetsJoin(joined_fleet));
+        }
+
+        for (const auto& jumped_fleet : sector->jumped_fleets)
+        {
+            if (jumped_fleet.owner == player->id)
+                payload.jumped_fleets.push_back(messageTypes::MsgFleetsJump(jumped_fleet));
+        }
+
+        for (const auto& destroyed_ship : sector->destroyed_ships)
+        {
+            if (destroyed_ship.owner == player->id)
+                payload.destroyed_ships.push_back(destroyed_ship.ship_id);
+        }
+
+        for (const auto& changed_fleet : sector->fleets_changed)
+        {
+            if (changed_fleet.owner == player->id)
+                payload.changed_fleet_populations.push_back(messageTypes::MsgChangedFleetPopulation(changed_fleet));
         }
     }
 

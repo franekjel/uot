@@ -31,5 +31,7 @@ void render_selection_graphics(const client_context& context, const Point pos, c
 
 void render_fleet_weapon_ranges(const client_context& context, const Point pos, const std::shared_ptr<Fleet> f);
 
+void render_animations(const client_context& context);
+
 }  // namespace rendering
 #endif  // SECTOR_RENDERING_H
