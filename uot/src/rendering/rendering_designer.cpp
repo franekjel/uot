@@ -58,6 +58,61 @@ void render_designer_view::_mouse_handler(client_context& context, Uint32 event_
             create_design_button->clicked(context);
         }
     }
+
+    if (et == iu::uot_event_type::designer_motion_available)
+    {
+        using AreaType = size_settings::designer_available_area;
+        int _x = x - AreaType::x_offset;
+        int _y = y - AreaType::y_offset;
+
+        auto res = modules_available->handle_motion(_x, _y);
+        if (res.has_value())
+        {
+            box.x = x;
+            box.y = y;
+            box.module_type = _available[res.value()];
+            box.hull_type.reset();
+            return;
+        }
+        box.reset();
+    }
+
+    if (et == iu::uot_event_type::designer_motion_chosen)
+    {
+        using AreaType = size_settings::designer_chosen_area;
+        int _x = x - AreaType::x_offset;
+        int _y = y - AreaType::y_offset;
+
+        auto res = modules_chosen->handle_motion(_x, _y);
+        if (res.has_value())
+        {
+            box.x = x;
+            box.y = y;
+            box.module_type = _chosen[res.value()];
+            box.hull_type.reset();
+            return;
+        }
+        box.reset();
+    }
+
+    if (et == iu::uot_event_type::designer_motion_hull)
+    {
+        using AreaType = size_settings::designer_hull_area;
+        int _x = x - AreaType::x_offset;
+        int _y = y - AreaType::y_offset;
+
+        auto res = hull->handle_motion(_x, _y);
+        if (res.has_value())
+        {
+            box.x = x;
+            box.y = y;
+            box.module_type.reset();
+            box.hull_type = _hull[res.value()];
+            return;
+        }
+        box.reset();
+    }
+
 }
 
 std::string rendering::render_designer_view::get_general_info()
@@ -228,6 +283,44 @@ void render_designer_view::key_handler(client_context& context, Uint16 k)
     }
 }
 
+inline std::string get_module_info(ModuleType type) {
+    const auto& m = Modules.at(type);
+    return "a lot of module info in here";
+}
+
+inline std::string get_hull_info(ShipHull::Type type) {
+    const auto& m = ShipHulls.at(type);
+    return "a lot of hull info in here";
+}
+
+void rendering::render_module_info_box(client_context& context, ModuleType type, int x, int y)
+{
+    auto& r = context.r;
+    auto& gr = context.gr;
+
+    const auto& m = Modules.at(type);
+    sdl_utilities::set_viewport(r.get(), x, y, buildings_meta::frame_width, buildings_meta::frame_height);
+    sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
+
+    sdl_utilities::render_text(r.get(), gr->infobox_font, get_module_info(type), buildings_meta::frame_width / 2,
+                               buildings_meta::frame_height / 2, buildings_meta::frame_width,
+                               SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
+}
+
+void rendering::render_hull_info_box(client_context& context, ShipHull::Type type, int x, int y)
+{
+    auto& r = context.r;
+    auto& gr = context.gr;
+
+    const auto& h = ShipHulls.at(type);
+    sdl_utilities::set_viewport(r.get(), x, y, buildings_meta::frame_width, buildings_meta::frame_height);
+    sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
+
+    sdl_utilities::render_text(r.get(), gr->infobox_font, get_hull_info(type), buildings_meta::frame_width / 2,
+                               buildings_meta::frame_height / 2, buildings_meta::frame_width,
+                               SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
+}
+
 void render_designer_view::_draw(client_context& context)
 {
     refresh_lists(context);
@@ -258,6 +351,15 @@ void render_designer_view::_draw(client_context& context)
     render_list(context, hull, false);
 
     render_design_info(context);
+
+    if (box.module_type.has_value())
+    {
+        rendering::render_module_info_box(context, box.module_type.value(), box.x,
+                        box.y);
+    } else if (box.hull_type.has_value()) {
+        rendering::render_hull_info_box(context, box.hull_type.value(), box.x,
+                        box.y);
+    }
 }
 
 void render_designer_view::init(client_context& context)
