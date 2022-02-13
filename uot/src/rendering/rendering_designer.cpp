@@ -203,17 +203,20 @@ void render_designer_view::init(client_context& context)
 {
     std::vector<std::string> v_available;
     std::vector<std::string> v_chosen;
-    std::vector<std::string> v_hulls{std::string(hull_names[0]), std::string(hull_names[1]),
-                                     std::string(hull_names[2])};
+    std::vector<std::string> v_hulls;
 
     auto gs = context.getGameState();
-    for (auto& m : Modules)
+    for (auto& m : gs.value->player->available_modules)
     {
-        v_available.push_back(m.second.name);
-        _available.push_back(m.first);
+        v_available.push_back(Modules.at(m).name);
+        _available.push_back(m);
     }
 
-    _hull = {ShipHull::Type::SmallShipHull, ShipHull::Type::MediumShipHull, ShipHull::Type::GrandShipHull};
+    for (auto& h : gs.value->player->available_hulls)
+    {
+        v_hulls.push_back(std::string(hull_names[static_cast<int>(h) - static_cast<int>(ShipHull::SmallShipHull)]));
+        _hull.push_back(h);
+    }
 
     modules_available = std::make_shared<ui_list_state>(
         v_available,
@@ -314,4 +317,23 @@ void render_designer_view::init(client_context& context)
                        {size_settings::designer_info_area::width / 2 - 150, 700, 300, 50}});
 }
 
-inline void render_designer_view::refresh_lists(client_context& context) {}
+inline void render_designer_view::refresh_lists(client_context& context)
+{
+    auto gs = context.getGameState();
+    modules_available->elems.clear();
+    _available.clear();
+    _hull.clear();
+    hull->elems.clear();
+
+    for (auto& m : gs.value->player->available_modules)
+    {
+        modules_available->elems.push_back(Modules.at(m).name);
+        _available.push_back(m);
+    }
+
+    for (auto& h : gs.value->player->available_hulls)
+    {
+        hull->elems.push_back(std::string(hull_names[static_cast<int>(h) - static_cast<int>(ShipHull::SmallShipHull)]));
+        _hull.push_back(h);
+    }
+}
