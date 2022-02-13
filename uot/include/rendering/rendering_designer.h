@@ -74,17 +74,20 @@ struct render_designer_view : render_view<render_designer_view>
         int ship_aggro{0};
     } sh_info;
 
-
     struct info_box
     {
         int x, y;
         std::optional<ModuleType> module_type;
         std::optional<ShipHull::Type> hull_type;
 
-        inline void reset() {module_type.reset(); hull_type.reset();}
+        inline void reset()
+        {
+            module_type.reset();
+            hull_type.reset();
+        }
     };
 
-   info_box box;
+    info_box box;
 };
 
 void render_module_info_box(client_context& context, ModuleType type, int x, int y);

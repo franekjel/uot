@@ -112,7 +112,6 @@ void render_designer_view::_mouse_handler(client_context& context, Uint32 event_
         }
         box.reset();
     }
-
 }
 
 std::string rendering::render_designer_view::get_general_info()
@@ -286,12 +285,14 @@ void render_designer_view::key_handler(client_context& context, Uint16 k)
     }
 }
 
-inline std::string get_module_info(ModuleType type) {
+inline std::string get_module_info(ModuleType type)
+{
     const auto& m = Modules.at(type);
     return "a lot of module info in here";
 }
 
-inline std::string get_hull_info(ShipHull::Type type) {
+inline std::string get_hull_info(ShipHull::Type type)
+{
     const auto& m = ShipHulls.at(type);
     return "a lot of hull info in here";
 }
@@ -357,11 +358,11 @@ void render_designer_view::_draw(client_context& context)
 
     if (box.module_type.has_value())
     {
-        rendering::render_module_info_box(context, box.module_type.value(), box.x,
-                        box.y);
-    } else if (box.hull_type.has_value()) {
-        rendering::render_hull_info_box(context, box.hull_type.value(), box.x,
-                        box.y);
+        rendering::render_module_info_box(context, box.module_type.value(), box.x, box.y);
+    }
+    else if (box.hull_type.has_value())
+    {
+        rendering::render_hull_info_box(context, box.hull_type.value(), box.x, box.y);
     }
 }
 
