@@ -242,21 +242,21 @@ void PlayersList::CountWeeklyNumbers()
         if (!have_any_colony)
         {
             player->is_loser = true;
+            number_of_loosers++;
         }
     }
 
-    int number_of_not_loosers = 0;
-    unsigned int potential_winner;
-    for (const auto& [player_id, player] : players)
-    {
-        if (!(player->is_loser))
-        {
-            number_of_not_loosers++;
-            potential_winner = player_id;
-        }
-    }
+    int number_of_not_loosers = PlayersCount() - number_of_loosers;
     if (number_of_not_loosers == 1)
     {
+        unsigned int potential_winner;
+        for (const auto& [player_id, player] : players)
+        {
+            if (!(player->is_loser))
+            {
+                potential_winner = player_id;
+            }
+        }
         auto& winner = players[potential_winner];
         winner->is_winner = true;
     }
