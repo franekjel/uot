@@ -402,11 +402,14 @@ void rendering::render_planet_view::_draw(client_context& context)
 
         if (box.has_value())
         {
-            if(box->building_type.has_value()) {
-                rendering::render_building_info_box(context, box.value().building_type.value(), box.value().x, box.value().y);
+            if (box->building_type.has_value())
+            {
+                rendering::render_building_info_box(context, box.value().building_type.value(), box.value().x,
+                                                    box.value().y);
             }
 
-            if(box->design_id.has_value()) {
+            if (box->design_id.has_value())
+            {
                 rendering::render_ship_info_box(context, box.value().design_id.value(), box.value().x, box.value().y);
             }
         }
@@ -677,9 +680,7 @@ void rendering::render_planet_view::key_handler(client_context& context, Uint16 
     }
 }
 
-inline std::string get_ship_info(const std::shared_ptr<ShipDesign>& design_id) {
-    return "opis designu totalnie tutaj";
-}
+inline std::string get_ship_info(const std::shared_ptr<ShipDesign>& design_id) { return "opis designu totalnie tutaj"; }
 
 inline std::string get_building_info(Building::BuildingType type)
 {
@@ -739,7 +740,8 @@ void rendering::render_building_info_box(client_context& context, Building::Buil
                                SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
 }
 
-void rendering::render_ship_info_box(client_context& context, const unsigned int design_id, int x, int y) {
+void rendering::render_ship_info_box(client_context& context, const unsigned int design_id, int x, int y)
+{
     auto& r = context.r;
     auto& gr = context.gr;
     auto gs = context.getGameState();
