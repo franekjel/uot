@@ -79,10 +79,15 @@ void uot_net_client::handle_message(const std::string& data)
                 state->all_players.insert({id, std::make_shared<Player>(id)});
             state->all_players[player_id] = state->player;
 
+            context.player_id = state->player->id;
+
             for (const auto& sec_msg : start_msg->galaxy.sectors)
                 parseSector(sec_msg);
 
             parseDesigns(state, start_msg->starting_ships_designs);
+
+            for (const auto& d : start_msg->starting_ships_designs)
+                context.gui->current_design_id = std::max(context.gui->current_design_id, d.id + 1);
         }
         break;
 
@@ -102,7 +107,8 @@ void uot_net_client::handle_message(const std::string& data)
             for (const auto& pop_data : newturn_msg->updated_populations)
                 state->player->owned_colonies.at(pop_data.first)->population = pop_data.second;
 
-            parseInvadedColonies(state, newturn_msg->invaded_colonies);
+            for (const auto& soldiers_data : newturn_msg->updated_soldiers)
+                state->player->owned_colonies.at(soldiers_data.first)->soldiers = soldiers_data.second;
 
             parseBuildingsUpdates(state, newturn_msg->buildings_updates);
 
@@ -131,6 +137,8 @@ void uot_net_client::handle_message(const std::string& data)
             parseDesigns(state, newturn_msg->ship_designs);
 
             parseLostObjects(state, newturn_msg->lost_objects);
+
+            parseInvadedColonies(state, newturn_msg->invaded_colonies);
 
             ///
             ///
@@ -187,6 +195,7 @@ void uot_net_client::parseSector(const messageTypes::MsgSector& sec_msg)
         galaxy.end())  // if sector already exists (because eg. this is neighbour sector) only modify existing
     {
         s = galaxy.at(sec_msg.id);
+        s->objects.clear();
     }
     else  // otherwise create and add new sector
     {
@@ -262,6 +271,7 @@ void uot_net_client::parseSector(const messageTypes::MsgSector& sec_msg)
                     player->owned_space_bases[base->id] = base;
             }
             s->objects.insert({inhabitable->id, inhabitable});
+            state->objects.insert({inhabitable->id, inhabitable});
         }
     }
 }
@@ -293,7 +303,6 @@ void uot_net_client::parseBuildingsUpdates(std::shared_ptr<game_state>& state,
 void uot_net_client::parseShipsUpdates(std::shared_ptr<game_state>& state,
                                        const std::vector<messageTypes::MsgShipUpdate>& ships_updates)
 {
-    // TODO: should it be like parseBuildingsUpdates? @Pawel?
     for (const auto& a : ships_updates)
     {
         state->planets[a.planet_id]->colony->ship_building_queue.clear();
@@ -423,8 +432,35 @@ void uot_net_client::parseWatchedSectorUpdate(
                 enemy_fleet->movement_vec = fu.predicted_position - fu.position;
             }
             state->enemies_fleet_in_current_sector = enemies_fleet_in_current_sector;
-
             updateAnimations(state, u.fleets_in_fight);
+        }
+
+        for (const auto& nb : u.new_bases)
+        {
+            auto& obj = state->objects.at(nb.object_id);
+            if (!obj->base)
+                obj->base = std::make_shared<SpaceBase>(nb.base_id, obj, state->player);
+            if (nb.owner == player_id)
+            {
+                obj->base->owner = state->player;
+                state->player->owned_space_bases.insert({nb.base_id, obj->base});
+            }
+            else
+                obj->base->owner = state->all_players.at(nb.owner);
+        }
+        for (const auto& nc : u.new_colonies)
+        {
+            auto& planet = state->planets.at(nc.object_id);
+            if (!planet->colony)
+                planet->colony = std::make_shared<Colony>(nc.colony_id, planet);
+            planet->colony->population = nc.population;
+            if (nc.owner == player_id)
+            {
+                planet->colony->owner = state->player;
+                state->player->owned_colonies.insert({nc.colony_id, planet->colony});
+            }
+            else
+                planet->colony->owner = state->all_players.at(nc.owner);
         }
     }
 }
@@ -558,16 +594,37 @@ void uot_net_client::parseJumpedFleets(std::shared_ptr<game_state>& state,
     }
 }
 
-void uot_net_client::parseLostObjects(std::shared_ptr<game_state>& state, const std::vector<unsigned int>& lost)
+void uot_net_client::parseLostObjects(std::shared_ptr<game_state>& state, const std::vector<unsigned int>& lost_objects)
 {
-    // TODO: These are ids of sector_object? Comments say about colony id...
+    for (const auto& lost : lost_objects)
+    {
+        auto p = state->planets.find(lost);
+        if (p != state->planets.end())
+        {
+            const unsigned int colony_id = p->second->colony->id;
+            state->player->owned_colonies.erase(colony_id);
+            continue;
+        }
+        auto q = state->objects.find(lost);
+        if (q != state->objects.end())
+        {
+            const unsigned int base_id = q->second->base->id;
+            state->player->owned_space_bases.erase(base_id);
+        }
+    }
 }
 
 void uot_net_client::parseInvadedColonies(std::shared_ptr<game_state>& state,
                                           const std::vector<messageTypes::MsgColony>& invaded)
 {
-    // TODO: This is just update of soldier count? If so why that big message, simple struct {id, soldiers_number}
-    // should be sufficient
+    for (const auto& c : invaded)
+    {
+        auto& colony = state->planets.at(c.planet_id)->colony;
+        colony->buildings = c.buildings;
+        colony->population = c.population;
+        colony->owner = state->player;
+        colony->soldiers = 0.0f;
+    }
 }
 
 void uot_net_client::updateAnimations(std::shared_ptr<game_state>& state,

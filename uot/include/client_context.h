@@ -33,6 +33,8 @@ struct client_context
     std::shared_ptr<SDL_Window> w;
     std::shared_ptr<game_gui> gui;
 
+    unsigned int player_id;
+
     client_context(const std::shared_ptr<game_resources> gr, const std::shared_ptr<game_state> gs,
                    std::shared_ptr<msg_queue> mq)
         : gr(gr), gs(gs), mq(mq){};

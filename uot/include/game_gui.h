@@ -62,6 +62,8 @@ struct game_gui
 
     unsigned int player_id_cache = 0;
 
+    unsigned int current_design_id = 0;
+
     game_gui() {}
 
     int get_next_button_id() { return user_button_id++; }

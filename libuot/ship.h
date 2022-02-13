@@ -53,6 +53,9 @@ const std::map<ShipHull::Type, ShipHull> ShipHulls{
 
 };
 
+const std::map<ShipHull::Type, std::string> hull_type_to_design_name = {
+    {ShipHull::SmallShipHull, "Small"}, {ShipHull::MediumShipHull, "Medium"}, {ShipHull::GrandShipHull, "Grand"}};
+
 struct ShipDesign
 {
     unsigned int id;
