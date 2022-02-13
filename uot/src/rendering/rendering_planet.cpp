@@ -188,6 +188,7 @@ void rendering::render_planet_view::init(client_context& context)
                                    // dodać sprawdzanie czy zasoby pozwalają na
                                    // dodanie tego budynku
                                    _queue.push_back(t);
+
                                    queue->elems.push_back(
                                        Buildings.at(t).name + " " +
                                        std::to_string(static_cast<int>(Buildings.at(t).worker_weeks_cost)));
@@ -466,7 +467,7 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         else
         {
             // handle list element clicks
-            build->handle_timed_click(context, x, y);
+            built->handle_timed_click(context, x, y);
         }
     }
 
@@ -485,7 +486,7 @@ void rendering::render_planet_view::_mouse_handler(client_context& context, Uint
         else
         {
             // handle list element clicks
-            build->handle_timed_click(context, x, y);
+            queue->handle_timed_click(context, x, y);
         }
     }
 
