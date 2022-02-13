@@ -297,8 +297,12 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
                 if (current_object.has_value() && current_object.value()->position == sec_obj->position &&
                     dynamic_cast<Planet*>(current_object.value().get()))
                 {
-                    context.view = down(context);
-                    current_object.reset();
+                    auto p = dynamic_cast<Planet*>(current_object.value().get());
+                    if (p->colony && p->colony->owner->id == context.player_id)
+                    {
+                        context.view = down(context);
+                        current_object.reset();
+                    }
                 }
                 current_object = sec_obj;
                 return;

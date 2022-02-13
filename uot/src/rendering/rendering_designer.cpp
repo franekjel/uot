@@ -496,29 +496,29 @@ void render_designer_view::init(client_context& context)
                        {size_settings::planet_build_area::width / 2 - 180, 360, 360, 50}},
         300, 50, 50, 10);
 
-    create_design_button = std::make_unique<generic_button>(generic_button{
-        [&](client_context& context)
-        {
-            if (cur_design.has_value())
-            {
-                static unsigned int id{0u};
-                std::cout << "click" << std::endl;
-                auto s = std::make_shared<ShipDesign>(id++, "New Design" + std::to_string(id), cur_design->hull_type,
-                                                      std::move(cur_design->sides), std::move(cur_design->inside));
-
-                cur_design.reset();
-                auto mq = context.getActionQueue().value;
-                mq->build_design(s, false);
-                _chosen.clear();
-                modules_chosen->elems.clear();
-                hull->selected_elem.reset();
-                current_costs.clear();
-                current_upkeep.clear();
-                current_worker_weeks = 0u;
-            }
-        },
-        "CREATE",
-        {size_settings::designer_info_area::width / 2 - 150, 700, 300, 50}});
+    create_design_button = std::make_unique<generic_button>(
+        generic_button{[&](client_context& context)
+                       {
+                           if (cur_design.has_value())
+                           {
+                               unsigned int& id = context.gui->current_design_id;
+                               auto s = std::make_shared<ShipDesign>(
+                                   id, hull_type_to_design_name.at(cur_design->hull_type) + std::to_string(id),
+                                   cur_design->hull_type, std::move(cur_design->sides), std::move(cur_design->inside));
+                               id++;
+                               cur_design.reset();
+                               auto mq = context.getActionQueue().value;
+                               mq->build_design(s, false);
+                               _chosen.clear();
+                               modules_chosen->elems.clear();
+                               hull->selected_elem.reset();
+                               current_costs.clear();
+                               current_upkeep.clear();
+                               current_worker_weeks = 0u;
+                           }
+                       },
+                       "CREATE",
+                       {size_settings::designer_info_area::width / 2 - 150, 700, 300, 50}});
 }
 
 inline void render_designer_view::refresh_lists(client_context& context)

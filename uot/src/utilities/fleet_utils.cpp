@@ -65,7 +65,10 @@ bool fleet_can_build(client_context& context)
     for (auto& o : s->objects)
     {
         InhabitableObject* p = dynamic_cast<InhabitableObject*>(o.second.get());
-        if (p == nullptr || p->resource_deposit.empty() || p->base != nullptr)
+        if (p == nullptr || p->resource_deposit.empty())
+            continue;
+
+        if (p->base != nullptr && p->base->owner->id == context.player_id)
             continue;
 
         if ((p->position - f->position).squaredLength() > Fleet::kNearValue)
