@@ -198,12 +198,12 @@ void PlayersList::CountWeeklyNumbers()
                     player->owned_space_bases[base->id] = base;
                     player->known_galaxy->sectors[bb_object->sector_id]->IncrementWatcher(base->owner->id);
 
+                    auto& sector = player->known_galaxy->sectors[fleet->base_building_object->sector_id];
+                    sector->new_bases.push_back({base->id, bb_object->id, player->id});
+
                     fleet->building_progress = 0.0f;
                     fleet->full_building_progress = 0.0f;
                     fleet->base_building_object = nullptr;
-
-                    auto& sector = player->known_galaxy->sectors[fleet->base_building_object->sector_id];
-                    sector->new_bases.push_back({base->id, bb_object->id, player->id});
                 }
             }
             else if (fleet->current_action == Fleet::Action::Colonize)
@@ -219,12 +219,13 @@ void PlayersList::CountWeeklyNumbers()
                     player->known_galaxy->sectors[fleet->colony_building_object->sector_id]->IncrementWatcher(
                         fleet->colony_building_object->colony->owner->id);
                     fleet->current_action = Fleet::Action::None;
-                    fleet->building_progress = 0.0f;
-                    fleet->full_building_progress = 0.0f;
-                    fleet->colony_building_object = nullptr;
 
                     auto& sector = player->known_galaxy->sectors[fleet->base_building_object->sector_id];
                     sector->new_colonies.push_back({colony->id, cb_object->id, player->id, colony->population});
+
+                    fleet->building_progress = 0.0f;
+                    fleet->full_building_progress = 0.0f;
+                    fleet->colony_building_object = nullptr;
                 }
             }
         }
