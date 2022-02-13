@@ -412,4 +412,5 @@ const std::set<Building::BuildingType> UnlimitedBuildings = {Building::BuildingT
                                                              Building::BuildingType::DarkMatterPowerPlants,
                                                              Building::BuildingType::SmallOrbitalShipyard,
                                                              Building::BuildingType::MediumOrbitalShipyard,
+                                                             Building::BuildingType::Soldier,
                                                              Building::BuildingType::GrandOrbitalShipyard};
