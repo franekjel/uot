@@ -140,8 +140,10 @@ void rendering::render_planet_view::init(client_context& context)
         auto available_buildings = pl->colony->GetAvailableBuildings();
         for (const auto& [b, count] : available_buildings)
         {
-            v_build.push_back(Buildings.at(b).name);
-            _build.push_back(b);
+            if(count > 0) {
+                v_build.push_back(Buildings.at(b).name);
+                _build.push_back(b);
+            }
         }
 
         for (const auto& b : pl->colony->buildings)
@@ -301,8 +303,10 @@ inline void rendering::render_planet_view::refresh_lists(client_context& context
     auto available_buildings = pl->colony->GetAvailableBuildings();
     for (const auto& [b, count] : available_buildings)
     {
-        build->elems.push_back(Buildings.at(b).name);
-        _build.push_back(b);
+        if(count > 0) {
+            build->elems.push_back(Buildings.at(b).name);
+            _build.push_back(b);
+        }
     }
 
     for (const auto& b : pl->colony->buildings)
