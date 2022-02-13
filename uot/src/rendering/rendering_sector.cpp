@@ -144,11 +144,14 @@ void rendering::render_selected_object_info(const client_context& context)
         {
             if (f.second < 0)
                 continue;
-            info << PlanetaryFeaturesTypes.find(f.first)->second.name + ", ";
+            info << PlanetaryFeaturesTypes.find(f.first)->second.name << " (" << f.second << "), ";
         }
     }
     else if (io)
     {
+        const auto& type_info = InhToNameDesc.find(io->object_type)->second;
+        info << "Type: " << type_info.first << "\n";
+        info << type_info.second << "\n";
         info << "Base: ";
         if (io->base)
         {
@@ -170,7 +173,10 @@ void rendering::render_selected_object_info(const client_context& context)
     }
     else if (st)
     {
+        const auto& type_info = StarToNameDesc.find(st->star_type)->second;
         info << "The center of this sector\n";
+        info << "Type: " << type_info.first << "\n";
+        info << type_info.second << "\n";
     }
 
     sdl_utilities::render_text(r.get(), gr->secondary_font, info.str(), size_settings::context_area::width / 2,
