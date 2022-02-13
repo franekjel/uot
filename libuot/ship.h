@@ -69,6 +69,11 @@ struct ShipDesign
                const std::map<ModuleType, int>& sides, const std::map<ModuleType, int>& inside);
 };
 
+bool IsShipDesignCorrect(const unsigned int id, const std::string& name, const ShipHull::Type hull_type,
+                         const std::map<ModuleType, int>& sides, const std::map<ModuleType, int>& inside);
+bool IsShipDesignPossible(const unsigned int id, const std::string& name, const ShipHull::Type hull_type,
+                          const std::map<ModuleType, int>& sides, const std::map<ModuleType, int>& inside);
+
 struct Ship
 {
     unsigned int id;
