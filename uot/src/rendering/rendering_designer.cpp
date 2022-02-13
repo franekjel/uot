@@ -63,13 +63,16 @@ void render_designer_view::_mouse_handler(client_context& context, Uint32 event_
 std::string rendering::render_designer_view::get_design_cost()
 {
     std::string cost{"Current costs: \n"};
-    bool h = hull->selected_elem.has_value();
-    for (auto& [r, c] : current_costs)
+    bool _h = hull->selected_elem.has_value();
+    std::map<Resource, float> disp_c = current_costs;
+
+    if(_h) {
+        auto& h = ShipHulls.at(_hull[hull->selected_elem.value()]);
+        disp_c += h.cost;
+    }
+    for (auto& [r, c] : disp_c)
     {
-        const auto val = (h && ShipHulls.at(_hull[hull->selected_elem.value()]).cost.count(r) > 0)
-                             ? c + ShipHulls.at(_hull[hull->selected_elem.value()]).cost.at(r)
-                             : c;
-        cost += std::string(resourceNames[static_cast<int>(r)]) + ": " + std::to_string(static_cast<int>(val)) + "\n";
+        cost += std::string(resourceNames[static_cast<int>(r)]) + ": " + std::to_string(static_cast<int>(c)) + "\n";
     }
 
     return cost + "\n";
@@ -78,7 +81,19 @@ std::string rendering::render_designer_view::get_design_cost()
 std::string rendering::render_designer_view::get_design_upkeep()
 {
     std::string upkeep{"Current upkeep: \n"};
-    for (auto& [r, c] : current_upkeep)
+
+    std::map<Resource, float> disp_upk;
+
+    if (hull->selected_elem.has_value()) {
+        auto& h = ShipHulls.at(_hull[hull->selected_elem.value()]);
+        disp_upk += h.additional_upkeep;
+        disp_upk += ShipDesign::percentage_cost_upkeep * h.cost;
+    }
+
+    disp_upk += current_upkeep;
+
+
+    for (auto& [r, c] : disp_upk)
     {
         upkeep += std::string(resourceNames[static_cast<int>(r)]) + ": " + std::to_string(static_cast<int>(c)) + "\n";
     }
@@ -224,21 +239,14 @@ void render_designer_view::init(client_context& context)
                        {
                            if (modules_available->selected_elem.has_value())
                            {
-                               auto v = modules_available->selected_elem.value();
+                               const auto v = modules_available->selected_elem.value();
+                               const auto& m = Modules.at(_available[v]);
                                _chosen.push_back(_available[v]);
                                modules_chosen->elems.push_back(modules_available->elems[v]);
 
-                               for (auto& [r, c] : Modules.at(_available[v]).cost)
-                               {
-                                   current_costs[r] += c;
-                               }
-
-                               for (auto& [r, c] : Modules.at(_available[v]).cost)
-                               {
-                                   current_upkeep[r] += c;
-                               }
-
-                               current_worker_weeks += Modules.at(_available[v]).worker_weeks_cost_per_size;
+                               current_costs += m.cost;
+                               current_upkeep += m.additional_upkeep;
+                               current_worker_weeks += m.worker_weeks_cost_per_size * m.size;
                            }
                        },
                        "ADD",
@@ -252,18 +260,19 @@ void render_designer_view::init(client_context& context)
                            auto gs = context.getGameState();
                            if (modules_chosen->selected_elem.has_value())
                            {
-                               auto v = modules_chosen->selected_elem.value();
-                               for (auto& [r, c] : Modules.at(_chosen[v]).cost)
-                               {
+                               const auto v = modules_chosen->selected_elem.value();
+                               const auto& m = Modules.at(_chosen[v]);
+
+                               for(const auto& [r, c] : m.cost) {
                                    current_costs[r] -= c;
                                }
 
-                               for (auto& [r, c] : Modules.at(_chosen[v]).cost)
-                               {
+                               for(const auto& [r, c] : m.additional_upkeep) {
                                    current_upkeep[r] -= c;
                                }
 
-                               current_worker_weeks -= Modules.at(_chosen[v]).worker_weeks_cost_per_size;
+                               current_worker_weeks -= m.worker_weeks_cost_per_size * m.size;
+
                                modules_chosen->elems.erase(modules_chosen->elems.cbegin() + v,
                                                            modules_chosen->elems.cbegin() + v + 1);
                                _chosen.erase(_chosen.cbegin() + v, _chosen.cbegin() + v + 1);
