@@ -88,9 +88,10 @@ bool PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy>
                        {{ModuleType::SmallReactor, 1}}));
     new_player->ship_designs[2] = std::shared_ptr<ShipDesign>(new ShipDesign(
         2, "Small colonizer", ShipHull::SmallShipHull, {}, {{ModuleType::SmallReactor, 1}, {ModuleType::Quarters, 1}}));
-    new_player->ship_designs[3] = std::shared_ptr<ShipDesign>(
-        new ShipDesign(3, "Supership", ShipHull::SmallShipHull, {{ModuleType::AdvancedContructionModule, 4}},
-                       {{ModuleType::AdvancedBigReactor, 2}, {ModuleType::Quarters, 4}}));
+    new_player->ship_designs[3] = std::shared_ptr<ShipDesign>(new ShipDesign(
+        3, "Supership", ShipHull::SmallShipHull,
+        {{ModuleType::AdvancedContructionModule, 4}, {ModuleType::AdvancedArmorPlates, 1}, {ModuleType::SmallLaser, 1}},
+        {{ModuleType::AdvancedBigReactor, 2}, {ModuleType::Quarters, 2}}));
 
     c->ship_building_queue.push_back(ShipBuildProgress(new_player->ship_designs[3], starting_sector));
     // c->ship_building_queue.push_back(ShipBuildProgress(new_player->ship_designs[1], starting_sector));

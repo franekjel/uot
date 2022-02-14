@@ -437,7 +437,7 @@ void uot_net_client::parseWatchedSectorUpdate(
                 enemy_fleet->wanted_position = fu.predicted_position;
                 enemy_fleet->movement_vec = fu.predicted_position - fu.position;
             }
-            state->enemies_fleet_in_current_sector = enemies_fleet_in_current_sector;
+            state->enemies_fleet_in_current_sector = std::move(enemies_fleet_in_current_sector);
             updateAnimations(state, u.fleets_in_fight);
             context.fleet_mutex.unlock();
         }
@@ -639,6 +639,7 @@ void uot_net_client::updateAnimations(std::shared_ptr<game_state>& state,
                                       const std::vector<messageTypes::MsgFleetParameters>& fleets_in_fight)
 {
     auto& anims = context.gui->fight_animations;
+    printf("\n\nTHERE IS %d ANIMATIONS!!!\n\n", anims.size());
     for (auto it = anims.begin(), it_next = it; it != anims.end(); it = it_next)
     {
         it_next++;
