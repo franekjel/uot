@@ -13,7 +13,6 @@
 struct ShipHull
 {
     int sides_size;
-    int back_size;
     int inside_size;
     std::map<Resource, float> cost;
     std::map<Resource, float> additional_upkeep;
@@ -53,6 +52,9 @@ const std::map<ShipHull::Type, ShipHull> ShipHulls{
 
 };
 
+const std::map<ShipHull::Type, std::string> hull_type_to_design_name = {
+    {ShipHull::SmallShipHull, "Small"}, {ShipHull::MediumShipHull, "Medium"}, {ShipHull::GrandShipHull, "Grand"}};
+
 struct ShipDesign
 {
     unsigned int id;
@@ -68,6 +70,11 @@ struct ShipDesign
     ShipDesign(const unsigned int id, const std::string& name, const ShipHull::Type hull_type,
                const std::map<ModuleType, int>& sides, const std::map<ModuleType, int>& inside);
 };
+
+bool IsShipDesignCorrect(const ShipHull::Type hull_type, const std::map<ModuleType, int>& sides,
+                         const std::map<ModuleType, int>& inside);
+bool IsShipDesignPossible(const ShipHull::Type hull_type, const unsigned int sides_size,
+                          const unsigned int inside_size);
 
 struct Ship
 {
@@ -97,6 +104,8 @@ struct Ship
     std::shared_ptr<Fleet> fleet;
 
     std::map<ModuleType, int> ship_weapons;
+    std::map<ModuleType, float> ship_weapons_current_state;
+    float reload_modifier = -1.0f;
 
     static std::shared_ptr<Ship> ShipFromDesign(const int id, const std::shared_ptr<ShipDesign> design);
 
@@ -112,7 +121,7 @@ struct Ship
 struct Fleet
 {
     unsigned int id;
-    std::vector<std::shared_ptr<Ship>> ships;
+    std::map<unsigned int, std::shared_ptr<Ship>> ships;
     float soldiers;
     float civilians;
     float human_capacity;

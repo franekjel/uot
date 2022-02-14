@@ -22,7 +22,8 @@ void render_list(client_context& context, std::shared_ptr<ui_list_state> l_st, c
     SDL_RenderGetViewport(r.get(), &curr_view);
     auto old_view{curr_view};
     curr_view.y += l_st->action_button.pos.h / 2;
-    curr_view.h = l_st->action_button.pos.y - l_st->action_button.pos.h / 2 - 15;
+    curr_view.h = use_button ? l_st->action_button.pos.y - l_st->action_button.pos.h / 2 - 15
+                             : curr_view.h - l_st->action_button.pos.h;
 
     SDL_RenderSetViewport(r.get(), &curr_view);
 
@@ -39,8 +40,8 @@ void render_list(client_context& context, std::shared_ptr<ui_list_state> l_st, c
         SDL_Rect dest{l_st->w_off, l_st->h_off + (l_st->h + l_st->h_off) * curr - l_st->offset, l_st->w, l_st->h};
         SDL_RenderFillRect(r.get(), &dest);
         // render text
-        sdl_utilities::render_text(r.get(), gr->action_button_font, e, dest.x + dest.w / 2, dest.y + dest.h / 2,
-                                   dest.w * 0.7, t);
+        sdl_utilities::render_text_center(r.get(), gr->action_button_font, e, dest.x + dest.w / 2, dest.y + dest.h / 2,
+                                          dest.w * 0.7, t);
         // inc position
         ++curr;
     }
@@ -73,13 +74,12 @@ void ui_list_state::handle_timed_click(client_context& context, const int x, con
         {
             if (selected_elem.has_value() && selected_elem.value() == curr)
             {
-                auto curr_time = std::chrono::duration_cast<std::chrono::duration<double>>(
-                    last_click - std::chrono::high_resolution_clock::now());
-                if (curr_time.count() < 0.5)
+                auto curr_time = SDL_GetTicks() - last_click;
+                if (curr_time < 500)
                 {
                     action_button.clicked(context);
                 }
-                last_click = std::chrono::high_resolution_clock::now();
+                last_click = SDL_GetTicks();
                 return;
             }
             // implicit else

@@ -6,7 +6,7 @@ float Colony::population_building_modificator = 1.0f;
 
 std::map<Resource, float> Colony::GetColonyGains()
 {
-    std::map<Resource, float> colony_gains = {};
+    std::map<Resource, float> colony_gains = {{Resource::Food, 1.0f}};
     float neccessary_workers = 0;
 
     for (auto& buildingType : buildings)
@@ -78,7 +78,7 @@ void Colony::UpdateBuildingQueue()
     if (building_queue.size() == 0)
         return;
 
-    float people_weeks_to_distribute = unemployed_population * population_building_modificator;
+    float people_weeks_to_distribute = unemployed_population * population_building_modificator + 0.5f;
     auto itr = building_queue.begin();
     while (people_weeks_to_distribute > 0.0f && itr != building_queue.end())
     {

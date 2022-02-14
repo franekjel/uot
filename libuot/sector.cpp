@@ -75,8 +75,8 @@ Sector::FleetParameters::FleetParameters(std::shared_ptr<Fleet> fleet)
     }
     else
     {
-        base_fleet_speed = fleet->ships[0]->speed;
-        for (const auto& ship : fleet->ships)
+        base_fleet_speed = fleet->ships.begin()->second->speed;
+        for (const auto& [id, ship] : fleet->ships)
         {
             if (ship->speed < base_fleet_speed)
             {

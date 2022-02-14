@@ -86,6 +86,10 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
                                        std::shared_ptr<messageTypes::ActionsPayload> payload)
 {
     auto player = players[players_net_names_rev[player_net_name]];
+
+    if (player->is_loser)
+        return false;
+
     for (const auto& build : payload->buildRequests)
     {
         player->HandleBuildRequest(build.building_type, build.upgrade_from, build.colony_id);
@@ -169,13 +173,14 @@ void PlayersList::CountWeeklyNumbers()
     //    thread.join();
 
     // Let it be synchornic for now - can be done async but too much work for now
-
     for (auto& player : players)
         CountWeeklyNumbersPlayer(player.second);
 
     // here are weekly actions performed that could not have been done multithreadedly
     for (auto& [player_id, player] : players)
     {
+        if (player->is_loser)
+            continue;
         auto& player_fleets = player->owned_fleets;
         for (const auto& [fleet_id, fleet] : player_fleets)
         {
@@ -185,6 +190,8 @@ void PlayersList::CountWeeklyNumbers()
                 {
                     if (fleet->base_building_object->base)
                     {
+                        fleet->base_building_object->base->owner->lost_objects.push_back(
+                            fleet->base_building_object->id);
                         fleet->base_building_object->base->owner->owned_space_bases.erase(
                             fleet->base_building_object->base->owner->owned_space_bases.find(
                                 fleet->base_building_object->base->id));
@@ -198,12 +205,12 @@ void PlayersList::CountWeeklyNumbers()
                     player->owned_space_bases[base->id] = base;
                     player->known_galaxy->sectors[bb_object->sector_id]->IncrementWatcher(base->owner->id);
 
+                    auto& sector = player->known_galaxy->sectors[fleet->base_building_object->sector_id];
+                    sector->new_bases.push_back({base->id, bb_object->id, player->id});
+
                     fleet->building_progress = 0.0f;
                     fleet->full_building_progress = 0.0f;
                     fleet->base_building_object = nullptr;
-
-                    auto& sector = player->known_galaxy->sectors[fleet->base_building_object->sector_id];
-                    sector->new_bases.push_back({base->id, bb_object->id, player->id});
                 }
             }
             else if (fleet->current_action == Fleet::Action::Colonize)
@@ -212,22 +219,46 @@ void PlayersList::CountWeeklyNumbers()
                 {
                     auto& cb_object = fleet->colony_building_object;
                     cb_object->colony = std::make_shared<Colony>(id_source++, cb_object);
+                    cb_object->is_being_colonized = false;
                     auto& colony = cb_object->colony;
                     player->owned_colonies[fleet->colony_building_object->colony->id] =
                         fleet->colony_building_object->colony;
                     fleet->colony_building_object->colony->population = Fleet::kColonizationCost;
+                    fleet->colony_building_object->colony->owner = player;
                     player->known_galaxy->sectors[fleet->colony_building_object->sector_id]->IncrementWatcher(
                         fleet->colony_building_object->colony->owner->id);
                     fleet->current_action = Fleet::Action::None;
+
+                    auto& sector = player->known_galaxy->sectors[fleet->colony_building_object->sector_id];
+                    sector->new_colonies.push_back({colony->id, cb_object->id, player->id, colony->population});
+
                     fleet->building_progress = 0.0f;
                     fleet->full_building_progress = 0.0f;
                     fleet->colony_building_object = nullptr;
-
-                    auto& sector = player->known_galaxy->sectors[fleet->base_building_object->sector_id];
-                    sector->new_colonies.push_back({colony->id, cb_object->id, player->id, colony->population});
                 }
             }
         }
+
+        if (player->owned_colonies.empty())
+        {
+            player->is_loser = true;
+            number_of_loosers++;
+        }
+    }
+
+    int number_of_not_loosers = PlayersCount() - number_of_loosers;
+    if (number_of_not_loosers == 1)
+    {
+        unsigned int potential_winner;
+        for (const auto& [player_id, player] : players)
+        {
+            if (!(player->is_loser))
+            {
+                potential_winner = player_id;
+            }
+        }
+        auto& winner = players[potential_winner];
+        winner->is_winner = true;
     }
 }
 
@@ -236,7 +267,9 @@ void PlayersList::SendNewTurnMessage(int turn_number, net_server_uot& messaging_
 {
     for (auto& player : players)
     {
-        messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first], galaxy);
+        if (!player.second->stop_sending)
+            messaging_service.send_new_turn_message(turn_number, player.second, players_net_names[player.first],
+                                                    galaxy);
     }
 
     // cleanup
@@ -264,6 +297,8 @@ void PlayersList::SendStartGameMessage(net_server_uot& messaging_service, std::s
 
 void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
 {
+    if (player->is_loser)
+        return;
     auto& player_resources = player->owned_resources;
     auto& player_resources_change = player->resources_changed;
     auto& player_colonies = player->owned_colonies;
@@ -316,6 +351,7 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
         }
 
         float food_bilans = colony_gains[Resource::Food] - colony.second->population * population_food_usage;
+        player_resources[Resource::Food] += food_bilans;
 
         if (food_bilans >= 0)
         {
@@ -398,7 +434,7 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
             for (const auto& [other_fleet_id, other_fleet] : fleet->location_sector->present_fleets)
             {
                 if (other_fleet_id != fleet_id && other_fleet->owner_id != fleet->owner_id &&
-                    (other_fleet->position - fleet_position).squaredLength() <= weapon.range)
+                    (other_fleet->position - fleet_position).squaredLength() <= weapon.range * weapon.range)
                 {
                     in_distance.push_back(other_fleet);
                     fleet_values_sum += other_fleet->fleet_aggro;
@@ -464,7 +500,6 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
                 fleet->location_sector->IncrementWatcher(player->id);
                 player->owned_colonies[invaded_colony->id] = invaded_colony;
 
-                fleet->invaded_colony = nullptr;
                 fleet->current_action = Fleet::Action::None;
                 invaded_colony->building_queue.clear();
                 invaded_colony->ship_building_queue.clear();
@@ -475,6 +510,7 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
                 player->new_colonies.push_back(invaded_colony);
                 fleet->location_sector->new_colonies.push_back({invaded_colony->id, invaded_colony->planet->id,
                                                                 invaded_colony->owner->id, invaded_colony->population});
+                fleet->invaded_colony.reset();
             }
             else if (fleet->soldiers <= Fleet::kEpsSoldiers)
             {
@@ -512,6 +548,9 @@ void PlayersList::CountEveryTurnNumbers()
 
         for (const auto& id : fleets_to_remove)
         {
+            if (player->owned_fleets[id]->current_action == Fleet::Action::Colonize &&
+                player->owned_fleets[id]->colony_building_object)
+                player->owned_fleets[id]->colony_building_object->is_being_colonized = false;
             player->owned_fleets[id]->location_sector->present_fleets.erase(id);
             player->owned_fleets[id]->location_sector->DecrementWatcher(player_id);
             player->owned_fleets.erase(id);

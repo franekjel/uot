@@ -300,22 +300,22 @@ messageTypes::MsgChangedFleetPopulation::MsgChangedFleetPopulation(const Sector:
 
 messageTypes::MsgDetailedShipInfo::MsgDetailedShipInfo() {}
 
-messageTypes::MsgDetailedShipInfo::MsgDetailedShipInfo(std::shared_ptr<Ship> ship)
-    : id(id),
-      hp(hp),
-      max_hp(max_hp),
-      hp_regen(hp_regen),
-      shield(shield),
-      max_shield(max_shield),
-      energy(energy),
-      energy_regen(energy_regen),
-      max_energy(max_energy),
-      soldiers(soldiers),
-      civilians(civilians),
-      human_capacity(human_capacity),
-      speed(speed),
-      design_id(ship->design->id),
-      weapons(ship->ship_weapons)
+messageTypes::MsgDetailedShipInfo::MsgDetailedShipInfo(std::shared_ptr<Ship> s)
+    : id(s->id),
+      hp(s->hp),
+      max_hp(s->max_hp),
+      hp_regen(s->hp_regen),
+      shield(s->shield),
+      max_shield(s->max_shield),
+      energy(s->energy),
+      energy_regen(s->energy_regen),
+      max_energy(s->max_energy),
+      soldiers(s->soldiers),
+      civilians(s->civilians),
+      human_capacity(s->human_capacity),
+      speed(s->speed),
+      design_id(s->design->id),
+      weapons(s->ship_weapons)
 {
 }
 
@@ -327,10 +327,9 @@ messageTypes::MsgDetailedFleetInfo::MsgDetailedFleetInfo(std::shared_ptr<Fleet> 
       civilians(fleet->civilians),
       human_capacity(fleet->human_capacity),
       position(fleet->position),
-      wanted_position(fleet->wanted_position),
       current_action(fleet->current_action)
 {
-    for (const auto& ship : fleet->ships)
+    for (const auto& [id, ship] : fleet->ships)
     {
         ships.push_back(messageTypes::MsgDetailedShipInfo(ship));
     }

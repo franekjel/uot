@@ -15,7 +15,7 @@ struct render_sector_view : render_view<render_sector_view>
     void _wheel_handler(client_context& context, int x, int y, int xmov, int ymov);
 };
 
-void render_sector_sector_helper(const client_context& context, const std::shared_ptr<Sector>& sector);
+void render_sector_sector_helper(client_context& context, const std::shared_ptr<Sector>& sector);
 
 void render_sector_object();
 
@@ -25,11 +25,13 @@ void render_selected_object_info(const client_context& context);
 
 void render_fleet(const client_context& context, const std::shared_ptr<Fleet> f);
 
-void render_selected_fleet_info(const client_context& context);
+void render_selected_fleet_info(client_context& context);
 
 void render_selection_graphics(const client_context& context, const Point pos, const int tex_size);
 
 void render_fleet_weapon_ranges(const client_context& context, const Point pos, const std::shared_ptr<Fleet> f);
+
+void render_animations(const client_context& context);
 
 }  // namespace rendering
 #endif  // SECTOR_RENDERING_H

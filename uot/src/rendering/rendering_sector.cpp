@@ -1,6 +1,8 @@
 #define _USE_MATH_DEFINES
 #include "rendering_sector.h"
 #include <cmath>
+#include <iomanip>
+#include <sstream>
 
 #include "client_context.h"
 #include "game_gui.h"
@@ -65,6 +67,7 @@ void rendering::render_sector_view::_draw(client_context& context)
         render_sector_sector_helper(context, curr);
     }
     render_object_selection(context);
+
     // =======================================================
     // draw the right, information / GUI panel
     sdl_utilities::set_render_viewport<size_settings::context_area>(r.get());
@@ -107,30 +110,82 @@ void rendering::render_selected_object_info(const client_context& context)
     const auto& gr = context.gr;
     const auto& gui = context.gui;
 
-    sdl_utilities::render_text(r.get(), gr->main_font, "PLANET NAME", size_settings::context_area::width / 2,
-                               fonts::main_font_size / 2 + 30, size_settings::context_area::width - 50,
-                               {0xFF, 0xFF, 0xFF, 0xFF});
+    auto pl = std::dynamic_pointer_cast<Planet>(gui->current_object.value());
+    auto io = std::dynamic_pointer_cast<InhabitableObject>(gui->current_object.value());
+    auto st = std::dynamic_pointer_cast<Star>(gui->current_object.value());
+    std::string type = pl ? "PLANET " : io ? "OBJECT " : "STAR ";
+    sdl_utilities::render_text_center(r.get(), gr->main_font, type + std::to_string(gui->current_object.value()->id),
+                                      size_settings::context_area::width / 2, fonts::main_font_size / 2 + 30,
+                                      size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
     int textureIdx = gui->GetTextureIndex(gui->current_object.value());
     render_planet_helper(context, 2.0, size_settings::context_area::width / 2,
                          std::min(250, planets_meta::texture_size[textureIdx] * 2), gr->planetTextures[textureIdx]);
 
-    auto pl = std::dynamic_pointer_cast<Planet>(gui->current_object.value());
-    auto io = std::dynamic_pointer_cast<InhabitableObject>(gui->current_object.value());
-    auto st = std::dynamic_pointer_cast<Star>(gui->current_object.value());
-
-    std::string type = pl ? "Planet" : io ? "Inh Object" : "Star";
-
     // render planet info
-    sdl_utilities::render_text(r.get(), gr->secondary_font,
-                               " planet index: " + std::to_string(gui->current_object.value()->id) + "\n type " + type +
-                                   " \n planet info 2\n planet info 3",
-                               size_settings::context_area::width / 2, size_settings::context_area::height * 0.75,
-                               size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+    std::stringstream info;
+    info << std::fixed << std::setprecision(0);
+
+    if (pl)
+    {
+        if (pl->colony)
+        {
+            info << "Owner: " + std::to_string(pl->colony->owner->id);
+            info << (pl->colony->owner->id == gui->player_id_cache ? " (you)\n" : "\n");
+            info << "Population: " << roundf(pl->colony->population) << "\n";
+            info << "Soldiers: " << roundf(pl->colony->soldiers) << "\n";
+        }
+
+        info << "Features: ";
+        if (pl->planetary_features.empty())
+            info << "None";
+
+        for (auto& f : pl->planetary_features)
+        {
+            if (f.second < 0)
+                continue;
+            info << PlanetaryFeaturesTypes.find(f.first)->second.name << " (" << f.second << "), ";
+        }
+    }
+    else if (io)
+    {
+        const auto& type_info = InhToNameDesc.find(io->object_type)->second;
+        info << "Type: " << type_info.first << "\n";
+        info << type_info.second << "\n";
+        info << "Base: ";
+        if (io->base)
+        {
+            info << "owned by " + std::to_string(io->base->owner->id);
+            info << (io->base->owner->id == gui->player_id_cache ? " (you)\n" : "\n");
+        }
+        else
+            info << "none\n";
+
+        info << "Resources:";
+        if (io->resource_deposit.empty())
+            info << " none\n";
+        else
+            info << "\n";
+        for (auto& res : io->resource_deposit)
+        {
+            info << resourceNames[static_cast<int>(res.first)] << " (" << roundf(res.second) << ")\n";
+        }
+    }
+    else if (st)
+    {
+        const auto& type_info = StarToNameDesc.find(st->star_type)->second;
+        info << "The center of this sector\n";
+        info << "Type: " << type_info.first << "\n";
+        info << type_info.second << "\n";
+    }
+
+    sdl_utilities::render_text_center(r.get(), gr->secondary_font, info.str(), size_settings::context_area::width / 2,
+                                      size_settings::context_area::height * 0.75,
+                                      size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 }
 
-void rendering::render_sector_sector_helper(const client_context& context, const std::shared_ptr<Sector>& sector)
+void rendering::render_sector_sector_helper(client_context& context, const std::shared_ptr<Sector>& sector)
 {
     const auto& gr = context.gr;
     const auto& gui = context.gui;
@@ -161,9 +216,16 @@ void rendering::render_sector_sector_helper(const client_context& context, const
 
     for (auto& [id, f] : sector->present_fleets)
     {
-        f->owner_id = 1;  // TODO: REMOVE IN FINAL VERSION (for now we don't have enough info about fleets)
         render_fleet(context, f);
     }
+
+    const auto& gs = context.getGameState().value;
+    for (auto& [id, f] : gs->enemies_fleet_in_current_sector)
+    {
+        render_fleet(context, f);
+    }
+
+    render_animations(context);
 }
 
 rendering::view_t rendering::render_sector_view::_up() { return std::make_shared<render_universe_view>(); }
@@ -187,8 +249,17 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
     auto& current_sector = context.gui->current_sector;
     auto& current_object = context.gui->current_object;
     auto& current_fleet = context.gui->current_fleet;
-    x = x - AreaType::x_offset;
-    y = y - AreaType::y_offset;
+    if (et == input_utilities::uot_event_type::left_click_context ||
+        et == input_utilities::uot_event_type::motion_context)
+    {
+        x = x - size_settings::context_area::x_offset;
+        y = y - size_settings::context_area::y_offset;
+    }
+    else
+    {
+        x = x - AreaType::x_offset;
+        y = y - AreaType::y_offset;
+    }
 
     if (et == iu::uot_event_type::left_click_play)
     {
@@ -223,10 +294,15 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
 
             if (iu::check_collision(x, y, planet_x - 0.5 * tex_size, planet_y - 0.5 * tex_size, tex_size, tex_size))
             {
-                if (current_object.has_value() && current_object.value()->position == sec_obj->position)
+                if (current_object.has_value() && current_object.value()->position == sec_obj->position &&
+                    dynamic_cast<Planet*>(current_object.value().get()))
                 {
-                    context.view = down(context);
-                    current_object.reset();
+                    auto p = dynamic_cast<Planet*>(current_object.value().get());
+                    if (p->colony && p->colony->owner->id == context.player_id)
+                    {
+                        context.view = down(context);
+                        current_object.reset();
+                    }
                 }
                 current_object = sec_obj;
                 return;
@@ -246,6 +322,7 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
 
             if (iu::check_collision(x, y, _x, _y, _w, _h))
             {
+                gui->reset_selection();
                 current_sector = neighbor;
             }
         }
@@ -266,14 +343,42 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
             f->wanted_position = pos;
         }
     }
+    else if (et == iu::uot_event_type::left_click_context || et == iu::uot_event_type::motion_context)
+    {
+        bool hit = false;
+
+        for (auto& b : gui->selected_fleet_buttons)
+        {
+            std::visit(
+                [&](auto&& v)
+                {
+                    const auto& pos = v->pos;
+                    if (iu::check_collision(x, y, pos.x, pos.y, pos.w, pos.h))
+                    {
+                        if (event_type == SDL_MOUSEBUTTONDOWN && v->is_active())
+                        {
+                            v->clicked(context);
+                            return;
+                        }
+
+                        context.gui->focused_button = v->button_id;
+                        hit = true;
+                        return;
+                    }
+                },
+                b);
+        }
+
+        if (!hit)
+            context.gui->focused_button.reset();
+    }
 }
 
 void rendering::render_sector_view::key_handler(client_context& context, Uint16 k)
 {
     if (k == SDLK_ESCAPE)
     {
-        context.gui->current_object.reset();
-        context.gui->current_fleet.reset();
+        context.gui->reset_selection();
         context.view = _up();
     }
 }
@@ -327,7 +432,7 @@ void rendering::render_selection_graphics(const client_context& context, const P
                      SDL_GetTicks() / 100, NULL, SDL_FLIP_NONE);
 }
 
-void rendering::render_selected_fleet_info(const client_context& context)
+void rendering::render_selected_fleet_info(client_context& context)
 {
     const auto& r = context.r;
     const auto& gr = context.gr;
@@ -335,9 +440,9 @@ void rendering::render_selected_fleet_info(const client_context& context)
 
     const auto& f = gui->current_fleet.value();
 
-    sdl_utilities::render_text(r.get(), gr->main_font, "fleet " + std::to_string(f->id),
-                               size_settings::context_area::width / 2, fonts::main_font_size / 2 + 30,
-                               size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_center(r.get(), gr->main_font, "fleet " + std::to_string(f->id),
+                                      size_settings::context_area::width / 2, fonts::main_font_size / 2 + 30,
+                                      size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 
     std::string fleet_info = "";
 
@@ -346,15 +451,33 @@ void rendering::render_selected_fleet_info(const client_context& context)
         "shields: " + std::to_string(int(f->current_shields)) + "/" + std::to_string(int(f->max_shields)) + "\n";
     fleet_info += "avg energy: " + std::to_string(int(f->average_energy * 100.0f)) + "%\n";
     fleet_info += "ships:\n";
-    for (const auto& s : f->ships)
+    for (const auto& [id, s] : f->ships)
     {
-        fleet_info += " id" + std::to_string(s->id) + ": " + s->design->name + "\n";
+        fleet_info += " id" + std::to_string(id) + ": " + s->design->name + "\n";
     }
 
+    std::stringstream ss;
+    ss << "civilians: " << std::fixed << std::setprecision(0) << f->civilians << "\n";
+    ss << "soldiers: " << std::fixed << std::setprecision(0) << f->soldiers << "\n";
+    ss << "places left: " << std::fixed << std::setprecision(0) << (f->human_capacity - (f->civilians + f->soldiers))
+       << "\n";
+
+    fleet_info += ss.str();
+
     sdl_utilities::set_render_viewport<size_settings::fleet_info_area>(r.get());
-    sdl_utilities::render_text(r.get(), gr->secondary_font, fleet_info, size_settings::context_area::width / 2,
-                               fonts::main_font_size / 2 + 30 + gui->current_fleet_info_offset,
-                               size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_top_center(r.get(), gr->secondary_font, fleet_info,
+                                          size_settings::context_area::width / 2,
+                                          fonts::main_font_size / 2 + 30 + gui->current_fleet_info_offset,
+                                          size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+
+    sdl_utilities::set_render_viewport<size_settings::context_area>(r.get());
+    gui->set_button_font(gr->action_button_font);
+    for (auto& b : gui->selected_fleet_buttons)
+    {
+        set_fleet_button_color(b, context);
+        std::visit([&](auto&& v) { v->draw(context, v->button_id == gui->focused_button); }, b);
+    }
+    gui->reset_button_font();
 }
 
 void rendering::render_fleet_weapon_ranges(const client_context& context, const Point pos,
@@ -371,5 +494,13 @@ void rendering::render_fleet_weapon_ranges(const client_context& context, const 
         const SDL_Rect s{0, 0, tex.w, tex.h};
         const SDL_Rect d{static_cast<int>(x - 0.5 * tex.w), static_cast<int>(y - 0.5 * tex.h), tex.w, tex.h};
         SDL_RenderCopyEx(r.get(), tex.t.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
+    }
+}
+
+void rendering::render_animations(const client_context& context)
+{
+    for (const auto& [id, a] : context.gui->fight_animations)
+    {
+        a->Render(context.r);
     }
 }
