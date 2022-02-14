@@ -224,11 +224,12 @@ void PlayersList::CountWeeklyNumbers()
                     player->owned_colonies[fleet->colony_building_object->colony->id] =
                         fleet->colony_building_object->colony;
                     fleet->colony_building_object->colony->population = Fleet::kColonizationCost;
+                    fleet->colony_building_object->colony->owner = player;
                     player->known_galaxy->sectors[fleet->colony_building_object->sector_id]->IncrementWatcher(
                         fleet->colony_building_object->colony->owner->id);
                     fleet->current_action = Fleet::Action::None;
 
-                    auto& sector = player->known_galaxy->sectors[fleet->base_building_object->sector_id];
+                    auto& sector = player->known_galaxy->sectors[fleet->colony_building_object->sector_id];
                     sector->new_colonies.push_back({colony->id, cb_object->id, player->id, colony->population});
 
                     fleet->building_progress = 0.0f;
