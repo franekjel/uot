@@ -169,8 +169,8 @@ void Player::HandleBuildRequest(Building::BuildingType type, Building::BuildingT
     auto av_buildings = colony->second->GetAvailableBuildings();
     if (av_buildings.count(type) == 0 || av_buildings[type] <= 0)
         return;
-    if (upgrade_from != Building::BuildingType::None && colony->second->buildings.count(upgrade_from) <= 0 &&
-        colony->second->buildings[upgrade_from] <= 0)
+    if (upgrade_from != Building::BuildingType::None &&
+        (colony->second->buildings.count(upgrade_from) <= 0 || colony->second->buildings[upgrade_from] <= 0))
         return;
 
     for (const auto &res : building.cost)
