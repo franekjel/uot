@@ -4,7 +4,7 @@
 
 #include "common.h"
 
-static constexpr float habitable_planet_base_chance = 0.01f;
+static constexpr float habitable_planet_base_chance = 0.5f;
 
 static std::normal_distribution<> size_distribution{1.0, 0.15};
 
@@ -143,14 +143,14 @@ std::map<unsigned int, std::shared_ptr<SectorObject>> GalaxyGenerator::GenerateS
         return sector_objects;
     }
 
-    const int num_objects = std::discrete_distribution<>({1, 2, 5, 10, 5, 3, 1})(gen);
-    const float habitable_chance = habitable_planet_base_chance * habitable_planet_chance_multipler;
+    const int num_objects = std::discrete_distribution<>({0, 2, 5, 10, 5, 3, 1000})(gen);
+    const float habitable_chance = habitable_planet_base_chance;
 
     std::vector<Point> objects_positions = GeneratePositionsInSector({Point(0.0f, 0.0f)}, num_objects);
 
     for (const auto &pos : objects_positions)
     {
-        switch (std::discrete_distribution<>({1, 3, 3})(gen))
+        switch (std::discrete_distribution<>({1, 300, 3})(gen))
         {
             case 0:
             {
@@ -169,7 +169,7 @@ std::map<unsigned int, std::shared_ptr<SectorObject>> GalaxyGenerator::GenerateS
                 else
                 {
                     std::shared_ptr<SectorObject> o = GenerateInhabitable(
-                        pos, InhabitableObject::ObjectType::InhabitablePlanet, {40, 20, 8, 1, 1, 1}, sector_id);
+                        pos, InhabitableObject::ObjectType::InhabitablePlanet, {0, 20, 8, 1, 1, 1}, sector_id);
                     sector_objects.insert({o->id, o});
                 }
 
@@ -191,6 +191,8 @@ GalaxyGenerator::GalaxyGenerator(int size, float habitable_planet_chance_multipl
     : size(size), habitable_planet_chance_multipler(habitable_planet_chance_multipler)
 {
     gen = std::mt19937(dev());
+    std::seed_seq seed{23, 423, 543};
+    gen.seed(seed);
 }
 
 Galaxy GalaxyGenerator::Generate()

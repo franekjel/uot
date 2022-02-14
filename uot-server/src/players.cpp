@@ -13,11 +13,9 @@ unsigned int PlayersList::GetStartingSectorId(std::shared_ptr<Galaxy> wholeGalax
             std::shared_ptr<Planet> is_planet = std::dynamic_pointer_cast<Planet>(sector_object);
             if (!!is_planet)
             {
-                num_of_planets++;
-                if (!!(is_planet->colony))
+                if (!(is_planet->colony))
                 {
-                    num_of_planets = -1;
-                    break;
+                    num_of_planets++;
                 }
             }
         }
@@ -78,6 +76,25 @@ bool PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy>
     players[id] = new_player;
     players_net_names[id] = player_net_name;
     players_net_names_rev[player_net_name] = id;
+
+    std::shared_ptr<Sector> starting_sector = wholeGalaxy->sectors.at(startingSectorId);
+    auto& c = startingPlanet->colony;
+    c->population = 180.0f;
+    c->buildings = {{Building::Farms, 3},      {Building::PowerPlants, 3},    {Building::SmallOrbitalShipyard, 1},
+                    {Building::MetalsMine, 3}, {Building::RareMetalsMine, 2}, {Building::CrystalsMine, 1},
+                    {Building::Laboratory, 2}, {Building::PolymersFactory, 1}};
+    new_player->ship_designs[1] = std::shared_ptr<ShipDesign>(
+        new ShipDesign(1, "Small builder", ShipHull::SmallShipHull, {{ModuleType::BasicContructionModule, 1}},
+                       {{ModuleType::SmallReactor, 1}}));
+    new_player->ship_designs[2] = std::shared_ptr<ShipDesign>(new ShipDesign(
+        2, "Small colonizer", ShipHull::SmallShipHull, {}, {{ModuleType::SmallReactor, 1}, {ModuleType::Quarters, 1}}));
+    new_player->ship_designs[3] = std::shared_ptr<ShipDesign>(
+        new ShipDesign(3, "Supership", ShipHull::SmallShipHull, {{ModuleType::AdvancedContructionModule, 4}},
+                       {{ModuleType::AdvancedBigReactor, 2}, {ModuleType::Quarters, 4}}));
+
+    c->ship_building_queue.push_back(ShipBuildProgress(new_player->ship_designs[3], starting_sector));
+    // c->ship_building_queue.push_back(ShipBuildProgress(new_player->ship_designs[1], starting_sector));
+    // c->ship_building_queue.push_back(ShipBuildProgress(new_player->ship_designs[2], starting_sector));
 
     return true;
 }
@@ -313,13 +330,13 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     player_resources_change[Resource::Food] = true;
 
     // This is a temporary debuggingsolution please remove ASAP
-    for (int i = (int)Resource::Metals; i <= (int)Resource::Last; i++)
-    {
-        if (player_resources.count((Resource)i) == 0)
-            player_resources[(Resource)i] = 0.0f;
-        player_resources[(Resource)i] += 1.0f;
-        player_resources_change[(Resource)i] = true;
-    }
+    // for (int i = (int)Resource::Metals; i <= (int)Resource::Last; i++)
+    //{
+    //    if (player_resources.count((Resource)i) == 0)
+    //        player_resources[(Resource)i] = 0.0f;
+    //    player_resources[(Resource)i] += 1.0f;
+    //    player_resources_change[(Resource)i] = true;
+    //}
 
     // calculate expenses and gains of player colonies
     for (auto& colony : player_colonies)

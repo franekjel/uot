@@ -172,7 +172,7 @@ void Player::HandleBuildRequest(Building::BuildingType type, Building::BuildingT
     if (upgrade_from != Building::BuildingType::None &&
         (colony->second->buildings.count(upgrade_from) <= 0 || colony->second->buildings[upgrade_from] <= 0))
         return;
-    if (type == Building::BuildingType::Soldier &&
+    if (upgrade_from == Building::BuildingType::Soldier &&
         (colony->second->buildings.count(Building::BuildingType::MilitaryTrainingCentre) <= 0 ||
          colony->second->buildings[Building::BuildingType::MilitaryTrainingCentre] <= 0))
         return;
