@@ -16,7 +16,7 @@ void rendering::render_selected_sector_info(const client_context& context)
 
     auto sector_id = gui->current_sector.value()->sector_id % 10 + 1;
 
-    sdl_utilities::render_text(r.get(), gr->main_font,
+    sdl_utilities::render_text_center(r.get(), gr->main_font,
                                "SECTOR " + std::to_string(gui->current_sector.value()->sector_id),
                                size_settings::context_area::width / 2, fonts::main_font_size / 2 + 30,
                                size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
@@ -29,7 +29,7 @@ void rendering::render_selected_sector_info(const client_context& context)
     // render planet info
     if (!gui->cur_sector_info.has_value())
     {
-        sdl_utilities::render_text(r.get(), gr->secondary_font, " loading...", size_settings::context_area::width / 2,
+        sdl_utilities::render_text_center(r.get(), gr->secondary_font, " loading...", size_settings::context_area::width / 2,
                                    size_settings::context_area::height * 0.75, size_settings::context_area::width - 50,
                                    {0xFF, 0xFF, 0xFF, 0xFF});
         return;
@@ -38,7 +38,7 @@ void rendering::render_selected_sector_info(const client_context& context)
     std::string planet_info = "\n planets: " + std::to_string(gui->cur_sector_info->planet_cnt);
     std::string resource_info = "\n deposits: " + std::to_string(gui->cur_sector_info->deposit_cnt);
     std::string fleet_info = "\n fleets present: " + std::to_string(gui->cur_sector_info->fleet_cnt);
-    sdl_utilities::render_text(r.get(), gr->secondary_font, planet_info + resource_info + fleet_info,
+    sdl_utilities::render_text_center(r.get(), gr->secondary_font, planet_info + resource_info + fleet_info,
                                size_settings::context_area::width / 2, size_settings::context_area::height * 0.75,
                                size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 }

@@ -73,7 +73,7 @@ struct designer_info_area : area_properties<700, 770, 450, 10>
 {
 };
 
-struct designer_info_text_area : area_properties<700, 310, 450, 350>
+struct designer_info_text_area : area_properties<700, 600, 450, 50>
 {
 };
 

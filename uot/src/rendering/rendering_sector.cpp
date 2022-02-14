@@ -114,9 +114,9 @@ void rendering::render_selected_object_info(const client_context& context)
     auto io = std::dynamic_pointer_cast<InhabitableObject>(gui->current_object.value());
     auto st = std::dynamic_pointer_cast<Star>(gui->current_object.value());
     std::string type = pl ? "PLANET " : io ? "OBJECT " : "STAR ";
-    sdl_utilities::render_text(r.get(), gr->main_font, type + std::to_string(gui->current_object.value()->id),
-                               size_settings::context_area::width / 2, fonts::main_font_size / 2 + 30,
-                               size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_center(r.get(), gr->main_font, type + std::to_string(gui->current_object.value()->id),
+                                      size_settings::context_area::width / 2, fonts::main_font_size / 2 + 30,
+                                      size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
     int textureIdx = gui->GetTextureIndex(gui->current_object.value());
@@ -180,9 +180,9 @@ void rendering::render_selected_object_info(const client_context& context)
         info << type_info.second << "\n";
     }
 
-    sdl_utilities::render_text(r.get(), gr->secondary_font, info.str(), size_settings::context_area::width / 2,
-                               size_settings::context_area::height * 0.75, size_settings::context_area::width - 50,
-                               {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_center(r.get(), gr->secondary_font, info.str(), size_settings::context_area::width / 2,
+                                      size_settings::context_area::height * 0.75,
+                                      size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 }
 
 void rendering::render_sector_sector_helper(client_context& context, const std::shared_ptr<Sector>& sector)
@@ -440,9 +440,9 @@ void rendering::render_selected_fleet_info(client_context& context)
 
     const auto& f = gui->current_fleet.value();
 
-    sdl_utilities::render_text(r.get(), gr->main_font, "fleet " + std::to_string(f->id),
-                               size_settings::context_area::width / 2, fonts::main_font_size / 2 + 30,
-                               size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_center(r.get(), gr->main_font, "fleet " + std::to_string(f->id),
+                                      size_settings::context_area::width / 2, fonts::main_font_size / 2 + 30,
+                                      size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 
     std::string fleet_info = "";
 
@@ -465,9 +465,10 @@ void rendering::render_selected_fleet_info(client_context& context)
     fleet_info += ss.str();
 
     sdl_utilities::set_render_viewport<size_settings::fleet_info_area>(r.get());
-    sdl_utilities::render_text(r.get(), gr->secondary_font, fleet_info, size_settings::context_area::width / 2,
-                               fonts::main_font_size / 2 + 30 + gui->current_fleet_info_offset,
-                               size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_top_center(r.get(), gr->secondary_font, fleet_info,
+                                          size_settings::context_area::width / 2,
+                                          fonts::main_font_size / 2 + 30 + gui->current_fleet_info_offset,
+                                          size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 
     sdl_utilities::set_render_viewport<size_settings::context_area>(r.get());
     gui->set_button_font(gr->action_button_font);

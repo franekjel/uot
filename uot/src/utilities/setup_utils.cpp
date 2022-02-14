@@ -19,9 +19,9 @@ void init(client_context& context)
         throw std::runtime_error("SDL coudl not initialize! SDL Error: %s\n" + std::string(SDL_GetError()));
     }
 
-    context.w = sdl_utilities::sdl_create_window("UOT Sketch", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                                 size_settings::window_area::width, size_settings::window_area::height,
-                                                 SDL_WINDOW_SHOWN);
+    context.w = sdl_utilities::sdl_create_window("Universe of Technology", SDL_WINDOWPOS_CENTERED,
+                                                 SDL_WINDOWPOS_CENTERED, size_settings::window_area::width,
+                                                 size_settings::window_area::height, SDL_WINDOW_SHOWN);
 
     context.r = sdl_utilities::sdl_create_renderer(context.w, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 

@@ -40,7 +40,7 @@ void render_list(client_context& context, std::shared_ptr<ui_list_state> l_st, c
         SDL_Rect dest{l_st->w_off, l_st->h_off + (l_st->h + l_st->h_off) * curr - l_st->offset, l_st->w, l_st->h};
         SDL_RenderFillRect(r.get(), &dest);
         // render text
-        sdl_utilities::render_text(r.get(), gr->action_button_font, e, dest.x + dest.w / 2, dest.y + dest.h / 2,
+        sdl_utilities::render_text_center(r.get(), gr->action_button_font, e, dest.x + dest.w / 2, dest.y + dest.h / 2,
                                    dest.w * 0.7, t);
         // inc position
         ++curr;
