@@ -149,6 +149,9 @@ void uot_net_client::handle_message(const std::string& data)
                 mq->actions.fleetInfoRequests.push_back(context.gui->current_fleet.value()->id);
             }
 
+            context.getGameState().value->player->is_winner = newturn_msg->you_won;
+            context.getGameState().value->player->is_loser = newturn_msg->you_lost;
+
             context.gui->last_turn_time = std::chrono::steady_clock::now();
             context.gui->do_gui_per_turn_update(context);
 

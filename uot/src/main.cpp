@@ -71,6 +71,12 @@ int main(int argc, char* argv[])
 
         while (!quit)
         {
+            {
+                auto& player = context.getGameState().value->player;
+                if (player && (player->is_winner || player->is_loser))
+                    context.view = std::make_shared<rendering::render_end_view>();
+            }
+
             while (SDL_PollEvent(&e) != 0)
             {
                 if (e.type == SDL_QUIT)
@@ -79,6 +85,11 @@ int main(int argc, char* argv[])
                 }
                 else if (e.type == SDL_KEYDOWN)
                 {
+                    if (e.key.keysym.sym == SDLK_o && e.key.keysym.mod & KMOD_CTRL)
+                        context.getGameState().value->player->is_winner = true;
+                    else if (e.key.keysym.sym == SDLK_l && e.key.keysym.mod & KMOD_CTRL)
+                        context.getGameState().value->player->is_loser = true;
+
                     std::visit([&](auto&& v) { v->key_handler(context, e.key.keysym.sym); }, context.view);
                 }
                 else if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP)
