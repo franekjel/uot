@@ -220,10 +220,12 @@ void rendering::render_sector_sector_helper(client_context& context, const std::
     }
 
     const auto& gs = context.getGameState().value;
+    context.fleet_mutex.lock();
     for (auto& [id, f] : gs->enemies_fleet_in_current_sector)
     {
         render_fleet(context, f);
     }
+    context.fleet_mutex.unlock();
 
     render_animations(context);
 }

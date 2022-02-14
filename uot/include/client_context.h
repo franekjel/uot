@@ -57,6 +57,8 @@ struct client_context
         SDL_Quit();
     }
 
+    std::mutex fleet_mutex;
+
    private:
     std::recursive_mutex gs_mutex;
     std::shared_ptr<game_state> gs;

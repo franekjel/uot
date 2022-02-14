@@ -414,6 +414,7 @@ void uot_net_client::parseWatchedSectorUpdate(
         }
         if (context.gui->current_sector.has_value() && context.gui->current_sector.value()->sector_id == u.sector_id)
         {
+            context.fleet_mutex.lock();
             std::map<unsigned int, std::shared_ptr<Fleet>> enemies_fleet_in_current_sector;
             for (const auto& fu : u.fleets)
             {
@@ -438,6 +439,7 @@ void uot_net_client::parseWatchedSectorUpdate(
             }
             state->enemies_fleet_in_current_sector = enemies_fleet_in_current_sector;
             updateAnimations(state, u.fleets_in_fight);
+            context.fleet_mutex.unlock();
         }
 
         for (const auto& nb : u.new_bases)
