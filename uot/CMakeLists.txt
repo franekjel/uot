@@ -18,6 +18,7 @@ set(SRCS
     include/rendering/rendering_planet.h
     include/rendering/rendering_universe.h
     include/rendering/rendering_tech.h
+    include/rendering/rendering_end.h
     include/rendering/rendering_views.h
     include/rendering/ui_list.h
     include/rendering/animation.h
@@ -50,6 +51,7 @@ set(SRCS
     src/net/uot_net_client.cpp
     src/msg_queue.cpp
     src/utilities/fleet_utils.cpp
+    src/rendering/rendering_end.cpp
     )
 
 

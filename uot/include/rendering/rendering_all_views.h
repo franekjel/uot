@@ -2,6 +2,7 @@
 #define RENDERING_ALL_VIEWS_H
 
 #include "rendering_designer.h"
+#include "rendering_end.h"
 #include "rendering_menu.h"
 #include "rendering_planet.h"
 #include "rendering_sector.h"
