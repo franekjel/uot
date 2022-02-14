@@ -660,7 +660,7 @@ void uot_net_client::updateAnimations(std::shared_ptr<game_state>& state,
                 if (other_fleet_id != fleet->id && other_fleet->owner_id != fleet->owner_id &&
                     (other_fleet->position - fleet->position).squaredLength() <= range * range)
                 {
-                    switch (std::discrete_distribution<>({6, 3, 3, 1, 1, 1, 1})(gen))
+                    switch (std::discrete_distribution<>({0, 3, 3, 1, 1, 1, 1})(gen))
                     {
                         case 0:
                             break;

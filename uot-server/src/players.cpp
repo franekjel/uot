@@ -81,8 +81,8 @@ bool PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy>
     auto& c = startingPlanet->colony;
     c->population = 180.0f;
     c->buildings = {{Building::Farms, 3},      {Building::PowerPlants, 3},    {Building::SmallOrbitalShipyard, 1},
-                    {Building::MetalsMine, 3}, {Building::RareMetalsMine, 2}, {Building::CrystalsMine, 1},
-                    {Building::Laboratory, 2}, {Building::PolymersFactory, 1}};
+                    {Building::MetalsMine, 3}, {Building::RareMetalsMine, 2}, {Building::CrystalsMine, 2},
+                    {Building::Laboratory, 1}, {Building::PolymersFactory, 1}};
     new_player->ship_designs[1] = std::shared_ptr<ShipDesign>(
         new ShipDesign(1, "Small builder", ShipHull::SmallShipHull, {{ModuleType::BasicContructionModule, 1}},
                        {{ModuleType::SmallReactor, 1}}));
