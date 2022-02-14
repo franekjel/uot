@@ -306,6 +306,10 @@ inline void rendering::render_planet_view::refresh_lists(client_context& context
     {
         if (count > 0)
         {
+            if (b == Building::Soldier)
+                if (pl->colony->buildings.count(Building::MilitaryTrainingCentre) == 0 ||
+                    pl->colony->buildings.at(Building::MilitaryTrainingCentre) == 0)
+                    continue;
             build->elems.push_back(Buildings.at(b).name);
             _build.push_back(b);
         }

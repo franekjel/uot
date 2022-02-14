@@ -288,6 +288,8 @@ void uot_net_client::parseBuildingsUpdates(std::shared_ptr<game_state>& state,
     {
         if (a.days_remaining == 0)
         {
+            if (a.building_type == Building::Soldier)
+                continue;
             state->player->owned_colonies[a.colony_id]->buildings[a.building_type]++;
         }
         else
