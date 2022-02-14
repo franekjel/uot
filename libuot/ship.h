@@ -13,7 +13,6 @@
 struct ShipHull
 {
     int sides_size;
-    int back_size;
     int inside_size;
     std::map<Resource, float> cost;
     std::map<Resource, float> additional_upkeep;

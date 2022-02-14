@@ -227,8 +227,8 @@ std::shared_ptr<SDL_Renderer> sdl_utilities::sdl_create_renderer(const std::shar
     return ret;
 }
 
-void sdl_utilities::render_text(SDL_Renderer* r, std::shared_ptr<TTF_Font>& font, const std::string& t, int x, int y,
-                                int _w, SDL_Color c)
+void sdl_utilities::render_text_center(SDL_Renderer* r, std::shared_ptr<TTF_Font>& font, const std::string& t, int x,
+                                       int y, int _w, SDL_Color c)
 {
     auto textSurface =
         std::shared_ptr<SDL_Surface>(TTF_RenderText_Blended_Wrapped(font.get(), t.c_str(), c, _w), sdl_surface_deleter);
@@ -249,6 +249,56 @@ void sdl_utilities::render_text(SDL_Renderer* r, std::shared_ptr<TTF_Font>& font
     const auto h = textSurface->h;
 
     SDL_Rect s{0, 0, w, h}, d{x - w / 2, y - h / 2, w, h};
+    SDL_RenderCopyEx(r, tmp_tex.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
+}
+
+void sdl_utilities::render_text_top_left(SDL_Renderer* r, std::shared_ptr<TTF_Font>& font, const std::string& t, int x,
+                                         int y, int _w, SDL_Color c)
+{
+    auto textSurface =
+        std::shared_ptr<SDL_Surface>(TTF_RenderText_Blended_Wrapped(font.get(), t.c_str(), c, _w), sdl_surface_deleter);
+
+    if (textSurface == NULL)
+    {
+        throw std::runtime_error("Unable to generate text surface");
+    }
+
+    auto tmp_tex =
+        std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(r, textSurface.get()), sdl_texture_deleter);
+    if (tmp_tex == NULL)
+    {
+        throw std::runtime_error("Unable to generate text texture from surface");
+    }
+
+    const auto w = textSurface->w;
+    const auto h = textSurface->h;
+
+    SDL_Rect s{0, 0, w, h}, d{x, y, w, h};
+    SDL_RenderCopyEx(r, tmp_tex.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
+}
+
+void sdl_utilities::render_text_top_center(SDL_Renderer* r, std::shared_ptr<TTF_Font>& font, const std::string& t,
+                                           int x, int y, int _w, SDL_Color c)
+{
+    auto textSurface =
+        std::shared_ptr<SDL_Surface>(TTF_RenderText_Blended_Wrapped(font.get(), t.c_str(), c, _w), sdl_surface_deleter);
+
+    if (textSurface == NULL)
+    {
+        throw std::runtime_error("Unable to generate text surface");
+    }
+
+    auto tmp_tex =
+        std::shared_ptr<SDL_Texture>(SDL_CreateTextureFromSurface(r, textSurface.get()), sdl_texture_deleter);
+    if (tmp_tex == NULL)
+    {
+        throw std::runtime_error("Unable to generate text texture from surface");
+    }
+
+    const auto w = textSurface->w;
+    const auto h = textSurface->h;
+
+    SDL_Rect s{0, 0, w, h}, d{x - w / 2, y, w, h};
     SDL_RenderCopyEx(r, tmp_tex.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 }
 

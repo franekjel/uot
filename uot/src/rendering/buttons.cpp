@@ -35,8 +35,8 @@ void draw_button(client_context& context, const std::string& text, const button_
     SDL_RenderFillRect(r.get(), &dest);
 
     const auto button_offset_x = dest.w;
-    sdl_utilities::render_text(r.get(), gui->button_font.has_value() ? gui->button_font.value() : gr->main_font, text,
-                               dest.x + dest.w / 2, dest.y + dest.h / 2, dest.w * 0.8, f);
+    sdl_utilities::render_text_center(r.get(), gui->button_font.has_value() ? gui->button_font.value() : gr->main_font,
+                                      text, dest.x + dest.w / 2, dest.y + dest.h / 2, dest.w * 0.8, f);
 }
 }  // namespace rendering
 

@@ -137,60 +137,46 @@ std::string rendering::render_designer_view::get_general_info()
     ret += "Free space sides: " + std::to_string(disp_info.taken_sides) + "/" + std::to_string(disp_info.space_sides) +
            "\n";
     ret += "HP: " + std::to_string(disp_info.hp) + "\n";
-    ret += "HP regeneration: " + std::to_string(disp_info.hp_regen) + "\n";
+    ret += disp_info.hp_regen == 0 ? "" : "HP regeneration: " + std::to_string(disp_info.hp_regen) + "\n";
     ret += "Max Energy: " + std::to_string(disp_info.max_energy) + "\n";
     ret += "Energy use: " + std::to_string(disp_info.energy_use_normal) + "\n";
     ret += "Max energy use: " + std::to_string(disp_info.energy_use_max) + "\n";
     ret += "Energy regeneration: " + std::to_string(disp_info.energy_regen) + "\n";
-    ret += "Shields: " + std::to_string(disp_info.shields) + "\n";
-    ret += "Human Capacity: " + std::to_string(disp_info.human_capacity) + "\n";
-    ret += "Construction Points: " + std::to_string(disp_info.construction) + "\n";
-    ret += "Attack count: " + std::to_string(disp_info.attack) + "\n";
+    ret += disp_info.shields == 0 ? "" : "Shields: " + std::to_string(disp_info.shields) + "\n";
+    ret += disp_info.human_capacity == 0 ? "" : "Human Capacity: " + std::to_string(disp_info.human_capacity) + "\n";
+    ret += disp_info.construction == 0 ? "" : "Construction Points: " + std::to_string(disp_info.construction) + "\n";
+    ret += disp_info.attack == 0 ? "" : "Attack count: " + std::to_string(disp_info.attack) + "\n";
     ret += "Speed: " + std::to_string(disp_info.speed) + "\n";
-    ret += "Ship aggro: " + std::to_string(disp_info.ship_aggro) + "\n";
+    ret += "Aggro: " + std::to_string(disp_info.ship_aggro) + "\n";
     return ret;
 }
 
 std::string rendering::render_designer_view::get_design_cost()
 {
-    std::string cost{"Current costs: \n"};
     bool _h = hull->selected_elem.has_value();
-    std::map<Resource, float> disp_c = current_costs;
+    std::map<Resource, float> cost = current_costs;
 
     if (_h)
     {
         auto& h = ShipHulls.at(_hull[hull->selected_elem.value()]);
-        disp_c += h.cost;
-    }
-    for (auto& [r, c] : disp_c)
-    {
-        cost += std::string(resourceNames[static_cast<int>(r)]) + ": " + std::to_string(static_cast<int>(c)) + "\n";
+        cost += h.cost;
     }
 
-    return cost + "\n";
+    return std::string("Costs:\n") + resource_to_text(cost) + "\n";
 }
 
 std::string rendering::render_designer_view::get_design_upkeep()
 {
-    std::string upkeep{"Current upkeep: \n"};
-
-    std::map<Resource, float> disp_upk;
+    std::map<Resource, float> upkeep;
 
     if (hull->selected_elem.has_value())
     {
         auto& h = ShipHulls.at(_hull[hull->selected_elem.value()]);
-        disp_upk += h.additional_upkeep;
-        disp_upk += ShipDesign::percentage_cost_upkeep * h.cost;
+        upkeep += h.additional_upkeep;
+        upkeep += ShipDesign::percentage_cost_upkeep * h.cost;
     }
-
-    disp_upk += current_upkeep;
-
-    for (auto& [r, c] : disp_upk)
-    {
-        upkeep += std::string(resourceNames[static_cast<int>(r)]) + ": " + std::to_string(static_cast<int>(c)) + "\n";
-    }
-
-    return upkeep + "\n";
+    upkeep += current_upkeep;
+    return std::string("Upkeep:\n") + resource_to_text(upkeep) + "\n";
 }
 
 std::string rendering::render_designer_view::get_design_worker_cost()
@@ -220,9 +206,9 @@ void rendering::render_designer_view::render_design_info(client_context& context
 
     std::string name = "New Design";
 
-    sdl_utilities::render_text(r.get(), gr->main_font, name.c_str(), size_settings::designer_info_area::width / 2,
-                               fonts::main_font_size / 2 + 30, size_settings::designer_info_area::width - 50,
-                               {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_center(r.get(), gr->main_font, name.c_str(),
+                                      size_settings::designer_info_area::width / 2, fonts::main_font_size / 2 + 30,
+                                      size_settings::designer_info_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 
     sdl_utilities::set_render_viewport<size_settings::designer_info_text_area>(r.get());
     auto general_info = get_general_info();
@@ -233,10 +219,11 @@ void rendering::render_designer_view::render_design_info(client_context& context
     // worker cost
     auto wcost = get_design_worker_cost();
 
-    sdl_utilities::render_text(r.get(), gr->secondary_font, general_info + "\n" + cost + upkeep + wcost,
-                               size_settings::designer_info_text_area::width / 2 + 80,
-                               size_settings::designer_info_text_area::height / 2 + info_offset,
-                               size_settings::designer_info_text_area::width - 120, {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_top_center(r.get(), gr->secondary_font, general_info + "\n" + cost + upkeep + wcost,
+                                          size_settings::designer_info_text_area::width / 2 + 80,
+                                          size_settings::designer_info_text_area::y_offset + info_offset,
+                                          size_settings::designer_info_text_area::width - 120,
+                                          {0xFF, 0xFF, 0xFF, 0xFF});
 
     using AreaType = size_settings::designer_info_area;
     sdl_utilities::set_render_viewport<AreaType>(r.get());
@@ -288,13 +275,77 @@ void render_designer_view::key_handler(client_context& context, Uint16 k)
 inline std::string get_module_info(ModuleType type)
 {
     const auto& m = Modules.at(type);
-    return "a lot of module info in here";
+    std::string i = m.name + "\n\n";
+    i += "Size: " + std::to_string(m.size) + "\n";
+    i += "Destination: " + (m.destination == Module::Sides ? std::string("sides") : std::string("inside")) + "\n";
+    if (m.generating_energy > 0)
+    {
+        i += "Energy generation: " + rendering::f2s(m.generating_energy) + "\n";
+        i += "Energy capacity: " + rendering::f2s(m.energy_capacity) + "\n";
+    }
+    else
+        i += "Energy usage: " + rendering::f2s(m.energy_usage) + "\n";
+    if (m.shield_capacity > 0)
+        i += "Shield capacity: " + rendering::f2s(m.shield_capacity) + "\n";
+    if (m.additional_hp > 0)
+        i += "Additional HP: " + rendering::f2s(m.additional_hp) + "\n";
+    if (type == ModuleType::NanobotsSelfRepairModule)
+        i += "HP regeneration: " + rendering::f2s(Module::nanobots_hp_regen_amount) + "\n";
+    if (m.contruction_speed > 0)
+        i += "Contruction speed: " + rendering::f2s(m.contruction_speed) + "\n";
+    if (m.human_capacity > 0)
+        i += "Human capacity: " + std::to_string(int(m.human_capacity)) + "\n";
+
+    if (m.weapon.has_value())
+    {
+        const auto& w = m.weapon.value();
+        i += "Attacks: " + std::to_string(w.attack_count) + "\n";
+        i += "Damage: " + rendering::f2s(w.damage) + "\n";
+        i += "Range: " + rendering::f2s(w.range) + "\n";
+
+        switch (w.special_features)
+        {
+            case Weapon::BypassShield:
+                i += "Bypass shields\n";
+                break;
+            case Weapon::ShieldDamageBonus:
+                i += "Shield damage bonus\n";
+                break;
+            case Weapon::HPDamageBonus:
+                i += "HP damage bonus\n";
+                break;
+            default:
+                break;
+        }
+    }
+    i += "\nCost:\n";
+    i += rendering::resource_to_text(m.cost);
+    i += "  work:" + rendering::f2s(m.worker_weeks_cost_per_size);
+    i += "\nAdditional upkeep:\n";
+    i += rendering::resource_to_text(m.additional_upkeep);
+    return i;
 }
 
 inline std::string get_hull_info(ShipHull::Type type)
 {
     const auto& m = ShipHulls.at(type);
-    return "a lot of hull info in here";
+
+    std::string i = hull_type_to_design_name.at(type) + " hull\n\n";
+    i += "Sides size: " + std::to_string(m.sides_size) + "\n";
+    i += "Inside size: " + std::to_string(m.inside_size) + "\n";
+    i += "Base HP: " + rendering::f2s(m.hp) + "\n";
+    i += "Speed: " + rendering::f2s(m.speed) + "\n";
+    i += "Energy consumption: " + rendering::f2s(m.engines_energy_consumtion) + "\n";
+    i += "Required crew: " + rendering::f2s(m.crew) + "\n";
+    i += "Warp drive energy: " + rendering::f2s(m.warp_drive_energy) + "\n";
+    i += "Aggro: " + rendering::f2s(m.ship_aggro) + "\n";
+    i += "\nCost:\n";
+    i += rendering::resource_to_text(m.cost);
+    i += "  work:" + rendering::f2s(m.worker_weeks_cost);
+    i += "\nAdditional upkeep:\n";
+    i += rendering::resource_to_text(m.additional_upkeep);
+
+    return i;
 }
 
 void rendering::render_module_info_box(client_context& context, ModuleType type, int x, int y)
@@ -306,9 +357,9 @@ void rendering::render_module_info_box(client_context& context, ModuleType type,
     sdl_utilities::set_viewport(r.get(), x, y, buildings_meta::frame_width, buildings_meta::frame_height);
     sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
 
-    sdl_utilities::render_text(r.get(), gr->infobox_font, get_module_info(type), buildings_meta::frame_width / 2,
-                               buildings_meta::frame_height / 2, buildings_meta::frame_width,
-                               SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_center(r.get(), gr->infobox_font, get_module_info(type), buildings_meta::frame_width / 2,
+                                      buildings_meta::frame_height / 2, buildings_meta::frame_width,
+                                      SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
 }
 
 void rendering::render_hull_info_box(client_context& context, ShipHull::Type type, int x, int y)
@@ -320,9 +371,9 @@ void rendering::render_hull_info_box(client_context& context, ShipHull::Type typ
     sdl_utilities::set_viewport(r.get(), x, y, buildings_meta::frame_width, buildings_meta::frame_height);
     sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
 
-    sdl_utilities::render_text(r.get(), gr->infobox_font, get_hull_info(type), buildings_meta::frame_width / 2,
-                               buildings_meta::frame_height / 2, buildings_meta::frame_width,
-                               SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_center(r.get(), gr->infobox_font, get_hull_info(type), buildings_meta::frame_width / 2,
+                                      buildings_meta::frame_height / 2, buildings_meta::frame_width,
+                                      SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
 }
 
 void render_designer_view::_draw(client_context& context)

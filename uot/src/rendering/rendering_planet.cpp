@@ -28,29 +28,20 @@ std::array<std::string, 3> planet_names{
 inline std::string get_planet_info(std::shared_ptr<Planet>& pl)
 {
     std::string info;
-    info += "Population: " + std::to_string(static_cast<int>(pl->colony->population)) + "\n\n";
+    info += "Civilians: " + std::to_string(static_cast<int>(pl->colony->population)) + "\n";
+    info += "Soldiers: " + std::to_string(static_cast<int>(pl->colony->soldiers)) + "\n\n";
 
-    info += "Gains: \n";
-    for (auto& g : pl->colony->GetColonyGains())
-    {
-        info += std::string(resourceNames.at(static_cast<int>(g.first))) + " " + std::to_string(g.second) + "\n";
-    }
+    info += "Gains:\n";
+    info += rendering::resource_to_text(pl->colony->GetColonyGains()) + "\n";
 
-    info += "\n";
+    info += "Expenses:\n";
+    info += rendering::resource_to_text(pl->colony->GetColonyExpenses()) + "\n";
 
-    info += "Expenses: \n";
-    for (auto& e : pl->colony->GetColonyExpenses())
-    {
-        info += std::string(resourceNames.at(static_cast<int>(e.first))) + " " + std::to_string(e.second) + "\n";
-    }
-
-    info += "\n";
-
-    info += "Features: \n";
+    info += "Features:\n";
     for (auto& f : pl->planetary_features)
     {
-        auto& feat = PlanetaryFeaturesTypes.at(f.first);
-        info += feat.name + " \n";
+        const auto& feat = PlanetaryFeaturesTypes.at(f.first);
+        info += feat.name + "(" + std::to_string(f.second) + ")\n";
     }
 
     return info;
@@ -71,9 +62,9 @@ void rendering::render_planet_view::render_planet_info(const client_context& con
         : io ? (std::string(resourceNames[static_cast<int>(io->resource_deposit.begin()->first)]) + " Object")
              : "Star";
 
-    sdl_utilities::render_text(r.get(), gr->main_font, name.c_str(), size_settings::planet_info_area::width / 2,
-                               fonts::main_font_size / 2 + 30, size_settings::planet_info_area::width - 50,
-                               {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_center(r.get(), gr->main_font, name.c_str(), size_settings::planet_info_area::width / 2,
+                                      fonts::main_font_size / 2 + 30, size_settings::planet_info_area::width - 50,
+                                      {0xFF, 0xFF, 0xFF, 0xFF});
 
     // render planet here again
     int textureIdx = gui->GetTextureIndex(gui->current_object.value());
@@ -88,9 +79,10 @@ void rendering::render_planet_view::render_planet_info(const client_context& con
         const auto info = get_planet_info(pl);
         if (info.length() > 0)
         {
-            sdl_utilities::render_text(r.get(), gr->secondary_font, info, size_settings::planet_info_area::width / 2,
-                                       size_settings::planet_info_text_area::height / 2 + info_offset,
-                                       size_settings::planet_info_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+            sdl_utilities::render_text_center(r.get(), gr->secondary_font, info,
+                                              size_settings::planet_info_area::width / 2,
+                                              size_settings::planet_info_text_area::height / 2 + info_offset,
+                                              size_settings::planet_info_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
         }
 
         int x, y;
@@ -684,40 +676,38 @@ void rendering::render_planet_view::key_handler(client_context& context, Uint16 
     }
 }
 
-inline std::string get_ship_info(const std::shared_ptr<ShipDesign>& design_id) { return "opis designu totalnie tutaj"; }
+inline std::string get_ship_info(const std::shared_ptr<ShipDesign>& design)
+{
+    std::string i = design->name + "\n\n";
+    i += hull_type_to_design_name.at(design->hull_type) + " hull\n\n";
+
+    for (const auto& [m, count] : design->inside)
+        i += Modules.at(m).name + "(" + std::to_string(count) + ")\n";
+    for (const auto& [m, count] : design->sides)
+        i += Modules.at(m).name + "(" + std::to_string(count) + ")\n";
+
+    i += "\nCost:\n";
+    i += rendering::resource_to_text(design->cost);
+    i += "  work:" + rendering::f2s(design->worker_weeks_cost);
+    i += "\nUpkeep:\n";
+    i += rendering::resource_to_text(design->upkeep);
+    return i;
+}
 
 inline std::string get_building_info(Building::BuildingType type)
 {
-    std::string cost_string = " COST: \n";
-    cost_string += "  Work: " + std::to_string(int(Buildings.at(type).worker_weeks_cost)) + "\n";
-    for (const auto& e : Buildings.at(type).cost)
-    {
-        cost_string +=
-            "  " + std::string(resourceNames[to_underlying(e.first)]) + ": " + std::to_string(int(e.second)) + "\n";
-    }
+    std::string cost_string = " Cost: \n";
+    cost_string += "   Work: " + std::to_string(int(Buildings.at(type).worker_weeks_cost)) + "\n";
+    cost_string += rendering::resource_to_text(Buildings.at(type).cost, "   ");
 
-    cost_string += "\n";
+    std::string production_string =
+        std::string(" Production:\n") + rendering::resource_to_text(Buildings.at(type).production, "   ");
 
-    std::string production_string = " PRODUCTION: \n";
-    for (const auto& e : Buildings.at(type).production)
-    {
-        production_string +=
-            "  " + std::string(resourceNames[to_underlying(e.first)]) + ": " + std::to_string(int(e.second)) + "\n";
-    }
+    std::string upkeep_string =
+        std::string(" Upkeep:\n") + rendering::resource_to_text(Buildings.at(type).upkeep, "   ");
+    upkeep_string += "   Workers: " + std::to_string((int)Buildings.at(type).workers) + "\n";
 
-    production_string += "\n";
-
-    std::string upkeep_string = " UPKEEP: \n";
-    for (const auto& e : Buildings.at(type).upkeep)
-    {
-        upkeep_string +=
-            "  " + std::string(resourceNames[to_underlying(e.first)]) + ": " + std::to_string(int(e.second)) + "\n";
-    }
-
-    upkeep_string += "   Workers: " + std::to_string((int)Buildings.at(type).workers) + "\n\n";
-
-    return std::string(Buildings.at(type).description) + "\n\n" + cost_string + "\n" + production_string +
-           upkeep_string;
+    return std::string(Buildings.at(type).description) + "\n" + cost_string + "\n" + production_string + upkeep_string;
 }
 
 void rendering::render_building_info_box(client_context& context, Building::BuildingType type, int x, int y)
@@ -739,9 +729,9 @@ void rendering::render_building_info_box(client_context& context, Building::Buil
 
     SDL_RenderCopyEx(context.r.get(), context.gr->buildings_sprite.get(), &s, &d, 0, nullptr, SDL_FLIP_NONE);
 
-    sdl_utilities::render_text(r.get(), gr->infobox_font, get_building_info(type), buildings_meta::frame_width / 2,
-                               buildings_meta::frame_height / 2, buildings_meta::frame_width,
-                               SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_center(r.get(), gr->infobox_font, get_building_info(type),
+                                      buildings_meta::frame_width / 2, buildings_meta::frame_height / 2,
+                                      buildings_meta::frame_width, SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
 }
 
 void rendering::render_ship_info_box(client_context& context, const unsigned int design_id, int x, int y)
@@ -755,7 +745,7 @@ void rendering::render_ship_info_box(client_context& context, const unsigned int
     sdl_utilities::set_viewport(r.get(), x, y, buildings_meta::frame_width, buildings_meta::frame_height);
     sdl_utilities::paint_background(r.get(), SDL_Color{0x00, 0x00, 0x00, 200});
 
-    sdl_utilities::render_text(r.get(), gr->infobox_font, get_ship_info(d), buildings_meta::frame_width / 2,
-                               buildings_meta::frame_height / 2, buildings_meta::frame_width,
-                               SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_center(r.get(), gr->infobox_font, get_ship_info(d), buildings_meta::frame_width / 2,
+                                      buildings_meta::frame_height / 2, buildings_meta::frame_width,
+                                      SDL_Color{0xFF, 0xFF, 0xFF, 0xFF});
 }
