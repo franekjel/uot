@@ -500,7 +500,6 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
                 fleet->location_sector->IncrementWatcher(player->id);
                 player->owned_colonies[invaded_colony->id] = invaded_colony;
 
-                fleet->invaded_colony = nullptr;
                 fleet->current_action = Fleet::Action::None;
                 invaded_colony->building_queue.clear();
                 invaded_colony->ship_building_queue.clear();
@@ -511,6 +510,7 @@ void PlayersList::CountEveryTurnNumbersPlayer(std::shared_ptr<Player> player)
                 player->new_colonies.push_back(invaded_colony);
                 fleet->location_sector->new_colonies.push_back({invaded_colony->id, invaded_colony->planet->id,
                                                                 invaded_colony->owner->id, invaded_colony->population});
+                fleet->invaded_colony.reset();
             }
             else if (fleet->soldiers <= Fleet::kEpsSoldiers)
             {

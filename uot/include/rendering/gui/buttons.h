@@ -240,7 +240,7 @@ struct soldier_off_button : button<soldier_off_button>
 
 struct invade_button : button<invade_button>
 {
-    invade_button() : button<invade_button>{4, std::string("INVADE"), bpos::fleet_4_2, bcol::basic} {}
+    invade_button() : button<invade_button>{13, std::string("INVADE"), bpos::fleet_4_2, bcol::basic} {}
     bool active = true;
     bool is_active() { return active; }
     void update_active(client_context& context);
@@ -249,7 +249,7 @@ struct invade_button : button<invade_button>
 
 struct fleet_cancel_button : button<fleet_cancel_button>
 {
-    fleet_cancel_button() : button<fleet_cancel_button>{4, std::string("CANCEL"), bpos::fleet_5_1, bcol::basic} {}
+    fleet_cancel_button() : button<fleet_cancel_button>{14, std::string("CANCEL"), bpos::fleet_5_1, bcol::basic} {}
     bool active = true;
     bool is_active() { return active; }
     void update_active(client_context& context);
