@@ -104,12 +104,6 @@ void uot_net_client::handle_message(const std::string& data)
             for (const auto& r : newturn_msg->updated_resources)
                 state->player->owned_resources[r.first] = r.second;
 
-            for (const auto& pop_data : newturn_msg->updated_populations)
-                state->player->owned_colonies.at(pop_data.first)->population = pop_data.second;
-
-            for (const auto& soldiers_data : newturn_msg->updated_soldiers)
-                state->player->owned_colonies.at(soldiers_data.first)->soldiers = soldiers_data.second;
-
             parseBuildingsUpdates(state, newturn_msg->buildings_updates);
 
             parseTechnologyUpdate(state, newturn_msg->technology_updates);
@@ -139,6 +133,12 @@ void uot_net_client::handle_message(const std::string& data)
             parseLostObjects(state, newturn_msg->lost_objects);
 
             parseInvadedColonies(state, newturn_msg->invaded_colonies);
+
+            for (const auto& pop_data : newturn_msg->updated_populations)
+                state->player->owned_colonies.at(pop_data.first)->population = pop_data.second;
+
+            for (const auto& soldiers_data : newturn_msg->updated_soldiers)
+                state->player->owned_colonies.at(soldiers_data.first)->soldiers = soldiers_data.second;
 
             ///
             ///
@@ -624,6 +624,7 @@ void uot_net_client::parseInvadedColonies(std::shared_ptr<game_state>& state,
         colony->population = c.population;
         colony->owner = state->player;
         colony->soldiers = 0.0f;
+        state->player->owned_colonies[c.id] = colony;
     }
 }
 
