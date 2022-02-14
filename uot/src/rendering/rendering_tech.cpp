@@ -159,13 +159,13 @@ void rendering::render_tech_info(client_context& context, std::shared_ptr<game_s
 
     auto tech = Technologies.find(tt)->second;
 
-    sdl_utilities::render_text(r.get(), gr->main_font, tech.name, size_settings::context_area::width / 2,
-                               fonts::main_font_size + 30, size_settings::context_area::width - 50,
-                               {0xFF, 0xFF, 0xFF, 0xFF});
+    sdl_utilities::render_text_center(r.get(), gr->main_font, tech.name, size_settings::context_area::width / 2,
+                                      fonts::main_font_size + 30, size_settings::context_area::width - 50,
+                                      {0xFF, 0xFF, 0xFF, 0xFF});
 
     if (researched)
     {
-        sdl_utilities::render_text(
+        sdl_utilities::render_text_center(
             r.get(), gr->secondary_font,
             tech.description +
                 "\nDays left: " + std::to_string(static_cast<int>(gs->player->researched_technology.progress_left)),
@@ -177,10 +177,10 @@ void rendering::render_tech_info(client_context& context, std::shared_ptr<game_s
     }
     else
     {
-        sdl_utilities::render_text(r.get(), gr->secondary_font,
-                                   tech.description + "\nCost: " + std::to_string(static_cast<int>(tech.cost)),
-                                   size_settings::context_area::width / 2, size_settings::context_area::height * 0.42,
-                                   size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
+        sdl_utilities::render_text_center(
+            r.get(), gr->secondary_font, tech.description + "\nCost: " + std::to_string(static_cast<int>(tech.cost)),
+            size_settings::context_area::width / 2, size_settings::context_area::height * 0.42,
+            size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 
         if (gs->player->researched_technology.technology != tt && gs->player->available_technologies.count(tt) > 0)
         {
@@ -204,7 +204,7 @@ void rendering::render_tech_view::_mouse_handler(client_context& context, Uint32
     const auto et = iu::get_event_type(event_type, m, x, y);
     if (et == iu::uot_event_type::left_click_play || et == iu::uot_event_type::motion_play)
     {
-        using AreaType = size_settings::play_area;
+        using AreaType = size_settings::tech_area;
         auto state = context.getGameState();
         auto& gs = state.value;
         auto& gr = context.gr;
@@ -351,6 +351,6 @@ void rendering::render_tech_node(const client_context& context, std::shared_ptr<
     std::string text = Technologies.find(tech_type)->second.name;
 
     const auto button_offset_x = dest.w;
-    sdl_utilities::render_text(r.get(), gr->infobox_font, text, dest.x + dest.w / 2, dest.y + dest.h / 2, dest.w * 0.84,
-                               prim);
+    sdl_utilities::render_text_center(r.get(), gr->infobox_font, text, dest.x + dest.w / 2, dest.y + dest.h / 2,
+                                      dest.w * 0.84, prim);
 }

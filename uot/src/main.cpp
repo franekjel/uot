@@ -61,10 +61,22 @@ int main(int argc, char* argv[])
         Uint32 fps_current;                    // the current FPS.
         Uint32 fps_frames = 0;                 // frames passed since the last recorded fps.
 #endif
+        if (argc > 1)
+        {
+            std::string ipv4(argv[1]);
+            nc.connect_to_server(ipv4);
+        }
+        else
+            nc.connect_to_server();
 
-        nc.connect_to_server();
         while (!quit)
         {
+            {
+                auto& player = context.getGameState().value->player;
+                if (player && (player->is_winner || player->is_loser))
+                    context.view = std::make_shared<rendering::render_end_view>();
+            }
+
             while (SDL_PollEvent(&e) != 0)
             {
                 if (e.type == SDL_QUIT)
@@ -73,6 +85,11 @@ int main(int argc, char* argv[])
                 }
                 else if (e.type == SDL_KEYDOWN)
                 {
+                    if (e.key.keysym.sym == SDLK_o && e.key.keysym.mod & KMOD_CTRL)
+                        context.getGameState().value->player->is_winner = true;
+                    else if (e.key.keysym.sym == SDLK_l && e.key.keysym.mod & KMOD_CTRL)
+                        context.getGameState().value->player->is_loser = true;
+
                     std::visit([&](auto&& v) { v->key_handler(context, e.key.keysym.sym); }, context.view);
                 }
                 else if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP)

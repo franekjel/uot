@@ -27,6 +27,10 @@ struct game_state : public uncopiable
     void reset_sector();
     std::shared_ptr<Player> player;
     std::map<unsigned int, std::shared_ptr<Planet>> planets;
+    std::map<unsigned int, std::shared_ptr<InhabitableObject>> objects;
+    std::map<unsigned int, std::shared_ptr<Ship>> ships;
+    std::map<unsigned int, std::shared_ptr<Player>> all_players;
+    std::map<unsigned int, std::shared_ptr<Fleet>> enemies_fleet_in_current_sector;
 };
 
 #endif

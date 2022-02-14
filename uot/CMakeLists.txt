@@ -18,10 +18,13 @@ set(SRCS
     include/rendering/rendering_planet.h
     include/rendering/rendering_universe.h
     include/rendering/rendering_tech.h
+    include/rendering/rendering_end.h
     include/rendering/rendering_views.h
     include/rendering/ui_list.h
+    include/rendering/animation.h
     include/utilities/sdl_utilities.h
     include/utilities/setup_utils.h
+    include/utilities/fleet_utils.h
     include/singleton.h
     include/constants/size_settings.h
     include/rendering/texture.h
@@ -42,12 +45,14 @@ set(SRCS
     src/rendering/rendering_tech.cpp
     src/rendering/ui_list.cpp
     src/rendering/buttons.cpp
+    src/rendering/animation.cpp
     src/utilities/sdl_utils.cpp
     src/utilities/setup_utils.cpp
     src/net/uot_net_client.cpp
     src/msg_queue.cpp
-
-)
+    src/utilities/fleet_utils.cpp
+    src/rendering/rendering_end.cpp
+    )
 
 
 include_directories(include/)

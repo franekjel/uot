@@ -15,6 +15,7 @@ class PlayersList
     std::map<unsigned int, std::shared_ptr<Player>> players = {};
     std::map<unsigned int, std::string> players_net_names = {};
     std::map<std::string, unsigned int> players_net_names_rev = {};
+    int number_of_loosers = 0;
 
    public:
     unsigned int GetStartingSectorId(std::shared_ptr<Galaxy> wholeGalaxy);

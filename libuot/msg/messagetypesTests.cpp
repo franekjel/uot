@@ -473,8 +473,6 @@ void NewTurnPayloadTest()
 
     ntp.destroyed_ships.push_back(2);
 
-    ntp.fleets_in_fight.push_back(messageTypes::MsgFleetParameters(flp2, false));
-
     auto ser = ntp.Serialize();
     std::shared_ptr<messageTypes::BasePayload> des = messageTypes::Deserialize(ser);
     auto type = des->GetType();
@@ -556,12 +554,6 @@ void NewTurnPayloadTest()
 
     if (cast->destroyed_ships[0] != ntp.destroyed_ships[0])
         std::cout << "NewTurn - wrong destroyed ships\n";
-
-    if (cast->fleets_in_fight.size() != ntp.fleets_in_fight.size())
-        std::cout << "NewTurn - wrong fleets in fight size\n";
-
-    if (!(cast->fleets_in_fight[0] == ntp.fleets_in_fight[0]))
-        std::cout << "NewTurn - wrong fleets in fight ships\n";
 }
 
 void ActionsPayloadTest()

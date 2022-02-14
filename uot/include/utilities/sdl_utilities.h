@@ -11,8 +11,14 @@
 
 namespace sdl_utilities
 {
-void render_text(SDL_Renderer* r, std::shared_ptr<TTF_Font>& font, const std::string& t, int x, int y, int w,
-                 SDL_Color c);
+void render_text_center(SDL_Renderer* r, std::shared_ptr<TTF_Font>& font, const std::string& t, int x, int y, int w,
+                        SDL_Color c);
+
+void render_text_top_left(SDL_Renderer* r, std::shared_ptr<TTF_Font>& font, const std::string& t, int x, int y, int w,
+                          SDL_Color c);
+
+void render_text_top_center(SDL_Renderer* r, std::shared_ptr<TTF_Font>& font, const std::string& t, int x, int y, int w,
+                            SDL_Color c);
 
 std::shared_ptr<SDL_Texture> load_texture_from_file(const std::string& path, const std::shared_ptr<SDL_Renderer>& r);
 std::shared_ptr<SDL_Texture> load_and_paint_texture_from_file(const std::string& path,

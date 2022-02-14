@@ -13,7 +13,8 @@ Player::Player(const unsigned int id_, const std::shared_ptr<Galaxy> &known_gala
         resources_changed[resource.first] = true;
     }
     owned_colonies = {};
-    owned_colonies[starting_colony->id] = starting_colony;
+    if (starting_colony)
+        owned_colonies[starting_colony->id] = starting_colony;
     owned_space_bases = {};
     owned_fleets = {};
     researched_technology = {};
@@ -168,7 +169,13 @@ void Player::HandleBuildRequest(Building::BuildingType type, Building::BuildingT
     auto av_buildings = colony->second->GetAvailableBuildings();
     if (av_buildings.count(type) == 0 || av_buildings[type] <= 0)
         return;
-
+    if (upgrade_from != Building::BuildingType::None &&
+        (colony->second->buildings.count(upgrade_from) <= 0 || colony->second->buildings[upgrade_from] <= 0))
+        return;
+    if (type == Building::BuildingType::Soldier &&
+        (colony->second->buildings.count(Building::BuildingType::MilitaryTrainingCentre) <= 0 ||
+         colony->second->buildings[Building::BuildingType::MilitaryTrainingCentre] <= 0))
+        return;
     for (const auto &res : building.cost)
     {
         if (owned_resources[res.first] < res.second)
@@ -207,12 +214,12 @@ void Player::HandleJoinFleetRequest(unsigned int first_fleet_id, unsigned int se
     if ((first_fleet->position - second_fleet->position).squaredLength() > Fleet::kNearValue)
         return;
 
-    for (const auto &ship : second_fleet->ships)
+    for (const auto &[id, ship] : second_fleet->ships)
     {
         ship->fleet = first_fleet;
     }
 
-    first_fleet->ships.insert(first_fleet->ships.end(), second_fleet->ships.begin(), second_fleet->ships.end());
+    first_fleet->ships.merge(second_fleet->ships);
 
     first_fleet->location_sector->present_fleets.erase(
         first_fleet->location_sector->present_fleets.find(second_fleet_id));
@@ -318,7 +325,7 @@ void Player::HandleCancelFleetRequest(unsigned int fleet_id)
     switch (current_fleet->current_action)
     {
         case Fleet::Action::WarpLoading:
-            for (auto &ship : current_fleet->ships)
+            for (auto &[id, ship] : current_fleet->ships)
             {
                 ship->warp_drive_charge = 0.0f;
             }
@@ -329,6 +336,7 @@ void Player::HandleCancelFleetRequest(unsigned int fleet_id)
             current_fleet->full_building_progress = 0.0f;
             break;
         case Fleet::Action::Colonize:
+            current_fleet->colony_building_object->is_being_colonized = false;
             current_fleet->colony_building_object = nullptr;
             current_fleet->building_progress = 0.0f;
             current_fleet->full_building_progress = 0.0f;
@@ -360,9 +368,10 @@ void Player::HandleColonizeFleetRequest(unsigned int fleet_id)
         if ((handled_fleet->position - obj->position).squaredLength() <= Fleet::kNearValue)
         {
             auto planet = std::dynamic_pointer_cast<Planet>(obj);
-            if (planet && !planet->colony)
+            if (planet && !planet->colony && !planet->is_being_colonized)
             {
                 handled_fleet->colony_building_object = planet;
+                planet->is_being_colonized = true;
                 break;
             }
         }
@@ -439,6 +448,9 @@ void Player::HandleShipDesignRequest(unsigned int id, bool delete_design, std::s
     {
         return;
     }
+
+    if (!IsShipDesignCorrect(hull_type, sides, inside))
+        return;
 
     auto current_design = std::make_shared<ShipDesign>(id, name, hull_type, sides, inside);
     changed_designs.push_back({id, current_design, false});

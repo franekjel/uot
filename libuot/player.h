@@ -51,6 +51,8 @@ struct Player
     Player(const unsigned int player_id_, const std::shared_ptr<Galaxy>& known_galaxy_,
            const std::map<Resource, float>& owned_resources_, const std::shared_ptr<Colony>& starting_colony);
 
+    Player(const unsigned int player_id_) : id(player_id_){};
+
     // fields below are server-only
     Player(const unsigned int player_id_, const std::shared_ptr<Galaxy>& whole_galaxy_,
            const std::map<Resource, float>& owned_resources_, const unsigned int& starting_sector_id,
@@ -60,6 +62,10 @@ struct Player
     std::vector<unsigned int> lost_objects;
     std::vector<std::shared_ptr<Colony>> new_colonies;
     std::vector<unsigned int> fleet_info_requests;
+
+    bool is_loser = false;
+    bool is_winner = false;
+    bool stop_sending = false;
 
     struct ChangedDesign
     {

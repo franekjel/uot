@@ -12,14 +12,6 @@ static const std::vector<Star::StarType> all_star_types = {Star::StarType::Sunny
                                                            Star::StarType::RedGiant,   Star::StarType::WhiteDwarf,
                                                            Star::StarType::BrownDwarf, Star::StarType::BlackHole};
 
-Point GalaxyGenerator::PointOnCircle(float r)
-{
-    std::uniform_real_distribution<float> dist(-1.0, 1.0);
-    Point p = Point(dist(gen), dist(gen));
-    p *= r / sqrtf(p.squaredLength());
-    return p;
-}
-
 bool too_close(std::vector<Point> all, Point b, const float Eps)
 {
     for (const auto &p : all)
@@ -215,7 +207,7 @@ Galaxy GalaxyGenerator::Generate()
         while (pos.squaredLength() >= 1.0f || too_close(sector_positions, pos, 0.01))
             pos = Point(std::clamp(dist(gen), -1.0, 1.0), std::clamp(dist(gen), -1.0, 1.0));
         const std::map<unsigned int, std::shared_ptr<SectorObject>> sector_objects = GenerateSectorObjects(i);
-        galaxy.sectors.insert({i, std::shared_ptr<Sector>(new Sector{i, pos, {}, sector_objects, {}, {}})});
+        galaxy.sectors.insert({i, std::make_shared<Sector>(i, pos, sector_objects)});
         sector_positions.push_back(pos);
     }
     for (auto &[id1, s1] : galaxy.sectors)

@@ -28,6 +28,11 @@ void msg_queue::reset()
     actions.buildRequests.clear();
     actions.moveFleetRequests.clear();
     actions.technologyRequest = Technology::TechnologyType::Empty;
+    actions.fleetActionRequests.clear();
+    actions.shipDesignRequests.clear();
+    actions.createShipRequests.clear();
+    actions.fleetInfoRequests.clear();
+    actions.joinFleetsRequests.clear();
 }
 
 void msg_queue::build_ship(const int design_id, const int planet_id)
@@ -39,4 +44,50 @@ void msg_queue::build_ship(const int design_id, const int planet_id)
 void msg_queue::build_design(std::shared_ptr<ShipDesign>& design, const bool _delete)
 {
     messageTypes::MsgShipDesign request(design, _delete);
+    actions.shipDesignRequests.push_back(request);
+}
+
+void msg_queue::request_fleet_jump(unsigned int fleet_id)
+{
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::WarpLoading);
+}
+
+void msg_queue::request_fleet_build(unsigned int fleet_id)
+{
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::BuildAsteroidMine);
+}
+
+void msg_queue::request_fleet_colonize(unsigned int fleet_id)
+{
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::Colonize);
+}
+
+void msg_queue::request_fleet_civil_on(unsigned int fleet_id)
+{
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::KidnapCivilians);
+}
+
+void msg_queue::request_fleet_civil_off(unsigned int fleet_id)
+{
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::KickOutCivilians);
+}
+
+void msg_queue::request_fleet_soldiers_on(unsigned int fleet_id)
+{
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::BorrowSoldiers);
+}
+
+void msg_queue::request_fleet_soldiers_off(unsigned int fleet_id)
+{
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::DisembarkSoldiers);
+}
+
+void msg_queue::request_fleet_invade(unsigned int fleet_id)
+{
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::Invade);
+}
+
+void msg_queue::request_fleet_cancel(unsigned int fleet_id)
+{
+    actions.fleetActionRequests.emplace_back(fleet_id, Fleet::Action::None);
 }

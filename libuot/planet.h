@@ -31,23 +31,37 @@ struct PlanetaryFeatures
 // all features
 const std::map<PlanetaryFeatures::PlanetaryFeatureType, PlanetaryFeatures> PlanetaryFeaturesTypes{
     {PlanetaryFeatures::PlanetaryFeatureType::TemperateClimate,
-     {"Temperate climate", "This planet has Earth-like climate, good plants", {{Building::BuildingType::Farms, 6}}}},
+     {"Temperate climate",
+      "This planet has Earth-like climate, good plants",
+      {{Building::BuildingType::Farms, 6}, {Building::BuildingType::AdvancedFarms, 6}}}},
     {PlanetaryFeatures::PlanetaryFeatureType::HotClimate,
      {"Hot climate",
       "This planet is very hot. Plants can only be grown near the poles",
-      {{Building::BuildingType::Farms, 2}}}},
+      {{Building::BuildingType::Farms, 2}, {Building::BuildingType::AdvancedFarms, 2}}}},
     {PlanetaryFeatures::PlanetaryFeatureType::ColdClimate,
      {"Cold climate",
       "This planet is very cold. Plants can only be grown near the equator",
-      {{Building::BuildingType::Farms, 1}}}},
+      {{Building::BuildingType::Farms, 1}, {Building::BuildingType::AdvancedFarms, 1}}}},
     {PlanetaryFeatures::PlanetaryFeatureType::MetalsDeposit,
-     {"Metals deposit", "", {{Building::BuildingType::MetalsMine, 1}}}},
+     {"Metals deposit",
+      "",
+      {{Building::BuildingType::MetalsMine, 1},
+       {Building::BuildingType::AdvancedMetalsMine, 1},
+       {Building::BuildingType::GrandMetalsMine, 1}}}},
     {PlanetaryFeatures::PlanetaryFeatureType::RareMetalsDeposit,
-     {"Rare metals deposit", "", {{Building::BuildingType::MetalsMine, 1}}}},
+     {"Rare metals deposit",
+      "",
+      {{Building::BuildingType::RareMetalsMine, 1},
+       {Building::BuildingType::AdvancedRareMetalsMine, 1},
+       {Building::BuildingType::GrandRareMetalsMine, 1}}}},
     {PlanetaryFeatures::PlanetaryFeatureType::CrystalsDeposit,
-     {"Crystals deposit", "", {{Building::BuildingType::CrystalsMine, 1}}}},
+     {"Crystals deposit",
+      "",
+      {{Building::BuildingType::CrystalsMine, 1},
+       {Building::BuildingType::AdvancedCrystalsMine, 1},
+       {Building::BuildingType::GrandCrystalsMine, 1}}}},
     {PlanetaryFeatures::PlanetaryFeatureType::FertileLands,
-     {"Fertile lands", "", {{Building::BuildingType::Farms, 1}}}},
+     {"Fertile lands", "", {{Building::BuildingType::Farms, 1}, {Building::BuildingType::AdvancedFarms, 1}}}},
     {PlanetaryFeatures::PlanetaryFeatureType::AncientRuins,
      {"Ancient ruins",
       "Remains of ancient civilization can be found on this planet",
@@ -73,6 +87,7 @@ struct Planet : SectorObject
     std::map<PlanetaryFeatures::PlanetaryFeatureType, int> planetary_features;
     std::map<Building::BuildingType, int> possible_buildings;
     std::shared_ptr<Colony> colony;
+    bool is_being_colonized = false;
     static constexpr float colony_work_cost = 500.0f;
     static constexpr float colony_metal_cost = 500.0f;
 
@@ -154,6 +169,7 @@ struct Colony
 
     std::map<Building::BuildingType, int> GetAvailableBuildings();
 
+    Colony() = default;
     Colony(const unsigned int id, const std::shared_ptr<Planet> planet_);
 
     // fields below are server-only
