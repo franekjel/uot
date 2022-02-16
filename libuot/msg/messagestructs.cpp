@@ -104,6 +104,8 @@ messageTypes::MsgSector::MsgSector(const std::shared_ptr<Sector>& sector)
         if (!!planet)
             planets.push_back(MsgPlanet(planet));
     }
+    for (auto& warp_zone : sector->warp_zones)
+        warp_zones.push_back(MsgWarpZone(warp_zone));
 }
 
 messageTypes::MsgGalaxy::MsgGalaxy() { sectors = {}; }
@@ -333,4 +335,22 @@ messageTypes::MsgDetailedFleetInfo::MsgDetailedFleetInfo(std::shared_ptr<Fleet> 
     {
         ships.push_back(messageTypes::MsgDetailedShipInfo(ship));
     }
+}
+
+messageTypes::MsgWarpZone::MsgWarpZone() {}
+
+messageTypes::MsgWarpZone::MsgWarpZone(std::shared_ptr<WarpZone> warpZone)
+    : id(warpZone->id), position(warpZone->position), sector_id(warpZone->locationSector->sector_id)
+{
+    if (warpZone->IsActive())
+        connected_warp_zone_id = warpZone->connectedWarpZone->id;
+    else
+        connected_warp_zone_id = 0;
+}
+
+messageTypes::MsgWarpZoneUpdates::MsgWarpZoneUpdates() {}
+
+messageTypes::MsgWarpZoneUpdates::MsgWarpZoneUpdates(int sector_id_, Point position_, int days_remaining_)
+    : sector_id(sector_id_), position(position_), days_remaining(days_remaining_)
+{
 }

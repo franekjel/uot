@@ -81,6 +81,17 @@ struct MsgNeighbor
     MsgNeighbor(const std::shared_ptr<Sector>& sector);
 };
 
+struct MsgWarpZone
+{
+    unsigned int id;
+    Point position;
+    unsigned int sector_id;
+    unsigned int connected_warp_zone_id;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgWarpZone, id, position, sector_id, connected_warp_zone_id)
+    MsgWarpZone();
+    MsgWarpZone(std::shared_ptr<WarpZone> warpZone);
+};
+
 struct MsgSector
 {
     int id;
@@ -89,7 +100,8 @@ struct MsgSector
     std::vector<MsgStar> stars;
     std::vector<MsgInhabitable> inhabitables;
     std::vector<MsgPlanet> planets;
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgSector, id, position, neighbors, stars, inhabitables, planets)
+    std::vector<MsgWarpZone> warp_zones;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgSector, id, position, neighbors, stars, inhabitables, planets, warp_zones)
     MsgSector();
     MsgSector(const std::shared_ptr<Sector>& sector);
 };
@@ -216,6 +228,16 @@ struct MsgBuildingsUpdates
                         int days_remaining_);
 };
 
+struct MsgWarpZoneUpdates
+{
+    unsigned int sector_id;
+    Point position;
+    int days_remaining;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgWarpZoneUpdates, sector_id, position, days_remaining)
+    MsgWarpZoneUpdates();
+    MsgWarpZoneUpdates(int sector_id_, Point position_, int days_remaining_);
+};
+
 struct MsgFleet
 {
     unsigned int id;
@@ -277,7 +299,9 @@ struct MsgWatchedSectorUpdate
     std::vector<MsgNewColony> new_colonies;
     std::vector<MsgNewBase> new_bases;
     std::vector<MsgFleetParameters> fleets_in_fight;
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgWatchedSectorUpdate, sector_id, fleets, new_colonies, new_bases, fleets_in_fight)
+    std::vector<MsgWarpZone> warp_zones;  // new or just connected
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MsgWatchedSectorUpdate, sector_id, fleets, new_colonies, new_bases, fleets_in_fight,
+                                   warp_zones)
     MsgWatchedSectorUpdate();
     MsgWatchedSectorUpdate(int sector_id_);
 };

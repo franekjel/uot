@@ -93,6 +93,7 @@ struct NewTurnPayload : BasePayload  // New turn
     std::map<int, float> updated_soldiers;       /*colony_id, soldiers*/
     std::vector<MsgTechnologyUpdate> technology_updates;
     std::vector<MsgBuildingsUpdates> buildings_updates;
+    std::vector<MsgWarpZoneUpdates> warp_zones_updates;
     std::vector<MsgWatchedSectorUpdate> watched_sectors_updates;
     std::vector<MsgSector> new_sectors;
     std::vector<MsgFleetsJoin> joined_fleets;
@@ -107,10 +108,10 @@ struct NewTurnPayload : BasePayload  // New turn
     std::vector<MsgDetailedFleetInfo> fleet_info_response;
     MessageType GetType() override { return MessageType::NewTurn; }
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(NewTurnPayload, you_lost, you_won, updated_resources, updated_populations,
-                                   updated_soldiers, technology_updates, buildings_updates, watched_sectors_updates,
-                                   new_sectors, joined_fleets, jumped_fleets, ship_designs, ships_updates, new_ships,
-                                   changed_fleet_populations, destroyed_ships, lost_objects, invaded_colonies,
-                                   fleet_info_response)
+                                   updated_soldiers, technology_updates, buildings_updates, warp_zones_updates,
+                                   watched_sectors_updates, new_sectors, joined_fleets, jumped_fleets, ship_designs,
+                                   ships_updates, new_ships, changed_fleet_populations, destroyed_ships, lost_objects,
+                                   invaded_colonies, fleet_info_response)
     std::string Serialize() override
     {
         nlohmann::json jsonPayload = (*this);

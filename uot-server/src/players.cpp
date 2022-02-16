@@ -143,6 +143,9 @@ bool PlayersList::HandlePlayerRequests(std::string player_net_name,
             case Fleet::Action::WarpLoading:
                 player->HandleWarpLoadingFleetRequest(fleet_action_request.fleet_id);
                 break;
+            case Fleet::Action::CreateWarpZone:
+                //TODO
+                break;
             case Fleet::Action::None:
                 break;
 

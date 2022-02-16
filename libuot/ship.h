@@ -170,6 +170,7 @@ struct Fleet
         KidnapCivilians,
         DisembarkSoldiers,
         BorrowSoldiers,
+        CreateWarpZone,
         CancelAction
     } current_action;
 
