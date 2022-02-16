@@ -249,11 +249,12 @@ void Player::HandleWarpLoadingFleetRequest(unsigned int fleet_id)
 
     auto &this_sector = current_fleet->location_sector;
     bool is_near_warp_point = false;
-    for (const auto &neigh : this_sector->neighbors)
+    for (const auto &warp_zone : this_sector->warp_zones)
     {
-        is_near_warp_point |=
-            ((neigh->position - this_sector->position).normalized() - current_fleet->position).squaredLength() <=
-            Fleet::kNearValue;
+        if (warp_zone->IsActive())
+        {
+            is_near_warp_point |= (warp_zone->position - current_fleet->position).squaredLength() <= Fleet::kNearValue;
+        }
     }
 
     if (!is_near_warp_point)

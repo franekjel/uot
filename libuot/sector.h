@@ -97,6 +97,19 @@ const std ::map<InhabitableObject::ObjectType, std::pair<std::string, std::strin
 
 };
 
+struct WarpZone
+{
+    unsigned int id;
+    Point position;
+    std::shared_ptr<Sector> locationSector;
+    std::shared_ptr<WarpZone> connectedWarpZone;
+
+    WarpZone() = default;
+    WarpZone(unsigned int id_, Point position_);
+    bool IsActive();
+    static void CreateWarpZonesNeighbours(std::shared_ptr<Sector> s1, std::shared_ptr<Sector> s2);
+};
+
 struct Sector
 {
     /* Sector is circle with R=1.0 and star in centre
@@ -107,6 +120,7 @@ struct Sector
     std::set<std::shared_ptr<Sector>> neighbors;
     std::map<unsigned int, std::shared_ptr<SectorObject>> objects;
     std::map<unsigned int, std::shared_ptr<Fleet>> present_fleets;
+    std::vector<std::shared_ptr<WarpZone>> warp_zones;
 
     Sector() = default;
     Sector(const unsigned int sector_id, const Point &position,

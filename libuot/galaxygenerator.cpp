@@ -225,6 +225,7 @@ Galaxy GalaxyGenerator::Generate()
         {
             s1->neighbors.insert(dists[i].second);
             dists[i].second->neighbors.insert(s1);
+            WarpZone::CreateWarpZonesNeighbours(s1, dists[i].second);
         }
     }
 

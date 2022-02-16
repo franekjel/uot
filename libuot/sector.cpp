@@ -8,20 +8,24 @@ void Sector::JumpFleet(unsigned int fleet_id)
         return;
     float min_dist = FLT_MAX;
     std::shared_ptr<Sector> dest;
+    std::shared_ptr<WarpZone> zone;
     auto this_fleet = present_fleets[fleet_id];
-    for (const auto& neighbor : neighbors)
+    for (const auto& warp_zone : warp_zones)
     {
-        auto wersor_to_dest = (neighbor->position - position).normalized();
-        auto dist = (this_fleet->position - wersor_to_dest).squaredLength();
-        if (dist < min_dist)
+        if (warp_zone->IsActive())
         {
-            min_dist = dist;
-            dest = neighbor;
+            auto dist = (this_fleet->position - warp_zone->position).squaredLength();
+            if (dist < min_dist)
+            {
+                min_dist = dist;
+                dest = warp_zone->locationSector;
+                zone = warp_zone;
+            }
         }
     }
 
     this_fleet->JumpFleet();
-    this_fleet->position = (position - dest->position).normalized();
+    this_fleet->position = zone->connectedWarpZone->position;
     this_fleet->wanted_position = this_fleet->position;
 
     present_fleets.erase(present_fleets.find(fleet_id));
@@ -90,4 +94,23 @@ Sector::FleetParameters::FleetParameters(std::shared_ptr<Fleet> fleet)
         }
         average_energy = tot_energy / fleet->ships.size();
     }
+}
+
+WarpZone::WarpZone(unsigned int id_, Point position_) : id(id_), position(position_) {}
+
+bool WarpZone::IsActive() { return !!connectedWarpZone; }
+
+void WarpZone::CreateWarpZonesNeighbours(std::shared_ptr<Sector> s1, std::shared_ptr<Sector> s2)
+{
+    auto wz1 = std::make_shared<WarpZone>(id_source++, (s2->position - s1->position).normalized());
+    wz1->locationSector = s1;
+
+    auto wz2 = std::make_shared<WarpZone>(id_source++, (s1->position - s2->position).normalized());
+    wz2->locationSector = s2;
+
+    wz1->connectedWarpZone = wz2;
+    wz2->connectedWarpZone = wz1;
+
+    s1->warp_zones.push_back(wz1);
+    s2->warp_zones.push_back(wz2);
 }
