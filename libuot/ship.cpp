@@ -57,7 +57,8 @@ std::shared_ptr<Ship> Ship::ShipFromDesign(const int id, const std::shared_ptr<S
             ship->energy_regen += m.generating_energy * count;
             ship->human_capacity += m.human_capacity * count;
             ship->construction_points += m.contruction_speed * count;
-            if (m.weapon.has_value())
+            auto _w = m.weapon;
+            if (_w.has_value())
             {
                 Weapon w = m.weapon.value();
                 ship->ship_weapons[type] += w.attack_count * count;
@@ -200,6 +201,7 @@ void Fleet::UpdateFleet()
         }
         if (needed_energy <= 0.0f)
         {
+            ship.unique();
             ship->reload_modifier = -1.0f;
             continue;
         }

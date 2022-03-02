@@ -2,6 +2,7 @@
 
 #include <array>
 #include <map>
+#include <string_view>
 #include <string>
 
 enum class Resource

@@ -16,7 +16,8 @@
 void rendering::render_sector_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov)
 {
     auto& gui = context.gui;
-    if (gui->current_fleet.has_value() &&
+    auto c_flt = gui->current_fleet;
+    if (c_flt.has_value() &&
         input_utilities::check_view_area_collision<size_settings::fleet_info_area>(x, y))
     {
         gui->current_fleet_info_offset += 4 * ymov;
@@ -47,7 +48,8 @@ void rendering::render_sector_view::_draw(client_context& context)
 
     SDL_RenderCopyEx(r.get(), gr->sector_boundary.t.get(), &s, &d, 0.0, NULL, SDL_FLIP_NONE);
 
-    if (gui->current_sector.has_value())
+    auto c_sct = gui->current_sector;
+    if (c_sct.has_value())
     {
         // sector render here
         const auto& curr = gui->current_sector.value();
@@ -73,14 +75,13 @@ void rendering::render_sector_view::_draw(client_context& context)
     sdl_utilities::set_render_viewport<size_settings::context_area>(r.get());
     sdl_utilities::paint_frame(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, SDL_Color{0x00, 0x00, 0x00, 0xFF});
 
-    if (gui->current_object.has_value())
+    auto c_obj = gui->current_object;
+    if (c_obj.has_value())
     {
         render_selected_object_info(context);
     }
-    else if (gui->current_fleet.has_value())
-    {
-        render_selected_fleet_info(context);
-    }
+    // function checks whether a fleet is selected inside
+    render_selected_fleet_info(context);
 }
 
 void rendering::render_object_selection(const client_context& context)
@@ -89,7 +90,8 @@ void rendering::render_object_selection(const client_context& context)
     const auto& gr = context.gr;
     const auto& gui = context.gui;
 
-    if (!gui->current_object.has_value())
+    auto c_obj = gui->current_object;
+    if (!c_obj.has_value())
     {
         return;
     }
@@ -296,7 +298,8 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
 
             if (iu::check_collision(x, y, planet_x - 0.5 * tex_size, planet_y - 0.5 * tex_size, tex_size, tex_size))
             {
-                if (current_object.has_value() && current_object.value()->position == sec_obj->position &&
+                auto c_obj = current_object;
+                if (c_obj.has_value() && current_object.value()->position == sec_obj->position &&
                     dynamic_cast<Planet*>(current_object.value().get()))
                 {
                     auto p = dynamic_cast<Planet*>(current_object.value().get());
@@ -332,9 +335,10 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
     else if (et == iu::uot_event_type::right_click_play)
     {
         auto& current_fleet = context.gui->current_fleet;
-        if (current_fleet.has_value())
+        auto c_flt = current_fleet;
+        if (c_flt.has_value())
         {
-            auto& f = current_fleet.value();
+            auto& f = c_flt.value();
 
             Point pos{(x - size_settings::play_area::width / 2.0f) / (size_settings::play_area::height / 2.0f),
                       (y - size_settings::play_area::height / 2.0f) / (size_settings::play_area::height / 2.0f)};
@@ -394,7 +398,8 @@ void rendering::render_fleet(const client_context& context, const std::shared_pt
     const Point vec = std::isnan(f->wanted_position.x) ? Point{0, 0} : f->wanted_position - f->position;
     Point v = f->position + f->movement_vec * (float(dt) / float(turn_time_ms));
 
-    if (context.gui->current_fleet.has_value() && f == context.gui->current_fleet.value())
+    auto c_flt = context.gui->current_fleet;
+    if (c_flt.has_value() && f == c_flt.value())
     {
         render_fleet_weapon_ranges(context, v, f);
         render_selection_graphics(context, v, 32);
@@ -440,7 +445,13 @@ void rendering::render_selected_fleet_info(client_context& context)
     const auto& gr = context.gr;
     const auto& gui = context.gui;
 
-    const auto& f = gui->current_fleet.value();
+    auto c_flt = gui->current_fleet;
+
+    if(!c_flt.has_value()){
+        return;
+    }
+
+    const auto& f = c_flt.value();
 
     sdl_utilities::render_text_center(r.get(), gr->main_font, "fleet " + std::to_string(f->id),
                                       size_settings::context_area::width / 2, fonts::main_font_size / 2 + 30,
