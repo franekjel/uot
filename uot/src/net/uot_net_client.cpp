@@ -569,8 +569,8 @@ void uot_net_client::parseJoinedFleets(std::shared_ptr<game_state>& state,
         if (context.gui->current_fleet.has_value() && context.gui->current_fleet.value()->id == f2->id)
             context.gui->current_fleet.reset();
         {
-                std::lock_guard pr_fleet(state->present_fleet_mutex);
-                f2->location_sector->present_fleets.erase(f2->id);
+            std::lock_guard pr_fleet(state->present_fleet_mutex);
+            f2->location_sector->present_fleets.erase(f2->id);
         }
         state->player->owned_fleets.erase(f2->id);
 

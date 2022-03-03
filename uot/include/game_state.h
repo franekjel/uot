@@ -3,9 +3,9 @@
 
 #include <array>
 #include <atomic>
+#include <mutex>
 #include <optional>
 #include <variant>
-#include <mutex>
 #include <vector>
 #include "../../libuot/sector.h"
 #include "sdl_utilities.h"
@@ -20,7 +20,6 @@ struct position
 
 struct game_state : public uncopiable
 {
-
    protected:
     game_state() {}
     friend singleton<game_state>;

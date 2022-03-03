@@ -17,8 +17,7 @@ void rendering::render_sector_view::_wheel_handler(client_context& context, int 
 {
     auto& gui = context.gui;
     auto current_fleet = gui->current_fleet;
-    if (current_fleet.has_value() &&
-        input_utilities::check_view_area_collision<size_settings::fleet_info_area>(x, y))
+    if (current_fleet.has_value() && input_utilities::check_view_area_collision<size_settings::fleet_info_area>(x, y))
     {
         gui->current_fleet_info_offset += 4 * ymov;
     }
@@ -110,7 +109,8 @@ void rendering::render_selected_object_info(const client_context& context)
     const auto& gui = context.gui;
 
     auto current_object = gui->current_object;
-    if(!current_object.has_value()) {
+    if (!current_object.has_value())
+    {
         return;
     }
 
@@ -451,7 +451,8 @@ void rendering::render_selected_fleet_info(client_context& context)
     const auto& gui = context.gui;
 
     auto current_fleet = gui->current_fleet;
-    if(!current_fleet.has_value()) {
+    if (!current_fleet.has_value())
+    {
         return;
     }
 
