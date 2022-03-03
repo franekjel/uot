@@ -468,11 +468,6 @@ void rendering::render_selected_fleet_info(client_context& context)
     fleet_info +=
         "shields: " + std::to_string(int(f->current_shields)) + "/" + std::to_string(int(f->max_shields)) + "\n";
     fleet_info += "avg energy: " + std::to_string(int(f->average_energy * 100.0f)) + "%\n";
-    fleet_info += "ships:\n";
-    for (const auto& [id, s] : f->ships)
-    {
-        fleet_info += " id" + std::to_string(id) + ": " + s->design->name + "\n";
-    }
 
     std::stringstream ss;
     ss << "civilians: " << std::fixed << std::setprecision(0) << f->civilians << "\n";
@@ -482,10 +477,18 @@ void rendering::render_selected_fleet_info(client_context& context)
 
     fleet_info += ss.str();
 
+    fleet_info += "ships:\n";
+    for (const auto& [id, s] : f->ships)
+    {
+        fleet_info += " id" + std::to_string(id) + ": " + s->design->name + " en:" + std::to_string(int(s->energy)) +
+                      "/" + std::to_string(int(s->max_energy)) + "\n    hp:" + std::to_string(int(s->hp)) + "/" +
+                      std::to_string(int(s->max_hp)) + " sh:" + std::to_string(int(s->shield)) + "/" +
+                      std::to_string(int(s->max_shield)) + "\n";
+    }
+
     sdl_utilities::set_render_viewport<size_settings::fleet_info_area>(r.get());
-    sdl_utilities::render_text_top_center(r.get(), gr->secondary_font, fleet_info,
-                                          size_settings::context_area::width / 2,
-                                          fonts::main_font_size / 2 + 30 + gui->current_fleet_info_offset,
+    sdl_utilities::render_text_top_center(r.get(), gr->infobox_font, fleet_info, size_settings::context_area::width / 2,
+                                          fonts::infobox_font_size / 2 + gui->current_fleet_info_offset,
                                           size_settings::context_area::width - 50, {0xFF, 0xFF, 0xFF, 0xFF});
 
     sdl_utilities::set_render_viewport<size_settings::context_area>(r.get());
