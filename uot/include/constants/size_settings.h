@@ -93,7 +93,7 @@ struct tech_area : area_properties<1180, 800, 30, 30>
 {
 };
 
-struct fleet_info_area : area_properties<350, 300, 1225, 150>
+struct fleet_info_area : area_properties<350, 300, 1225, 120>
 {
 };
 
