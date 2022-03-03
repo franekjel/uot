@@ -464,6 +464,7 @@ void rendering::render_selected_fleet_info(client_context& context)
 
     std::string fleet_info = "";
 
+    fleet_info += "Action: " + std::string(Fleet::kActionNames[f->current_action]) + "\n";
     fleet_info += "HP: " + std::to_string(int(f->current_hp)) + "/" + std::to_string(int(f->max_hp)) + "\n";
     fleet_info +=
         "shields: " + std::to_string(int(f->current_shields)) + "/" + std::to_string(int(f->max_shields)) + "\n";

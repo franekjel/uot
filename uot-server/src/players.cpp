@@ -79,6 +79,19 @@ bool PlayersList::AddPlayer(std::string player_net_name, std::shared_ptr<Galaxy>
     players_net_names[id] = player_net_name;
     players_net_names_rev[player_net_name] = id;
 
+    std::shared_ptr<Sector> starting_sector = wholeGalaxy->sectors.at(startingSectorId);
+    auto& c = startingPlanet->colony;
+    c->population = 50.0f;
+    c->buildings = {{Building::Farms, 1},
+                    {Building::PowerPlants, 1},
+                    {Building::SmallOrbitalShipyard, 1},
+                    {Building::MetalsMine, 1}};
+    new_player->ship_designs[1] = std::shared_ptr<ShipDesign>(
+        new ShipDesign(1, "Small builder", ShipHull::SmallShipHull, {{ModuleType::BasicContructionModule, 1}},
+                       {{ModuleType::SmallReactor, 1}}));
+    new_player->ship_designs[2] = std::shared_ptr<ShipDesign>(new ShipDesign(
+        2, "Small colonizer", ShipHull::SmallShipHull, {}, {{ModuleType::SmallReactor, 1}, {ModuleType::Quarters, 1}}));
+
     return true;
 }
 
@@ -311,15 +324,6 @@ void PlayersList::CountWeeklyNumbersPlayer(std::shared_ptr<Player> player)
     player_resources_change[Resource::Technology] = true;
     player_resources[Resource::Food] = 0.0f;
     player_resources_change[Resource::Food] = true;
-
-    // This is a temporary debuggingsolution please remove ASAP
-    for (int i = (int)Resource::Metals; i <= (int)Resource::Last; i++)
-    {
-        if (player_resources.count((Resource)i) == 0)
-            player_resources[(Resource)i] = 0.0f;
-        player_resources[(Resource)i] += 1.0f;
-        player_resources_change[(Resource)i] = true;
-    }
 
     // calculate expenses and gains of player colonies
     for (auto& colony : player_colonies)

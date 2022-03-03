@@ -3,7 +3,7 @@
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 
-#define UOT_DEBUG true
+#define UOT_DEBUG false
 
 struct Point
 {
@@ -70,5 +70,5 @@ inline Point operator*(Point lhs, const float rhs)
 
 inline Point Point::normalized() const { return (*this) * (1 / sqrt(squaredLength())); }
 
-static constexpr int WEEK_LENGTH = 2;
+static constexpr int WEEK_LENGTH = 10;
 static constexpr int turn_time_ms = 300;
