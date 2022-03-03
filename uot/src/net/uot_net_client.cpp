@@ -525,6 +525,8 @@ void uot_net_client::parseFleetInfo(std::shared_ptr<Fleet> f, const messageTypes
     f->civilians = i.civilians;
     f->soldiers = i.soldiers;
     f->current_action = i.current_action;
+    if (f->current_action != f->Fleet::Action::None)
+        f->wanted_position = f->position;
 
     // We can assume that we don't need to remove or add ships becaouse we handle joining fleets, new ships construction
     // and fights losses
@@ -535,7 +537,7 @@ void uot_net_client::parseFleetInfo(std::shared_ptr<Fleet> f, const messageTypes
         s->energy = s_msg.energy;
         s->shield = s_msg.shield;
         s->max_hp = s_msg.max_hp;
-        s->max_energy = s_msg.energy;
+        s->max_energy = s_msg.max_energy;
         s->max_shield = s_msg.max_shield;
         s->soldiers = s_msg.soldiers;
         s->civilians = s_msg.civilians;

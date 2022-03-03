@@ -63,7 +63,7 @@ std::shared_ptr<SectorObject> GalaxyGenerator::GenerateInhabitable(const Point &
         return std::shared_ptr<SectorObject>(
             new InhabitableObject(SectorObject(id_source++, pos, float(size_distribution(gen)), sector_id), {}, type));
     }
-    std::discrete_distribution<> dist({2.0, 1.0, 1.0, 0.2, 0.1, 0.1});
+    std::discrete_distribution<> dist({0.2, 1.0, 1.0, 0.2, 0.1, 0.1});
     int resource_count = dist(gen) + 1;
     switch (dist(gen))
     {
@@ -115,12 +115,12 @@ std::shared_ptr<SectorObject> GalaxyGenerator::GenerateHabitablePlanet(const Poi
             features.insert({type, count});
     };
 
-    add_features(PlanetaryFeatures::MetalsDeposit, {0, 1, 1, 1, 1});
-    add_features(PlanetaryFeatures::RareMetalsDeposit, {20, 10, 5, 5});
-    add_features(PlanetaryFeatures::CrystalsDeposit, {20, 10, 5, 5});
-    add_features(PlanetaryFeatures::FertileLands, {20, 10, 5, 5});
-    add_features(PlanetaryFeatures::AncientRuins, {80, 5, 5, 5, 5});
-    add_features(PlanetaryFeatures::AncientNanobotsDeposit, {80, 5, 5, 5, 5});
+    add_features(PlanetaryFeatures::MetalsDeposit, {0, 0, 1, 1, 1, 1});
+    add_features(PlanetaryFeatures::RareMetalsDeposit, {10, 10, 5, 5});
+    add_features(PlanetaryFeatures::CrystalsDeposit, {10, 10, 5, 5});
+    add_features(PlanetaryFeatures::FertileLands, {10, 10, 5, 5, 5, 5});
+    add_features(PlanetaryFeatures::AncientRuins, {80, 5, 5, 5, 1, 1});
+    add_features(PlanetaryFeatures::AncientNanobotsDeposit, {80, 5, 5, 1, 1});
 
     return std::make_shared<Planet>(SectorObject(id_source++, p, float(size_distribution(gen)), sector_id), climate,
                                     features);
@@ -155,7 +155,7 @@ std::map<unsigned int, std::shared_ptr<SectorObject>> GalaxyGenerator::GenerateS
             case 0:
             {
                 std::shared_ptr<SectorObject> o =
-                    GenerateInhabitable(pos, InhabitableObject::ObjectType::Asteroid, {40, 20, 8, 1, 1, 1}, sector_id);
+                    GenerateInhabitable(pos, InhabitableObject::ObjectType::Asteroid, {8, 20, 8, 1, 1, 1}, sector_id);
                 sector_objects.insert({o->id, o});
                 break;
             }
@@ -169,7 +169,7 @@ std::map<unsigned int, std::shared_ptr<SectorObject>> GalaxyGenerator::GenerateS
                 else
                 {
                     std::shared_ptr<SectorObject> o = GenerateInhabitable(
-                        pos, InhabitableObject::ObjectType::InhabitablePlanet, {40, 20, 8, 1, 1, 1}, sector_id);
+                        pos, InhabitableObject::ObjectType::InhabitablePlanet, {8, 20, 8, 1, 1, 1}, sector_id);
                     sector_objects.insert({o->id, o});
                 }
 
@@ -178,7 +178,7 @@ std::map<unsigned int, std::shared_ptr<SectorObject>> GalaxyGenerator::GenerateS
             case 2:
             {
                 std::shared_ptr<SectorObject> o =
-                    GenerateInhabitable(pos, InhabitableObject::ObjectType::GasGiant, {20, 0, 4, 0, 0, 1}, sector_id);
+                    GenerateInhabitable(pos, InhabitableObject::ObjectType::GasGiant, {10, 0, 4, 0, 0, 1}, sector_id);
                 sector_objects.insert({o->id, o});
                 break;
             }

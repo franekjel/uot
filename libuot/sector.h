@@ -61,23 +61,23 @@ struct InhabitableObject : SectorObject
         if (resource_deposit.empty())
             return {0, {}};
         std::map<Resource, float> cost;
-        float work = 100.0f;
+        float work = 40.0f;
         cost[Resource::Metals] = 100;
         Resource deposit_type = resource_deposit.begin()->first;
         switch (deposit_type)
         {
             case Resource::RareMetals:
                 cost[Resource::Metals] += 100;
-                work += 200.0f;
+                work += 50.0f;
                 break;
             case Resource::Crystals:
                 cost[Resource::Metals] += 100;
-                work += 200.0f;
+                work += 50.0f;
                 break;
             case Resource::Polymers:
                 cost[Resource::Crystals] = 40;
                 cost[Resource::RareMetals] = 40;
-                work += 300.0f;
+                work += 60.0f;
                 break;
             default:
                 break;
