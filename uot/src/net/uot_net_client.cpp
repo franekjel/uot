@@ -1,6 +1,7 @@
 #include "uot_net_client.h"
 #include <array>
 #include <iostream>
+#include <mutex>
 
 #include "game_state.h"
 #include "msg/messagetypes.h"
@@ -362,6 +363,7 @@ void uot_net_client::parseNewShipsUpdate(std::shared_ptr<game_state>& state,
             const auto& p = s.fleet_parameters;
             fleet = std::make_shared<Fleet>(p.id, sector, p.position, state->player->id);
             state->player->owned_fleets.insert({fleet->id, fleet});
+            std::lock_guard pr_fleet(state->present_fleet_mutex);
             sector->present_fleets.insert({fleet->id, fleet});
         }
         else
@@ -436,7 +438,9 @@ void uot_net_client::parseWatchedSectorUpdate(
                 enemy_fleet->wanted_position = fu.predicted_position;
                 enemy_fleet->movement_vec = fu.predicted_position - fu.position;
             }
-            state->enemies_fleet_in_current_sector = enemies_fleet_in_current_sector;
+            std::unique_lock e_fleet(state->enemy_fleet_mutex);
+            state->enemies_fleet_in_current_sector = std::move(enemies_fleet_in_current_sector);
+            e_fleet.unlock();
             updateAnimations(state, u.fleets_in_fight);
         }
 
@@ -497,6 +501,7 @@ void uot_net_client::parseDestroyedShips(std::shared_ptr<game_state>& state,
                 context.gui->current_fleet.reset();
 
             state->player->owned_fleets.erase(fleet->id);
+            std::lock_guard pr_fleet(state->present_fleet_mutex);
             fleet->location_sector->present_fleets.erase(fleet->id);
         }
     }
@@ -563,7 +568,10 @@ void uot_net_client::parseJoinedFleets(std::shared_ptr<game_state>& state,
         updateFleet(f1, j.fleet_parameters);
         if (context.gui->current_fleet.has_value() && context.gui->current_fleet.value()->id == f2->id)
             context.gui->current_fleet.reset();
-        f2->location_sector->present_fleets.erase(f2->id);
+        {
+            std::lock_guard pr_fleet(state->present_fleet_mutex);
+            f2->location_sector->present_fleets.erase(f2->id);
+        }
         state->player->owned_fleets.erase(f2->id);
 
         f1->fleet_weapons.clear();
@@ -590,8 +598,10 @@ void uot_net_client::parseJumpedFleets(std::shared_ptr<game_state>& state,
         auto& s2 = state->player->known_galaxy->sectors.at(fj.sector_id_to);
         auto& f = state->player->owned_fleets.at(fj.fleet_id);
 
+        std::unique_lock pr_fleet(state->present_fleet_mutex);
         s2->present_fleets.insert({fj.fleet_id, f});
         s1->present_fleets.erase(fj.fleet_id);
+        pr_fleet.unlock();
         f->location_sector = s2;
         f->position = fj.position;
         f->wanted_position = f->position;
