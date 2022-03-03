@@ -11,14 +11,9 @@ unsigned int PlayersList::GetStartingSectorId(std::shared_ptr<Galaxy> wholeGalax
         for (const auto& [id, sector_object] : sector->objects)
         {
             std::shared_ptr<Planet> is_planet = std::dynamic_pointer_cast<Planet>(sector_object);
-            if (!!is_planet)
+            if (is_planet && !(is_planet->colony))
             {
                 num_of_planets++;
-                if (!!(is_planet->colony))
-                {
-                    num_of_planets = -1;
-                    break;
-                }
             }
         }
         if (num_of_planets > 0)

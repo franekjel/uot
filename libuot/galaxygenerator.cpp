@@ -191,6 +191,8 @@ GalaxyGenerator::GalaxyGenerator(int size, float habitable_planet_chance_multipl
     : size(size), habitable_planet_chance_multipler(habitable_planet_chance_multipler)
 {
     gen = std::mt19937(dev());
+    std::seed_seq seed{23, 423, 543};
+    gen.seed(seed);
 }
 
 Galaxy GalaxyGenerator::Generate()
@@ -227,6 +229,21 @@ Galaxy GalaxyGenerator::Generate()
             dists[i].second->neighbors.insert(s1);
         }
     }
+    std::map<unsigned int, std::shared_ptr<SectorObject>> new_objects;
+    for (auto &o : galaxy.sectors.begin()->second->objects)
+    {
+        auto io = std::dynamic_pointer_cast<InhabitableObject>(o.second);
+        if (io)
+        {
+            auto new_planet = GenerateHabitablePlanet(o.second->position, galaxy.sectors.begin()->second->sector_id);
+            new_objects.insert({new_planet->id, new_planet});
+        }
+        else
+        {
+            new_objects.insert(o);
+        }
+    }
+    galaxy.sectors.begin()->second->objects = new_objects;
 
     return galaxy;
 }
