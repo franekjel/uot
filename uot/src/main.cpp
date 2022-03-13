@@ -47,10 +47,10 @@ int main(int argc, char* argv[])
         su::loadMedia(context);
 
         // Play the music
-        if (Mix_PlayMusic(context.gr->ambient.get(), -1) == -1)
-        {
-            throw std::runtime_error("failed to play the music track");
-        }
+        //if (Mix_PlayMusic(context.gr->ambient.get(), -1) == -1)
+        //{
+        //    throw std::runtime_error("failed to play the music track");
+        //}
 
         volatile bool quit = false;
         SDL_Event e;

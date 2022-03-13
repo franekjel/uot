@@ -650,6 +650,7 @@ void uot_net_client::parseInvadedColonies(std::shared_ptr<game_state>& state,
 void uot_net_client::updateAnimations(std::shared_ptr<game_state>& state,
                                       const std::vector<messageTypes::MsgFleetParameters>& fleets_in_fight)
 {
+    static auto last_time = SDL_GetTicks();
     auto& anims = context.gui->fight_animations;
     printf("\n\nTHERE IS %d ANIMATIONS!!!\n\n", anims.size());
     for (auto it = anims.begin(), it_next = it; it != anims.end(); it = it_next)
@@ -661,6 +662,13 @@ void uot_net_client::updateAnimations(std::shared_ptr<game_state>& state,
 
     for (const auto& in_fight : fleets_in_fight)
     {
+        if(SDL_GetTicks() - last_time > 600) {
+            if (Mix_PlayChannel(-1, context.gr->shot.get(), 0) == -1)
+            {
+                throw std::runtime_error("couldnt plat the click sound");
+            }
+            last_time = SDL_GetTicks();
+        }
         auto& fleet = state->player->owned_fleets.at(in_fight.id);
         updateFleet(fleet, in_fight);
 

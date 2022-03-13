@@ -16,14 +16,9 @@
 void rendering::render_sector_view::_wheel_handler(client_context& context, int x, int y, int xmov, int ymov)
 {
     auto& gui = context.gui;
-<<<<<<< HEAD
     auto c_flt = gui->current_fleet;
     if (c_flt.has_value() &&
         input_utilities::check_view_area_collision<size_settings::fleet_info_area>(x, y))
-=======
-    auto current_fleet = gui->current_fleet;
-    if (current_fleet.has_value() && input_utilities::check_view_area_collision<size_settings::fleet_info_area>(x, y))
->>>>>>> b72a8dc9b2a54ddebbcfe24f64c0dc7330c74b42
     {
         gui->current_fleet_info_offset += 4 * ymov;
     }
@@ -53,13 +48,8 @@ void rendering::render_sector_view::_draw(client_context& context)
 
     SDL_RenderCopyEx(r.get(), gr->sector_boundary.t.get(), &s, &d, 0.0, NULL, SDL_FLIP_NONE);
 
-<<<<<<< HEAD
-    auto c_sct = gui->current_sector;
-    if (c_sct.has_value())
-=======
     auto current_sector = gui->current_sector;
     if (current_sector.has_value())
->>>>>>> b72a8dc9b2a54ddebbcfe24f64c0dc7330c74b42
     {
         // sector render here
         const auto& curr = current_sector.value();
@@ -85,18 +75,12 @@ void rendering::render_sector_view::_draw(client_context& context)
     sdl_utilities::set_render_viewport<size_settings::context_area>(r.get());
     sdl_utilities::paint_frame(r.get(), SDL_Color{0xFF, 0xFF, 0xFF, 0xFF}, SDL_Color{0x00, 0x00, 0x00, 0xFF});
 
-<<<<<<< HEAD
     auto c_obj = gui->current_object;
     if (c_obj.has_value())
     {
         render_selected_object_info(context);
     }
     // function checks whether a fleet is selected inside
-=======
-    // check inside
-    render_selected_object_info(context);
-    // check is inside
->>>>>>> b72a8dc9b2a54ddebbcfe24f64c0dc7330c74b42
     render_selected_fleet_info(context);
 }
 
@@ -106,13 +90,8 @@ void rendering::render_object_selection(const client_context& context)
     const auto& gr = context.gr;
     const auto& gui = context.gui;
 
-<<<<<<< HEAD
-    auto c_obj = gui->current_object;
-    if (!c_obj.has_value())
-=======
     auto current_object = gui->current_object;
     if (!current_object.has_value())
->>>>>>> b72a8dc9b2a54ddebbcfe24f64c0dc7330c74b42
     {
         return;
     }
@@ -252,21 +231,12 @@ void rendering::render_sector_sector_helper(client_context& context, const std::
     }
     pr_fleet.unlock();
 
-<<<<<<< HEAD
-    const auto& gs = context.getGameState().value;
-    context.fleet_mutex.lock();
-=======
     std::unique_lock en_fleet(gs->enemy_fleet_mutex);
->>>>>>> b72a8dc9b2a54ddebbcfe24f64c0dc7330c74b42
     for (auto& [id, f] : gs->enemies_fleet_in_current_sector)
     {
         render_fleet(context, f);
     }
-<<<<<<< HEAD
-    context.fleet_mutex.unlock();
-=======
     en_fleet.unlock();
->>>>>>> b72a8dc9b2a54ddebbcfe24f64c0dc7330c74b42
 
     render_animations(context);
 }
@@ -338,15 +308,9 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
 
             if (iu::check_collision(x, y, planet_x - 0.5 * tex_size, planet_y - 0.5 * tex_size, tex_size, tex_size))
             {
-<<<<<<< HEAD
                 auto c_obj = current_object;
                 if (c_obj.has_value() && current_object.value()->position == sec_obj->position &&
                     dynamic_cast<Planet*>(current_object.value().get()))
-=======
-                auto c_obj = gui->current_object;
-                if (c_obj.has_value() && c_obj.value()->position == sec_obj->position &&
-                    dynamic_cast<Planet*>(c_obj.value().get()))
->>>>>>> b72a8dc9b2a54ddebbcfe24f64c0dc7330c74b42
                 {
                     auto p = dynamic_cast<Planet*>(c_obj.value().get());
                     if (p->colony && p->colony->owner->id == context.player_id)
@@ -380,12 +344,8 @@ void rendering::render_sector_view::_mouse_handler(client_context& context, Uint
     }
     else if (et == iu::uot_event_type::right_click_play)
     {
-<<<<<<< HEAD
         auto& current_fleet = context.gui->current_fleet;
         auto c_flt = current_fleet;
-=======
-        auto c_flt = gui->current_fleet;
->>>>>>> b72a8dc9b2a54ddebbcfe24f64c0dc7330c74b42
         if (c_flt.has_value())
         {
             auto& f = c_flt.value();
@@ -448,13 +408,8 @@ void rendering::render_fleet(const client_context& context, const std::shared_pt
     const Point vec = std::isnan(f->wanted_position.x) ? Point{0, 0} : f->wanted_position - f->position;
     Point v = f->position + f->movement_vec * (float(dt) / float(turn_time_ms));
 
-<<<<<<< HEAD
-    auto c_flt = context.gui->current_fleet;
-    if (c_flt.has_value() && f == c_flt.value())
-=======
     auto current_fleet = context.gui->current_fleet;
     if (current_fleet.has_value() && f == current_fleet.value())
->>>>>>> b72a8dc9b2a54ddebbcfe24f64c0dc7330c74b42
     {
         render_fleet_weapon_ranges(context, v, f);
         render_selection_graphics(context, v, 32);

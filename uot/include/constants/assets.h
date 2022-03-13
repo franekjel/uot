@@ -269,6 +269,8 @@ constexpr std::string_view click_filename = "assets/audio/click.wav";
 constexpr std::string_view open_planet_filename = "assets/audio/open_planet.wav";
 constexpr std::string_view open_ship_filename = "assets/audio/open_ship.wav";
 constexpr std::string_view scanning_filename = "assets/audio/scanning.wav";
+constexpr std::string_view shot_filename = "assets/audio/shot.wav";
+constexpr std::string_view explosion_filename = "assets/audio/explosion.wav";
 
 }  // namespace audio_meta
 

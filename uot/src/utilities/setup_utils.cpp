@@ -182,5 +182,7 @@ void loadMedia(client_context& context)
     gr->open_planet = sdl_utilities::load_chunk(std::string(audio_meta::open_planet_filename));
     gr->open_ship = sdl_utilities::load_chunk(std::string(audio_meta::open_ship_filename));
     gr->scanning = sdl_utilities::load_chunk(std::string(audio_meta::scanning_filename));
+    gr->shot = sdl_utilities::load_chunk(std::string(audio_meta::shot_filename));
+    gr->explosion = sdl_utilities::load_chunk(std::string(audio_meta::explosion_filename));
 }
 }  // namespace setup_utils

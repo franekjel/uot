@@ -58,6 +58,8 @@ struct game_resources : public uncopiable
     std::shared_ptr<Mix_Chunk> open_planet;
     std::shared_ptr<Mix_Chunk> open_ship;
     std::shared_ptr<Mix_Chunk> scanning;
+    std::shared_ptr<Mix_Chunk> shot;
+    std::shared_ptr<Mix_Chunk> explosion;
 };
 
 #endif
