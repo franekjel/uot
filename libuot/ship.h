@@ -173,6 +173,17 @@ struct Fleet
         CancelAction
     } current_action;
 
+    static constexpr std::array<std::string_view, 10> kActionNames{"None",
+                                                                   "Loading warp",
+                                                                   "Building",
+                                                                   "Colonizing",
+                                                                   "Invading",
+                                                                   "Disembark civilians",
+                                                                   "Boarding civilians",
+                                                                   "Disembark soldiers",
+                                                                   "Boarding soldiers",
+                                                                   "Cancel"};
+
     Fleet() = default;
 
     Fleet(const unsigned int id, const std::shared_ptr<Sector>& location_sector, const Point& position,
